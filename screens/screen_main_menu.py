@@ -31,7 +31,7 @@ class MainMenuScreen(Screen):
             app.root.ids.screen_manager.add_widget(screen)
             btn = buttons.NavButton(
                 id='nav_btn_%d' % self.counter,
-                text='title %d: %s' % (self.counter, 'a' * self.counter),
+                text='title %d: %s' % (self.counter, 'a' * self.counter * 50),
                 screen='screen_%d' % self.counter,
             )
             app.root.ids.nav_buttons_layout.add_widget(btn)

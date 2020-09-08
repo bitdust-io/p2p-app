@@ -39,14 +39,22 @@ KVMainWindow = """
         Rectangle:
             pos: self.pos
             size: self.size
-    AnchorLayout:
-        anchor_x: 'center'
-        anchor_y: 'top'
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: 1, 1
         StackLayout:
+            canvas.before:
+                Color:
+                    rgba: .9, .9, 1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
             id: nav_buttons_layout
             orientation: 'lr-tb'
             padding: 2
             spacing: 2
+            size_hint: 1, None
+            height: self.minimum_height
             NavButton:
                 id: add_screen_btn: add_screen_btn
                 screen: 'main_menu_screen'
@@ -62,12 +70,9 @@ KVMainWindow = """
                 id: disconnected_screen_btn: disconnected_screen_btn
                 screen: 'disconnected_screen'
                 text: 'disconnected'
-    AnchorLayout:
-        anchor_x: 'center'
-        anchor_y: 'bottom'
         ScreenManagement:
             id: screen_manager
-            size_hint: 1, .92
+            size_hint: 1, 1
 """
 
 class MainWindow(FloatLayout):

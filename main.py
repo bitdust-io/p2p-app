@@ -19,6 +19,7 @@ from screens import screen_new_identity
 
 kv = """
 #:import NoTransition kivy.uix.screenmanager.NoTransition
+#:import Window kivy.core.window.Window
 """
 
 kv += labels.KVLabel
