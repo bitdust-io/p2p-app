@@ -14,6 +14,7 @@ from screens import screen_welcome
 from screens import screen_main_menu
 from screens import screen_offline
 from screens import screen_new_identity
+from screens import screen_private_chat
 
 #------------------------------------------------------------------------------ 
 
@@ -33,6 +34,7 @@ kv += screen_welcome.KVWelcomeScreen
 kv += screen_main_menu.KVMainMenuScreen
 kv += screen_offline.KVDisconnectedScreen
 kv += screen_new_identity.KVNewIdentityScreen
+kv += screen_private_chat.KVPrivateChatScreen
 kv += navigation.KVNavButton
 kv += navigation.KVScreenManagement
 kv += navigation.KVMainWindow
@@ -49,10 +51,12 @@ class BitDustApp(App):
             'welcome_screen': screen_welcome.WelcomeScreen,
             'disconnected_screen': screen_offline.DisconnectedScreen,
             'new_identity_screen': screen_new_identity.NewIdentityScreen,
+            'private_chat_alice': screen_private_chat.PrivateChatScreen,
         })
         main_window.open_screen('welcome_screen')
         main_window.open_screen('new_identity_screen')
-        main_window.select_screen('welcome_screen')
+        main_window.open_screen('private_chat_alice')
+        main_window.select_screen('private_chat_alice')
         return main_window
 
 #------------------------------------------------------------------------------

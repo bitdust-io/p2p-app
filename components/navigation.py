@@ -7,6 +7,10 @@ from kivy.uix.screenmanager import ScreenManager
 
 #------------------------------------------------------------------------------
 
+from components.webfont import fa_icon
+
+#------------------------------------------------------------------------------
+
 KVScreenManagement = """
 <ScreenManagement>:
     transition: NoTransition()
@@ -20,7 +24,7 @@ class ScreenManagement(ScreenManager):
 
 #------------------------------------------------------------------------------
 
-KVNavButton = """
+KVNavButton = f"""
 <NavButton>:
     spacing: 0
     padding: 0
@@ -57,6 +61,7 @@ KVNavButton = """
                 pos: self.pos[0]+2, self.pos[1]+2
                 size: self.size[0]-2, self.size[1]-4
                 radius: [self.corner_radius, 0, 0, self.corner_radius, ]
+        font_size: 16
         text: root.nav_btn_text
         on_press: root.on_action_area_pressed()
     Button:
@@ -87,8 +92,8 @@ KVNavButton = """
                 pos: self.pos[0]+2, self.pos[1]+2
                 size: self.size[0]-4, self.size[1]-4
                 radius: [0, self.corner_radius, self.corner_radius, 0, ]
-        font_size: 14
-        text: '[b]x[/b]'
+        font_size: 16
+        text: '{fa_icon('times')}'
         on_release: root.on_close_area_pressed()
 """
 
@@ -115,7 +120,7 @@ class NavButton(GridLayout):
 
 #------------------------------------------------------------------------------
 
-KVMainWindow = """
+KVMainWindow = f"""
 <MainWindow>:
     color: 0, 0, 0, 1
     canvas.before:
@@ -139,11 +144,11 @@ KVMainWindow = """
                 size_hint: None, None
                 width: 26
                 height: 26
-                text: '[b]+[/b]'
-                font_size: 22
                 bg_normal: .4,.65,.4,1
                 bg_pressed: .5,.75,.5,1
                 corner_radius: 8
+                font_size: 16
+                text: '{fa_icon('plus')}'
                 on_press: root.ids.screen_manager.current = 'main_menu_screen'
         ScreenManagement:
             id: screen_manager
