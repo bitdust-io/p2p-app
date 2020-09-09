@@ -56,4 +56,6 @@ KVDisconnectedScreen = """
 """
 
 class DisconnectedScreen(Screen):
-    pass
+
+    def get_title(self):
+        return 'connection'

@@ -2,8 +2,8 @@ from kivy.uix.button import Button
 
 #------------------------------------------------------------------------------
 
-KVButton = """
-<Button>:
+KVRoundedButton = """
+<RoundedButton@Button>:
     markup: True
     background_color: 0,0,0,0
     color: 1,1,1,1
@@ -31,17 +31,3 @@ KVButton = """
             size: self.size[0]-4, self.size[1]-4
             radius: [self.corner_radius,]
 """
-
-#------------------------------------------------------------------------------
-
-KVNavButton = """
-<NavButton>:
-    size_hint_x: None
-    width: self.texture_size[0] + 20
-    on_press: root.parent.parent.parent.ids.screen_manager.current = (self.screen or root.parent.parent.parent.ids.screen_manager.current)  
-"""
-
-class NavButton(Button):
-    pass
-
-#------------------------------------------------------------------------------

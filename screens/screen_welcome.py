@@ -11,4 +11,6 @@ KVWelcomeScreen = """
 """
 
 class WelcomeScreen(Screen):
-    pass
+
+    def get_title(self):
+        return 'welcome'

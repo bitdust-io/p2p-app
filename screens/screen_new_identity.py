@@ -11,4 +11,6 @@ KVNewIdentityScreen = """
 """
 
 class NewIdentityScreen(Screen):
-    pass
+
+    def get_title(self):
+        return 'your identity'
