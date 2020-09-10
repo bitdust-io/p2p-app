@@ -16,6 +16,8 @@ from screens import screen_offline
 from screens import screen_new_identity
 from screens import screen_private_chat
 
+from service import websock
+
 #------------------------------------------------------------------------------ 
 
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')  # disable multi-touch
@@ -58,6 +60,16 @@ class BitDustApp(App):
         main_window.open_screen('private_chat_alice')
         main_window.select_screen('private_chat_alice')
         return main_window
+
+    def on_process_health(self, resp):
+        print('on_process_health', resp)
+
+    def on_start(self):
+        websock.start()
+        websock.ws_call({"command": "api_call", "method": "process_health", "kwargs": {}, }, self.on_process_health)
+
+    def on_stop(self):
+        websock.stop()
 
 #------------------------------------------------------------------------------
 
