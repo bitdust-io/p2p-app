@@ -1,4 +1,4 @@
-from kivy.uix.screenmanager import Screen
+from components.screen import AppScreen
 
 
 KVNewIdentityScreen = """
@@ -10,7 +10,7 @@ KVNewIdentityScreen = """
 
 """
 
-class NewIdentityScreen(Screen):
+class NewIdentityScreen(AppScreen):
 
     def get_title(self):
         return 'your identity'

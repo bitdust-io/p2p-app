@@ -1,4 +1,4 @@
-from kivy.uix.screenmanager import Screen
+from components.screen import AppScreen
 
 
 KVWelcomeScreen = """
@@ -10,7 +10,7 @@ KVWelcomeScreen = """
 
 """
 
-class WelcomeScreen(Screen):
+class WelcomeScreen(AppScreen):
 
     def get_title(self):
         return 'welcome'

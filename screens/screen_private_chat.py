@@ -1,6 +1,7 @@
-from kivy.uix.screenmanager import Screen
+from components.screen import AppScreen
 
 from components.webfont import fa_icon
+
 
 KVPrivateChatScreen = """
 <PrivateChatScreen>:
@@ -26,7 +27,7 @@ KVPrivateChatScreen = """
 
 """
 
-class PrivateChatScreen(Screen):
+class PrivateChatScreen(AppScreen):
 
     def get_title(self):
         return f"{fa_icon('comment')} Alice"

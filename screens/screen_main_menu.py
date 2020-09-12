@@ -1,24 +1,27 @@
-from kivy.app import App
-
-from kivy.uix.screenmanager import Screen
-
-from components import buttons
+from components.screen import AppScreen
 
 
 KVMainMenuScreen = """
 <MainMenuScreen>:
     GridLayout:
-        cols: 1
+        cols: 3
         padding: 10
-        spacing: 2
+        spacing: 10
         row_force_default: True
         row_default_height: 40
         Button:
             text: 'menuA'
-            # on_press: root.on_menu_item_clicked()
+        Button:
+            text: 'menuB'
+        Button:
+            text: 'menuC'
+        Button:
+            text: 'menuD'
+        Button:
+            text: 'menuE'
 """
 
-class MainMenuScreen(Screen):
+class MainMenuScreen(AppScreen):
 
     def get_title(self):
         return 'menu'

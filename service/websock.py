@@ -12,9 +12,14 @@ from kivy.clock import mainthread
 
 #------------------------------------------------------------------------------
 
+_Debug = True
+
+#------------------------------------------------------------------------------
+
 _WebSocketApp = None
 _WebSocketQueue = None
 _WebSocketReady = False
+_WebSocketClosed = False
 _LastCallID = 0
 _PendingCalls = []
 _CallbacksQueue = {}
@@ -35,60 +40,89 @@ def is_ready():
     global _WebSocketReady
     return _WebSocketReady
 
+
+def is_closed():
+    global _WebSocketClosed
+    return _WebSocketClosed
+
 #------------------------------------------------------------------------------
-
-@mainthread
-def on_message(ws_inst, message):
-    global _CallbacksQueue
-    json_data = json.loads(message)
-    print(json_data)
-    if 'call_id' not in json_data:
-        return
-    call_id = json_data['call_id']
-    if call_id not in _CallbacksQueue:
-        return
-    result_callback = _CallbacksQueue.pop(call_id)
-    print('going to call %r with %r' % (result_callback, json_data, ))
-    result_callback(json_data)
-
-
-@mainthread
-def on_error(ws_inst, error):
-    print(error)
-
-
-@mainthread
-def on_close(ws_inst):
-    global _WebSocketReady
-    _WebSocketReady = False
-    print("ws closed")
-
 
 @mainthread
 def on_open(ws_inst):
     global _WebSocketReady
+    global _WebSocketClosed
     global _PendingCalls
     _WebSocketReady = True
-    print("ws started")
+    _WebSocketClosed = False
+    if _Debug:
+        print('websocket opened')
     for json_data, cb, in _PendingCalls:
         ws_queue().put_nowait((json_data, cb, ))
     _PendingCalls.clear()
 
 
 @mainthread
+def on_close(ws_inst):
+    global _WebSocketReady
+    global _WebSocketClosed
+    _WebSocketReady = False
+    _WebSocketClosed = True
+    if _Debug:
+        print('websocket closed')
+
+
+@mainthread
+def on_message(ws_inst, message):
+    global _CallbacksQueue
+    json_data = json.loads(message)
+    if _Debug:
+        print('on_message', json_data)
+    if 'payload' not in json_data:
+        if _Debug:
+            print('no payload found in the response')
+        return
+    if 'call_id' not in json_data['payload']:
+        if _Debug:
+            print('call_id not found in the response')
+        return
+    call_id = json_data['payload']['call_id']
+    if call_id not in _CallbacksQueue:
+        if _Debug:
+            print('call_id found in the response, but no callbacks registered')
+        return
+    result_callback = _CallbacksQueue.pop(call_id)
+    if _Debug:
+        print('going to call %r' % result_callback)
+    result_callback(json_data)
+
+
+@mainthread
+def on_error(ws_inst, error):
+    global _PendingCalls
+    if _Debug:
+        print('on_error', error)
+    for json_data, cb, in _PendingCalls:
+        if cb:
+            cb(error)
+
+
+@mainthread
 def on_fail(err, result_callback=None):
+    if _Debug:
+        print('on_fail', err)
     if result_callback:
         result_callback(err)
 
 #------------------------------------------------------------------------------
 
-def queue_thread(active_queue):
+def requests_thread(active_queue):
     global _LastCallID
     global _CallbacksQueue
     while True:
         json_data, result_callback = active_queue.get()
         if json_data is None:
-            print('going to stop queue_thread')
+            if _Debug:
+                print('going to stop requests thread')
             break
         if 'call_id' not in json_data:
             _LastCallID += 1
@@ -101,11 +135,14 @@ def queue_thread(active_queue):
             continue
         _CallbacksQueue[call_id] = result_callback
         data = json.dumps(json_data)
-        print('sending', data)
+        if _Debug:
+            print('sending', data)
         ws().send(data)
+    if _Debug:
+        print('request thread finishing')
 
 
-def ws_thread():
+def websocket_thread():
     global _WebSocketApp
     websocket.enableTrace(False)
     _WebSocketApp = websocket.WebSocketApp(
@@ -116,14 +153,16 @@ def ws_thread():
         on_open = on_open,
     )
     ws().run_forever()
+    if _Debug:
+        print('websocket thread finishing')
 
 #------------------------------------------------------------------------------
 
 def start():
     global _WebSocketQueue
     _WebSocketQueue = queue.Queue(maxsize=100)
-    thread.start_new_thread(ws_thread, ())
-    thread.start_new_thread(queue_thread, (_WebSocketQueue, ))
+    thread.start_new_thread(websocket_thread, ())
+    thread.start_new_thread(requests_thread, (_WebSocketQueue, ))
 
 
 def stop():
@@ -141,8 +180,14 @@ def stop():
 
 def ws_call(json_data, cb=None):
     global _PendingCalls
-    print('ws_call', json_data)
     if not is_ready():
-        _PendingCalls.append((json_data, cb, ))
+        if not is_closed():
+            if _Debug:
+                print('websocket not started yet, remember pending request')
+            _PendingCalls.append((json_data, cb, ))
+        else:
+            if _Debug:
+                print('about to restart websocket thread')
+            thread.start_new_thread(websocket_thread, ())
     else:
         ws_queue().put_nowait((json_data, cb, ))

@@ -9,14 +9,15 @@ from kivy.lang import Builder
 from components import buttons
 from components import labels
 from components import navigation
+from components import main_window
 
 from screens import screen_welcome
 from screens import screen_main_menu
+from screens import screen_process_dead
 from screens import screen_offline
 from screens import screen_new_identity
 from screens import screen_private_chat
-
-from service import websock
+from screens import controller
 
 #------------------------------------------------------------------------------ 
 
@@ -28,18 +29,19 @@ Config.set('graphics', 'resizable', True)
 kv = """
 #:import NoTransition kivy.uix.screenmanager.NoTransition
 #:import Window kivy.core.window.Window
-"""
-
-kv += labels.KVLabel
-kv += buttons.KVRoundedButton
-kv += screen_welcome.KVWelcomeScreen
-kv += screen_main_menu.KVMainMenuScreen
-kv += screen_offline.KVDisconnectedScreen
-kv += screen_new_identity.KVNewIdentityScreen
-kv += screen_private_chat.KVPrivateChatScreen
-kv += navigation.KVNavButton
-kv += navigation.KVScreenManagement
-kv += navigation.KVMainWindow
+""" + '\n'.join([
+    labels.KVLabel,
+    buttons.KVRoundedButton,
+    screen_welcome.KVWelcomeScreen,
+    screen_main_menu.KVMainMenuScreen,
+    screen_process_dead.KVProcessDeadScreen,
+    screen_offline.KVDisconnectedScreen,
+    screen_new_identity.KVNewIdentityScreen,
+    screen_private_chat.KVPrivateChatScreen,
+    navigation.KVNavButton,
+    navigation.KVScreenManagement,
+    main_window.KVMainWindow,
+])
 
 Builder.load_string(kv)
 
@@ -47,29 +49,30 @@ Builder.load_string(kv)
 
 class BitDustApp(App):
 
+    control = None
+    main_window = None
+
     def build(self):
-        main_window = navigation.MainWindow()
-        main_window.init_screens({
+        self.control = controller.Controller(self)
+        self.main_window = main_window.MainWindow()
+        self.main_window.register_screens({
+            'process_dead': screen_process_dead.ProcessDeadScreen,
             'welcome_screen': screen_welcome.WelcomeScreen,
             'disconnected_screen': screen_offline.DisconnectedScreen,
             'new_identity_screen': screen_new_identity.NewIdentityScreen,
             'private_chat_alice': screen_private_chat.PrivateChatScreen,
         })
-        main_window.open_screen('welcome_screen')
-        main_window.open_screen('new_identity_screen')
-        main_window.open_screen('private_chat_alice')
-        main_window.select_screen('private_chat_alice')
-        return main_window
-
-    def on_process_health(self, resp):
-        print('on_process_health', resp)
+        # main_window.open_screen('welcome_screen')
+        # main_window.open_screen('new_identity_screen')
+        # main_window.open_screen('private_chat_alice')
+        # main_window.select_screen('private_chat_alice')
+        return self.main_window
 
     def on_start(self):
-        websock.start()
-        websock.ws_call({"command": "api_call", "method": "process_health", "kwargs": {}, }, self.on_process_health)
+        self.control.start()
 
     def on_stop(self):
-        websock.stop()
+        self.control.stop()
 
 #------------------------------------------------------------------------------
 

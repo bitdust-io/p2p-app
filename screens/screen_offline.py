@@ -1,4 +1,4 @@
-from kivy.uix.screenmanager import Screen
+from components.screen import AppScreen
 
 
 KVDisconnectedScreen = """
@@ -55,7 +55,7 @@ KVDisconnectedScreen = """
 
 """
 
-class DisconnectedScreen(Screen):
+class DisconnectedScreen(AppScreen):
 
     def get_title(self):
         return 'connection'
