@@ -1,0 +1,15 @@
+<ProcessDeadScreen>:
+	title: 'connecting...'
+    ScrollView:
+        do_scroll_x: False
+        GridLayout:
+            cols: 1
+            size_hint: None, None
+            width: Window.width - 10
+            height: self.minimum_height
+            Label:
+                color: 0, 0, 0, 1 
+                markup: True
+                text: '[size=56]dead[/size]'
+                height: 200
+                size_hint_y: None

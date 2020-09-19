@@ -1,0 +1,32 @@
+<MainWindow>:
+    color: 0, 0, 0, 1
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: 1, 1
+        StackLayout:
+            id: nav_buttons_layout
+            orientation: 'lr-tb'
+            padding: 1
+            spacing: 2
+            size_hint: 1, None
+            height: self.minimum_height
+            RoundedButton:
+                id: main_nav_button
+                size_hint: None, None
+                width: 26
+                height: 26
+                bg_normal: .4,.65,.4,1
+                bg_pressed: .5,.75,.5,1
+                corner_radius: 8
+                font_size: 16
+                text: fa_icon('plus')
+                on_press: root.ids.screen_manager.current = 'main_menu_screen'
+        ScreenManagement:
+            id: screen_manager
+            size_hint: 1, 1
