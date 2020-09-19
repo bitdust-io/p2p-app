@@ -5,45 +5,10 @@ from kivy.uix.floatlayout import FloatLayout
 
 #------------------------------------------------------------------------------
 
-from components.webfont import fa_icon
 from components.navigation import NavButton
 
 #------------------------------------------------------------------------------
 
-KVMainWindow = f"""
-<MainWindow>:
-    color: 0, 0, 0, 1
-    canvas.before:
-        Color:
-            rgba: 1, 1, 1, 1
-        Rectangle:
-            pos: self.pos
-            size: self.size
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint: 1, 1
-        StackLayout:
-            id: nav_buttons_layout
-            orientation: 'lr-tb'
-            padding: 1
-            spacing: 2
-            size_hint: 1, None
-            height: self.minimum_height
-            RoundedButton:
-                id: main_nav_button
-                size_hint: None, None
-                width: 26
-                height: 26
-                bg_normal: .4,.65,.4,1
-                bg_pressed: .5,.75,.5,1
-                corner_radius: 8
-                font_size: 16
-                text: '{fa_icon('plus')}'
-                on_press: root.ids.screen_manager.current = 'main_menu_screen'
-        ScreenManagement:
-            id: screen_manager
-            size_hint: 1, 1
-"""
 
 class MainWindow(FloatLayout):
 
@@ -53,8 +18,8 @@ class MainWindow(FloatLayout):
     latest_screen = ''
 
     state_process_health = NumericProperty(0)
-    state_network_connected = NumericProperty(0)
     state_identity_get = NumericProperty(0)
+    state_network_connected = NumericProperty(0)
 
     def register_screens(self, screens_dict):
         for screen_id, screen_class in screens_dict.items():
@@ -85,6 +50,8 @@ class MainWindow(FloatLayout):
         if screen_id not in self.active_screens:
             self.open_screen(screen_id)
         if self.selected_screen:
+            if self.selected_screen == screen_id:
+                return
             _, selected_btn = self.active_screens[self.selected_screen]
             selected_btn.selected = False
         _, another_btn = self.active_screens[screen_id]
@@ -94,10 +61,24 @@ class MainWindow(FloatLayout):
         self.latest_screen = self.selected_screen
 
     def on_state_process_health(self, instance, value):
-        print('on_state_process_health', value)
+        print('on_state_process_health', instance, value)
         if value == -1:
             self.latest_screen = self.selected_screen
             self.select_screen('process_dead')
         else:
             if self.latest_screen:
                 self.select_screen(self.latest_screen)
+
+    def on_state_identity_get(self, instance, value):
+        print('on_state_identity_get', instance, value)
+        if value == -1:
+            self.latest_screen = self.selected_screen
+            self.select_screen('new_identity_screen')
+        else:
+            if self.latest_screen:
+                self.select_screen(self.latest_screen)
+
+#------------------------------------------------------------------------------
+
+from kivy.lang.builder import Builder 
+Builder.load_file('./components/main_window.kv')

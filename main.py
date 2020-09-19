@@ -6,17 +6,6 @@ from kivy.lang import Builder
 
 #------------------------------------------------------------------------------
 
-from components import buttons
-from components import labels
-from components import navigation
-from components import main_window
-
-from screens import screen_welcome
-from screens import screen_main_menu
-from screens import screen_process_dead
-from screens import screen_offline
-from screens import screen_new_identity
-from screens import screen_private_chat
 from screens import controller
 
 #------------------------------------------------------------------------------ 
@@ -26,24 +15,11 @@ Config.set('graphics', 'resizable', True)
 
 #------------------------------------------------------------------------------
 
-kv = """
+Builder.load_string("""
 #:import NoTransition kivy.uix.screenmanager.NoTransition
 #:import Window kivy.core.window.Window
-""" + '\n'.join([
-    labels.KVLabel,
-    buttons.KVRoundedButton,
-    screen_welcome.KVWelcomeScreen,
-    screen_main_menu.KVMainMenuScreen,
-    screen_process_dead.KVProcessDeadScreen,
-    screen_offline.KVDisconnectedScreen,
-    screen_new_identity.KVNewIdentityScreen,
-    screen_private_chat.KVPrivateChatScreen,
-    navigation.KVNavButton,
-    navigation.KVScreenManagement,
-    main_window.KVMainWindow,
-])
-
-Builder.load_string(kv)
+#:import fa_icon components.webfont.fa_icon
+""")
 
 #------------------------------------------------------------------------------
 
@@ -53,19 +29,28 @@ class BitDustApp(App):
     main_window = None
 
     def build(self):
+        from components import labels
+        from components import buttons
+        from components import text_input
+        from components import navigation
+        from components import main_window
+
+        from screens import screen_main_menu
+        from screens import screen_welcome
+        from screens import screen_process_dead
+        from screens import screen_new_identity
+        from screens import screen_recover_identity
+        from screens import screen_private_chat
+
         self.control = controller.Controller(self)
         self.main_window = main_window.MainWindow()
         self.main_window.register_screens({
             'process_dead': screen_process_dead.ProcessDeadScreen,
             'welcome_screen': screen_welcome.WelcomeScreen,
-            'disconnected_screen': screen_offline.DisconnectedScreen,
             'new_identity_screen': screen_new_identity.NewIdentityScreen,
+            'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
             'private_chat_alice': screen_private_chat.PrivateChatScreen,
         })
-        # main_window.open_screen('welcome_screen')
-        # main_window.open_screen('new_identity_screen')
-        # main_window.open_screen('private_chat_alice')
-        # main_window.select_screen('private_chat_alice')
         return self.main_window
 
     def on_start(self):

@@ -1,16 +1,14 @@
 from components.screen import AppScreen
 
 
-KVNewIdentityScreen = """
-<NewIdentityScreen>:
-    Label:
-        color: 0, 0, 0, 1 
-        markup: True
-        text: '[size=14]new identity[/size]'
-
-"""
-
 class NewIdentityScreen(AppScreen):
 
-    def get_title(self):
-        return 'your identity'
+    def on_create_identity_button_clicked(self, *args):
+        pass
+
+    def on_recover_identity_button_clicked(self, *args):
+        self.main_win().select_screen('recover_identity_screen')
+
+
+from kivy.lang.builder import Builder 
+Builder.load_file('./screens/screen_new_identity.kv')
