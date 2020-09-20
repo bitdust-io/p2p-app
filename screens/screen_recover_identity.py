@@ -6,7 +6,6 @@ class RecoverIdentityScreen(AppScreen):
 
     def on_start_recover_identity_button_clicked(self, *args):
         self.ids.recover_identity_button.disabled = True
-        self.control().api_call_id += 1
         websock.ws_call(
             json_data={
                 "command": "api_call",
@@ -14,7 +13,6 @@ class RecoverIdentityScreen(AppScreen):
                 "kwargs": {
                     "private_key_source": self.ids.private_key_input.text,
                 },
-                "call_id": self.control().api_call_id,
             },
             cb=self.on_identity_recover_result,
         )
@@ -29,6 +27,7 @@ class RecoverIdentityScreen(AppScreen):
             return
         self.main_win().close_screen('new_identity_screen')
         self.main_win().close_screen('recover_identity_screen')
+        self.main_win().select_screen('welcome_screen')
         self.control().run()
 
 

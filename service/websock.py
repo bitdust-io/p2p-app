@@ -82,7 +82,7 @@ def on_message(ws_inst, message):
     global _CallbacksQueue
     json_data = json.loads(message)
     if _Debug:
-        print('on_message', json_data)
+        print('        on_message', json_data)
     if 'payload' not in json_data:
         if _Debug:
             print('no payload found in the response')
@@ -106,7 +106,7 @@ def on_message(ws_inst, message):
         result_callback(json_data)
         return True
     if _Debug:
-        print('unexpected payload_type', json_data)
+        print('        unexpected payload_type', json_data)
     raise Exception(payload_type)
 
 

@@ -9,6 +9,9 @@ from components.navigation import NavButton
 
 #------------------------------------------------------------------------------
 
+_Debug = True
+
+#------------------------------------------------------------------------------
 
 class MainWindow(FloatLayout):
 
@@ -47,13 +50,16 @@ class MainWindow(FloatLayout):
         self.ids.nav_buttons_layout.remove_widget(btn)
 
     def select_screen(self, screen_id):
+        if _Debug:
+            print('select_screen', screen_id)
         if screen_id not in self.active_screens:
             self.open_screen(screen_id)
         if self.selected_screen:
             if self.selected_screen == screen_id:
                 return
-            _, selected_btn = self.active_screens[self.selected_screen]
-            selected_btn.selected = False
+            if self.selected_screen in self.active_screens:
+                _, selected_btn = self.active_screens[self.selected_screen]
+                selected_btn.selected = False
         _, another_btn = self.active_screens[screen_id]
         another_btn.selected = True
         self.ids.screen_manager.current = screen_id
@@ -61,22 +67,38 @@ class MainWindow(FloatLayout):
         self.latest_screen = self.selected_screen
 
     def on_state_process_health(self, instance, value):
-        print('on_state_process_health', instance, value)
+        if _Debug:
+            print('on_state_process_health', instance, value)
         if value == -1:
             self.latest_screen = self.selected_screen
             self.select_screen('process_dead')
         else:
             if self.latest_screen:
                 self.select_screen(self.latest_screen)
+            self.close_screen('process_dead')
 
     def on_state_identity_get(self, instance, value):
-        print('on_state_identity_get', instance, value)
+        if _Debug:
+            print('on_state_identity_get', instance, value)
         if value == -1:
             self.latest_screen = self.selected_screen
             self.select_screen('new_identity_screen')
         else:
             if self.latest_screen:
                 self.select_screen(self.latest_screen)
+            self.close_screen('new_identity_screen')
+            self.close_screen('recover_identity_screen')
+
+    def on_state_network_connected(self, instance, value):
+        if _Debug:
+            print('on_state_network_connected', instance, value)
+        if value == -1:
+            self.latest_screen = self.selected_screen
+            self.select_screen('connecting_screen')
+        else:
+            if self.latest_screen:
+                self.select_screen(self.latest_screen)
+            self.close_screen('connecting_screen')
 
 #------------------------------------------------------------------------------
 
