@@ -3,6 +3,7 @@ import time
 #------------------------------------------------------------------------------
 
 from service import websock
+from service import api_client
 
 #------------------------------------------------------------------------------
 
@@ -18,6 +19,7 @@ def all_screens():
     from screens import screen_recover_identity
     from screens import screen_connecting
     from screens import screen_private_chat
+    from screens import screen_my_id
     return {
         'process_dead_screen': screen_process_dead.ProcessDeadScreen,
         'main_menu_screen': screen_main_menu.MainMenuScreen,
@@ -25,6 +27,7 @@ def all_screens():
         'welcome_screen': screen_welcome.WelcomeScreen,
         'new_identity_screen': screen_new_identity.NewIdentityScreen,
         'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
+        'my_id_screen': screen_my_id.MyIDScreen,
         'private_chat_screen': screen_private_chat.PrivateChatScreen,
     }
 
@@ -76,13 +79,10 @@ class Controller(object):
         # all is good
         return True
 
+    #------------------------------------------------------------------------------
+
     def verify_process_health(self, *args, **kwargs):
-        if _Debug:
-            print('verify_process_health')
-        websock.ws_call(
-            json_data={"command": "api_call", "method": "process_health", "kwargs": {}, },
-            cb=self.on_process_health_result,
-        )
+        return api_client.process_health(cb=self.on_process_health_result)
 
     def on_process_health_result(self, resp):
         if _Debug:
@@ -95,12 +95,7 @@ class Controller(object):
         self.run()
 
     def verify_identity_get(self, *args, **kwargs):
-        if _Debug:
-            print('verify_identity_get')
-        websock.ws_call(
-            json_data={"command": "api_call", "method": "identity_get", "kwargs": {}, },
-            cb=self.on_identity_get_result,
-        )
+        return api_client.identity_get(cb=self.on_identity_get_result)
 
     def on_identity_get_result(self, resp):
         self.identity_get_latest = time.time()
@@ -111,12 +106,7 @@ class Controller(object):
         self.run()
 
     def verify_network_connected(self, *args, **kwargs):
-        if _Debug:
-            print('verify_network_connected')
-        websock.ws_call(
-            json_data={"command": "api_call", "method": "network_connected", "kwargs": {"wait_timeout": 0, }, },
-            cb=self.on_network_connected_result,
-        )
+        return api_client.network_connected(cb=self.on_network_connected_result)
 
     def on_network_connected_result(self, resp):
         self.network_connected_latest = time.time()

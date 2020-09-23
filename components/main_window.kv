@@ -9,17 +9,18 @@
     BoxLayout:
         orientation: 'vertical'
         size_hint: 1, 1
+        padding: 0
+        sizing: 0
         StackLayout:
             id: nav_buttons_layout
             orientation: 'lr-tb'
-            padding: 1
-            spacing: 3
+            padding: 1, 1
+            spacing: 2, 0
             size_hint: 1, None
             height: self.minimum_height
             Button:
                 id: main_nav_button
                 disabled: True
-                # bool(root.state_process_health != 1 or root.state_identity_get != 1) 
                 size_hint: None, None
                 width: 28
                 height: 28
@@ -30,3 +31,4 @@
         ScreenManagement:
             id: screen_manager
             size_hint: 1, 1
+            pos_hint: {'top': 1}

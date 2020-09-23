@@ -272,27 +272,27 @@ def verify_state():
     return 'not-started'
 
 
-def ws_call(json_data, cb=None, retry=False):
+def ws_call(json_data, cb=None):
     global _PendingCalls
     st = verify_state()
     if st == 'ready':
         ws_queue().put_nowait((json_data, cb, ))
-        return
+        return True
     if st == 'closed':
         if cb:
             cb(Exception('web socket is closed'))
-        return
+        return False
     if st == 'connecting':
         if _Debug:
             print('web socket still connecting, remember pending request')
         _PendingCalls.append((json_data, cb, ))
-        return
+        return True
     if st == 'not-started':
         if _Debug:
             print('web socket was not started')
         if cb:
             cb(Exception('web socket was not started'))
-        return
+        return False
         # if _Debug:
         #     print('web socket was not started, about to restart web socket thread and remember pending request')
         # start()

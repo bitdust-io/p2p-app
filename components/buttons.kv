@@ -11,7 +11,7 @@
     bg_disabled: .3,.3,.3,1
     bg_normal_delta: .2
     bg_disabled_delta: .1
-    corner_radius: 5
+    corner_radius: 3
 
 
 <RoundedButton@RoundedButtonInfo>:
@@ -28,3 +28,9 @@
             pos: self.pos[0]+2, self.pos[1]+2
             size: self.size[0]-4, self.size[1]-4
             radius: [self.corner_radius,]
+
+
+<RoundedFlexWidthButton@RoundedButton>:
+	text_padding: 10
+	size_hint_x: None
+	width: self.texture_size[0] + self.text_padding * 2
