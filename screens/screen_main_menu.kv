@@ -1,17 +1,54 @@
+<MainMenuButton@Button>:
+	fa_icon_text: ''
+	short_text: ''
+	fa_icon_size: 60
+	short_text_size: 14
+	height: 120
+	width: 120
+    size_hint: None, None
+    disabled_color: .8,.8,.8,1
+    background_disabled_normal: ''
+    background_color: 0,0,0,0
+    color_normal: .1,.4,.7,1
+    color_pressed: .2,.5,.8,1
+    color: self.color_normal if self.state == 'normal' else self.color_pressed
+    markup: True
+    text_size: self.size
+    halign: 'center'
+	text: '[size={}]{}[/size]\n[size={}]{}[/size]'.format(self.fa_icon_size, self.fa_icon_text, self.short_text_size, self.short_text)
+    corner_radius: 5
+
+
 <MainMenuScreen>:
-    GridLayout:
-        cols: 3
-        padding: 10
-        spacing: 10
-        row_force_default: True
-        row_default_height: 40
-        Button:
-            text: 'menuA'
-        Button:
-            text: 'menuB'
-        Button:
-            text: 'menuC'
-        Button:
-            text: 'menuD'
-        Button:
-            text: 'menuE'
+	# title: fa_icon('bars')
+	title: ''
+
+    StackLayout:
+        orientation: 'lr-tb'
+        padding: 0
+        spacing: 0
+        size_hint: 1, None
+        height: self.minimum_height
+        pos_hint: {'top': 1}
+
+        MainMenuButton:
+			fa_icon_text: fa_icon('id-card-alt')
+			short_text: 'my identity'
+        MainMenuButton:
+			fa_icon_text: fa_icon('search')
+            short_text: 'search people'
+        MainMenuButton:
+			fa_icon_text: fa_icon('address-book')
+            short_text: 'contacts'
+        MainMenuButton:
+			fa_icon_text: fa_icon('hdd')
+            short_text: 'my files'
+        MainMenuButton:
+			fa_icon_text: fa_icon('user-secret')
+            short_text: 'secrets'
+        MainMenuButton:
+			fa_icon_text: fa_icon('cogs')
+            short_text: 'settings'
+        MainMenuButton:
+			fa_icon_text: fa_icon('graduation-cap')
+            short_text: 'wiki'

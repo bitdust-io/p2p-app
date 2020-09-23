@@ -37,31 +37,20 @@ class BitDustApp(App):
         from components import navigation
         from components import main_window
 
-        from screens import screen_main_menu
-        from screens import screen_welcome
-        from screens import screen_process_dead
-        from screens import screen_new_identity
-        from screens import screen_recover_identity
-        from screens import screen_connecting
-        from screens import screen_private_chat
-
         self.control = controller.Controller(self)
         self.main_window = main_window.MainWindow()
-        self.main_window.register_screens({
-            'process_dead': screen_process_dead.ProcessDeadScreen,
-            'connecting_screen': screen_connecting.ConnectingScreen,
-            'welcome_screen': screen_welcome.WelcomeScreen,
-            'new_identity_screen': screen_new_identity.NewIdentityScreen,
-            'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
-            'private_chat_alice': screen_private_chat.PrivateChatScreen,
-        })
         return self.main_window
 
     def on_start(self):
+        self.main_window.register_screens(controller.all_screens())
+        self.main_window.register_controller(self.control)
+        self.main_window.select_screen('process_dead_screen')
         self.control.start()
 
     def on_stop(self):
         self.control.stop()
+        self.main_window.unregister_controller()
+        self.main_window.unregister_screens()
 
 #------------------------------------------------------------------------------
 

@@ -1,10 +1,19 @@
+from kivy.uix.button import Button
+
+#------------------------------------------------------------------------------
+
 from components.screen import AppScreen
+
+#------------------------------------------------------------------------------
+
+class MainMenuButton(Button):
+
+    pass
 
 
 class MainMenuScreen(AppScreen):
 
-    def get_title(self):
-        return 'menu'
+    pass
 
 
 from kivy.lang.builder import Builder 

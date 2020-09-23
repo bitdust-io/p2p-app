@@ -13,20 +13,20 @@
             id: nav_buttons_layout
             orientation: 'lr-tb'
             padding: 1
-            spacing: 2
+            spacing: 3
             size_hint: 1, None
             height: self.minimum_height
-            RoundedButton:
+            Button:
                 id: main_nav_button
+                disabled: True
+                # bool(root.state_process_health != 1 or root.state_identity_get != 1) 
                 size_hint: None, None
-                width: 26
-                height: 26
-                bg_normal: .4,.65,.4,1
-                bg_pressed: .5,.75,.5,1
-                corner_radius: 8
-                font_size: 16
-                text: fa_icon('plus')
-                on_press: root.ids.screen_manager.current = 'main_menu_screen'
+                width: 28
+                height: 28
+                background_normal: 'atlas://images/logo/logo-color-28x28'
+                background_down: 'atlas://images/logo/logo-white-28x28'
+                background_disabled_normal: 'atlas://images/logo/logo-black-28x28'
+                on_press: root.on_main_menu_button_pressed()
         ScreenManagement:
             id: screen_manager
             size_hint: 1, 1

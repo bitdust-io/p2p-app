@@ -10,6 +10,26 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
+def all_screens():
+    from screens import screen_main_menu
+    from screens import screen_welcome
+    from screens import screen_process_dead
+    from screens import screen_new_identity
+    from screens import screen_recover_identity
+    from screens import screen_connecting
+    from screens import screen_private_chat
+    return {
+        'process_dead_screen': screen_process_dead.ProcessDeadScreen,
+        'main_menu_screen': screen_main_menu.MainMenuScreen,
+        'connecting_screen': screen_connecting.ConnectingScreen,
+        'welcome_screen': screen_welcome.WelcomeScreen,
+        'new_identity_screen': screen_new_identity.NewIdentityScreen,
+        'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
+        'private_chat_screen': screen_private_chat.PrivateChatScreen,
+    }
+
+#------------------------------------------------------------------------------
+
 class Controller(object):
 
     process_health_latest = 0
@@ -65,6 +85,8 @@ class Controller(object):
         )
 
     def on_process_health_result(self, resp):
+        if _Debug:
+            print('on_process_health_result %r' % resp)
         self.process_health_latest = time.time()
         if not isinstance(resp, dict):
             self.mw().state_process_health = -1

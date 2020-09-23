@@ -2,13 +2,21 @@ from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty  # @UnresolvedImport
 
+#------------------------------------------------------------------------------
+
+_Debug = True
+
+#------------------------------------------------------------------------------
+
 
 class AppScreen(Screen):
 
     title = StringProperty('')
 
-    # def __init__(self, **kw):
-    #     super(AppScreen, self).__init__(**kw)
+    def __init__(self, **kw):
+        super(AppScreen, self).__init__(**kw)
+        if _Debug:
+            print('screen %r created' % self.title)
 
     def get_title(self):
         return self.title

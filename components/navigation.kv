@@ -1,8 +1,5 @@
 <ScreenManagement>:
     transition: NoTransition()
-    MainMenuScreen:
-        id: main_menu_screen
-        name: 'main_menu_screen'
 
 
 <NavButton>:
@@ -12,12 +9,12 @@
     rows: 1
     size_hint: None, None
     width: self.minimum_width
-    height: 26
+    height: 28
     Button:
         width: self.texture_size[0] + 18
-        height: 26
+        height: 28
         size_hint: None, None
-        corner_radius: 8
+        corner_radius: 9
         markup: True
         background_color: 0,0,0,0
         color: 1,1,1,1
@@ -41,7 +38,7 @@
                 pos: self.pos[0]+2, self.pos[1]+2
                 size: self.size[0]-4, self.size[1]-4
                 radius: [self.corner_radius, self.corner_radius, self.corner_radius, self.corner_radius, ]
-        font_size: 16
+        font_size: 14
         text: root.nav_btn_text
         on_press: root.on_action_area_pressed()
 
@@ -53,12 +50,12 @@
     rows: 1
     size_hint: None, None
     width: self.minimum_width
-    height: 26
+    height: 28
     Button:
         width: self.texture_size[0] + 14
-        height: 26
+        height: 28
         size_hint: None, None
-        corner_radius: 8
+        corner_radius: 9
         markup: True
         background_color: 0,0,0,0
         color: 1,1,1,1
@@ -89,7 +86,7 @@
         width: 21
         height: 26
         size_hint: None, None
-        corner_radius: 8
+        corner_radius: 9
         markup: True
         background_color: 0,0,0,0
         color: .3,.7,1,1

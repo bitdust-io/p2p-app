@@ -1,4 +1,4 @@
-<RoundedButton@Button>:
+<RoundedButtonInfo@Button>:
     markup: True
     background_color: 0,0,0,0
     color: 1,1,1,1
@@ -12,6 +12,9 @@
     bg_normal_delta: .2
     bg_disabled_delta: .1
     corner_radius: 5
+
+
+<RoundedButton@RoundedButtonInfo>:
     canvas.before:
         Color:
             rgba: self.bg_disabled if self.disabled else (self.bg_normal if self.state == 'normal' else self.bg_pressed) 
