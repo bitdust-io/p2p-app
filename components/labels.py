@@ -1,6 +1,2 @@
-
-KVLabel = """
-<Label>:
-    markup: True
-    color: 0, 0, 0, 1
-"""
+from kivy.lang.builder import Builder 
+Builder.load_file('./components/labels.kv')
