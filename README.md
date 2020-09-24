@@ -1,6 +1,9 @@
-# BitDust User App
+# BitDust p2p-app
 
-BitDust user App written in Python using Kivy framework 
+This is BitDust Application written in Python using Kivy framework.
+
+
+### Install and run inside development environment
 
 At first clone the files locally and change to the repository folder:
 
@@ -21,3 +24,16 @@ Also to make sure you are running the most recent version you can run following 
 Then you should be able to start the application inside development environment:
 
                 make run
+
+
+### Build for Android
+
+
+
+### Build for MacOS
+
+
+
+### Build for Windows
+
+

@@ -25,3 +25,10 @@ def identity_get(cb=None):
 def network_connected(wait_timeout=0, cb=None):
     return run('network_connected', kwargs={'wait_timeout': wait_timeout, }, cb=cb, )
 
+
+def user_observe(nickname, attempts=5, cb=None):
+    return run('user_observe', kwargs={'nickname': nickname, 'attempts': 5, }, cb=cb, )
+
+
+def friend_add(global_user_id, alias='', cb=None):
+    return run('friend_add', kwargs={'trusted_user_id': global_user_id, 'alias': alias, }, cb=cb, )

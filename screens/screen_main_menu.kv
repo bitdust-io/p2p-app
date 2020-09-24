@@ -35,10 +35,11 @@
 	        MainMenuButton:
 				fa_icon_text: fa_icon('id-card-alt')
 				short_text: 'my identity'
-				on_press: root.main_win().select_screen('my_id_screen')
+				on_press: root.main_win().select_screen('my_id_screen', verify_state=True)
 	        MainMenuButton:
 				fa_icon_text: fa_icon('search')
 	            short_text: 'search people'
+				on_press: root.main_win().select_screen('search_people_screen', verify_state=True)
 	        MainMenuButton:
 				fa_icon_text: fa_icon('address-book')
 	            short_text: 'contacts'

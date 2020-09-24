@@ -18,8 +18,9 @@ def all_screens():
     from screens import screen_new_identity
     from screens import screen_recover_identity
     from screens import screen_connecting
-    from screens import screen_private_chat
     from screens import screen_my_id
+    from screens import screen_search_people
+    from screens import screen_private_chat
     return {
         'process_dead_screen': screen_process_dead.ProcessDeadScreen,
         'main_menu_screen': screen_main_menu.MainMenuScreen,
@@ -28,6 +29,7 @@ def all_screens():
         'new_identity_screen': screen_new_identity.NewIdentityScreen,
         'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
         'my_id_screen': screen_my_id.MyIDScreen,
+        'search_people_screen': screen_search_people.SearchPeopleScreen,
         'private_chat_screen': screen_private_chat.PrivateChatScreen,
     }
 
@@ -55,7 +57,7 @@ class Controller(object):
     def run(self):
         if _Debug:
             print('control.run')
-        # BitDust process must be running already
+        # BitDust node process must be running already
         if self.mw().state_process_health == 0:
             return self.verify_process_health()
         elif self.mw().state_process_health == -1:

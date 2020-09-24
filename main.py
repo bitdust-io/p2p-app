@@ -31,6 +31,8 @@ class BitDustApp(App):
     main_window = None
 
     def build(self):
+        from components import layouts
+        from components import colors
         from components import labels
         from components import buttons
         from components import text_input
