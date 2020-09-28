@@ -10,6 +10,9 @@ class ConnectingScreen(AppScreen):
 
     verify_network_connected_task = None
 
+    def is_closable(self):
+        return False
+
     def on_enter(self, *args):
         self.verify_network_connected_task = Clock.schedule_interval(self.control().verify_network_connected, 1)
 

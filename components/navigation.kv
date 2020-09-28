@@ -2,14 +2,17 @@
     transition: NoTransition()
 
 
-<NavButton>:
+<NavButtonBase@GridLayout>:
     spacing: 0
     padding: 0
-    cols: 1
-    rows: 1
     size_hint: None, None
     width: self.minimum_width
     height: 29
+
+
+<NavButtonActive@GridLayout>:
+    cols: 1
+    rows: 1
 
     Button:
         width: self.texture_size[0] + 18
@@ -46,14 +49,9 @@
         on_press: root.on_action_area_pressed()
 
 
-<NavClosableButton>:
-    spacing: 0
-    padding: 0
+<NavButtonClosable@NavButtonBase>:
     cols: 2
     rows: 1
-    size_hint: None, None
-    width: self.minimum_width
-    height: 29
 
     Button:
         width: self.texture_size[0] + 14

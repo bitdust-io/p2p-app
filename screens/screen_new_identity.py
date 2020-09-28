@@ -3,6 +3,9 @@ from components.screen import AppScreen
 
 class NewIdentityScreen(AppScreen):
 
+    def is_closable(self):
+        return False
+
     def on_create_identity_button_clicked(self, *args):
         pass
 

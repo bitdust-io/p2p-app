@@ -20,6 +20,7 @@ def all_screens():
     from screens import screen_connecting
     from screens import screen_my_id
     from screens import screen_search_people
+    from screens import screen_friends
     from screens import screen_private_chat
     return {
         'process_dead_screen': screen_process_dead.ProcessDeadScreen,
@@ -30,6 +31,7 @@ def all_screens():
         'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
         'my_id_screen': screen_my_id.MyIDScreen,
         'search_people_screen': screen_search_people.SearchPeopleScreen,
+        'friends_screen': screen_friends.FriendsScreen,
         'private_chat_screen': screen_private_chat.PrivateChatScreen,
     }
 

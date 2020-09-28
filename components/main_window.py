@@ -5,7 +5,7 @@ from kivy.uix.floatlayout import FloatLayout
 
 #------------------------------------------------------------------------------
 
-from components.navigation import NavButton
+from components.navigation import NavButtonActive, NavButtonClosable
 
 #------------------------------------------------------------------------------
 
@@ -47,11 +47,12 @@ class MainWindow(FloatLayout):
         screen = screen_class(name=screen_id, id=screen_id)
         self.ids.screen_manager.add_widget(screen)
         title = screen.get_title()
+        closable = screen.is_closable()
         if title:
-            btn = NavButton(
-                text=screen.get_title(),
-                screen=screen_id,
-            )
+            if closable:
+                btn = NavButtonClosable(text=title, screen=screen_id)
+            else:
+                btn = NavButtonActive(text=title, screen=screen_id)
             self.ids.nav_buttons_layout.add_widget(btn)
         else:
             btn = None
