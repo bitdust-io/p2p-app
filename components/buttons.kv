@@ -1,17 +1,21 @@
-<RoundedButtonInfo@Button>:
-    markup: True
+<BasicButton@Button>:
     background_color: 0,0,0,0
     color: 1,1,1,1
     disabled_color: .8,.8,.8,1
     background_disabled_normal: ''
-    height: 30
-    size_hint_y: None
+	text_padding_x: 5
+	text_padding_y: 5
+    markup: True
+	font_size: '14sp'
+
+
+<RoundedButtonInfo@BasicButton>:
+    corner_radius: 3
     bg_normal: .1,.4,.7,1
     bg_pressed: .2,.5,.8,1
     bg_disabled: .3,.3,.3,1
     bg_normal_delta: .2
     bg_disabled_delta: .1
-    corner_radius: 3
 
 
 <RoundedButton@RoundedButtonInfo>:
@@ -21,16 +25,26 @@
         RoundedRectangle:
             pos: self.pos
             size: self.size
-            radius: [self.corner_radius+1,]
+            radius: [self.corner_radius+1, ]
         Color:
             rgba: (self.bg_disabled[0]+self.bg_disabled_delta,self.bg_disabled[1]+self.bg_disabled_delta,self.bg_disabled[2]+self.bg_disabled_delta,1) if self.disabled else ((self.bg_normal[0]+self.bg_normal_delta,self.bg_normal[1]+self.bg_normal_delta,self.bg_normal[2]+self.bg_normal_delta,1) if self.state == 'normal' else (self.bg_pressed[0]+self.bg_normal_delta,self.bg_pressed[1]+self.bg_normal_delta,self.bg_pressed[2]+self.bg_normal_delta,1))
         RoundedRectangle:
             pos: self.pos[0]+2, self.pos[1]+2
             size: self.size[0]-4, self.size[1]-4
-            radius: [self.corner_radius,]
+            radius: [self.corner_radius, ]
 
 
 <RoundedFlexWidthButton@RoundedButton>:
-	text_padding: 10
 	size_hint_x: None
-	width: self.texture_size[0] + self.text_padding * 2
+	width: self.texture_size[0] + dp(self.text_padding_x) * 2
+
+
+<RoundedFlexHeightButton@RoundedButton>:
+	size_hint_y: None
+	height: self.texture_size[1] + dp(self.text_padding_y) * 2
+
+
+<RoundedFlexButton@RoundedButton>:
+	size_hint: None, None
+	width: self.texture_size[0] + dp(self.text_padding_x) * 2
+	height: self.texture_size[1] + dp(self.text_padding_y) * 2

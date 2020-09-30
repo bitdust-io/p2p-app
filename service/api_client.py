@@ -32,3 +32,7 @@ def user_observe(nickname, attempts=5, cb=None):
 
 def friend_add(global_user_id, alias='', cb=None):
     return run('friend_add', kwargs={'trusted_user_id': global_user_id, 'alias': alias, }, cb=cb, )
+
+
+def friends_list(cb=None):
+    return run('friends_list', cb=cb)

@@ -11,12 +11,12 @@
 	height: self.minimum_height
 	spacing: 10
 
-	RoundedFlexWidthButton:
+	RoundedFlexButton:
 		text: fa_icon('plus')
 		pos_hint: {'center_y': 0.5, 'right': 1}
-		height: 24
-		text_padding: 5
-		font_size: 16
+		# height: 24
+		# text_padding: 5
+		font_size: '20sp'
 		on_press: root.on_search_result_add_clicked()
 
 	Label:
@@ -24,11 +24,12 @@
 		pos_hint: {'left': 1}
 		size_hint: None, None
 	    width: self.texture_size[0]
-		height: self.texture_size[1] + 20
+		height: self.texture_size[1] + dp(20)
 		text: ''
 
 
 <SearchPeopleScreen>:
+
     VerticalLayout:
         pos_hint: {'top': 1}
         size_hint: 1, 1
@@ -39,20 +40,18 @@
 			size_hint: 1, None
         	height: self.minimum_height
 
-			TextInput:
+			SingleLineTextInput:
 				id: search_input
-				size_hint: None, None
+				size_hint_x: None
 				width: 150
-                height: self.minimum_height
-				multiline: False
 				hint_text: 'alice'
 				text: ''
 
-			RoundedFlexWidthButton:
+			RoundedFlexButton:
 				id: search_button
-				size_hint: None, None
                 disabled: False
-				text: fa_icon('search')
+				text: ' {} '.format(fa_icon('search'))
+				# text: 'search'
 				on_press: root.on_search_button_clicked()
 
 	    VerticalScrollView:

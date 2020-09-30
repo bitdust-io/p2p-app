@@ -10,14 +10,14 @@ class ScreenManagement(ScreenManager):
 
 #------------------------------------------------------------------------------
 
-class NavButtonBase(GridLayout):
+class NavButtonWrap(GridLayout):
 
     selected = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         self.screen = kwargs.pop('screen')
         self.nav_btn_text = kwargs.pop('text')
-        super(NavButtonBase, self).__init__(**kwargs)
+        super(NavButtonWrap, self).__init__(**kwargs)
 
     def get_main_window(self):
         return self.parent.parent.parent
@@ -29,11 +29,11 @@ class NavButtonBase(GridLayout):
         self.get_main_window().select_screen(self.screen)
 
 
-class NavButtonActive(NavButtonBase):
+class NavButtonActive(NavButtonWrap):
     pass
 
 
-class NavButtonClosable(NavButtonBase):
+class NavButtonClosable(NavButtonWrap):
 
     def on_close_area_pressed(self):
         self.get_main_window().close_screen(self.screen)
