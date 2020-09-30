@@ -5,7 +5,7 @@ from kivy.uix.floatlayout import FloatLayout
 
 #------------------------------------------------------------------------------
 
-from components.navigation import NavButton
+from components.navigation import NavButtonActive, NavButtonClosable
 
 #------------------------------------------------------------------------------
 
@@ -47,11 +47,12 @@ class MainWindow(FloatLayout):
         screen = screen_class(name=screen_id, id=screen_id)
         self.ids.screen_manager.add_widget(screen)
         title = screen.get_title()
+        closable = screen.is_closable()
         if title:
-            btn = NavButton(
-                text=screen.get_title(),
-                screen=screen_id,
-            )
+            if closable:
+                btn = NavButtonClosable(text=title, screen=screen_id)
+            else:
+                btn = NavButtonActive(text=title, screen=screen_id)
             self.ids.nav_buttons_layout.add_widget(btn)
         else:
             btn = None
@@ -71,7 +72,12 @@ class MainWindow(FloatLayout):
         if _Debug:
             print('closed screen %r' % screen_id)
 
-    def select_screen(self, screen_id):
+    def select_screen(self, screen_id, verify_state=False):
+        if verify_state:
+            if self.state_process_health != 1 or self.state_identity_get != 1:
+                if _Debug:
+                    print('selecting screen %r not possible, state verify failed' % screen_id)
+                return False
         if _Debug:
             print('selecting screen %r' % screen_id)
         if screen_id not in self.active_screens:
@@ -81,7 +87,7 @@ class MainWindow(FloatLayout):
             if self.selected_screen == screen_id:
                 if _Debug:
                     print('skip, selected screen is already %r' % screen_id)
-                return
+                return True
             if self.selected_screen in self.active_screens:
                 _, selected_btn = self.active_screens[self.selected_screen]
                 if selected_btn:
@@ -93,6 +99,7 @@ class MainWindow(FloatLayout):
         self.selected_screen = screen_id
         if self.selected_screen not in ['process_dead_screen', 'connecting_screen', ]:
             self.latest_screen = self.selected_screen
+        return True
 
     def on_state_process_health(self, instance, value):
         if _Debug:
@@ -189,10 +196,6 @@ class MainWindow(FloatLayout):
         # raise Exception('unexpected state reached: %r %r %r' % (
         #     self.state_process_health, self.state_identity_get, self.state_network_connected,
         # ))
-
-    def on_main_menu_button_pressed(self, *args):
-        if self.state_process_health == 1 and self.state_identity_get == 1:
-            self.select_screen('main_menu_screen')
 
 #------------------------------------------------------------------------------
 

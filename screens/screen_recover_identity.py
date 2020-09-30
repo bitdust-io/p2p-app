@@ -4,6 +4,9 @@ from service import websock
 
 class RecoverIdentityScreen(AppScreen):
 
+    def is_closable(self):
+        return False
+
     def on_start_recover_identity_button_clicked(self, *args):
         self.ids.recover_identity_button.disabled = True
         websock.ws_call(

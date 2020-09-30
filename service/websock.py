@@ -153,9 +153,8 @@ def on_message(ws_inst, message):
                 print('call_id found in the response, but no callbacks registered')
             return
         result_callback = _CallbacksQueue.pop(call_id)
-        # if _Debug:
-        #     print('going to call %r' % result_callback)
-        result_callback(json_data)
+        if result_callback:
+            result_callback(json_data)
         return True
     if _Debug:
         print('        unexpected payload_type', json_data)
@@ -167,13 +166,6 @@ def on_error(ws_inst, error):
     global _PendingCalls
     if _Debug:
         print('on_error', error)
-    # if is_started():
-        # if _Debug:
-        #     print('retry web socket thread after 3 seconds %r' % time.asctime())
-        # Clock.schedule_once(lambda dt: thread.start_new_thread(websocket_thread, (), ), 5)
-    #     return
-    # if _Debug:
-    #     print('web socket got an error, but was not started')
 
 
 @mainthread
@@ -293,10 +285,6 @@ def ws_call(json_data, cb=None):
         if cb:
             cb(Exception('web socket was not started'))
         return False
-        # if _Debug:
-        #     print('web socket was not started, about to restart web socket thread and remember pending request')
-        # start()
-        # _PendingCalls.append((json_data, cb, ))
     raise Exception('unexpected state %r' % st)
 
 #------------------------------------------------------------------------------

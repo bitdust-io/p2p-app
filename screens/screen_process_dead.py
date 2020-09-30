@@ -11,6 +11,9 @@ class ProcessDeadScreen(AppScreen):
 
     verify_process_health_task = None
 
+    def is_closable(self):
+        return False
+
     def on_enter(self, *args):
         self.verify_process_health_task = Clock.schedule_interval(self.control().verify_process_health, 3)
 

@@ -30,8 +30,8 @@ identity_details_temlate_text = """[size=15][color=#909090]name:[/color] [b]{nam
 
 class MyIDScreen(AppScreen):
 
-    def get_title(self):
-        return f"{fa_icon('id-card-alt')}  my identity"
+    # def get_title(self):
+    #     return f"{fa_icon('id-card-alt')}  my identity"
 
     def on_enter(self, *args):
         api_client.identity_get(cb=self.on_identity_get_result)

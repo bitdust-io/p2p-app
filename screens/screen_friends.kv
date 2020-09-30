@@ -1,0 +1,72 @@
+<FriendsScreen>:
+	title: '{}  contacts'.format(fa_icon('address-book'))
+
+	VerticalLayout:
+    	id: friends_list
+    	pos_hint: {'top': 1}
+		size_hint: 1, 1
+		# height: 300
+		padding: 5
+		spacing: 5
+
+		FriendsListView:
+            id: friends_list_view
+            size_hint: 1, 1
+
+
+<FriendRecord@SelectableRecord>:
+
+    canvas.before:
+        Color:
+            rgba: (.9, .9, 1, 1) if self.selected else (1, 1, 1, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    orientation: 'lr-tb'
+    height: 70
+    size_hint_y: None
+
+    global_id: 'global_id'
+	username: 'username'
+	idhost: 'idhost'
+	alias: 'alias'
+    contact_state: 'contact_state'
+
+    Label:
+        id: label_field
+        text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
+        font_size: 16
+        size_hint: None, 1
+        width: self.texture_size[0] + 10
+
+    Label:
+        id: contact_state_field
+        text: root.contact_state
+        font_size: 16
+        color: (.7, .7, .7, 1)
+        size_hint: None, 1
+        width: self.texture_size[0] + 10
+
+
+<FriendsListView>:
+    viewclass: 'FriendRecord'
+    SelectableRecycleBoxLayout:
+        default_size: None, dp(56)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: False
+
+
+<FriendActionButton@Button>:
+    markup: True
+    background_color: 0,0,0,0
+    color: 1,1,1,1
+    disabled_color: .8,.8,.8,1
+    background_disabled_normal: ''
+    width: 30
+    height: 30
+    size_hint: None, None

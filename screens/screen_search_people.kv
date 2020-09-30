@@ -1,0 +1,65 @@
+<NoUsersFound@Label>:
+    width: self.texture_size[0]
+	height: self.texture_size[1] + 20
+	size_hint: None, None
+	pos_hint: {'left': 1}
+	text: 'no users found'
+
+
+<SearchResult@HorizontalLayout>:
+	size_hint: 1, None
+	height: self.minimum_height
+	spacing: 10
+
+	RoundedFlexButton:
+		text: fa_icon('plus')
+		pos_hint: {'center_y': 0.5, 'right': 1}
+		# height: 24
+		# text_padding: 5
+		font_size: '20sp'
+		on_press: root.on_search_result_add_clicked()
+
+	Label:
+		id: search_result_label
+		pos_hint: {'left': 1}
+		size_hint: None, None
+	    width: self.texture_size[0]
+		height: self.texture_size[1] + dp(20)
+		text: ''
+
+
+<SearchPeopleScreen>:
+
+    VerticalLayout:
+        pos_hint: {'top': 1}
+        size_hint: 1, 1
+        padding: 15
+
+		HorizontalLayout:
+	        pos_hint: {'top': 1}
+			size_hint: 1, None
+        	height: self.minimum_height
+
+			SingleLineTextInput:
+				id: search_input
+				size_hint_x: None
+				width: 150
+				hint_text: 'alice'
+				text: ''
+
+			RoundedFlexButton:
+				id: search_button
+                disabled: False
+				text: ' {} '.format(fa_icon('search'))
+				# text: 'search'
+				on_press: root.on_search_button_clicked()
+
+	    VerticalScrollView:
+
+			VerticalLayout:
+		    	id: search_results
+		    	pos_hint: {'top': 1}
+				size_hint: 1, None
+				height: self.minimum_height
+				padding: 5
+				spacing: 5

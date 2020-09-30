@@ -1,33 +1,46 @@
 <MainWindow>:
-    color: 0, 0, 0, 1
     canvas.before:
         Color:
             rgba: 1, 1, 1, 1
         Rectangle:
             pos: self.pos
             size: self.size
+
+    color: 0, 0, 0, 1
+
     BoxLayout:
         orientation: 'vertical'
         size_hint: 1, 1
         padding: 0
         sizing: 0
+
         StackLayout:
             id: nav_buttons_layout
             orientation: 'lr-tb'
-            padding: 1, 1
-            spacing: 2, 0
+            padding: 0, 0
+            spacing: 1, 1
             size_hint: 1, None
             height: self.minimum_height
+
             Button:
                 id: main_nav_button
                 disabled: True
-                size_hint: None, None
-                width: 28
-                height: 28
-                background_normal: 'atlas://images/logo/logo-color-28x28'
-                background_down: 'atlas://images/logo/logo-white-28x28'
-                background_disabled_normal: 'atlas://images/logo/logo-black-28x28'
-                on_press: root.on_main_menu_button_pressed()
+
+			    background_color: 0,0,0,0
+			    color: .1,.4,.7,1
+			    disabled_color: .8,.8,.8,1
+			    background_disabled_normal: ''
+
+			    text_padding_x: 5
+			    text_padding_y: 5
+				font_size: '15sp'
+			    width: self.texture_size[0] + dp(self.text_padding_x) * 2
+			    height: self.texture_size[1] + dp(self.text_padding_y) * 2
+			    size_hint: None, None
+			    text: ' {} '.format(fa_icon('bars'))
+
+                on_press: root.select_screen('main_menu_screen', verify_state=True)
+
         ScreenManagement:
             id: screen_manager
             size_hint: 1, 1

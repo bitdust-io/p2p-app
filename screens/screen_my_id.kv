@@ -1,12 +1,16 @@
 <MyIDScreen>:
+	title: '{}  my identity'.format(fa_icon('user-circle'))
+
     ScrollView:
         do_scroll_x: False
+
 	    BoxLayout:
 	        orientation: 'vertical'
 	        pos_hint: {'top': 1}
 	        size_hint: 1, None
 	        height: self.minimum_height
 	        padding: 15
+
 	        Label:
 	        	id: my_id_details
 
@@ -23,5 +27,5 @@
 			    readonly: True
 			    text:""
 
-			RoundedFlexWidthButton:
+			RoundedFlexButton:
 				text: 'key backup'

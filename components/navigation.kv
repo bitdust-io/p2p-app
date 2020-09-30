@@ -2,29 +2,41 @@
     transition: NoTransition()
 
 
-<NavButton>:
+<NavButtonWrap@GridLayout>:
     spacing: 0
     padding: 0
-    cols: 1
-    rows: 1
     size_hint: None, None
     width: self.minimum_width
-    height: 29
-    Button:
-        width: self.texture_size[0] + 18
-        height: 29
-        size_hint: None, None
-        corner_radius: 2
-        markup: True
-        background_color: 0,0,0,0
-        color: 1,1,1,1
-        disabled_color: .8,.8,.8,1
-        background_disabled_normal: ''
-        bg_normal: .1,.5,.8,1
-        bg_pressed: .2,.6,.9,1
-        bg_disabled: .3,.3,.3,1
-        bg_normal_delta: .1
-        bg_disabled_delta: .1
+    height: self.minimum_height
+
+
+<NavButtonBase@Button>:
+    corner_radius: 2
+	text_padding_x: 5
+	text_padding_y: 5
+	font_size: '15sp'
+    width: self.texture_size[0] + dp(self.text_padding_x) * 2
+    height: self.texture_size[1] + dp(self.text_padding_y) * 2
+    size_hint: None, None
+    background_color: 0,0,0,0
+    color: 1,1,1,1
+    disabled_color: .8,.8,.8,1
+    background_disabled_normal: ''
+    bg_normal: .1,.5,.8,1
+    bg_pressed: .2,.6,.9,1
+    bg_disabled: .3,.3,.3,1
+    bg_normal_delta: .1
+    bg_disabled_delta: .1
+
+
+<NavButtonActive@NavButtonWrap>:
+    cols: 1
+    rows: 1
+    padding: 0
+    spacing: 0
+
+    NavButtonBase:
+
         canvas.before:
             Color:
                 rgba: self.bg_normal if (self.state == 'normal' and not root.selected) else self.bg_pressed 
@@ -38,34 +50,20 @@
                 pos: self.pos[0]+2, self.pos[1]+2
                 size: self.size[0]-4, self.size[1]-4
                 radius: [self.corner_radius, self.corner_radius, self.corner_radius, self.corner_radius, ]
-        font_size: 14
-        text: root.nav_btn_text
+
+	    text: root.nav_btn_text
         on_press: root.on_action_area_pressed()
 
 
-<NavClosableButton>:
-    spacing: 0
-    padding: 0
+<NavButtonClosable@NavButtonWrap>:
     cols: 2
     rows: 1
-    size_hint: None, None
-    width: self.minimum_width
-    height: 29
-    Button:
-        width: self.texture_size[0] + 14
-        height: 29
-        size_hint: None, None
-        corner_radius: 2
-        markup: True
-        background_color: 0,0,0,0
-        color: 1,1,1,1
-        disabled_color: .8,.8,.8,1
-        background_disabled_normal: ''
-        bg_normal: .1,.5,.8,1
-        bg_pressed: .2,.6,.9,1
-        bg_disabled: .3,.3,.3,1
-        bg_normal_delta: .1
-        bg_disabled_delta: .1
+    padding: 0
+    spacing: 0
+
+    NavButtonBase:
+    	id: inner_button
+
         canvas.before:
             Color:
                 rgba: self.bg_normal if (self.state == 'normal' and not root.selected) else self.bg_pressed 
@@ -79,12 +77,13 @@
                 pos: self.pos[0]+2, self.pos[1]+2
                 size: self.size[0]-2, self.size[1]-4
                 radius: [self.corner_radius, 0, 0, self.corner_radius, ]
-        font_size: 16
-        text: root.nav_btn_text
+
+	    text: root.nav_btn_text
         on_press: root.on_action_area_pressed()
+
     Button:
-        width: 21
-        height: 29
+        width: dp(21)
+        height: root.ids.inner_button.texture_size[1] + dp(root.ids.inner_button.text_padding_y) * 2
         size_hint: None, None
         corner_radius: 2
         markup: True
@@ -97,6 +96,7 @@
         bg_disabled: .3,.3,.3,1
         bg_normal_delta: 0
         bg_disabled_delta: .1
+
         canvas.before:
             Color:
                 rgba: self.bg_normal 
@@ -110,6 +110,7 @@
                 pos: self.pos[0]+2, self.pos[1]+2
                 size: self.size[0]-4, self.size[1]-4
                 radius: [0, self.corner_radius, self.corner_radius, 0, ]
-        font_size: 16
+
+        font_size: '15sp'
         text: fa_icon('times')
         on_release: root.on_close_area_pressed()
