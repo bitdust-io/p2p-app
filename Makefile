@@ -4,6 +4,7 @@
 
 REQUIREMENTS_TXT:=requirements.txt
 
+OS=$(shell lsb_release -si 2>/dev/null || uname)
 PIP:="venv/bin/pip"
 PYTHON="venv/bin/python"
 PYTHON_VERSION=python3
@@ -17,7 +18,6 @@ pyclean:
 
 clean: pyclean
 	@rm -rf venv
-	@rm -rf .tox
 
 venv:
 	@rm -rf venv
@@ -26,10 +26,14 @@ venv:
 	@$(PIP) install Cython pygments docutils pillow
 	@$(PIP) install -r $(REQUIREMENTS_TXT)
 
-apt_install:
-	@sudo apt-get install python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip wkhtmltopdf
+system_dependencies:
+ifeq ($(OS), Ubuntu)
+	@sudo apt-get install --yes --no-install-recommends python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip
+elif
+	@brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer
+endif
 
-install: apt_install venv
+install: system_dependencies clean venv
 
 update:
 	@git fetch

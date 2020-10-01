@@ -30,9 +30,13 @@ def user_observe(nickname, attempts=5, cb=None):
     return run('user_observe', kwargs={'nickname': nickname, 'attempts': 5, }, cb=cb, )
 
 
+def friends_list(cb=None):
+    return run('friends_list', cb=cb)
+
+
 def friend_add(global_user_id, alias='', cb=None):
     return run('friend_add', kwargs={'trusted_user_id': global_user_id, 'alias': alias, }, cb=cb, )
 
 
-def friends_list(cb=None):
-    return run('friends_list', cb=cb)
+def friend_remove(global_user_id, cb=None):
+    return run('friend_remove', kwargs={'user_id': global_user_id, }, cb=cb, )

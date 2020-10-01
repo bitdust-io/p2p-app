@@ -1,11 +1,11 @@
-<BasicTextInput@TextInput>:
-	text_padding_y: 5
-    cursor_color: (0, 0, 0, 1)
+<BasicTextInput>:
+	text_padding_y: app.text_input_padding_y
+    cursor_color: app.color_black
     cursor_width: '2sp'
-	font_size: '14sp'
+	font_size: app.base_font_size
 
 
-<SingleLineTextInput@BasicTextInput>:
+<SingleLineTextInput>:
 	multiline: False
 	size_hint_y: None
-	height: self.line_height + dp(self.text_padding_y) * 2
+	height: self.line_height + self.text_padding_y * 2

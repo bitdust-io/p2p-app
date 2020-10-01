@@ -2,7 +2,7 @@
     transition: NoTransition()
 
 
-<NavButtonWrap@GridLayout>:
+<NavButtonWrap>:
     spacing: 0
     padding: 0
     size_hint: None, None
@@ -10,26 +10,41 @@
     height: self.minimum_height
 
 
-<NavButtonBase@Button>:
+<NavButtonBase>:
     corner_radius: 2
-	text_padding_x: 5
-	text_padding_y: 5
+	text_padding_x: app.button_text_padding_x
+	text_padding_y: app.button_text_padding_y
 	font_size: '15sp'
-    width: self.texture_size[0] + dp(self.text_padding_x) * 2
-    height: self.texture_size[1] + dp(self.text_padding_y) * 2
+    width: self.texture_size[0] + self.text_padding_x * 2
+    height: self.texture_size[1] + self.text_padding_y * 2
     size_hint: None, None
-    background_color: 0,0,0,0
-    color: 1,1,1,1
-    disabled_color: .8,.8,.8,1
+    background_color: app.color_transparent
+    color: app.color_white
+    disabled_color: app.color_btn_disabled
     background_disabled_normal: ''
-    bg_normal: .1,.5,.8,1
-    bg_pressed: .2,.6,.9,1
-    bg_disabled: .3,.3,.3,1
+    bg_normal: app.color_btn_normal
+    bg_pressed: app.color_btn_pressed
+    bg_disabled: app.color_btn_disabled
     bg_normal_delta: .1
     bg_disabled_delta: .1
 
 
-<NavButtonActive@NavButtonWrap>:
+<NavButtonCloseArea>:
+    size_hint: None, None
+    corner_radius: 2
+    markup: True
+    background_color: app.color_transparent
+    color: app.color_btn_text_dark
+    disabled_color: app.color_btn_disabled
+    background_disabled_normal: ''
+    bg_normal: app.color_btn_normal
+    bg_pressed: app.color_btn_pressed
+    bg_disabled: app.color_btn_disabled
+    bg_normal_delta: 0
+    bg_disabled_delta: .1
+
+
+<NavButtonActive>:
     cols: 1
     rows: 1
     padding: 0
@@ -55,7 +70,7 @@
         on_press: root.on_action_area_pressed()
 
 
-<NavButtonClosable@NavButtonWrap>:
+<NavButtonClosable>:
     cols: 2
     rows: 1
     padding: 0
@@ -81,25 +96,11 @@
 	    text: root.nav_btn_text
         on_press: root.on_action_area_pressed()
 
-    Button:
-        width: dp(21)
-        height: root.ids.inner_button.texture_size[1] + dp(root.ids.inner_button.text_padding_y) * 2
-        size_hint: None, None
-        corner_radius: 2
-        markup: True
-        background_color: 0,0,0,0
-        color: .3,.7,1,1
-        disabled_color: .8,.8,.8,1
-        background_disabled_normal: ''
-        bg_normal: .1,.5,.8,1
-        bg_pressed: .2,.6,.9,1
-        bg_disabled: .3,.3,.3,1
-        bg_normal_delta: 0
-        bg_disabled_delta: .1
+    NavButtonCloseArea:
 
         canvas.before:
             Color:
-                rgba: self.bg_normal 
+                rgba: self.bg_normal
             RoundedRectangle:
                 pos: self.pos
                 size: self.size
@@ -111,6 +112,8 @@
                 size: self.size[0]-4, self.size[1]-4
                 radius: [0, self.corner_radius, self.corner_radius, 0, ]
 
-        font_size: '15sp'
-        text: fa_icon('times')
+	    width: dp(20)
+	    height: root.ids.inner_button.texture_size[1] + root.ids.inner_button.text_padding_y * 2
+        font_size: sp(14)
+        text: fa_icon('times', with_spaces=False)
         on_release: root.on_close_area_pressed()

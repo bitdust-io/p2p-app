@@ -7,12 +7,10 @@ from components.screen import AppScreen
 #------------------------------------------------------------------------------
 
 class MainMenuButton(Button):
-
     pass
 
 
 class MainMenuScreen(AppScreen):
-
     pass
 
 

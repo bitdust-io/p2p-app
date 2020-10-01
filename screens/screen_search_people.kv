@@ -1,30 +1,29 @@
-<NoUsersFound@Label>:
+<NoUsersFound>:
     width: self.texture_size[0]
-	height: self.texture_size[1] + 20
+	height: self.texture_size[1]
 	size_hint: None, None
 	pos_hint: {'left': 1}
 	text: 'no users found'
 
 
-<SearchResult@HorizontalLayout>:
+<SearchResult>:
 	size_hint: 1, None
 	height: self.minimum_height
-	spacing: 10
+	spacing: dp(5)
 
 	RoundedFlexButton:
-		text: fa_icon('plus')
 		pos_hint: {'center_y': 0.5, 'right': 1}
-		# height: 24
-		# text_padding: 5
-		font_size: '20sp'
+		font_size: '14sp'
+		text: fa_icon('plus')
 		on_press: root.on_search_result_add_clicked()
 
 	Label:
 		id: search_result_label
-		pos_hint: {'left': 1}
+		pos_hint: {'left': 1, 'center_y': 0.5}
 		size_hint: None, None
 	    width: self.texture_size[0]
-		height: self.texture_size[1] + dp(20)
+		height: self.texture_size[1]
+		font_size: '14sp'
 		text: ''
 
 
@@ -43,15 +42,14 @@
 			SingleLineTextInput:
 				id: search_input
 				size_hint_x: None
-				width: 150
+				width: dp(150)
 				hint_text: 'alice'
 				text: ''
 
 			RoundedFlexButton:
 				id: search_button
                 disabled: False
-				text: ' {} '.format(fa_icon('search'))
-				# text: 'search'
+				text: fa_icon('search')
 				on_press: root.on_search_button_clicked()
 
 	    VerticalScrollView:
