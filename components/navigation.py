@@ -1,5 +1,6 @@
 from kivy.properties import BooleanProperty  # @UnresolvedImport
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager
 
 #------------------------------------------------------------------------------
@@ -29,6 +30,14 @@ class NavButtonWrap(GridLayout):
         self.get_main_window().select_screen(self.screen)
 
 
+class NavButtonBase(Button):
+    pass
+
+
+class NavButtonCloseArea(Button):
+    pass
+
+
 class NavButtonActive(NavButtonWrap):
     pass
 
@@ -40,5 +49,6 @@ class NavButtonClosable(NavButtonWrap):
 
 #------------------------------------------------------------------------------
 
-from kivy.lang.builder import Builder 
+from kivy.lang.builder import Builder
+print('./components/navigation.kv')
 Builder.load_file('./components/navigation.kv')

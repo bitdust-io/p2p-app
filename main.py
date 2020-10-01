@@ -31,14 +31,16 @@ class BitDustApp(App):
     main_window = None
 
     def build(self):
+        from components import styles
         from components import layouts
-        from components import colors
         from components import labels
         from components import buttons
         from components import text_input
+        from components import list_view
         from components import navigation
         from components import main_window
 
+        styles.init(self)
         self.control = controller.Controller(self)
         self.main_window = main_window.MainWindow()
         return self.main_window

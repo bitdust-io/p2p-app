@@ -1,31 +1,34 @@
 <FriendsScreen>:
-	title: '{}  contacts'.format(fa_icon('address-book'))
+	title: '{}  contacts'.format(fa_icon('address-book', with_spaces=False))
 
 	VerticalLayout:
     	id: friends_list
     	pos_hint: {'top': 1}
 		size_hint: 1, 1
-		# height: 300
-		padding: 5
-		spacing: 5
+		padding: dp(5)
+		spacing: dp(5)
 
 		FriendsListView:
             id: friends_list_view
             size_hint: 1, 1
 
 
-<FriendRecord@SelectableRecord>:
+<FriendRecord>:
 
     canvas.before:
         Color:
-            rgba: (.9, .9, 1, 1) if self.selected else (1, 1, 1, 1)
+            rgba: (.95, .95, 95, 1) if self.selected else (1, 1, 1, 1)
         Rectangle:
             pos: self.pos
             size: self.size
 
-    orientation: 'lr-tb'
-    height: 70
+	padding: 0
+	spacing: 1
+	text_padding_x: app.friend_record_padding_x
+	text_padding_y: app.friend_record_padding_y
+    height: app.friend_record_height
     size_hint_y: None
+    size_hint_x: 1
 
     global_id: 'global_id'
 	username: 'username'
@@ -36,23 +39,28 @@
     Label:
         id: label_field
         text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
-        font_size: 16
+        halign: 'left'
+        font_size: '16sp'
         size_hint: None, 1
-        width: self.texture_size[0] + 10
+        width: self.texture_size[0] + root.text_padding_x * 2
 
     Label:
         id: contact_state_field
         text: root.contact_state
-        font_size: 16
+        font_size: '16sp'
         color: (.7, .7, .7, 1)
         size_hint: None, 1
-        width: self.texture_size[0] + 10
+        width: self.texture_size[0] + root.text_padding_x * 2
+
+	Widget:
+		height: 1
+		size_hint: 1, None
 
 
 <FriendsListView>:
     viewclass: 'FriendRecord'
     SelectableRecycleBoxLayout:
-        default_size: None, dp(56)
+        default_size: None, app.friend_record_height
         default_size_hint: 1, None
         size_hint_y: None
         height: self.minimum_height
@@ -61,12 +69,14 @@
         touch_multiselect: False
 
 
-<FriendActionButton@Button>:
+<FriendActionButton>:
+	text_padding_x: dp(5)
+	text_padding_y: dp(5)
     markup: True
-    background_color: 0,0,0,0
-    color: 1,1,1,1
-    disabled_color: .8,.8,.8,1
+    background_color: app.color_transparent
+    color: app.color_btn_text_light
+    disabled_color: app.color_btn_disabled
     background_disabled_normal: ''
-    width: 30
-    height: 30
+    width: self.texture_size[0] + self.text_padding_x * 2
+    height: app.friend_record_height
     size_hint: None, None

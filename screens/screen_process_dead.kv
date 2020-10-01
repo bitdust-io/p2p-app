@@ -1,18 +1,13 @@
 <ProcessDeadScreen>:
 	title: 'starting...'
 
-    ScrollView:
-        do_scroll_x: False
+    GridLayout:
+        cols: 1
+        size_hint: 1, 1
 
-        GridLayout:
-            cols: 1
-            size_hint: None, None
-            width: Window.width - 10
-            height: self.minimum_height
-
-            Label:
-                color: 0, 0, 0, 1 
-                markup: True
-                text: '[size=26]starting BitDust ...[/size]'
-                height: 200
-                size_hint_y: None
+        Label:
+            color: 0, 0, 0, 1 
+            markup: True
+            text: '[size=26]starting BitDust ...[/size]'
+            height: dp(200)
+            size_hint_y: None

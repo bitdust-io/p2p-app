@@ -21,7 +21,7 @@
                 halign: 'right'
                 text: "private key:"
                 text_size: self.size
-                height: 20
+                height: dp(20)
                 size_hint: 1, None
                 pos_hint: {'center_x': .5}
 
@@ -38,10 +38,9 @@
 	                height: self.minimum_height
 	                size_hint: 1, 1
 
-            RoundedButton:
+            RoundedFlexButton:
                 id: recover_identity_button
                 text: 'recover'
-                size_hint: None, None
                 pos_hint: {'center_x': .5}
                 on_release: root.on_start_recover_identity_button_clicked()
 
@@ -50,7 +49,7 @@
                 valign: 'bottom'
                 halign: 'right'
                 text: ""
-                height: 20
+                height: dp(20)
                 size_hint: None, None
                 pos_hint: {'center_x': .5}
 

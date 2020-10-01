@@ -7,8 +7,8 @@ This is BitDust Application written in Python using Kivy framework.
 
 At first clone the files locally and change to the repository folder:
 
-                git clone https://github.com/bitdust-io/user-app.git
-                cd user-app
+                git clone https://github.com/bitdust-io/p2p-app.git
+                cd p2p-app
 
 
 To be able to run the application from command line you must first install Kivy dependencies (tested on Linux Debian) and create Python virtual environment:

@@ -1,6 +1,7 @@
 from kivy.properties import BooleanProperty, ObjectProperty  # @UnresolvedImport
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.stacklayout import StackLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
@@ -13,7 +14,7 @@ class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior, Recycle
     touch_deselect_last = BooleanProperty(True)
 
 
-class SelectableRecord(RecycleDataViewBehavior, StackLayout):
+class BaseSelectableRecord(RecycleDataViewBehavior):
 
     index = None
     selected = BooleanProperty(False)
@@ -21,10 +22,10 @@ class SelectableRecord(RecycleDataViewBehavior, StackLayout):
 
     def refresh_view_attrs(self, rv, index, data):
         self.index = index
-        return super(SelectableRecord, self).refresh_view_attrs(rv, index, data)
+        return super(BaseSelectableRecord, self).refresh_view_attrs(rv, index, data)
 
     def on_touch_down(self, touch):
-        if super(SelectableRecord, self).on_touch_down(touch):
+        if super(BaseSelectableRecord, self).on_touch_down(touch):
             return True
         if self.collide_point(*touch.pos) and self.selectable:
             return self.parent.select_with_touch(self.index, touch)
@@ -38,6 +39,14 @@ class SelectableRecord(RecycleDataViewBehavior, StackLayout):
         self.selected = is_selected
         rv.on_selection_applied(self, index, is_selected, prev_selected)
         return index
+
+
+class SelectableStackRecord(BaseSelectableRecord, StackLayout):
+    pass
+
+
+class SelectableHorizontalRecord(BaseSelectableRecord, BoxLayout):
+    pass
 
 
 class SelectableRecycleView(RecycleView):

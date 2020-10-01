@@ -21,7 +21,7 @@
                 valign: "bottom"
                 halign: "center"
                 text: "username:"
-                height: 20
+                height: dp(20)
                 size_hint: 1, None
 
             TextInput:
@@ -31,22 +31,18 @@
                 multiline: False
                 pos_hint: {'center_x': .5}
                 size_hint: None, None
-                width: 160
+                width: dp(160)
                 height: self.minimum_height
 
-            RoundedButton:
+            RoundedFlexButton:
                 id: create_identity_button
                 text: "create"
-                width: 100
-                size_hint: None, None
                 pos_hint: {'center_x': .5}
                 on_release: root.on_create_identity_button_clicked()
 
-            RoundedButton:
+            RoundedFlexButton:
                 id: recover_identity_button
                 text: "recover"
-                width: 100
-                size_hint: None, None
                 pos_hint: {'center_x': .5}
                 on_release: root.on_recover_identity_button_clicked()
 

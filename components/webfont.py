@@ -1452,5 +1452,8 @@ fa_map = {
     "zhihu": "\uf63f",
 }
 
-def fa_icon(name, font_file='fonts/fa-solid.ttf'):
-    return '[font={}]{}[/font]'.format(font_file, fa_map[name])
+def fa_icon(name, font_file='fonts/fa-solid.ttf', with_spaces=True):
+    s = '[font={}]{}[/font]'.format(font_file, fa_map[name])
+    if not with_spaces:
+        return s
+    return ' {} '.format(s)

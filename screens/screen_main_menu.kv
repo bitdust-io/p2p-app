@@ -1,23 +1,23 @@
-<MainMenuButton@Button>:
+<MainMenuButton>:
     fa_icon_text: ''
     short_text: ''
-    fa_icon_size: 60
-    short_text_size: 14
+    fa_icon_size: '60sp'
+    short_text_size: '14sp'
     height: 120
     width: 120
     size_hint: None, None
-    disabled_color: .8,.8,.8,1
+    corner_radius: 5
+    disabled_color: app.color_btn_disabled
     background_disabled_normal: ''
-    background_color: 0,0,0,0
-    color_normal: .2,.5,.8,1
-    color_pressed: .3,.6,.9,1
+    background_color: app.color_transparent
+    color_normal: app.color_btn_normal
+    color_pressed: app.color_btn_pressed
     color: self.color_normal if self.state == 'normal' else self.color_pressed
     markup: True
     text_size: self.size
     halign: 'center'
     valign: 'top'
     text: '[size={}]{}[/size][size=5]\n\n[/size][color=#606060][size={}]{}[/size][/color]'.format(self.fa_icon_size, self.fa_icon_text, self.short_text_size, self.short_text)
-    corner_radius: 5
 
 
 <MainMenuScreen>:
@@ -26,33 +26,33 @@
         do_scroll_x: False
         StackLayout:
             orientation: 'lr-tb'
-            padding: 0, 20
+            padding: 0, dp(20)
             spacing: 0
             size_hint: 1, None
             height: self.minimum_height
             pos_hint: {'top': 1}
     
             MainMenuButton:
-                fa_icon_text: fa_icon('id-card-alt')
+                fa_icon_text: fa_icon('id-card-alt', with_spaces=False)
                 short_text: 'my identity'
                 on_press: root.main_win().select_screen('my_id_screen', verify_state=True)
             MainMenuButton:
-                fa_icon_text: fa_icon('search')
+                fa_icon_text: fa_icon('search', with_spaces=False)
                 short_text: 'search people'
                 on_press: root.main_win().select_screen('search_people_screen', verify_state=True)
             MainMenuButton:
-                fa_icon_text: fa_icon('address-book')
+                fa_icon_text: fa_icon('address-book', with_spaces=False)
                 short_text: 'contacts'
                 on_press: root.main_win().select_screen('friends_screen', verify_state=True)
             MainMenuButton:
-                fa_icon_text: fa_icon('hdd')
+                fa_icon_text: fa_icon('hdd', with_spaces=False)
                 short_text: 'my files'
             MainMenuButton:
-                fa_icon_text: fa_icon('user-secret')
+                fa_icon_text: fa_icon('user-secret', with_spaces=False)
                 short_text: 'secrets'
             MainMenuButton:
-                fa_icon_text: fa_icon('cogs')
+                fa_icon_text: fa_icon('cogs', with_spaces=False)
                 short_text: 'settings'
             MainMenuButton:
-                fa_icon_text: fa_icon('graduation-cap')
+                fa_icon_text: fa_icon('graduation-cap', with_spaces=False)
                 short_text: 'wiki'

@@ -24,8 +24,7 @@ class SearchResult(HorizontalLayout):
         )
 
     def on_friend_added(self, resp):
-        print('on_friend_added', self.parent.parent, resp)
-        
+        self.parent.parent.parent.parent.main_win().select_screen('friends_screen')
 
 
 class NoUsersFound(Label):
@@ -37,7 +36,7 @@ class SearchPeopleScreen(AppScreen):
     search_started = False
 
     def get_title(self):
-        return f"{fa_icon('search')}  search people"
+        return f"{fa_icon('search', with_spaces=False)}  search people"
 
     def on_enter(self):
         if self.search_started:

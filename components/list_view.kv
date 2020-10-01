@@ -1,6 +1,14 @@
 <SelectableRecycleView>:
-    bar_width: 15
-    bar_color: .2,.5,.8,1
-    bar_inactive_color: .1,.4,.7,1
+    bar_width: app.scroll_bar_width
+    bar_color: app.color_btn_normal
+    bar_inactive_color: app.color_btn_inactive
     effect_cls: "ScrollEffect"
     scroll_type: ['bars']
+
+
+<SelectableHorizontalRecord>:
+	orientation: 'horizontal'
+
+
+<SelectableStackRecord>:
+	orientation: 'lr-tb'
