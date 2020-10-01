@@ -4,7 +4,7 @@ from service import api_client
 
 #------------------------------------------------------------------------------
 
-identity_details_temlate_text = """[size=15][color=#909090]name:[/color] [b]{name}[/b]
+identity_details_temlate_text = """[size={text_size}][color=#909090]name:[/color] [b]{name}[/b]
 
 [color=#909090]global ID:[/color] [b]{global_id}[/b]
 
@@ -19,10 +19,10 @@ identity_details_temlate_text = """[size=15][color=#909090]name:[/color] [b]{nam
 [color=#909090]revision:[/color] {revision}
 
 [color=#909090]version:[/color]
-[size=11]{version}[/size]
+[size={small_text_size}]{version}[/size]
 
 [color=#909090]public key:[/color]
-[size=11][font=RobotoMono-Regular]{publickey}[/font][/size]
+[size={small_text_size}][font=RobotoMono-Regular]{publickey}[/font][/size]
 
 [/size]"""
 
@@ -45,6 +45,8 @@ class MyIDScreen(AppScreen):
             self.ids.my_id_details.text = str(resp)
             return
         self.ids.my_id_details.text = identity_details_temlate_text.format(
+            text_size='{}sp'.format(self.app().font_size_normal_absolute),
+            small_text_size='{}sp'.format(self.app().font_size_small_absolute),
             name=result.get('name', ''),
             global_id=result.get('global_id', ''),
             publickey=result.get('publickey', ''),

@@ -1,3 +1,7 @@
+import os
+
+#------------------------------------------------------------------------------
+
 from kivy.app import App
 
 from kivy.config import Config
@@ -9,6 +13,11 @@ from kivy.lang import Builder
 from screens import controller
 
 #------------------------------------------------------------------------------ 
+
+# os.environ['KIVY_METRICS_DENSITY'] = '1'
+# os.environ['KIVY_METRICS_FONTSCALE'] = '1'
+
+#------------------------------------------------------------------------------
 
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')  # disable multi-touch
 Config.set('graphics', 'resizable', True)

@@ -8,10 +8,15 @@ def init(app):
         print('sp(1.0):', sp(1.0))
 
     #--- FONT SIZE
-    app.base_font_size = sp(14)
-    app.small_font_size = sp(11)
-    app.large_font_size = sp(16)
-    app.icon_font_size = sp(14)
+    app.font_size_normal_absolute = 14
+    app.font_size_small_absolute = 11
+    app.font_size_large_absolute = 16
+    app.font_size_icon_absolute = 14
+
+    app.font_size_normal = sp(app.font_size_normal_absolute)
+    app.font_size_small = sp(app.font_size_small_absolute)
+    app.font_size_large = sp(app.font_size_large_absolute)
+    app.font_size_icon = sp(app.font_size_icon_absolute)
 
     #--- PADDING
     app.button_text_padding_x = dp(5)
