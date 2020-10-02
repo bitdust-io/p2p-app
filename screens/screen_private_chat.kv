@@ -5,21 +5,31 @@
         size_hint: 1, 1
 
         Label:
-            color: 0, 0, 0, 1 
-            markup: True
+        	size_hint: 1, 1
             text: '[size=24]bla \\n bla bla[/size]'
 
         BoxLayout:
             orientation: 'horizontal'
-            height: 60
+            # height: app.chat_input_height
+            height: self.minimum_height
             size_hint: 1, None
 
-            TextInput:
+            DynamicHeightTextInput:
                 id: chat_input
-                size_hint: 1, 1
+                size_hint_x: 1
+				text: ''
 
-            Button:
-                width: 60
-                height: 60
-                size_hint: None, None
-                text: 'send'
+            RoundedButton:
+            	id: chat_send_button
+				size_hint: None, None
+				width: self.texture_size[0] + self.text_padding_x * 2
+				height: self.texture_size[1] + self.text_padding_y * 2
+            	font_size: app.font_size_icon
+                text: fa_icon('paper-plane')
+
+
+<DynamicHeightTextInput>:
+	max_lines: 7
+    size_hint_y: None
+	font_size: app.chat_input_font_size
+	height: self.line_height * 1 + self.text_padding_y * 2

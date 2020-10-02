@@ -1,6 +1,10 @@
 from kivy.metrics import dp, sp
 
+#------------------------------------------------------------------------------
+
 _Debug = True
+
+#------------------------------------------------------------------------------
 
 def init(app):
     if _Debug:
@@ -21,7 +25,11 @@ def init(app):
     #--- PADDING
     app.button_text_padding_x = dp(5)
     app.button_text_padding_y = dp(5)
-    app.text_input_padding_y = dp(5)
+
+    app.text_input_padding_x_absolute = 5
+    app.text_input_padding_y_absolute = 5
+    app.text_input_padding_x = dp(app.text_input_padding_x_absolute)
+    app.text_input_padding_y = dp(app.text_input_padding_y_absolute)
 
     #--- SCROLL BAR
     app.scroll_bar_width = dp(15)
@@ -38,7 +46,13 @@ def init(app):
     app.color_btn_inactive = (.1,.4,.7,1)
     app.color_btn_disabled = (.8,.8,.8,1)
 
+    app.color_text_input_background = (.9,.9,.9,1)
+
     #--- SCREEN FRIENDS
     app.friend_record_padding_x = dp(5)
     app.friend_record_padding_y = dp(5)
     app.friend_record_height = sp(16) + dp(12)
+
+    #--- SCREEN PRIVATE CHAT
+    app.chat_input_font_size = sp(app.font_size_normal_absolute)
+    # app.chat_input_height = sp(app.font_size_normal_absolute) * 3

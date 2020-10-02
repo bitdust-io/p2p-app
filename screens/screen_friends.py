@@ -1,7 +1,3 @@
-from kivy.metrics import dp
-
-#------------------------------------------------------------------------------
-
 from components.buttons import RoundedButton
 from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
@@ -13,7 +9,6 @@ from service import api_client
 
 class FriendActionButton(RoundedButton):
     pass
-
 
 
 class FriendsScreen(AppScreen):
@@ -47,14 +42,12 @@ class FriendRecord(SelectableHorizontalRecord):
         if not self.visible_buttons:
             chat_button = FriendActionButton(
                 text=fa_icon('comments'),
-                # height=self.ids.label_field.texture_size[1] + dp(self.text_padding_y * 2),
                 on_release=self.on_chat_button_clicked,
             )
             self.visible_buttons.append(chat_button)
             self.add_widget(chat_button)
             delete_button = FriendActionButton(
                 text=fa_icon('trash'),
-                # height=self.ids.label_field.texture_size[1] + dp(self.text_padding_y * 2),
                 on_release=self.on_delete_button_clicked,
             )
             self.visible_buttons.append(delete_button)
@@ -67,9 +60,17 @@ class FriendRecord(SelectableHorizontalRecord):
             self.visible_buttons.clear()
 
     def on_chat_button_clicked(self, *args):
-        print('on_chat_button_clicked', self.global_id)
+        self.parent.parent.parent.parent.main_win().select_screen(
+            screen_id='private_chat_{}'.format(self.global_id),
+            screen_type='private_chat_screen',
+            global_id=self.global_id,
+            username=self.username,
+        )
 
     def on_delete_button_clicked(self, *args):
+        self.parent.parent.parent.parent.main_win().close_screen(
+            screen_id='private_chat_{}'.format(self.global_id),
+        )
         self.parent.parent.clear_selection()
         api_client.friend_remove(global_user_id=self.global_id, cb=self.parent.parent.parent.parent.populate)
 
