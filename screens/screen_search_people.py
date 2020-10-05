@@ -72,7 +72,7 @@ class SearchPeopleScreen(AppScreen):
                 text=str(resp),
             ))
             return
-        result = resp.get('payload', {}).get('response' , {}).get('result', {})
+        result = resp.get('payload', {}).get('response' , {}).get('result', [])
         if not result:
             self.ids.search_results.add_widget(NoUsersFound())
             return

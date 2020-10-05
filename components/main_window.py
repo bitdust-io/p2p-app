@@ -26,8 +26,8 @@ class MainWindow(FloatLayout):
     state_network_connected = NumericProperty(0)
 
     def register_screens(self, screens_dict):
-        for screen_id, screen_class in screens_dict.items():
-            self.screens_map[screen_id] = screen_class
+        for screen_type, screen_class in screens_dict.items():
+            self.screens_map[screen_type] = screen_class
 
     def unregister_screens(self):
         self.screens_map.clear()
@@ -38,13 +38,13 @@ class MainWindow(FloatLayout):
     def unregister_controller(self): 
         self.control = None
 
-    def open_screen(self, screen_id):
+    def open_screen(self, screen_id, screen_type, **kwargs):
         if screen_id in self.active_screens:
             if _Debug:
                 print('screen %r already opened' % screen_id)
             return
-        screen_class = self.screens_map[screen_id]
-        screen = screen_class(name=screen_id, id=screen_id)
+        screen_class = self.screens_map[screen_type]
+        screen = screen_class(name=screen_id, id=screen_id, **kwargs)
         self.ids.screen_manager.add_widget(screen)
         title = screen.get_title()
         closable = screen.is_closable()
@@ -72,7 +72,9 @@ class MainWindow(FloatLayout):
         if _Debug:
             print('closed screen %r' % screen_id)
 
-    def select_screen(self, screen_id, verify_state=False):
+    def select_screen(self, screen_id, verify_state=False, screen_type=None, **kwargs):
+        if screen_type is None:
+            screen_type = screen_id
         if verify_state:
             if self.state_process_health != 1 or self.state_identity_get != 1:
                 if _Debug:
@@ -81,7 +83,7 @@ class MainWindow(FloatLayout):
         if _Debug:
             print('selecting screen %r' % screen_id)
         if screen_id not in self.active_screens:
-            self.open_screen(screen_id)
+            self.open_screen(screen_id, screen_type, **kwargs)
         self.ids.main_nav_button.disabled = bool(screen_id in ['process_dead_screen', 'connecting_screen', ])
         if self.selected_screen:
             if self.selected_screen == screen_id:

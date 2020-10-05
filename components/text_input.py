@@ -9,6 +9,10 @@ class BasicTextInput(TextInput):
 class SingleLineTextInput(BasicTextInput):
     pass
 
+
+class MultiLineTextInput(BasicTextInput):
+    pass
+
 #------------------------------------------------------------------------------
 
 from kivy.lang.builder import Builder 
