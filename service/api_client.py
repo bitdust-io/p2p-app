@@ -23,11 +23,11 @@ def identity_get(cb=None):
 
 
 def network_connected(wait_timeout=0, cb=None):
-    return run('network_connected', kwargs={'wait_timeout': wait_timeout, }, cb=cb, )
+    return run('network_connected', kwargs={'wait_timeout': wait_timeout, }, cb=cb)
 
 
 def user_observe(nickname, attempts=5, cb=None):
-    return run('user_observe', kwargs={'nickname': nickname, 'attempts': 5, }, cb=cb, )
+    return run('user_observe', kwargs={'nickname': nickname, 'attempts': 5, }, cb=cb)
 
 
 def friends_list(cb=None):
@@ -35,8 +35,18 @@ def friends_list(cb=None):
 
 
 def friend_add(global_user_id, alias='', cb=None):
-    return run('friend_add', kwargs={'trusted_user_id': global_user_id, 'alias': alias, }, cb=cb, )
+    return run('friend_add', kwargs={'trusted_user_id': global_user_id, 'alias': alias, }, cb=cb)
 
 
 def friend_remove(global_user_id, cb=None):
-    return run('friend_remove', kwargs={'user_id': global_user_id, }, cb=cb, )
+    return run('friend_remove', kwargs={'user_id': global_user_id, }, cb=cb)
+
+
+def message_history(recipient_id=None, sender_id=None, message_type=None, offset=0, limit=100, cb=None):
+    return run('message_history', kwargs={
+        'recipient_id': recipient_id,
+        'sender_id': sender_id,
+        'message_type': message_type,
+        'offset': offset,
+        'limit': limit,
+    }, cb=cb)

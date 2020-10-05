@@ -129,12 +129,18 @@ def on_event(json_data):
     return True
 
 
+def on_stream_message(json_data):
+    if _Debug:
+        print('    WS STREAM MSG:', json_data['payload']['payload']['message_id'])
+    return True
+
+
 @mainthread
 def on_message(ws_inst, message):
     global _CallbacksQueue
     json_data = json.loads(message)
     if _Debug:
-        print('        on_message', json_data)
+        print('        on_message %d bytes' % len(message))
     if 'payload' not in json_data:
         if _Debug:
             print('no payload found in the response')
@@ -142,6 +148,8 @@ def on_message(ws_inst, message):
     payload_type = json_data.get('type')
     if payload_type == 'event':
         return on_event(json_data)
+    if payload_type == 'stream_message':
+        return on_stream_message(json_data)
     if payload_type == 'api_call':
         if 'call_id' not in json_data['payload']:
             if _Debug:
@@ -290,12 +298,24 @@ def ws_call(json_data, cb=None):
 #------------------------------------------------------------------------------
 
 def is_ok(response):
+    if not isinstance(response, dict):
+        return False
     return response_status(response) == 'OK'
 
 
 def response_errors(response):
+    if not isinstance(response, dict):
+        return ['no response', ]
     return response.get('payload', {}).get('response', {}).get('errors', [])
 
 
 def response_status(response):
+    if not isinstance(response, dict):
+        return ''
     return response.get('payload', {}).get('response', {}).get('status', '')
+
+
+def response_result(response):
+    if not isinstance(response, dict):
+        return None
+    return response.get('payload', {}).get('response', {}).get('result', [])

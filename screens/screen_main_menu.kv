@@ -41,6 +41,10 @@
                 short_text: 'search people'
                 on_press: root.main_win().select_screen('search_people_screen', verify_state=True)
             MainMenuButton:
+                fa_icon_text: fa_icon('comments', with_spaces=False)
+                short_text: 'chat'
+                # on_press: root.main_win().select_screen('chats_screen', verify_state=True)
+            MainMenuButton:
                 fa_icon_text: fa_icon('address-book', with_spaces=False)
                 short_text: 'contacts'
                 on_press: root.main_win().select_screen('friends_screen', verify_state=True)

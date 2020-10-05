@@ -4,13 +4,15 @@
         orientation: 'vertical'
         size_hint: 1, 1
 
-        Label:
-        	size_hint: 1, 1
-            text: '[size=24]bla \\n bla bla[/size]'
+		BoxLayout:
+			id: chat_messages
+	        orientation: 'vertical'
+	        size_hint: 1, 1
+	        padding: 5
+	        spacing: 5
 
         BoxLayout:
             orientation: 'horizontal'
-            # height: app.chat_input_height
             height: self.minimum_height
             size_hint: 1, None
 
@@ -33,3 +35,11 @@
     size_hint_y: None
 	font_size: app.chat_input_font_size
 	height: self.line_height * 1 + self.text_padding_y * 2
+
+
+<ChatMessageLabel>:
+	size_hint: None, None
+	pos_hint: {'left': 0}
+	width: self.texture_size[0]
+	height: self.texture_size[1]
+	halign: 'left'
