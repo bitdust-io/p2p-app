@@ -45,12 +45,16 @@ class Controller(object):
 
     def __init__(self, app):
         self.app = app
+        self.callbacks = {}
 
     def mw(self):
         return self.app.main_window
 
     def start(self):
-        websock.start()
+        websock.start(callbacks={
+            'on_error': self.on_websocket_error,
+            'on_stream_message': self.on_websocket_stream_message,
+        })
         self.run()
 
     def stop(self):
@@ -82,6 +86,26 @@ class Controller(object):
             return None
         # all is good
         return True
+
+    #------------------------------------------------------------------------------
+
+    def add_callback(self, target, cb, cb_id=None):
+        if target not in self.callbacks:
+            self.callbacks[target] = []
+        self.callbacks[target].append((cb, cb_id, ))
+
+    def remove_callback(self, target, cb=None, cb_id=None):
+        if target not in self.callbacks:
+            return False
+        for pos in range(len(self.callbacks[target])):
+            cur_cb, cur_cb_id = self.callbacks[target][pos]
+            if cb is not None and cur_cb == cb:
+                self.callbacks[target].pop(pos)
+                return True
+            if cb_id is not None and cur_cb_id == cb_id:
+                self.callbacks[target].pop(pos)
+                return True
+        return False
 
     #------------------------------------------------------------------------------
 
@@ -119,3 +143,25 @@ class Controller(object):
             return
         self.mw().state_network_connected = 1 if websock.is_ok(resp) else -1
         self.run()
+
+    #------------------------------------------------------------------------------
+
+    def on_websocket_error(self, websocket_instance, error):
+        if _Debug:
+            print('on_websocket_error', websocket_instance, error)
+        if self.mw().state_process_health != -1:
+            self.mw().state_process_health = -1
+            self.verify_process_health()
+
+    def on_websocket_stream_message(self, json_data):
+        if _Debug:
+            print('on_websocket_stream_message', json_data)
+        msg_type = json_data.get('payload', {}).get('payload', {}).get('data', {}).get('msg_type', '')
+        if msg_type == 'private_message':
+            self.on_private_message_received(json_data)
+            return
+
+    def on_private_message_received(self, json_data):
+        cb_list = self.callbacks.get('on_private_message_received', [])
+        for cb, cb_id in cb_list:
+            cb(json_data)

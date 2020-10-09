@@ -28,16 +28,18 @@ _WebSocketConnecting = False
 _LastCallID = 0
 _PendingCalls = []
 _CallbacksQueue = {}
-
+_RegisteredCallbacks = {}
 
 #------------------------------------------------------------------------------
 
-def start():
+def start(callbacks={}):
     global _WebSocketStarted
     global _WebSocketConnecting
     global _WebSocketQueue
+    global _RegisteredCallbacks
     if is_started():
         raise Exception('already started')
+    _RegisteredCallbacks = callbacks or {}
     _WebSocketConnecting = True
     _WebSocketStarted = True
     _WebSocketQueue = queue.Queue(maxsize=100)
@@ -49,8 +51,10 @@ def stop():
     global _WebSocketStarted
     global _WebSocketQueue
     global _WebSocketConnecting
+    global _RegisteredCallbacks
     if not is_started():
         raise Exception('has not been started')
+    _RegisteredCallbacks = {}
     _WebSocketStarted = False
     _WebSocketConnecting = False
     while True:
@@ -93,6 +97,11 @@ def is_connecting():
     global _WebSocketConnecting
     return _WebSocketConnecting
 
+
+def registered_callbacks():
+    global _RegisteredCallbacks
+    return _RegisteredCallbacks
+
 #------------------------------------------------------------------------------
 
 @mainthread
@@ -106,6 +115,9 @@ def on_open(ws_inst):
     _WebSocketConnecting = False
     if _Debug:
         print('websocket opened')
+    cb = registered_callbacks().get('on_open')
+    if cb:
+        cb(ws_inst)
     for json_data, cb, in _PendingCalls:
         ws_queue().put_nowait((json_data, cb, ))
     _PendingCalls.clear()
@@ -121,17 +133,26 @@ def on_close(ws_inst):
     _WebSocketConnecting = False
     if _Debug:
         print('websocket closed')
+    cb = registered_callbacks().get('on_close')
+    if cb:
+        cb(ws_inst)
 
 
 def on_event(json_data):
     if _Debug:
         print('    WS EVENT:', json_data['payload']['event_id'])
+    cb = registered_callbacks().get('on_event')
+    if cb:
+        cb(json_data)
     return True
 
 
 def on_stream_message(json_data):
     if _Debug:
         print('    WS STREAM MSG:', json_data['payload']['payload']['message_id'])
+    cb = registered_callbacks().get('on_stream_message')
+    if cb:
+        cb(json_data)
     return True
 
 
@@ -174,6 +195,9 @@ def on_error(ws_inst, error):
     global _PendingCalls
     if _Debug:
         print('on_error', error)
+    cb = registered_callbacks().get('on_error')
+    if cb:
+        cb(ws_inst, error)
 
 
 @mainthread
@@ -303,19 +327,23 @@ def is_ok(response):
     return response_status(response) == 'OK'
 
 
+def response_payload(response):
+    return response.get('payload', {})
+
+
 def response_errors(response):
     if not isinstance(response, dict):
         return ['no response', ]
-    return response.get('payload', {}).get('response', {}).get('errors', [])
+    return response_payload(response).get('response', {}).get('errors', [])
 
 
 def response_status(response):
     if not isinstance(response, dict):
         return ''
-    return response.get('payload', {}).get('response', {}).get('status', '')
+    return response_payload(response).get('response', {}).get('status', '')
 
 
 def response_result(response):
     if not isinstance(response, dict):
         return None
-    return response.get('payload', {}).get('response', {}).get('result', [])
+    return response_payload(response).get('response', {}).get('result', [])

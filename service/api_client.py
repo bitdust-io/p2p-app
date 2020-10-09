@@ -50,3 +50,12 @@ def message_history(recipient_id=None, sender_id=None, message_type=None, offset
         'offset': offset,
         'limit': limit,
     }, cb=cb)
+
+
+def message_send(recipient_id, data, ping_timeout=30, message_ack_timeout=15, cb=None):
+    return run('message_send', kwargs={
+        'recipient_id': recipient_id,
+        'data': data,
+        'ping_timeout': ping_timeout,
+        'message_ack_timeout': message_ack_timeout,
+    }, cb=cb)

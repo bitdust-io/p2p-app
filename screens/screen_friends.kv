@@ -1,16 +1,18 @@
 <FriendsScreen>:
 	title: '{}  contacts'.format(fa_icon('address-book', with_spaces=False))
 
-	VerticalLayout:
-    	id: friends_list
-    	pos_hint: {'top': 1}
-		size_hint: 1, 1
-		padding: dp(5)
-		spacing: dp(5)
+    VerticalScrollView:
 
-		FriendsListView:
-            id: friends_list_view
-            size_hint: 1, 1
+		VerticalLayout:
+	    	id: friends_list
+	    	pos_hint: {'top': 1}
+			size_hint: 1, 1
+			padding: dp(5)
+			spacing: dp(5)
+	
+			FriendsListView:
+	            id: friends_list_view
+	            size_hint: 1, 1
 
 
 <FriendRecord>:
@@ -37,18 +39,19 @@
     contact_state: 'contact_state'
 
     Label:
+        id: contact_state_field
+        text: root.contact_state
+        font_size: '10sp'
+        color: (.7, .7, .7, 1) if root.contact_state != 'CONNECTED' else (.6, 1, .6, 1)
+        size_hint: None, 1
+        width: self.texture_size[0] + root.text_padding_x
+        text: fa_icon('circle')
+
+    Label:
         id: label_field
         text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
         halign: 'left'
         font_size: '16sp'
-        size_hint: None, 1
-        width: self.texture_size[0] + root.text_padding_x * 2
-
-    Label:
-        id: contact_state_field
-        text: root.contact_state
-        font_size: '16sp'
-        color: (.7, .7, .7, 1)
         size_hint: None, 1
         width: self.texture_size[0] + root.text_padding_x * 2
 

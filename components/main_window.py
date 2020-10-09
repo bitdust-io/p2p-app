@@ -161,7 +161,7 @@ class MainWindow(FloatLayout):
             self.control.run()
             return
         raise Exception('unexpected state: %r' % value)
-    
+
     def on_state_success(self):
         if _Debug:
             print('on_state_success %r %r %r, latest_screen=%r' % (
