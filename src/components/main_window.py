@@ -68,9 +68,15 @@ class MainWindow(FloatLayout):
             return
         scrn, btn = self.active_screens.pop(screen_id)
         self.ids.screen_manager.remove_widget(scrn)
-        self.ids.nav_buttons_layout.remove_widget(btn)
+        if btn:
+            self.ids.nav_buttons_layout.remove_widget(btn)
         if _Debug:
             print('closed screen %r' % screen_id)
+
+    def close_active_screens(self):
+        screen_ids = list(self.active_screens.keys())
+        for screen_id in screen_ids:
+            self.close_screen(screen_id)
 
     def select_screen(self, screen_id, verify_state=False, screen_type=None, **kwargs):
         if screen_type is None:
@@ -110,10 +116,8 @@ class MainWindow(FloatLayout):
             if self.selected_screen:
                 if self.selected_screen not in ['process_dead_screen', 'connecting_screen', ]:
                     self.latest_screen = self.selected_screen
+            self.close_active_screens()
             self.select_screen('process_dead_screen')
-            self.close_screen('connecting_screen')
-            self.close_screen('new_identity_screen')
-            self.close_screen('recover_identity_screen')
             return
         if value == 1:
             self.on_state_success()
@@ -161,7 +165,7 @@ class MainWindow(FloatLayout):
             self.control.run()
             return
         raise Exception('unexpected state: %r' % value)
-    
+
     def on_state_success(self):
         if _Debug:
             print('on_state_success %r %r %r, latest_screen=%r' % (

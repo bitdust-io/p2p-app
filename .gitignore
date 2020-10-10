@@ -1,4 +1,7 @@
 venv
+buildozer
+.buildozer
+python-for-android
 
 
 # Byte-compiled / optimized / DLL files

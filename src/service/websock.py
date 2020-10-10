@@ -22,22 +22,26 @@ _Debug = True
 _WebSocketApp = None
 _WebSocketQueue = None
 _WebSocketReady = False
-_WebSocketClosed = False
+_WebSocketClosed = True
 _WebSocketStarted = False
 _WebSocketConnecting = False
 _LastCallID = 0
 _PendingCalls = []
 _CallbacksQueue = {}
-
+_RegisteredCallbacks = {}
 
 #------------------------------------------------------------------------------
 
-def start():
+def start(callbacks={}):
     global _WebSocketStarted
     global _WebSocketConnecting
     global _WebSocketQueue
+    global _RegisteredCallbacks
     if is_started():
         raise Exception('already started')
+    if _Debug:
+        print('websock.start()')
+    _RegisteredCallbacks = callbacks or {}
     _WebSocketConnecting = True
     _WebSocketStarted = True
     _WebSocketQueue = queue.Queue(maxsize=100)
@@ -49,8 +53,12 @@ def stop():
     global _WebSocketStarted
     global _WebSocketQueue
     global _WebSocketConnecting
+    global _RegisteredCallbacks
     if not is_started():
         raise Exception('has not been started')
+    if _Debug:
+        print('websock.stop()')
+    _RegisteredCallbacks = {}
     _WebSocketStarted = False
     _WebSocketConnecting = False
     while True:
@@ -60,7 +68,10 @@ def stop():
         except queue.Empty:
             break
     _WebSocketQueue.put_nowait((None, None, ))
-    ws().close()
+    if ws():
+        if _Debug:
+            print('websocket already closed')
+        ws().close()
 
 #------------------------------------------------------------------------------
 
@@ -93,6 +104,11 @@ def is_connecting():
     global _WebSocketConnecting
     return _WebSocketConnecting
 
+
+def registered_callbacks():
+    global _RegisteredCallbacks
+    return _RegisteredCallbacks
+
 #------------------------------------------------------------------------------
 
 @mainthread
@@ -105,7 +121,10 @@ def on_open(ws_inst):
     _WebSocketClosed = False
     _WebSocketConnecting = False
     if _Debug:
-        print('websocket opened')
+        print('websocket opened', time.time(), len(_PendingCalls))
+    cb = registered_callbacks().get('on_open')
+    if cb:
+        cb(ws_inst)
     for json_data, cb, in _PendingCalls:
         ws_queue().put_nowait((json_data, cb, ))
     _PendingCalls.clear()
@@ -120,18 +139,27 @@ def on_close(ws_inst):
     _WebSocketClosed = True
     _WebSocketConnecting = False
     if _Debug:
-        print('websocket closed')
+        print('websocket closed', time.time())
+    cb = registered_callbacks().get('on_close')
+    if cb:
+        cb(ws_inst)
 
 
 def on_event(json_data):
     if _Debug:
         print('    WS EVENT:', json_data['payload']['event_id'])
+    cb = registered_callbacks().get('on_event')
+    if cb:
+        cb(json_data)
     return True
 
 
 def on_stream_message(json_data):
     if _Debug:
         print('    WS STREAM MSG:', json_data['payload']['payload']['message_id'])
+    cb = registered_callbacks().get('on_stream_message')
+    if cb:
+        cb(json_data)
     return True
 
 
@@ -174,6 +202,9 @@ def on_error(ws_inst, error):
     global _PendingCalls
     if _Debug:
         print('on_error', error)
+    cb = registered_callbacks().get('on_error')
+    if cb:
+        cb(ws_inst, error)
 
 
 @mainthread
@@ -188,6 +219,8 @@ def on_fail(err, result_callback=None):
 def requests_thread(active_queue):
     global _LastCallID
     global _CallbacksQueue
+    if _Debug:
+        print('starting requests_thread()')
     while True:
         if not is_started():
             if _Debug:
@@ -207,6 +240,13 @@ def requests_thread(active_queue):
         if call_id in _CallbacksQueue:
             on_fail(Exception('call_id was not unique'), result_callback)
             continue
+        if not ws():
+            on_fail(Exception('websocket is closed'), result_callback)
+            continue
+#         result_callback = _CallbacksQueue.pop(call_id)
+#         if result_callback:
+#             result_callback(json_data)
+#         return True
         _CallbacksQueue[call_id] = result_callback
         data = json.dumps(json_data)
         if _Debug:
@@ -220,31 +260,33 @@ def websocket_thread():
     global _WebSocketApp
     global _WebSocketClosed
     websocket.enableTrace(False)
-    _WebSocketApp = websocket.WebSocketApp(
-        "ws://localhost:8280/",
-        on_message = on_message,
-        on_error = on_error,
-        on_close = on_close,
-        on_open = on_open,
-    )
     if _Debug:
         print('websocket_thread() beginning')
     while is_started():
         if _Debug:
             print('websocket_thread() calling run_forever(ping_interval=10) %r' % time.asctime())
         _WebSocketClosed = False
+        _WebSocketApp = websocket.WebSocketApp(
+            "ws://localhost:8280/",
+            on_message = on_message,
+            on_error = on_error,
+            on_close = on_close,
+            on_open = on_open,
+        )
         try:
             ret = ws().run_forever(ping_interval=10)
         except Exception as exc:
+            _WebSocketApp = None
             if _Debug:
                 print('websocket_thread(): %r' % exc)
             time.sleep(3)
         if _Debug:
-            print('websocket_thread().run_forever() returned %r' % ret)
-        if ret:
-            time.sleep(3)
-        else:
+            print('websocket_thread().run_forever() returned: %r  is_started: %r' % (ret, is_started(), ))
+        del _WebSocketApp
+        _WebSocketApp = None
+        if not is_started():
             break
+        time.sleep(3)
     _WebSocketApp = None
     if _Debug:
         print('websocket_thread() finished')
@@ -275,6 +317,8 @@ def verify_state():
 def ws_call(json_data, cb=None):
     global _PendingCalls
     st = verify_state()
+    if _Debug:
+        print('ws_call', st, cb)
     if st == 'ready':
         ws_queue().put_nowait((json_data, cb, ))
         return True
@@ -303,19 +347,23 @@ def is_ok(response):
     return response_status(response) == 'OK'
 
 
+def response_payload(response):
+    return response.get('payload', {})
+
+
 def response_errors(response):
     if not isinstance(response, dict):
         return ['no response', ]
-    return response.get('payload', {}).get('response', {}).get('errors', [])
+    return response_payload(response).get('response', {}).get('errors', [])
 
 
 def response_status(response):
     if not isinstance(response, dict):
         return ''
-    return response.get('payload', {}).get('response', {}).get('status', '')
+    return response_payload(response).get('response', {}).get('status', '')
 
 
 def response_result(response):
     if not isinstance(response, dict):
         return None
-    return response.get('payload', {}).get('response', {}).get('result', [])
+    return response_payload(response).get('response', {}).get('result', [])

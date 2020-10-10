@@ -19,6 +19,11 @@ pyclean:
 clean: pyclean
 	@rm -rf venv
 
+clean_android_build:
+	@rm -rf .build_incremental
+	@rm -rf .release_incremental
+	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android clean
+
 venv:
 	@rm -rf venv
 	@$(PYTHON_VERSION) -m venv venv
@@ -35,9 +40,57 @@ endif
 
 install: system_dependencies clean venv
 
+install_buildozer:
+	@rm -rf buildozer/
+	@git clone https://github.com/vesellov/buildozer
+	@cd buildozer/; ../venv/bin/python setup.py build; ../venv/bin/pip install -e .; cd ..;
+
+install_p4a:
+	@rm -rf python-for-android/
+	#@git clone --single-branch --branch master https://github.com/kivy/python-for-android.git
+	@git clone --single-branch --branch master https://github.com/vesellov/python-for-android.git
+	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
+	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
+
+update_p4a:
+	@cd ./python-for-android; git fetch --all; git reset --hard origin/master; cd ..;
+
+update_engine_repo:
+	@cd ./src/bitdust; git fetch --all; git reset --hard origin/master; cd ..;
+
+rewrite_android_dist_files:
+	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
+	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
+
+refresh_android_environment: update_p4a update_engine_repo rewrite_android_dist_files
+
+.build_android_incremental:
+	@python3 -c "import os, re; s = re.sub('(requirements = .+?python3)','# \g<1>',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
+	@python3 -c "import os, re; s = re.sub('# requirements = incremental,kivy','requirements = incremental,kivy',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
+	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android debug
+	@python3 -c "import os, re; s = re.sub('# (requirements = .+?python3)','\g<1>',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
+	@python3 -c "import os, re; s = re.sub('requirements = incremental,kivy','# requirements = incremental,kivy',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
+	@echo '1' > .build_android_incremental
+
+build_android: refresh_environment .build_android_incremental
+	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android debug
+
+.release_android_incremental:
+	@python3 -c "import os, re; s = re.sub('(requirements = .+?python3)','# \g<1>',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
+	@python3 -c "import os, re; s = re.sub('# requirements = incremental,kivy','requirements = incremental,kivy',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
+	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
+	@python3 -c "import os, re; s = re.sub('# (requirements = .+?python3)','\g<1>',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
+	@python3 -c "import os, re; s = re.sub('requirements = incremental,kivy','# requirements = incremental,kivy',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
+	@echo '1' > .release_android_incremental
+
+release: refresh_android_environment .release_android_incremental
+	@rm -rfv ./bin/*.apk
+	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release  | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
+	@mv ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
+
 update:
 	@git fetch
 	@git reset --hard origin/master
 
 run:
-	@$(PYTHON) main.py
+	@$(PYTHON) src/main.py

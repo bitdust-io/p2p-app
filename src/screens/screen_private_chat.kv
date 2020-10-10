@@ -1,20 +1,23 @@
 <PrivateChatScreen>:
 
-    BoxLayout:
-        orientation: 'vertical'
+    VerticalLayout:
         size_hint: 1, 1
+        pos_hint: {'top': 1}
 
-		BoxLayout:
-			id: chat_messages
-	        orientation: 'vertical'
-	        size_hint: 1, 1
-	        padding: 5
-	        spacing: 5
+	    VerticalScrollView:
+	    	id: chat_messages_view
 
-        BoxLayout:
-            orientation: 'horizontal'
-            height: self.minimum_height
+			VerticalLayout:
+				id: chat_messages
+				size_hint: 1, None
+				height: self.minimum_height
+		        padding: 5
+		        spacing: 5
+
+        HorizontalLayout:
             size_hint: 1, None
+            height: self.minimum_height
+	        pos_hint: {'bottom': 1}
 
             DynamicHeightTextInput:
                 id: chat_input
@@ -28,6 +31,7 @@
 				height: self.texture_size[1] + self.text_padding_y * 2
             	font_size: app.font_size_icon
                 text: fa_icon('paper-plane')
+                on_release: root.on_chat_send_button_clicked()
 
 
 <DynamicHeightTextInput>:

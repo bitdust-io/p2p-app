@@ -60,7 +60,7 @@ class FriendRecord(SelectableHorizontalRecord):
             self.visible_buttons.clear()
 
     def on_chat_button_clicked(self, *args):
-        self.parent.parent.parent.parent.main_win().select_screen(
+        self.parent.parent.parent.parent.parent.main_win().select_screen(
             screen_id='private_chat_{}'.format(self.global_id),
             screen_type='private_chat_screen',
             global_id=self.global_id,

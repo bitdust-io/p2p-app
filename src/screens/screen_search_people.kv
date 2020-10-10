@@ -30,14 +30,14 @@
 <SearchPeopleScreen>:
 
     VerticalLayout:
-        pos_hint: {'top': 1}
         size_hint: 1, 1
+        pos_hint: {'top': 1}
         padding: 15
 
 		HorizontalLayout:
-	        pos_hint: {'top': 1}
 			size_hint: 1, None
         	height: self.minimum_height
+	        pos_hint: {'top': 1}
 
 			SingleLineTextInput:
 				id: search_input
@@ -57,8 +57,8 @@
 
 			VerticalLayout:
 		    	id: search_results
-		    	pos_hint: {'top': 1}
 				size_hint: 1, None
 				height: self.minimum_height
+		    	pos_hint: {'top': 1}
 				padding: 5
 				spacing: 5
