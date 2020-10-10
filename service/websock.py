@@ -22,7 +22,7 @@ _Debug = True
 _WebSocketApp = None
 _WebSocketQueue = None
 _WebSocketReady = False
-_WebSocketClosed = False
+_WebSocketClosed = True
 _WebSocketStarted = False
 _WebSocketConnecting = False
 _LastCallID = 0
@@ -39,6 +39,8 @@ def start(callbacks={}):
     global _RegisteredCallbacks
     if is_started():
         raise Exception('already started')
+    if _Debug:
+        print('websock.start()')
     _RegisteredCallbacks = callbacks or {}
     _WebSocketConnecting = True
     _WebSocketStarted = True
@@ -54,6 +56,8 @@ def stop():
     global _RegisteredCallbacks
     if not is_started():
         raise Exception('has not been started')
+    if _Debug:
+        print('websock.stop()')
     _RegisteredCallbacks = {}
     _WebSocketStarted = False
     _WebSocketConnecting = False
@@ -64,7 +68,10 @@ def stop():
         except queue.Empty:
             break
     _WebSocketQueue.put_nowait((None, None, ))
-    ws().close()
+    if ws():
+        if _Debug:
+            print('websocket already closed')
+        ws().close()
 
 #------------------------------------------------------------------------------
 
@@ -114,7 +121,7 @@ def on_open(ws_inst):
     _WebSocketClosed = False
     _WebSocketConnecting = False
     if _Debug:
-        print('websocket opened')
+        print('websocket opened', time.time(), len(_PendingCalls))
     cb = registered_callbacks().get('on_open')
     if cb:
         cb(ws_inst)
@@ -132,7 +139,7 @@ def on_close(ws_inst):
     _WebSocketClosed = True
     _WebSocketConnecting = False
     if _Debug:
-        print('websocket closed')
+        print('websocket closed', time.time())
     cb = registered_callbacks().get('on_close')
     if cb:
         cb(ws_inst)
@@ -212,6 +219,8 @@ def on_fail(err, result_callback=None):
 def requests_thread(active_queue):
     global _LastCallID
     global _CallbacksQueue
+    if _Debug:
+        print('starting requests_thread()')
     while True:
         if not is_started():
             if _Debug:
@@ -231,6 +240,13 @@ def requests_thread(active_queue):
         if call_id in _CallbacksQueue:
             on_fail(Exception('call_id was not unique'), result_callback)
             continue
+        if not ws():
+            on_fail(Exception('websocket is closed'), result_callback)
+            continue
+#         result_callback = _CallbacksQueue.pop(call_id)
+#         if result_callback:
+#             result_callback(json_data)
+#         return True
         _CallbacksQueue[call_id] = result_callback
         data = json.dumps(json_data)
         if _Debug:
@@ -244,31 +260,33 @@ def websocket_thread():
     global _WebSocketApp
     global _WebSocketClosed
     websocket.enableTrace(False)
-    _WebSocketApp = websocket.WebSocketApp(
-        "ws://localhost:8280/",
-        on_message = on_message,
-        on_error = on_error,
-        on_close = on_close,
-        on_open = on_open,
-    )
     if _Debug:
         print('websocket_thread() beginning')
     while is_started():
         if _Debug:
             print('websocket_thread() calling run_forever(ping_interval=10) %r' % time.asctime())
         _WebSocketClosed = False
+        _WebSocketApp = websocket.WebSocketApp(
+            "ws://localhost:8280/",
+            on_message = on_message,
+            on_error = on_error,
+            on_close = on_close,
+            on_open = on_open,
+        )
         try:
             ret = ws().run_forever(ping_interval=10)
         except Exception as exc:
+            _WebSocketApp = None
             if _Debug:
                 print('websocket_thread(): %r' % exc)
             time.sleep(3)
         if _Debug:
-            print('websocket_thread().run_forever() returned %r' % ret)
-        if ret:
-            time.sleep(3)
-        else:
+            print('websocket_thread().run_forever() returned: %r  is_started: %r' % (ret, is_started(), ))
+        del _WebSocketApp
+        _WebSocketApp = None
+        if not is_started():
             break
+        time.sleep(3)
     _WebSocketApp = None
     if _Debug:
         print('websocket_thread() finished')
@@ -299,6 +317,8 @@ def verify_state():
 def ws_call(json_data, cb=None):
     global _PendingCalls
     st = verify_state()
+    if _Debug:
+        print('ws_call', st, cb)
     if st == 'ready':
         ws_queue().put_nowait((json_data, cb, ))
         return True

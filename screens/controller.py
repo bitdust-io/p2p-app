@@ -52,6 +52,7 @@ class Controller(object):
 
     def start(self):
         websock.start(callbacks={
+            'on_open': self.on_websocket_open,
             'on_error': self.on_websocket_error,
             'on_stream_message': self.on_websocket_stream_message,
         })
@@ -115,11 +116,12 @@ class Controller(object):
     def on_process_health_result(self, resp):
         if _Debug:
             print('on_process_health_result %r' % resp)
-        self.process_health_latest = time.time()
         if not isinstance(resp, dict):
             self.mw().state_process_health = -1
+            self.process_health_latest = 0
             return
         self.mw().state_process_health = 1 if websock.is_ok(resp) else -1
+        self.process_health_latest = time.time() if websock.is_ok(resp) else 0
         self.run()
 
     def verify_identity_get(self, *args, **kwargs):
@@ -134,6 +136,8 @@ class Controller(object):
         self.run()
 
     def verify_network_connected(self, *args, **kwargs):
+        if _Debug:
+            print('verify_network_connected', time.asctime())
         return api_client.network_connected(cb=self.on_network_connected_result)
 
     def on_network_connected_result(self, resp):
@@ -146,11 +150,19 @@ class Controller(object):
 
     #------------------------------------------------------------------------------
 
+    def on_websocket_open(self, websocket_instance):
+        if _Debug:
+            print('on_websocket_open', websocket_instance)
+        if self.mw().state_process_health != 1:
+            self.process_health_latest = 0
+            self.verify_process_health()
+
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:
             print('on_websocket_error', websocket_instance, error)
         if self.mw().state_process_health != -1:
             self.mw().state_process_health = -1
+            self.process_health_latest = 0
             self.verify_process_health()
 
     def on_websocket_stream_message(self, json_data):
