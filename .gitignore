@@ -3,6 +3,19 @@ buildozer
 .buildozer
 python-for-android
 src/bitdust
+src/version.py
+bin/
+.release_android_incremental
+.build_android_incremental
+*.pyc
+*/*.pyc
+*.pyo
+*/*.pyo
+*.pyd
+*/*.pyd
+.DS_Store
+.buildozer/
+.tmp/
 
 
 # Byte-compiled / optimized / DLL files

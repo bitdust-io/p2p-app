@@ -15,11 +15,9 @@ rm -rf buildozer.spec.bk
 
 cp -v buildozer.spec buildozer.spec.bk
 
-# sed -i "s/^version = [0-9]*.[0-9]*.[0-9]*$/version = $1/g" buildozer.spec
-
 echo "__version__ = \"$1\"" > src/version.py
 
-make release
+make release_android
 
 mv -v -f buildozer.spec.bk buildozer.spec
 

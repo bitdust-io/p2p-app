@@ -34,7 +34,7 @@ run:
 	@$(PYTHON) src/main.py
 
 
-### Requirements / Dependencies
+### Requirements & Dependencies
 
 system_dependencies:
 ifeq ($(OS), Ubuntu)
@@ -50,7 +50,6 @@ install_buildozer:
 
 install_p4a:
 	@rm -rf python-for-android/
-	#@git clone --single-branch --branch master https://github.com/kivy/python-for-android.git
 	@git clone --single-branch --branch master https://github.com/vesellov/python-for-android.git
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
@@ -65,7 +64,7 @@ update_engine_repo:
 	@cd ./src/bitdust; git fetch --all; git reset --hard origin/master; cd ../..;
 
 
-### Android release
+### Android release & development
 
 clean_android_build:
 	@rm -rf .build_incremental
@@ -101,3 +100,41 @@ release_android: refresh_android_environment .release_android_incremental
 	@rm -rfv ./bin/*.apk
 	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release  | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
 	@mv ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
+
+download_apk:
+	@rm -rfv bin/*.apk
+	@scp android.build:bitdust.android/bin/BitDustAndroid.apk bin/.
+	@ls -la bin/
+
+test_apk:
+	@adb install -r bin/BitDustAndroid.apk
+
+log_adb:
+	@adb logcat | grep -vE "python  : extracting|pythonutil: Checking pattern" | grep -E "WebViewConsole|python|DEBUG|Bitdustnode|BitDustActivity|PythonActivity|BitDust|SDL|PythonService|crush|Exception|WebViewManager|WebViewFactory"
+
+log_adb_fast:
+	@adb logcat | grep -E "WebViewConsole|python|DEBUG|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust1|bitdust_io|Exception|WebViewManager|WebViewFactory"
+
+log_adb_brief:
+	@adb logcat | grep -v "Notification.Badge:" | grep -v "GameManagerService:" | grep -v "GamePkgDataHelper:" | grep -v "Layer   :" | grep -v "SurfaceFlinger:" | grep -v "SurfaceControl:" | grep -v "RemoteAnimationController:" | grep -v "WindowManager:" | grep -v extracting | grep -v "Checking pattern" | grep -v "Library loading" | grep -v "Loading library" | grep -v "AppleWebKit/537.36 (KHTML, like Gecko)" | grep -v "I Bitdustnode:   " | grep -v "I Bitdustnode: DEBUG:jnius.reflect:" | grep -e python -e Bitdustnode -e "E AndroidRuntime" -e "F DEBUG" -e "PythonActivity:" -e "WebViewConsole:" -e "SDL     :" -e "PythonService:" -e "org.bitdust_io.bitdust1"
+
+log_adb_short:
+	@adb logcat | grep -v "python  : extracting" | grep -v "pythonutil: Checking pattern" | grep -e python -e Bitdustnode -e "E AndroidRuntime" -e "F DEBUG" -e "PythonActivity:" -e "WebViewConsole:" -e "SDL     :" -e "PythonService:"
+
+log_adb_full:
+	@adb logcat
+
+log_main:
+	@adb shell tail -f /storage/emulated/0/.bitdust/logs/android.log
+
+log_states:
+	@adb shell tail -f /storage/emulated/0/.bitdust/logs/automats.log
+
+shell:
+	@adb shell "cd /storage/emulated/0/.bitdust/; ls -la; sh;"
+
+cat_main_log:
+	@adb shell cat /storage/emulated/0/.bitdust/logs/android.log
+
+cat_automat_log:
+	@adb shell cat /storage/emulated/0/.bitdust/logs/automats.log
