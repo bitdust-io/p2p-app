@@ -6,7 +6,6 @@ from kivy.uix.screenmanager import ScreenManager
 #------------------------------------------------------------------------------
 
 class ScreenManagement(ScreenManager):
-
     pass
 
 #------------------------------------------------------------------------------
@@ -50,5 +49,4 @@ class NavButtonClosable(NavButtonWrap):
 #------------------------------------------------------------------------------
 
 from kivy.lang.builder import Builder
-print('./components/navigation.kv')
 Builder.load_file('./components/navigation.kv')

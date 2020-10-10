@@ -3,8 +3,8 @@ from components.labels import NormalLabel
 from components.text_input import BasicTextInput
 from components.webfont import fa_icon
 
-from service import api_client
-from service import websock
+from lib import api_client
+from lib import websock
 
 #------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 from components.screen import AppScreen
-from components.webfont import fa_icon
-from service import api_client
+
+from lib import api_client
 
 #------------------------------------------------------------------------------
 

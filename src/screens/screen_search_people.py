@@ -6,7 +6,7 @@ from components.layouts import HorizontalLayout
 from components.screen import AppScreen
 from components.webfont import fa_icon
 
-from service import api_client
+from lib import api_client
 
 #------------------------------------------------------------------------------
 
@@ -80,7 +80,6 @@ class SearchPeopleScreen(AppScreen):
             self.ids.search_results.add_widget(SearchResult(
                 label_text=str(r['global_id']),
             ))
-
 
 #------------------------------------------------------------------------------
 

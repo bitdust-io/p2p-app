@@ -2,8 +2,8 @@ import time
 
 #------------------------------------------------------------------------------
 
-from service import websock
-from service import api_client
+from lib import websock
+from lib import api_client
 
 #------------------------------------------------------------------------------
 

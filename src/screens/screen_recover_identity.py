@@ -1,6 +1,8 @@
 from components.screen import AppScreen
-from service import websock
 
+from lib import websock
+
+#------------------------------------------------------------------------------
 
 class RecoverIdentityScreen(AppScreen):
 
@@ -33,6 +35,7 @@ class RecoverIdentityScreen(AppScreen):
         self.main_win().select_screen('welcome_screen')
         self.control().run()
 
+#------------------------------------------------------------------------------
 
 from kivy.lang.builder import Builder 
 Builder.load_file('./screens/screen_recover_identity.kv')

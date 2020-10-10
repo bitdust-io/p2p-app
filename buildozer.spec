@@ -1,7 +1,7 @@
 [app]
 
 # (str) Title of your application
-title = BitDust P2P App
+title = BitDust p2p-app
 
 # (str) Package name
 package.name = bitdust_p2p
@@ -134,9 +134,9 @@ android.ndk_api = 26
 android.accept_sdk_license = True
 
 # (str) Android entry point, default is ok for Kivy-based app
-android.entrypoint = org.bitdust_io.bitdust1.BitDustActivity
-android.activity_class_name = org.bitdust_io.bitdust1.BitDustActivity
-android.service_class_name = org.bitdust_io.bitdust1.BitDustService
+android.entrypoint = org.bitdust_io.bitdust_p2p.BitDustActivity
+android.activity_class_name = org.bitdust_io.bitdust_p2p.BitDustActivity
+android.service_class_name = org.bitdust_io.bitdust_p2p.BitDustService
 
 # (list) Pattern to whitelist for the whole project
 #android.whitelist =
@@ -168,7 +168,7 @@ android.add_src = java_classes/
 #android.gradle_dependencies =
 
 # (list) Java classes to add as activities to the manifest.
-android.add_activites = org.bitdust_io.bitdust1.BitDustActivity
+android.add_activites = org.bitdust_io.bitdust_p2p.BitDustActivity
 
 # (str) OUYA Console category. Should be one of GAME or APP
 # If you leave this blank, OUYA support will not be enabled
