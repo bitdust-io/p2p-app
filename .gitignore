@@ -2,6 +2,7 @@ venv
 buildozer
 .buildozer
 python-for-android
+src/bitdust
 
 
 # Byte-compiled / optimized / DLL files

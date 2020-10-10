@@ -31,11 +31,19 @@ venv:
 	@$(PIP) install Cython pygments docutils pillow
 	@$(PIP) install -r $(REQUIREMENTS_TXT)
 
+update:
+	@git fetch
+	@git reset --hard origin/master
+
+run:
+	@$(PYTHON) src/main.py
+
+
+### Requirements / Dependencies
+
 system_dependencies:
 ifeq ($(OS), Ubuntu)
 	@sudo apt-get install --yes --no-install-recommends python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip
-elif
-	@brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer
 endif
 
 install: system_dependencies clean venv
@@ -55,15 +63,11 @@ install_p4a:
 update_p4a:
 	@cd ./python-for-android; git fetch --all; git reset --hard origin/master; cd ..;
 
+make_link_engine_repo:
+	@rm -rf ./src/bitdust; ln -s ../../bitdust ./src/bitdust;
+
 update_engine_repo:
-	@cd ./src/bitdust; git fetch --all; git reset --hard origin/master; cd ..;
-
-update:
-	@git fetch
-	@git reset --hard origin/master
-
-run:
-	@$(PYTHON) src/main.py
+	@cd ./src/bitdust; git fetch --all; git reset --hard origin/master; cd ../..;
 
 
 ### Android release
