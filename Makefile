@@ -58,6 +58,16 @@ update_p4a:
 update_engine_repo:
 	@cd ./src/bitdust; git fetch --all; git reset --hard origin/master; cd ..;
 
+update:
+	@git fetch
+	@git reset --hard origin/master
+
+run:
+	@$(PYTHON) src/main.py
+
+
+### Android release
+
 rewrite_android_dist_files:
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
@@ -83,14 +93,7 @@ build_android: refresh_environment .build_android_incremental
 	@python3 -c "import os, re; s = re.sub('requirements = incremental,kivy','# requirements = incremental,kivy',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
 	@echo '1' > .release_android_incremental
 
-release: refresh_android_environment .release_android_incremental
+release_android: refresh_android_environment .release_android_incremental
 	@rm -rfv ./bin/*.apk
 	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release  | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
 	@mv ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
-
-update:
-	@git fetch
-	@git reset --hard origin/master
-
-run:
-	@$(PYTHON) src/main.py
