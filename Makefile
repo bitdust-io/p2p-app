@@ -19,11 +19,6 @@ pyclean:
 clean: pyclean
 	@rm -rf venv
 
-clean_android_build:
-	@rm -rf .build_incremental
-	@rm -rf .release_incremental
-	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android clean
-
 venv:
 	@rm -rf venv
 	@$(PYTHON_VERSION) -m venv venv
@@ -43,7 +38,7 @@ run:
 
 system_dependencies:
 ifeq ($(OS), Ubuntu)
-	@sudo apt-get install --yes --no-install-recommends python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip
+	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip
 endif
 
 install: system_dependencies clean venv
@@ -71,6 +66,11 @@ update_engine_repo:
 
 
 ### Android release
+
+clean_android_build:
+	@rm -rf .build_incremental
+	@rm -rf .release_incremental
+	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android clean
 
 rewrite_android_dist_files:
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
