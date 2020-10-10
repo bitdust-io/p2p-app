@@ -1,13 +1,32 @@
 import os
+import sys
+
+#------------------------------------------------------------------------------ 
+
+_Debug = True
+
+#------------------------------------------------------------------------------
+
+if _Debug:
+    print('__file__', os.path.dirname(os.path.abspath(__file__)))
+    print('os.getcwd', os.path.abspath(os.getcwd()))
+    print('sys.path', sys.path)
+    print('os.listdir', os.listdir(os.getcwd()))
+
+#------------------------------------------------------------------------------
+
+# current_src_folder = os.path.abspath(os.path.join(os.getcwd(), 'src'))
+# if os.path.isdir(current_src_folder):
+#     if current_src_folder not in sys.path:
+#         sys.path.append(current_src_folder)
+#         if _Debug:
+#             print('added %r to Python sys.path' % current_src_folder)
 
 #------------------------------------------------------------------------------
 
 from kivy.app import App
 from kivy.config import Config
-from kivy.core.window import Window
-from kivy.clock import Clock
 from kivy.lang import Builder
-from kivy.properties import BooleanProperty  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
@@ -21,10 +40,6 @@ if is_android():
     from jnius import autoclass  # @UnresolvedImport
     from android.permissions import request_permissions, Permission  # @UnresolvedImport
     import encodings.idna
-
-#------------------------------------------------------------------------------ 
-
-_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -104,10 +119,6 @@ class BitDustApp(App):
         self.main_window.unregister_controller()
         self.main_window.unregister_screens()
         # TODO: check if we need to stop BitDust engine after App closes
-        if is_android():
-            pass
-        else:
-            pass
 
     def on_pause(self):
         if _Debug:
@@ -118,7 +129,9 @@ class BitDustApp(App):
         if _Debug:
             print('BitDustApp.on_resume')
 
-    def start_service(self, finishing=False):
+    def start_android_service(self, finishing=False):
+        if not is_android():
+            return None
         if _Debug:
             print('BitDustApp.start_service finishing=%r' % finishing)
         service = autoclass(SERVICE_NAME)
@@ -137,23 +150,35 @@ class BitDustApp(App):
             self.service = service
             if _Debug:
                 print('service STARTED : %r' % self.service)
+        return self.service
 
-    def stop_service(self):
+    def stop_android_service(self):
+        if not is_android():
+            return None
         if _Debug:
             print('BitDustApp.stop_service %r' % self.service)
         service = autoclass(SERVICE_NAME)
         service.stop(PythonActivity.mActivity)
-        self.start_service(finishing=True)
+        self.start_android_service(finishing=True)
         if _Debug:
             print('BitDustApp.stop_service STOPPED')
+        return self.service
 
     def request_app_permissions(self, list_permissions=[]):
+        if not is_android():
+            return None
         global APP_STARTUP_PERMISSIONS
         if _Debug:
             print('BitDustApp.request_app_permissions', list_permissions or APP_STARTUP_PERMISSIONS)
         ret = request_permissions(list_permissions or APP_STARTUP_PERMISSIONS)
         if _Debug:
             print('request_permissions result : %r' % ret)
+        return ret
+
+    def check_restart_bitdust_engine(self):
+        if is_android():
+            return None
+        # TODO: to be implemented ...
 
 #------------------------------------------------------------------------------
 

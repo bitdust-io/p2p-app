@@ -44,20 +44,26 @@ BitDust p2p-app APK bundle will include files from both repositories, so we need
 
 ##### Install dependencies (tested on Ubuntu 18.04 Desktop)
 
-        make install_dependencies_ubuntu
+        make system_dependencies
+        make system_dependencies_android
 
 
-##### Install Buildozer
+##### Create Python virtual environment
+
+		make venv
+
+
+##### Install Buildozer into the virtual environment
 
         make install_buildozer
 
 
-##### Install python-for-android
+##### Install python-for-android (in a separate folder)
 
         make install_p4a
 
 
-##### Prepare keystore
+##### Prepare keystore to protect your .APK
 
 To be able to publish BitDust on Google Play Market .APK file must be digitaly signed.
 
@@ -79,12 +85,12 @@ This way Google will be able to verify the .APK file you built before publish it
 
 
 
-##### Make sure BitDust Engine and is up to date
+##### Make sure BitDust Engine is up to date before the build
 
         make update_engine_repo
 
 
-##### Build APK image
+##### Build APK image with specific version
 
         ./release_ubuntu.sh 1.0.5
 

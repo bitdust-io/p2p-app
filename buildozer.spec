@@ -36,7 +36,7 @@ version.filename = %(source.dir)s/version.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy,
-requirements = kivy,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,twisted==20.3.0,python3
+requirements = kivy,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,websocket_client,twisted==20.3.0,python3
 # requirements = incremental,kivy
 # there is an issue with incremental/twisted build... first you need to build only incremental and then twisted in second run
 
@@ -65,7 +65,7 @@ services = Bitdustnode:./service/main.py
 #
 
 #
-# author = © Copyright Info
+# author = (C) Copyright Info
 
 # change the major version of python used by the app
 osx.python_version = 3

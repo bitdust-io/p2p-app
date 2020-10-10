@@ -38,7 +38,7 @@ run:
 
 system_dependencies:
 ifeq ($(OS), Ubuntu)
-	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip
+	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip python-virtualenv libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip
 endif
 
 install: system_dependencies clean venv
@@ -70,6 +70,12 @@ clean_android_build:
 	@rm -rf .build_incremental
 	@rm -rf .release_incremental
 	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android clean
+
+system_dependencies_android:
+ifeq ($(OS), Ubuntu)
+	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends openjdk-8-jdk cython autoconf
+endif
+
 
 rewrite_android_dist_files:
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
@@ -103,7 +109,7 @@ release_android: refresh_android_environment .release_android_incremental
 
 download_apk:
 	@rm -rfv bin/*.apk
-	@scp android.build:bitdust.android/bin/BitDustAndroid.apk bin/.
+	@scp android.build:p2p-app/bin/BitDustAndroid.apk bin/.
 	@ls -la bin/
 
 test_apk:
