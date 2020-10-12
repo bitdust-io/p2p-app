@@ -50,7 +50,7 @@ BitDust p2p-app APK bundle will include files from both repositories, so we need
 
 ##### Create Python virtual environment
 
-		make venv
+        make venv
 
 
 ##### Install Buildozer into the virtual environment

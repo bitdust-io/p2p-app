@@ -23,7 +23,7 @@ venv:
 	@rm -rf venv
 	@$(PYTHON_VERSION) -m venv venv
 	@$(PIP) install --upgrade pip
-	@$(PIP) install Cython pygments docutils pillow
+	# @$(PIP) install Cython pygments docutils pillow
 	@$(PIP) install -r $(REQUIREMENTS_TXT)
 
 update:
@@ -61,7 +61,7 @@ make_link_engine_repo:
 	@rm -rf ./src/bitdust; ln -s ../../bitdust ./src/bitdust;
 
 update_engine_repo:
-	@cd ./src/bitdust; git fetch --all; git reset --hard origin/master; cd ../..;
+	@cd ./src/bitdust; git fetch origin -v; git reset --hard origin/master; cd ../..;
 
 
 ### Android release & development
@@ -71,11 +71,15 @@ clean_android_build:
 	@rm -rf .release_incremental
 	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android clean
 
+clean_android_build_full:
+	@rm -rf .build_incremental
+	@rm -rf .release_incremental
+	@rm -rf .buildozer
+
 system_dependencies_android:
 ifeq ($(OS), Ubuntu)
 	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends openjdk-8-jdk cython autoconf
 endif
-
 
 rewrite_android_dist_files:
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
@@ -104,7 +108,8 @@ build_android: refresh_environment .build_android_incremental
 
 release_android: refresh_android_environment .release_android_incremental
 	@rm -rfv ./bin/*.apk
-	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release  | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
+	# @VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
+	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
 	@mv ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 download_apk:
