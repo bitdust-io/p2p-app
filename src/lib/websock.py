@@ -320,7 +320,7 @@ def ws_call(json_data, cb=None):
     global _PendingCalls
     st = verify_state()
     if _Debug:
-        print('ws_call', st, cb)
+        print('ws_call', st)
     if st == 'ready':
         ws_queue().put_nowait((json_data, cb, ))
         return True

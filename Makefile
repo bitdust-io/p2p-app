@@ -45,8 +45,8 @@ install: system_dependencies clean venv
 
 install_buildozer:
 	@rm -rf buildozer/
-	@git clone https://github.com/vesellov/buildozer
-	@cd buildozer/; ../venv/bin/python setup.py build; ../venv/bin/pip install -e .; cd ..;
+	@git clone https://github.com/vesellov/buildozer buildozer
+	@cd ./buildozer/; ../venv/bin/python setup.py build; ../venv/bin/pip install -e .; cd ..
 
 install_p4a:
 	@rm -rf python-for-android/
@@ -108,8 +108,8 @@ build_android: refresh_environment .build_android_incremental
 
 release_android: refresh_android_environment .release_android_incremental
 	@rm -rfv ./bin/*.apk
-	# @VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
-	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
+	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
+	# @VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
 	@mv ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 download_apk:

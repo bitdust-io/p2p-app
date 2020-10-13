@@ -25,6 +25,10 @@ class RoundedFlexHeightButton(RoundedButton):
 class RoundedFlexButton(RoundedButton):
     pass
 
+
+class TransparentButton(BasicButton):
+    pass
+
 #------------------------------------------------------------------------------
 
 from kivy.lang.builder import Builder 

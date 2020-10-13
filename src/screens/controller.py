@@ -23,12 +23,12 @@ def all_screens():
     from screens import screen_friends
     from screens import screen_private_chat
     return {
-        'process_dead_screen': screen_process_dead.ProcessDeadScreen,
         'main_menu_screen': screen_main_menu.MainMenuScreen,
+        'process_dead_screen': screen_process_dead.ProcessDeadScreen,
         'connecting_screen': screen_connecting.ConnectingScreen,
-        'welcome_screen': screen_welcome.WelcomeScreen,
         'new_identity_screen': screen_new_identity.NewIdentityScreen,
         'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
+        'welcome_screen': screen_welcome.WelcomeScreen,
         'my_id_screen': screen_my_id.MyIDScreen,
         'search_people_screen': screen_search_people.SearchPeopleScreen,
         'friends_screen': screen_friends.FriendsScreen,
@@ -63,7 +63,10 @@ class Controller(object):
 
     def run(self):
         if _Debug:
-            print('control.run')
+            print('control.run %r/%r %r/%r %r/%r' % (
+                self.mw().state_process_health, self.process_health_latest,
+                self.mw().state_identity_get, self.identity_get_latest,
+                self.mw().state_network_connected, self.network_connected_latest, ))
         # BitDust node process must be running already
         if self.mw().state_process_health == 0:
             return self.verify_process_health()
@@ -88,6 +91,17 @@ class Controller(object):
         # all is good
         return True
 
+    def verify_process_health(self, *args, **kwargs):
+        return api_client.process_health(cb=self.on_process_health_result)
+
+    def verify_identity_get(self, *args, **kwargs):
+        return api_client.identity_get(cb=self.on_identity_get_result)
+
+    def verify_network_connected(self, *args, **kwargs):
+        if _Debug:
+            print('verify_network_connected', time.asctime())
+        return api_client.network_connected(cb=self.on_network_connected_result)
+
     #------------------------------------------------------------------------------
 
     def add_callback(self, target, cb, cb_id=None):
@@ -110,42 +124,39 @@ class Controller(object):
 
     #------------------------------------------------------------------------------
 
-    def verify_process_health(self, *args, **kwargs):
-        return api_client.process_health(cb=self.on_process_health_result)
-
     def on_process_health_result(self, resp):
-        if _Debug:
-            print('on_process_health_result %r' % resp)
         if not isinstance(resp, dict):
-            self.mw().state_process_health = -1
+            if _Debug:
+                print('on_process_health_result %r' % resp)
             self.process_health_latest = 0
+            self.mw().state_process_health = -1
             return
         self.mw().state_process_health = 1 if websock.is_ok(resp) else -1
         self.process_health_latest = time.time() if websock.is_ok(resp) else 0
         self.run()
 
-    def verify_identity_get(self, *args, **kwargs):
-        return api_client.identity_get(cb=self.on_identity_get_result)
-
     def on_identity_get_result(self, resp):
         self.identity_get_latest = time.time()
         if not isinstance(resp, dict):
+            if _Debug:
+                print('on_identity_get_result', resp)
+            self.identity_get_latest = 0
             self.mw().state_identity_get = -1
             return
         self.mw().state_identity_get = 1 if websock.is_ok(resp) else -1
+        self.identity_get_latest = time.time()
         self.run()
-
-    def verify_network_connected(self, *args, **kwargs):
-        if _Debug:
-            print('verify_network_connected', time.asctime())
-        return api_client.network_connected(cb=self.on_network_connected_result)
 
     def on_network_connected_result(self, resp):
         self.network_connected_latest = time.time()
         if not isinstance(resp, dict):
+            if _Debug:
+                print('on_network_connected_result', resp)
+            self.network_connected_latest = 0
             self.mw().state_network_connected = -1
             return
         self.mw().state_network_connected = 1 if websock.is_ok(resp) else -1
+        self.network_connected_latest = time.time()
         self.run()
 
     #------------------------------------------------------------------------------
@@ -155,6 +166,8 @@ class Controller(object):
             print('on_websocket_open', websocket_instance)
         if self.mw().state_process_health != 1:
             self.process_health_latest = 0
+            self.identity_get_latest = 0
+            self.network_connected_latest = 0
             self.verify_process_health()
 
     def on_websocket_error(self, websocket_instance, error):
@@ -163,6 +176,8 @@ class Controller(object):
         if self.mw().state_process_health != -1:
             self.mw().state_process_health = -1
             self.process_health_latest = 0
+            self.identity_get_latest = 0
+            self.network_connected_latest = 0
             self.verify_process_health()
 
     def on_websocket_stream_message(self, json_data):
