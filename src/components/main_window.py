@@ -79,10 +79,15 @@ class MainWindow(FloatLayout):
         if _Debug:
             print('closed screen %r' % screen_id)
 
-    def close_active_screens(self):
+    def close_screens(self, screen_ids_list):
+        for screen_id in screen_ids_list:
+            self.close_screen(screen_id)
+
+    def close_active_screens(self, exclude_screens=[]):
         screen_ids = list(self.active_screens.keys())
         for screen_id in screen_ids:
-            self.close_screen(screen_id)
+            if screen_id not in exclude_screens:
+                self.close_screen(screen_id)
 
     def select_screen(self, screen_id, verify_state=False, screen_type=None, **kwargs):
         if screen_type is None:
@@ -118,109 +123,13 @@ class MainWindow(FloatLayout):
     #------------------------------------------------------------------------------
 
     def on_state_process_health(self, instance, value):
-        if _Debug:
-            print('on_state_process_health', value)
-        if value == -1:
-            if self.selected_screen:
-                if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
-                    self.latest_screen = self.selected_screen
-            self.state_identity_get = 0
-            self.state_network_connected = 0
-            self.close_active_screens()
-            self.select_screen('process_dead_screen')
-            return
-        if value == 1:
-            self.on_state_success()
-            return
-        if value == 0:
-            self.control.run()
-            return
-        raise Exception('unexpected state: %r' % value)
+        self.control.on_state_process_health(instance, value)
 
     def on_state_identity_get(self, instance, value):
-        if _Debug:
-            print('on_state_identity_get', value)
-        if self.state_process_health != 1:
-            return
-        if value == -1:
-            if self.selected_screen:
-                if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
-                    self.latest_screen = self.selected_screen
-            self.state_network_connected = 0
-            self.select_screen('new_identity_screen')
-            self.close_screen('process_dead_screen')
-            self.close_screen('connecting_screen')
-            return
-        if value == 1:
-            self.on_state_success()
-            return
-        if value == 0:
-            self.control.run()
-            return
-        raise Exception('unexpected state: %r' % value)
+        self.control.on_state_identity_get(instance, value)
 
     def on_state_network_connected(self, instance, value):
-        if _Debug:
-            print('on_state_network_connected', value)
-        if self.state_process_health != 1:
-            return
-        if value == -1:
-            if self.selected_screen:
-                if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
-                    self.latest_screen = self.selected_screen
-            if self.selected_screen != 'welcome_screen':
-                self.select_screen('connecting_screen')
-            self.close_screen('process_dead_screen')
-            self.close_screen('new_identity_screen')
-            self.close_screen('recover_identity_screen')
-            return
-        if value == 1:
-            self.on_state_success()
-            return
-        if value == 0:
-            self.control.run()
-            return
-        raise Exception('unexpected state: %r' % value)
-
-    def on_state_success(self):
-        if _Debug:
-            print('on_state_success %r %r %r, latest_screen=%r selected_screen=%r' % (
-                self.state_process_health, self.state_identity_get, self.state_network_connected,
-                self.latest_screen, self.selected_screen, ))
-        if self.state_process_health == 1 and self.state_identity_get == 1 and self.state_network_connected == 1:
-            if self.latest_screen in ['process_dead_screen', 'connecting_screen', 'new_identity_screen', 'recover_identity_screen', ]:
-                self.latest_screen = 'main_menu_screen'
-            if self.selected_screen != 'welcome_screen':
-                self.select_screen(self.latest_screen or 'main_menu_screen')
-            self.close_screen('process_dead_screen')
-            self.close_screen('connecting_screen')
-            self.close_screen('new_identity_screen')
-            self.close_screen('recover_identity_screen')
-            return
-        if self.state_process_health == 1 and self.state_identity_get == 1 and self.state_network_connected in [-1, 0, ]:
-            if self.selected_screen:
-                if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
-                    self.latest_screen = self.selected_screen
-            if self.selected_screen != 'welcome_screen':
-                self.select_screen('connecting_screen')
-            self.close_screen('process_dead_screen')
-            self.close_screen('new_identity_screen')
-            self.close_screen('recover_identity_screen')
-            return
-        if self.state_process_health == 1 and self.state_identity_get == -1:
-            if self.selected_screen:
-                if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
-                    self.latest_screen = self.selected_screen
-            self.select_screen('new_identity_screen')
-            self.close_screen('process_dead_screen')
-            self.close_screen('connecting_screen')
-            self.close_screen('recover_identity_screen')
-            return
-        if self.selected_screen != 'welcome_screen':
-            self.select_screen('connecting_screen')
-        self.close_screen('process_dead_screen')
-        self.close_screen('new_identity_screen')
-        self.close_screen('recover_identity_screen')
+        self.control.on_state_network_connected(instance, value)
 
 #------------------------------------------------------------------------------
 

@@ -1,3 +1,7 @@
+import time
+
+#------------------------------------------------------------------------------
+
 from components.screen import AppScreen
 
 from lib import websock
@@ -31,8 +35,10 @@ class RecoverIdentityScreen(AppScreen):
             return
         self.main_win().close_screen('new_identity_screen')
         self.main_win().close_screen('recover_identity_screen')
-        self.main_win().select_screen('welcome_screen')
-        self.control().run()
+        self.main_win().select_screen('connecting_screen')
+        # self.control().run()
+        self.control().identity_get_latest = time.time()
+        self.main_win().state_identity_get = 1
 
 #------------------------------------------------------------------------------
 
