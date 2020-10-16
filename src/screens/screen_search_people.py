@@ -36,7 +36,7 @@ class SearchPeopleScreen(AppScreen):
     search_started = False
 
     def get_title(self):
-        return f"{fa_icon('search', with_spaces=False)}  search people"
+        return f"{fa_icon('search', with_spaces=False)} search people"
 
     def on_enter(self):
         if self.search_started:
