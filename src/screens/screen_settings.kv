@@ -1,0 +1,180 @@
+
+<OptionNameLabel@NormalLabel>:
+    size_hint: None, None
+    width: self.texture_size[0]
+    height: self.texture_size[1] + dp(10)
+    halign: 'left'
+    font_size: app.setting_normal_font_size
+
+
+<OptionDescriptionLabel@NormalLabel>:
+    size_hint: 1, None
+    # width: self.texture_size[0]
+    height: self.texture_size[1]
+    text_size: self.width, None
+    halign: 'left'
+    font_size: app.setting_small_font_size
+
+
+<SettingsTreeSubElement>:
+	pos_hint: {'left': 0}
+    font_size: app.setting_normal_font_size
+    width: self.texture_size[0]
+    height: self.texture_size[1] + dp(10)
+    text_size: self.width, None
+
+
+<SettingsTreeServiceElement>:
+
+	size_hint: 1, None
+    height: app.setting_record_height
+	padding: 0
+	spacing: 1
+
+	NormalLabel:
+		font_size: '10sp'
+		size_hint: None, 1
+		width: self.texture_size[0] + dp(10)
+		color: (.7, .7, .7, 1) if root.service_state != 'ON' else (.6, 1, .6, 1)
+		text: fa_icon('circle')
+
+    NormalLabel:
+        size_hint: None, 1
+        width: self.texture_size[0] + dp(10)
+        halign: 'left'
+        font_size: app.setting_normal_font_size
+        text: '{}'.format(root.service_name)
+
+
+<SettingsTreeBooleanElement>:
+
+	HorizontalLayout:
+		size_hint: 1, None
+	    height: self.minimum_height
+		padding: 0
+		spacing: 0
+
+		OptionNameLabel:
+			id: option_label
+		    text: '{}'.format(root.option_name)
+	
+		Widget:
+			size_hint: 1, None
+			height: 1
+	
+		CheckBox:
+	        canvas.before:
+	            Color:
+	                rgb: 0,0,0,1
+		        Rectangle:
+		            pos: self.pos[0] + 6, self.pos[1] + 6
+		            size: self.size[0] - 12, self.size[1] - 12
+	            Color:
+	                rgb: 1,1,1,1
+		        Rectangle:
+		            pos: self.pos[0] + 7, self.pos[1] + 7
+		            size: self.size[0] - 14, self.size[1] - 14
+	
+	        size_hint: None, None
+	        pos_hint: {'right': 1}
+	        width: root.ids.option_label.height
+	        height: root.ids.option_label.height
+			active: bool(root.option_value)
+			on_active: root.value_modified_callback(root.item_key, self.active)
+
+	OptionDescriptionLabel:
+    	text: '{}'.format(root.option_description)
+
+
+<SettingsTreeIntegerElement>:
+
+	HorizontalLayout:
+		size_hint: 1, None
+	    height: self.minimum_height
+		padding: 0
+		spacing: 0
+
+		OptionNameLabel:
+			id: option_label
+		    text: '{}'.format(root.option_name)
+	
+		Widget:
+			size_hint: 1, None
+			height: 1
+	
+		SingleLineTextInput:
+	        size_hint_x: None
+	        pos_hint: {'right': 1}
+	        width: dp(50)
+	        height: root.ids.option_label.height - dp(4)
+	        halign: 'left'
+	        font_size: app.setting_small_font_size
+	        input_filter: 'int'
+			text: '{}'.format(root.option_value)
+			# on_text: root.value_modified_callback(root.item_key, self.text)
+
+	OptionDescriptionLabel:
+    	text: '{}'.format(root.option_description)
+
+
+<SettingsTreeTextElement>:
+
+	HorizontalLayout:
+		size_hint: 1, None
+	    height: self.minimum_height
+		padding: 0
+		spacing: 0
+
+		OptionNameLabel:
+			id: option_label
+		    text: '{}'.format(root.option_name)
+	
+		Widget:
+			size_hint: 1, None
+			height: 1
+	
+		SingleLineTextInput:
+	        size_hint_x: None
+	        pos_hint: {'right': 1}
+	        width: dp(60)
+	        height: root.ids.option_label.height - dp(4)
+	        halign: 'left'
+	        font_size: app.setting_small_font_size
+			text: '{}'.format(root.option_value)
+			# on_text: root.value_modified_callback(root.item_key, self.text)
+
+	OptionDescriptionLabel:
+    	text: '{}'.format(root.option_description)
+
+
+<SettingsTreeView>:
+	size_hint: 1, None
+	height: self.minimum_height
+	root_options: {'text': 'settings'}
+	indent_start: dp(15)
+	indent_level: dp(5)
+	hide_root: True
+
+
+<SettingsScreen>:
+    title: '{} settings'.format(fa_icon('cogs', with_spaces=False))
+
+    ScrollView:
+        do_scroll_x: False
+
+        VerticalLayout:
+        	id: settings_content
+            pos_hint: {'top': 1}
+            size_hint: 1, None
+            height: self.minimum_height
+            padding: dp(15)
+            spacing: dp(5)
+
+			SettingsStatusMessage:
+				id: status_message_label
+				size_hint: 1, None
+				height: self.texture_size[1]
+				text: ''
+
+			SettingsTreeView
+				id: settings_tree

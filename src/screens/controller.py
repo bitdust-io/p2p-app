@@ -18,6 +18,7 @@ def all_screens():
     from screens import screen_new_identity
     from screens import screen_recover_identity
     from screens import screen_connecting
+    from screens import screen_settings
     from screens import screen_my_id
     from screens import screen_search_people
     from screens import screen_friends
@@ -29,6 +30,7 @@ def all_screens():
         'new_identity_screen': screen_new_identity.NewIdentityScreen,
         'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
         'welcome_screen': screen_welcome.WelcomeScreen,
+        'settings_screen': screen_settings.SettingsScreen,
         'my_id_screen': screen_my_id.MyIDScreen,
         'search_people_screen': screen_search_people.SearchPeopleScreen,
         'friends_screen': screen_friends.FriendsScreen,
