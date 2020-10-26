@@ -2,6 +2,10 @@ from kivy.uix.button import Button
 
 #------------------------------------------------------------------------------
 
+class NormalButton(Button):
+    pass
+
+
 class BasicButton(Button):
     pass
 

@@ -1,7 +1,7 @@
 
-<OptionNameLabel@NormalLabel>:
+<OptionNameLabel@NormalButton>:
     size_hint: None, None
-    width: self.texture_size[0]
+    width: self.texture_size[0] + dp(10)
     height: self.texture_size[1] + dp(10)
     halign: 'left'
     font_size: app.setting_normal_font_size
@@ -16,15 +16,16 @@
     font_size: app.setting_small_font_size
 
 
-<SettingsTreeSubElement>:
+<ParentElement>:
 	pos_hint: {'left': 0}
     font_size: app.setting_normal_font_size
     width: self.texture_size[0]
     height: self.texture_size[1] + dp(10)
     text_size: self.width, None
+    on_press: self.item_clicked_callback(self.item_key, self)
 
 
-<SettingsTreeServiceElement>:
+<ServiceElement>:
 
 	size_hint: 1, None
     height: app.setting_record_height
@@ -38,15 +39,13 @@
 		color: (.7, .7, .7, 1) if root.service_state != 'ON' else (.6, 1, .6, 1)
 		text: fa_icon('circle')
 
-    NormalLabel:
-        size_hint: None, 1
-        width: self.texture_size[0] + dp(10)
-        halign: 'left'
-        font_size: app.setting_normal_font_size
+    OptionNameLabel:
+		id: option_label
         text: '{}'.format(root.service_name)
+	    on_press: root.item_clicked_callback(root.item_key, root)
 
 
-<SettingsTreeBooleanElement>:
+<BooleanElement>:
 
 	HorizontalLayout:
 		size_hint: 1, None
@@ -57,6 +56,7 @@
 		OptionNameLabel:
 			id: option_label
 		    text: '{}'.format(root.option_name)
+		    on_press: root.item_clicked_callback(root.item_key, root)
 	
 		Widget:
 			size_hint: 1, None
@@ -86,38 +86,36 @@
     	text: '{}'.format(root.option_description)
 
 
-<SettingsTreeIntegerElement>:
+<IntegerElement>:
 
-	HorizontalLayout:
-		size_hint: 1, None
-	    height: self.minimum_height
-		padding: 0
-		spacing: 0
+	size_hint: 1, None
+    height: self.minimum_height
+	padding: 0
+	spacing: 0
 
-		OptionNameLabel:
-			id: option_label
-		    text: '{}'.format(root.option_name)
-	
-		Widget:
-			size_hint: 1, None
-			height: 1
-	
-		SingleLineTextInput:
-	        size_hint_x: None
-	        pos_hint: {'right': 1}
-	        width: dp(50)
-	        height: root.ids.option_label.height - dp(4)
-	        halign: 'left'
-	        font_size: app.setting_small_font_size
-	        input_filter: 'int'
-			text: '{}'.format(root.option_value)
-			# on_text: root.value_modified_callback(root.item_key, self.text)
+	OptionNameLabel:
+		id: option_label
+	    text: '{}'.format(root.option_name)
+	    on_press: root.item_clicked_callback(root.item_key, root)
+
+	SingleLineTextInput:
+        size_hint_x: None
+        width: dp(80)
+        height: self.line_height + dp(4)
+        pos_hint: {'right': 1}
+        halign: 'left'
+        valign: 'center'
+        padding: dp(5), dp(2)
+        font_size: app.setting_small_font_size
+        input_filter: 'int'
+		text: '{}'.format(root.option_value)
+		# on_text: root.value_modified_callback(root.item_key, self.text)
 
 	OptionDescriptionLabel:
     	text: '{}'.format(root.option_description)
 
 
-<SettingsTreeTextElement>:
+<TextElement>:
 
 	HorizontalLayout:
 		size_hint: 1, None
@@ -128,6 +126,7 @@
 		OptionNameLabel:
 			id: option_label
 		    text: '{}'.format(root.option_name)
+		    on_press: root.item_clicked_callback(root.item_key, root)
 	
 		Widget:
 			size_hint: 1, None
@@ -160,6 +159,7 @@
     title: '{} settings'.format(fa_icon('cogs', with_spaces=False))
 
     ScrollView:
+    	id: scroll_view
         do_scroll_x: False
 
         VerticalLayout:

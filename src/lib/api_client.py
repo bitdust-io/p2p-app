@@ -54,6 +54,10 @@ def configs_tree(cb=None):
     return run('configs_tree', cb=cb)
 
 
+def config_get(key, cb=None):
+    return run('config_get', kwargs={'key': key, }, cb=cb)
+
+
 def config_set(key, value, cb=None):
     return run('config_set', kwargs={'key': key, 'value': value, }, cb=cb)
 
