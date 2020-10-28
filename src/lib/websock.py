@@ -6,15 +6,17 @@ except ImportError:
     import _thread as thread
 
 import queue
-import websocket
 import json
 
 #------------------------------------------------------------------------------
 
-from kivy.clock import mainthread, Clock
+from kivy.clock import mainthread
 
 #------------------------------------------------------------------------------
 
+from lib import websocket
+
+#------------------------------------------------------------------------------
 _Debug = True
 
 #------------------------------------------------------------------------------
@@ -171,7 +173,7 @@ def on_message(ws_inst, message):
         print('        on_message %d bytes' % len(message))
     if 'payload' not in json_data:
         if _Debug:
-            print('no payload found in the response')
+            print('        no payload found in the response')
         return False
     payload_type = json_data.get('type')
     if payload_type == 'event':
@@ -181,12 +183,12 @@ def on_message(ws_inst, message):
     if payload_type == 'api_call':
         if 'call_id' not in json_data['payload']:
             if _Debug:
-                print('call_id not found in the response')
+                print('        call_id not found in the response')
             return
         call_id = json_data['payload']['call_id']
         if call_id not in _CallbacksQueue:
             if _Debug:
-                print('call_id found in the response, but no callbacks registered')
+                print('        call_id found in the response, but no callbacks registered')
             return
         result_callback = _CallbacksQueue.pop(call_id)
         if result_callback:
@@ -318,7 +320,7 @@ def ws_call(json_data, cb=None):
     global _PendingCalls
     st = verify_state()
     if _Debug:
-        print('ws_call', st, cb)
+        print('ws_call', st)
     if st == 'ready':
         ws_queue().put_nowait((json_data, cb, ))
         return True

@@ -2,6 +2,10 @@ from kivy.uix.button import Button
 
 #------------------------------------------------------------------------------
 
+class NormalButton(Button):
+    pass
+
+
 class BasicButton(Button):
     pass
 
@@ -23,6 +27,10 @@ class RoundedFlexHeightButton(RoundedButton):
 
 
 class RoundedFlexButton(RoundedButton):
+    pass
+
+
+class TransparentButton(BasicButton):
     pass
 
 #------------------------------------------------------------------------------

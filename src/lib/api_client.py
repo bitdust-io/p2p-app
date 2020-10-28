@@ -1,4 +1,8 @@
-from service import websock
+import time
+
+#------------------------------------------------------------------------------
+
+from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -8,7 +12,7 @@ _Debug = True
 
 def run(method, kwargs={}, cb=None, ):
     if _Debug:
-        print('api_client.run %r cb=%r' % (method, cb, ))
+        print('api_client.run %r %r' % (method, time.asctime(), ))
     jd = {'command': 'api_call', 'method': method, 'kwargs': kwargs, }
     return websock.ws_call(json_data=jd, cb=cb)
 
@@ -22,12 +26,48 @@ def identity_get(cb=None):
     return run('identity_get', cb=cb)
 
 
+def identity_create(username, preferred_servers=[], join_network=False, cb=None):
+    return run('identity_create', kwargs={
+        'username': username,
+        'preferred_servers': preferred_servers,
+        'join_network': join_network,
+    }, cb=cb)
+
+
+def identity_recover(private_key_source, known_idurl=None, join_network=False, cb=None):
+    return run('identity_recover', kwargs={
+        'private_key_source': private_key_source,
+        'known_idurl': known_idurl,
+        'join_network': join_network,
+    }, cb=cb)
+
+
 def network_connected(wait_timeout=0, cb=None):
     return run('network_connected', kwargs={'wait_timeout': wait_timeout, }, cb=cb)
 
 
+def configs_list(sort=True, cb=None):
+    return run('configs_list', kwargs={'sort': sort, }, cb=cb)
+
+
+def configs_tree(cb=None):
+    return run('configs_tree', cb=cb)
+
+
+def config_get(key, cb=None):
+    return run('config_get', kwargs={'key': key, }, cb=cb)
+
+
+def config_set(key, value, cb=None):
+    return run('config_set', kwargs={'key': key, 'value': value, }, cb=cb)
+
+
+def services_list(with_configs=False, cb=None):
+    return run('services_list', kwargs={'with_configs': with_configs, }, cb=cb)
+
+
 def user_observe(nickname, attempts=5, cb=None):
-    return run('user_observe', kwargs={'nickname': nickname, 'attempts': 5, }, cb=cb)
+    return run('user_observe', kwargs={'nickname': nickname, 'attempts': attempts, }, cb=cb)
 
 
 def friends_list(cb=None):

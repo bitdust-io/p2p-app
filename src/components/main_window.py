@@ -38,6 +38,8 @@ class MainWindow(FloatLayout):
     def unregister_controller(self): 
         self.control = None
 
+    #------------------------------------------------------------------------------
+
     def open_screen(self, screen_id, screen_type, **kwargs):
         if screen_id in self.active_screens:
             if _Debug:
@@ -45,6 +47,7 @@ class MainWindow(FloatLayout):
             return
         screen_class = self.screens_map[screen_type]
         screen = screen_class(name=screen_id, id=screen_id, **kwargs)
+        screen.on_opened()
         self.ids.screen_manager.add_widget(screen)
         title = screen.get_title()
         closable = screen.is_closable()
@@ -70,13 +73,21 @@ class MainWindow(FloatLayout):
         self.ids.screen_manager.remove_widget(scrn)
         if btn:
             self.ids.nav_buttons_layout.remove_widget(btn)
+            del btn
+        scrn.on_closed()
+        del scrn
         if _Debug:
             print('closed screen %r' % screen_id)
 
-    def close_active_screens(self):
+    def close_screens(self, screen_ids_list):
+        for screen_id in screen_ids_list:
+            self.close_screen(screen_id)
+
+    def close_active_screens(self, exclude_screens=[]):
         screen_ids = list(self.active_screens.keys())
         for screen_id in screen_ids:
-            self.close_screen(screen_id)
+            if screen_id not in exclude_screens:
+                self.close_screen(screen_id)
 
     def select_screen(self, screen_id, verify_state=False, screen_type=None, **kwargs):
         if screen_type is None:
@@ -105,103 +116,20 @@ class MainWindow(FloatLayout):
             another_btn.selected = True
         self.ids.screen_manager.current = screen_id
         self.selected_screen = screen_id
-        if self.selected_screen not in ['process_dead_screen', 'connecting_screen', ]:
+        if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
             self.latest_screen = self.selected_screen
         return True
 
+    #------------------------------------------------------------------------------
+
     def on_state_process_health(self, instance, value):
-        if _Debug:
-            print('on_state_process_health', value)
-        if value == -1:
-            if self.selected_screen:
-                if self.selected_screen not in ['process_dead_screen', 'connecting_screen', ]:
-                    self.latest_screen = self.selected_screen
-            self.close_active_screens()
-            self.select_screen('process_dead_screen')
-            return
-        if value == 1:
-            self.on_state_success()
-            return
-        if value == 0:
-            self.control.run()
-            return
-        raise Exception('unexpected state: %r' % value)
+        self.control.on_state_process_health(instance, value)
 
     def on_state_identity_get(self, instance, value):
-        if _Debug:
-            print('on_state_identity_get', value)
-        if value == -1:
-            if self.selected_screen:
-                if self.selected_screen not in ['process_dead_screen', 'connecting_screen', ]:
-                    self.latest_screen = self.selected_screen
-            self.select_screen('new_identity_screen')
-            self.close_screen('process_dead_screen')
-            self.close_screen('connecting_screen')
-            return
-        if value == 1:
-            self.on_state_success()
-            return
-        if value == 0:
-            self.control.run()
-            return
-        raise Exception('unexpected state: %r' % value)
+        self.control.on_state_identity_get(instance, value)
 
     def on_state_network_connected(self, instance, value):
-        if _Debug:
-            print('on_state_network_connected', value)
-        if value == -1:
-            if self.selected_screen:
-                if self.selected_screen not in ['process_dead_screen', 'connecting_screen', ]:
-                    self.latest_screen = self.selected_screen
-            self.select_screen('connecting_screen')
-            self.close_screen('process_dead_screen')
-            self.close_screen('new_identity_screen')
-            self.close_screen('recover_identity_screen')
-            return
-        if value == 1:
-            self.on_state_success()
-            return
-        if value == 0:
-            self.control.run()
-            return
-        raise Exception('unexpected state: %r' % value)
-
-    def on_state_success(self):
-        if _Debug:
-            print('on_state_success %r %r %r, latest_screen=%r' % (
-                self.state_process_health, self.state_identity_get, self.state_network_connected, self.latest_screen, ))
-        if self.state_process_health == 1 and self.state_identity_get == 1 and self.state_network_connected == 1:
-            self.select_screen(self.latest_screen or 'main_menu_screen')
-            self.close_screen('process_dead_screen')
-            self.close_screen('connecting_screen')
-            self.close_screen('new_identity_screen')
-            self.close_screen('recover_identity_screen')
-            return
-        if self.state_process_health == 1 and self.state_identity_get == 1 and self.state_network_connected == -1:
-            if self.selected_screen:
-                if self.selected_screen not in ['process_dead_screen', 'connecting_screen', ]:
-                    self.latest_screen = self.selected_screen
-            self.select_screen('connecting_screen')
-            self.close_screen('process_dead_screen')
-            self.close_screen('new_identity_screen')
-            self.close_screen('recover_identity_screen')
-            return
-        if self.state_process_health == 1 and self.state_identity_get == -1:
-            if self.selected_screen:
-                if self.selected_screen not in ['process_dead_screen', 'connecting_screen', ]:
-                    self.latest_screen = self.selected_screen
-            self.select_screen('new_identity_screen')
-            self.close_screen('process_dead_screen')
-            self.close_screen('connecting_screen')
-            self.close_screen('recover_identity_screen')
-            return
-        self.select_screen('connecting_screen')
-        self.close_screen('process_dead_screen')
-        self.close_screen('new_identity_screen')
-        self.close_screen('recover_identity_screen')
-        # raise Exception('unexpected state reached: %r %r %r' % (
-        #     self.state_process_health, self.state_identity_get, self.state_network_connected,
-        # ))
+        self.control.on_state_network_connected(instance, value)
 
 #------------------------------------------------------------------------------
 

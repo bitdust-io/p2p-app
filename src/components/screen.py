@@ -35,3 +35,9 @@ class AppScreen(Screen):
 
     def control(self):
         return self.app().control
+
+    def on_opened(self):
+        pass
+
+    def on_closed(self):
+        pass

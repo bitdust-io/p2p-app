@@ -57,6 +57,7 @@
             MainMenuButton:
                 fa_icon_text: fa_icon('cogs', with_spaces=False)
                 short_text: 'settings'
+                on_press: root.main_win().select_screen('settings_screen', verify_state=True)
             MainMenuButton:
                 fa_icon_text: fa_icon('graduation-cap', with_spaces=False)
                 short_text: 'wiki'

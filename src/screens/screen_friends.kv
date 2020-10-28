@@ -1,5 +1,5 @@
 <FriendsScreen>:
-	title: '{}  contacts'.format(fa_icon('address-book', with_spaces=False))
+	title: '{} contacts'.format(fa_icon('address-book', with_spaces=False))
 
     VerticalScrollView:
 
@@ -40,7 +40,6 @@
 
     Label:
         id: contact_state_field
-        text: root.contact_state
         font_size: '10sp'
         color: (.7, .7, .7, 1) if root.contact_state != 'CONNECTED' else (.6, 1, .6, 1)
         size_hint: None, 1

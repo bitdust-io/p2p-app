@@ -1,6 +1,7 @@
 from components.screen import AppScreen
-from components.webfont import fa_icon
-from service import api_client
+
+from lib import api_client
+from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -30,19 +31,16 @@ identity_details_temlate_text = """[size={text_size}][color=#909090]name:[/color
 
 class MyIDScreen(AppScreen):
 
-    # def get_title(self):
-    #     return f"{fa_icon('id-card-alt')}  my identity"
-
     def on_enter(self, *args):
         api_client.identity_get(cb=self.on_identity_get_result)
 
     def on_identity_get_result(self, resp):
-        if not isinstance(resp, dict):
+        if not websock.is_ok(resp):
             self.ids.my_id_details.text = str(resp)
             return
-        result = resp.get('payload', {}).get('response' , {}).get('result', {})
+        result = websock.response_result(resp)
         if not result:
-            self.ids.my_id_details.text = str(resp)
+            self.ids.my_id_details.text = websock.response_errors(resp)
             return
         self.ids.my_id_details.text = identity_details_temlate_text.format(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),

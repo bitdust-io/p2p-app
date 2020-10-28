@@ -2,8 +2,8 @@ import time
 
 #------------------------------------------------------------------------------
 
-from service import websock
-from service import api_client
+from lib import websock
+from lib import api_client
 
 #------------------------------------------------------------------------------
 
@@ -18,17 +18,19 @@ def all_screens():
     from screens import screen_new_identity
     from screens import screen_recover_identity
     from screens import screen_connecting
+    from screens import screen_settings
     from screens import screen_my_id
     from screens import screen_search_people
     from screens import screen_friends
     from screens import screen_private_chat
     return {
-        'process_dead_screen': screen_process_dead.ProcessDeadScreen,
         'main_menu_screen': screen_main_menu.MainMenuScreen,
+        'process_dead_screen': screen_process_dead.ProcessDeadScreen,
         'connecting_screen': screen_connecting.ConnectingScreen,
-        'welcome_screen': screen_welcome.WelcomeScreen,
         'new_identity_screen': screen_new_identity.NewIdentityScreen,
         'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
+        'welcome_screen': screen_welcome.WelcomeScreen,
+        'settings_screen': screen_settings.SettingsScreen,
         'my_id_screen': screen_my_id.MyIDScreen,
         'search_people_screen': screen_search_people.SearchPeopleScreen,
         'friends_screen': screen_friends.FriendsScreen,
@@ -63,7 +65,10 @@ class Controller(object):
 
     def run(self):
         if _Debug:
-            print('control.run')
+            print('control.run %r/%r %r/%r %r/%r' % (
+                self.mw().state_process_health, self.process_health_latest,
+                self.mw().state_identity_get, self.identity_get_latest,
+                self.mw().state_network_connected, self.network_connected_latest, ))
         # BitDust node process must be running already
         if self.mw().state_process_health == 0:
             return self.verify_process_health()
@@ -88,6 +93,17 @@ class Controller(object):
         # all is good
         return True
 
+    def verify_process_health(self, *args, **kwargs):
+        return api_client.process_health(cb=self.on_process_health_result)
+
+    def verify_identity_get(self, *args, **kwargs):
+        return api_client.identity_get(cb=self.on_identity_get_result)
+
+    def verify_network_connected(self, *args, **kwargs):
+        if _Debug:
+            print('verify_network_connected', time.asctime())
+        return api_client.network_connected(cb=self.on_network_connected_result)
+
     #------------------------------------------------------------------------------
 
     def add_callback(self, target, cb, cb_id=None):
@@ -110,42 +126,39 @@ class Controller(object):
 
     #------------------------------------------------------------------------------
 
-    def verify_process_health(self, *args, **kwargs):
-        return api_client.process_health(cb=self.on_process_health_result)
-
     def on_process_health_result(self, resp):
-        if _Debug:
-            print('on_process_health_result %r' % resp)
         if not isinstance(resp, dict):
-            self.mw().state_process_health = -1
+            if _Debug:
+                print('on_process_health_result %r' % resp)
             self.process_health_latest = 0
+            self.mw().state_process_health = -1
             return
         self.mw().state_process_health = 1 if websock.is_ok(resp) else -1
         self.process_health_latest = time.time() if websock.is_ok(resp) else 0
         self.run()
 
-    def verify_identity_get(self, *args, **kwargs):
-        return api_client.identity_get(cb=self.on_identity_get_result)
-
     def on_identity_get_result(self, resp):
         self.identity_get_latest = time.time()
         if not isinstance(resp, dict):
+            if _Debug:
+                print('on_identity_get_result', resp)
+            self.identity_get_latest = 0
             self.mw().state_identity_get = -1
             return
         self.mw().state_identity_get = 1 if websock.is_ok(resp) else -1
+        self.identity_get_latest = time.time()
         self.run()
-
-    def verify_network_connected(self, *args, **kwargs):
-        if _Debug:
-            print('verify_network_connected', time.asctime())
-        return api_client.network_connected(cb=self.on_network_connected_result)
 
     def on_network_connected_result(self, resp):
         self.network_connected_latest = time.time()
         if not isinstance(resp, dict):
+            if _Debug:
+                print('on_network_connected_result', resp)
+            self.network_connected_latest = 0
             self.mw().state_network_connected = -1
             return
         self.mw().state_network_connected = 1 if websock.is_ok(resp) else -1
+        self.network_connected_latest = time.time()
         self.run()
 
     #------------------------------------------------------------------------------
@@ -155,6 +168,8 @@ class Controller(object):
             print('on_websocket_open', websocket_instance)
         if self.mw().state_process_health != 1:
             self.process_health_latest = 0
+            self.identity_get_latest = 0
+            self.network_connected_latest = 0
             self.verify_process_health()
 
     def on_websocket_error(self, websocket_instance, error):
@@ -163,6 +178,8 @@ class Controller(object):
         if self.mw().state_process_health != -1:
             self.mw().state_process_health = -1
             self.process_health_latest = 0
+            self.identity_get_latest = 0
+            self.network_connected_latest = 0
             self.verify_process_health()
 
     def on_websocket_stream_message(self, json_data):
@@ -177,3 +194,96 @@ class Controller(object):
         cb_list = self.callbacks.get('on_private_message_received', [])
         for cb, cb_id in cb_list:
             cb(json_data)
+
+    def on_state_process_health(self, instance, value):
+        if _Debug:
+            print('on_state_process_health', value)
+        if value == -1:
+            if self.mw().selected_screen:
+                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
+                    self.mw().latest_screen = self.mw().selected_screen
+            self.mw().state_identity_get = 0
+            self.mw().state_network_connected = 0
+            self.mw().select_screen('process_dead_screen')
+            self.mw().close_active_screens(exclude_screens=['process_dead_screen', ])
+            return
+        if value == 1:
+            self.on_state_success()
+            return
+        if value == 0:
+            self.run()
+            return
+        raise Exception('unexpected process_health state: %r' % value)
+
+    def on_state_identity_get(self, instance, value):
+        if _Debug:
+            print('on_state_identity_get', value)
+        if self.mw().state_process_health != 1:
+            return
+        if value == -1:
+            if self.mw().selected_screen:
+                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
+                    self.mw().latest_screen = self.mw().selected_screen
+            self.mw().state_network_connected = 0
+            self.mw().select_screen('new_identity_screen')
+            self.mw().close_screens(['process_dead_screen', 'connecting_screen', ])
+            return
+        if value == 1:
+            self.on_state_success()
+            return
+        if value == 0:
+            self.run()
+            return
+        raise Exception('unexpected identity_get state: %r' % value)
+
+    def on_state_network_connected(self, instance, value):
+        if _Debug:
+            print('on_state_network_connected', value)
+        if self.mw().state_process_health != 1:
+            return
+        if value == -1:
+            if self.mw().selected_screen:
+                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
+                    self.mw().latest_screen = self.mw().selected_screen
+            if self.mw().selected_screen != 'welcome_screen':
+                self.mw().select_screen('connecting_screen')
+            self.mw().close_screens(['process_dead_screen', 'new_identity_screen', 'recover_identity_screen', ])
+            return
+        if value == 1:
+            self.on_state_success()
+            return
+        if value == 0:
+            self.run()
+            return
+        raise Exception('unexpected network_connected state: %r' % value)
+
+    def on_state_success(self):
+        if _Debug:
+            print('on_state_success %r %r %r, latest_screen=%r selected_screen=%r' % (
+                self.mw().state_process_health, self.mw().state_identity_get, self.mw().state_network_connected,
+                self.mw().latest_screen, self.mw().selected_screen, ))
+        if self.mw().state_process_health == 1 and self.mw().state_identity_get == 1 and self.mw().state_network_connected == 1:
+            if self.mw().latest_screen in ['process_dead_screen', 'connecting_screen', 'new_identity_screen', 'recover_identity_screen', ]:
+                self.mw().latest_screen = 'main_menu_screen'
+            if self.mw().selected_screen != 'welcome_screen':
+                self.mw().select_screen(self.mw().latest_screen or 'main_menu_screen')
+            self.mw().close_screens(['process_dead_screen', 'connecting_screen', 'new_identity_screen', 'recover_identity_screen', ])
+            return
+        if self.mw().state_process_health == 1 and self.mw().state_identity_get == 1 and self.mw().state_network_connected in [-1, 0, ]:
+            if self.mw().selected_screen:
+                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
+                    self.mw().latest_screen = self.mw().selected_screen
+            if self.mw().selected_screen != 'welcome_screen':
+                self.mw().select_screen('connecting_screen')
+            self.mw().close_screens(['process_dead_screen', 'new_identity_screen', 'recover_identity_screen', ])
+            return
+        if self.mw().state_process_health == 1 and self.mw().state_identity_get == -1:
+            if self.mw().selected_screen:
+                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
+                    self.mw().latest_screen = self.mw().selected_screen
+            self.mw().select_screen('new_identity_screen')
+            self.mw().close_screens(['process_dead_screen', 'connecting_screen', 'recover_identity_screen', ])
+            return
+        if self.mw().selected_screen != 'welcome_screen':
+            self.mw().select_screen('connecting_screen')
+        self.mw().close_screens(['process_dead_screen', 'new_identity_screen', 'recover_identity_screen', ])

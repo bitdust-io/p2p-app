@@ -3,8 +3,8 @@ from components.labels import NormalLabel
 from components.text_input import BasicTextInput
 from components.webfont import fa_icon
 
-from service import api_client
-from service import websock
+from lib import api_client
+from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -39,6 +39,7 @@ class PrivateChatScreen(AppScreen):
         return f"{fa_icon('comment', with_spaces=False)} {self.username}"
 
     def on_enter(self, *args):
+        self.ids.chat_status_label.text = ''
         self.control().add_callback('on_private_message_received', self.on_private_message_received)
         self.populate()
 
@@ -54,7 +55,9 @@ class PrivateChatScreen(AppScreen):
 
     def on_message_history_result(self, resp):
         if not websock.is_ok(resp):
+            self.ids.chat_status_label.text = '[color=#f00]%s[/color]' % (', '.join(websock.response_errors(resp)))
             return
+        self.ids.chat_status_label.text = ''
         self.ids.chat_messages.clear_widgets()
         current_direction = None
         current_sender = None
@@ -109,14 +112,16 @@ class PrivateChatScreen(AppScreen):
             data={'message': self.ids.chat_input.text, },
             cb=self.on_message_sent,
         )
+        self.ids.chat_status_label.text = ''
         self.ids.chat_input.text = ''
         self.ids.chat_input.refresh_height()
 
     def on_message_sent(self, resp):
-        if not websock.is_ok(resp):
-            return
         if _Debug:
             print('on_message_sent', resp)
+        if not websock.is_ok(resp):
+            self.ids.chat_status_label.text = '[color=#f00]%s[/color]' % (', '.join(websock.response_errors(resp)))
+            return
         self.populate()
 
     def on_private_message_received(self, json_data):
