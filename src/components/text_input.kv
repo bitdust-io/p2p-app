@@ -6,7 +6,7 @@
             size: self.size
             pos: self.pos
         Color:
-            rgba: app.color_text_input_background
+            rgba: app.color_text_input_background_active if self.focus else (app.color_text_input_background_disabled if self.disabled else app.color_text_input_background)
         Rectangle:
             size: (self.width - self.border[1] - self.border[3], self.height - self.border[0] - self.border[2])
             pos: (self.x + self.border[3], self.y + self.border[0])
@@ -19,7 +19,7 @@
             pos: self._cursor_visual_pos
             size: root.cursor_width, -self._cursor_visual_height
         Color:
-            rgba: app.color_text_input_foreground
+            rgba: app.color_text_input_foreground_disabled if self.disabled else app.color_text_input_foreground
 
 
 <BasicTextInput>:

@@ -1,12 +1,13 @@
 from kivy.clock import Clock
 from kivy.uix.treeview import TreeView, TreeViewNode
-from kivy.properties import BooleanProperty, StringProperty  # @UnresolvedImport
+from kivy.properties import ListProperty, StringProperty, NumericProperty  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
 from components.screen import AppScreen
 from components.labels import NormalLabel
 from components.buttons import NormalButton
+from components.text_input import SingleLineTextInput
 from components.layouts import HorizontalLayout, VerticalLayout
 
 from lib import api_client
@@ -15,6 +16,46 @@ from lib import websock
 #------------------------------------------------------------------------------
 
 _Debug = True
+
+#------------------------------------------------------------------------------
+
+class OptionValueTextInput(SingleLineTextInput):
+
+    pass
+
+
+class OptionValueIntInput(OptionValueTextInput):
+
+    def insert_text(self, substring, from_undo=False):
+        min_value = self.parent.parent.option_value_min
+        max_value = self.parent.parent.option_value_max
+        t = self.text
+        c = self.cursor[0]
+        if c == len(t):
+            new_text = self.text + substring
+        else:
+            new_text = t[:c] + substring + t[c:]
+        if new_text != '':
+            try:
+                new_value = int(new_text)
+            except:
+                return
+            if min_value is not None and min_value > new_value:
+                return
+            if max_value is not None and max_value < new_value:
+                return
+            return super(OptionValueIntInput, self).insert_text(substring, from_undo=from_undo)
+
+
+class OptionValueDiskSpaceInput(OptionValueTextInput):
+
+    pass
+
+
+class OptionValueSingleChoiceInput(OptionValueTextInput):
+
+    pass
+
 
 #------------------------------------------------------------------------------
 
@@ -60,19 +101,28 @@ class ServiceElement(TreeElement, HorizontalLayout):
 class OptionElement(TreeElement):
 
     option_name = StringProperty('')
-    option_value = BooleanProperty(None, allownone=True)
+    option_value = StringProperty(None, allownone=True)
+    option_value_default = StringProperty(None, allownone=True)
+    option_value_recent = StringProperty(None, allownone=True)
     option_description = StringProperty('')
 
     def __init__(self, **kwargs):
         self.option_name = kwargs.pop('option_name')
         self.option_value = kwargs.pop('option_value')
+        self.option_value_default = kwargs.pop('option_value_default', None)
         self.option_description = kwargs.pop('option_description', '')
         self.value_modified_callback = kwargs.pop('value_modified_callback', None)
         self.item_clicked_callback = kwargs.pop('item_clicked_callback', None)
+        self.option_value_recent = self.option_value
         kwargs['size_hint'] = (1, None)
         kwargs['padding'] = 0
         kwargs['spacing'] = 0
         super(OptionElement, self).__init__(**kwargs)
+
+    def on_option_value_input_updated(self):
+        print('on_option_value_input_updated', self.item_key, self.option_value_recent, self.ids.option_value_input.text)
+        if self.value_modified_callback:
+            self.value_modified_callback(self.item_key, self.ids.option_value_input.text)
 
 
 class BooleanElement(OptionElement, VerticalLayout):
@@ -84,9 +134,66 @@ class BooleanElement(OptionElement, VerticalLayout):
 
 class IntegerElement(OptionElement, VerticalLayout):
 
+    option_value_min = NumericProperty(None, allownone=True)
+    option_value_max = NumericProperty(None, allownone=True)
+
     def __init__(self, **kwargs):
+        self.option_value_min = kwargs.pop('option_value_min', None)
+        self.option_value_max = kwargs.pop('option_value_max', None)
         super(IntegerElement, self).__init__(**kwargs)
         self.bind(minimum_height=self.setter('height'))
+
+    def on_focus_changed(self):
+        if self.ids.option_value_input.focus:
+            self.option_value_recent = self.ids.option_value_input.text
+        else:
+            if self.ids.option_value_input.text != self.option_value_recent:
+                self.on_option_value_input_updated()
+            self.option_value_recent = None
+
+
+class DiskSpaceElement(OptionElement, VerticalLayout):
+
+    def __init__(self, **kwargs):
+        super(DiskSpaceElement, self).__init__(**kwargs)
+        self.bind(minimum_height=self.setter('height'))
+
+    def split_value(self, txt):
+        val, _, suf = txt.rpartition(' ')
+        val = ''.join(filter(str.isdigit, val))
+        suf = ''.join(filter(lambda c: c in 'bytesmgBMG', suf))
+        return val, suf
+
+    def on_focus_changed(self):
+        if self.ids.option_value_input.focus:
+            self.option_value_recent = self.ids.option_value_input.text
+        else:
+            _, suf = self.split_value(self.ids.option_value_input.text)
+            if suf.lower() not in ['bytes', 'kb', 'mb', 'gb', ]:
+                self.ids.option_value_input.text = self.option_value_recent
+            if self.ids.option_value_input.text != self.option_value_recent:
+                self.on_option_value_input_updated()
+            self.option_value_recent = None
+
+
+class SingleChoiceElement(OptionElement, VerticalLayout):
+
+    option_possible_values = ListProperty([])
+
+    def __init__(self, **kwargs):
+        self.option_possible_values = kwargs.pop('option_possible_values', [])
+        super(SingleChoiceElement, self).__init__(**kwargs)
+        self.bind(minimum_height=self.setter('height'))
+
+    def on_focus_changed(self):
+        if self.ids.option_value_input.focus:
+            self.option_value_recent = self.ids.option_value_input.text
+        else:
+            if self.ids.option_value_input.text not in self.option_possible_values:
+                self.ids.option_value_input.text = self.option_value_recent
+            if self.ids.option_value_input.text != self.option_value_recent:
+                self.on_option_value_input_updated()
+            self.option_value_recent = None
 
 
 class TextElement(OptionElement, VerticalLayout):
@@ -94,6 +201,14 @@ class TextElement(OptionElement, VerticalLayout):
     def __init__(self, **kwargs):
         super(TextElement, self).__init__(**kwargs)
         self.bind(minimum_height=self.setter('height'))
+
+    def on_focus_changed(self):
+        if self.ids.option_value_input.focus:
+            self.option_value_recent = self.ids.option_value_input.text
+        else:
+            if self.ids.option_value_input.text != self.option_value_recent:
+                self.on_option_value_input_updated()
+            self.option_value_recent = None
 
 #------------------------------------------------------------------------------
 
@@ -157,7 +272,35 @@ class SettingsScreen(AppScreen):
                                 is_open=False,
                                 is_leaf=True,
                                 option_name=cur_item_data.get('label', '') or sub_path,
-                                option_value=cur_item_data.get('value') or False,
+                                option_value=str(bool(cur_item_data.get('value') or False)).lower().replace('false', ''),
+                                option_value_default=cur_item_data.get('default'),
+                                option_description=cur_item_data.get('info') or '',
+                                value_modified_callback=self.on_option_value_modified,
+                                item_clicked_callback=self.on_item_clicked,
+                            )
+                        elif cur_item_data['type'] in ['selection', ]:
+                            sub_element = SingleChoiceElement(
+                                item_key=abs_path,
+                                item_data=cur_item_data,
+                                is_open=False,
+                                is_leaf=True,
+                                option_name=cur_item_data.get('label', '') or sub_path,
+                                option_value='{}'.format(cur_item_data.get('value') or ''),
+                                option_value_default=cur_item_data.get('default'),
+                                option_possible_values=cur_item_data.get('possible_values', []) or [],
+                                option_description=cur_item_data.get('info') or '',
+                                value_modified_callback=self.on_option_value_modified,
+                                item_clicked_callback=self.on_item_clicked,
+                            )
+                        elif cur_item_data['type'] in ['disk space', ]:
+                            sub_element = DiskSpaceElement(
+                                item_key=abs_path,
+                                item_data=cur_item_data,
+                                is_open=False,
+                                is_leaf=True,
+                                option_name=cur_item_data.get('label', '') or sub_path,
+                                option_value='{}'.format(cur_item_data.get('value') or 0),
+                                option_value_default=cur_item_data.get('default'),
                                 option_description=cur_item_data.get('info') or '',
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
@@ -170,7 +313,10 @@ class SettingsScreen(AppScreen):
                                 is_leaf=True,
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value='{}'.format(cur_item_data.get('value') or 0),
+                                option_value_default=cur_item_data.get('default'),
                                 option_description=cur_item_data.get('info') or '',
+                                option_value_min=cur_item_data.get('min'),
+                                option_value_max=cur_item_data.get('max'),
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
                             )
@@ -182,6 +328,7 @@ class SettingsScreen(AppScreen):
                                 is_leaf=True,
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value='{}'.format(cur_item_data.get('value') or ''),
+                                option_value_default=cur_item_data.get('default'),
                                 option_description=cur_item_data.get('info') or '',
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,

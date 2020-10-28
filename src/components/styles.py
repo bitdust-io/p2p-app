@@ -48,7 +48,10 @@ def init(app):
     app.color_btn_disabled = (.8,.8,.8,1)
 
     app.color_text_input_foreground = (.1,.1,.1,1)
-    app.color_text_input_background = (.9,.9,.9,1)
+    app.color_text_input_foreground_disabled = (.2,.2,.2,1)
+    app.color_text_input_background = (.92,.92,.92,1)
+    app.color_text_input_background_active = (.96,.96,.96,1)
+    app.color_text_input_background_disabled = (.8,.8,.8,1)
     app.color_text_input_border = (.75,.75,.75,1)
 
     #--- SCREEN SETTINGS
