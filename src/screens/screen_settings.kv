@@ -1,3 +1,23 @@
+<TreeElement>:
+    canvas.before:
+        Color:
+            rgba: self.color_selected if self.is_selected else self.odd_color if self.odd else self.even_color
+        Rectangle:
+            pos: [self.parent.x, self.y] if self.parent else [0, 0]
+            size: [self.parent.width, self.height] if self.parent else [1, 1]
+        Color:
+            rgba: 1, 1, 1, int(not self.is_leaf)
+        Rectangle:
+            source: 'atlas://data/images/defaulttheme/tree_%s' % ('opened' if self.is_open else 'closed')
+            size: self.height / 2.0, self.height / 2.0
+            pos: self.x - dp(20), self.center_y - dp(8)
+    canvas.after:
+        Color:
+            rgba: .5, .5, .5, .2
+        Line:
+            points: [self.parent.x, self.y, self.parent.right, self.y] if self.parent else []
+
+
 <OptionValueTextInput>:
     size_hint: None, None
     width: dp(100)
@@ -96,8 +116,8 @@
 
             size_hint: None, None
             pos_hint: {'right': 1}
-            width: root.ids.option_label.height
-            height: root.ids.option_label.height
+            width: app.setting_record_height - dp(4)
+            height: app.setting_record_height - dp(4)
             active: bool(root.option_value)
             on_active: root.value_modified_callback(root.item_key, self.active)
 

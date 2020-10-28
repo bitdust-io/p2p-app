@@ -1,4 +1,5 @@
 from kivy.clock import Clock
+from kivy.metrics import dp
 from kivy.uix.treeview import TreeView, TreeViewNode
 from kivy.properties import ListProperty, StringProperty, NumericProperty  # @UnresolvedImport
 
@@ -422,7 +423,7 @@ class SettingsScreen(AppScreen):
         if active_node:
             if _Debug:
                 print('active node:', active_node.item_key, active_node)
-            Clock.schedule_once(lambda *dt: self.ids.scroll_view.scroll_to(active_node, padding=10), -1)
+            Clock.schedule_once(lambda *dt: self.ids.scroll_view.scroll_to(active_node, padding=dp(5), animate=False), -1)
 
     def on_services_list_result(self, resp):
         if not websock.is_ok(resp):
