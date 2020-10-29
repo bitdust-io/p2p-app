@@ -244,6 +244,9 @@ class SettingsScreen(AppScreen):
             cb=lambda resp: self.on_config_get_result(resp, node.item_key, node),
         )
 
+    def build_description(self, src):
+        return src
+
     def build_item(self, item_key, item_data, known_tree):
         tv = self.ids.settings_tree
         parent = tv.get_root()
@@ -275,7 +278,7 @@ class SettingsScreen(AppScreen):
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value=str(bool(cur_item_data.get('value') or False)).lower().replace('false', ''),
                                 option_value_default=cur_item_data.get('default'),
-                                option_description=cur_item_data.get('info') or '',
+                                option_description=self.build_description(cur_item_data.get('info') or ''),
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
                             )
@@ -289,7 +292,7 @@ class SettingsScreen(AppScreen):
                                 option_value='{}'.format(cur_item_data.get('value') or ''),
                                 option_value_default=cur_item_data.get('default'),
                                 option_possible_values=cur_item_data.get('possible_values', []) or [],
-                                option_description=cur_item_data.get('info') or '',
+                                option_description=self.build_description(cur_item_data.get('info') or ''),
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
                             )
@@ -302,7 +305,7 @@ class SettingsScreen(AppScreen):
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value='{}'.format(cur_item_data.get('value') or 0),
                                 option_value_default=cur_item_data.get('default'),
-                                option_description=cur_item_data.get('info') or '',
+                                option_description=self.build_description(cur_item_data.get('info') or ''),
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
                             )
@@ -315,7 +318,7 @@ class SettingsScreen(AppScreen):
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value='{}'.format(cur_item_data.get('value') or 0),
                                 option_value_default=cur_item_data.get('default'),
-                                option_description=cur_item_data.get('info') or '',
+                                option_description=self.build_description(cur_item_data.get('info') or ''),
                                 option_value_min=cur_item_data.get('min'),
                                 option_value_max=cur_item_data.get('max'),
                                 value_modified_callback=self.on_option_value_modified,
@@ -330,7 +333,7 @@ class SettingsScreen(AppScreen):
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value='{}'.format(cur_item_data.get('value') or ''),
                                 option_value_default=cur_item_data.get('default'),
-                                option_description=cur_item_data.get('info') or '',
+                                option_description=self.build_description(cur_item_data.get('info') or ''),
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
                             )
