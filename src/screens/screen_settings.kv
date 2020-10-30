@@ -48,6 +48,7 @@
     height: self.texture_size[1] + dp(10)
     pos_hint: {'left': 1, 'center_y': .5}
     halign: 'left'
+    valign: 'top'
     padding: 0, 0
     text_size: self.width, None
     font_size: app.setting_normal_font_size
@@ -58,6 +59,7 @@
     height: self.texture_size[1]
     text_size: self.width, None
     halign: 'left'
+    valign: 'top'
     padding: dp(10), dp(0)
     font_size: app.setting_small_font_size
 
@@ -113,7 +115,7 @@
                 Rectangle:
                     pos: self.pos[0] + 7, self.pos[1] + 7
                     size: self.size[0] - 14, self.size[1] - 14
-
+			id: option_value_checkbox
             size_hint: None, None
             pos_hint: {'right': 1}
             width: app.setting_record_height - dp(4)
@@ -123,6 +125,10 @@
 
     OptionDescriptionLabel:
         text: '{}'.format(root.option_description)
+
+	Widget:
+		size_hint: 1, None
+		height: dp(5)
 
 
 <IntegerElement>:
@@ -150,6 +156,10 @@
     OptionDescriptionLabel:
         text: '{}'.format(root.option_description)
 
+	Widget:
+		size_hint: 1, None
+		height: dp(5)
+
 
 <DiskSpaceElement>:
     size_hint: 1, None
@@ -171,6 +181,10 @@
 
     OptionDescriptionLabel:
         text: '{}'.format(root.option_description)
+
+	Widget:
+		size_hint: 1, None
+		height: dp(5)
 
 
 <SingleChoiceElement>:
@@ -194,6 +208,10 @@
     OptionDescriptionLabel:
         text: '{}'.format(root.option_description)
 
+	Widget:
+		size_hint: 1, None
+		height: dp(5)
+
 
 <TextElement>:
     size_hint: 1, None
@@ -215,6 +233,10 @@
 
     OptionDescriptionLabel:
         text: '{}'.format(root.option_description)
+
+	Widget:
+		size_hint: 1, None
+		height: dp(5)
 
 
 <SettingsTreeView>:

@@ -6,7 +6,7 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@ def network_connected(wait_timeout=0, cb=None):
     return run('network_connected', kwargs={'wait_timeout': wait_timeout, }, cb=cb)
 
 
-def configs_list(sort=True, cb=None):
-    return run('configs_list', kwargs={'sort': sort, }, cb=cb)
+def configs_list(sort=True, include_info=False, cb=None):
+    return run('configs_list', kwargs={'sort': sort, 'include_info': include_info, }, cb=cb)
 
 
-def configs_tree(cb=None):
-    return run('configs_tree', cb=cb)
+def configs_tree(include_info=False, cb=None):
+    return run('configs_tree', kwargs={'include_info': include_info, }, cb=cb)
 
 
-def config_get(key, cb=None):
-    return run('config_get', kwargs={'key': key, }, cb=cb)
+def config_get(key, include_info=False, cb=None):
+    return run('config_get', kwargs={'key': key, 'include_info': include_info, }, cb=cb)
 
 
 def config_set(key, value, cb=None):

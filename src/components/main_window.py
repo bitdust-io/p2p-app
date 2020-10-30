@@ -40,6 +40,12 @@ class MainWindow(FloatLayout):
 
     #------------------------------------------------------------------------------
 
+    def is_screen_active(self, screen_id):
+        return screen_id in self.active_screens
+
+    def get_active_screen(self, screen_id):
+        return self.active_screens.get(screen_id, [None, ])[0]
+
     def open_screen(self, screen_id, screen_type, **kwargs):
         if screen_id in self.active_screens:
             if _Debug:
