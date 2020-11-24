@@ -396,6 +396,10 @@ class SettingsScreen(AppScreen):
                 continue
             if item_key.startswith('paths/'):
                 continue
+            if item_key.startswith('services/network/proxy'):
+                continue
+            if item_key.startswith('services/blockchain/explorer') or item_key.startswith('services/blockchain/wallet') or item_key.startswith('services/blockchain/miner'):
+                continue
             if 'value' in item and not item.get('info'):
                 continue
             d[item_key] = item

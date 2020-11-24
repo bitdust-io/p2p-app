@@ -21,9 +21,10 @@
 
 
 <MainMenuScreen>:
-    title: ''
+
     ScrollView:
         do_scroll_x: False
+
         StackLayout:
             orientation: 'lr-tb'
             padding: 0, dp(20)
@@ -36,28 +37,35 @@
                 fa_icon_text: fa_icon('id-card-alt', with_spaces=False)
                 short_text: 'my identity'
                 on_press: root.main_win().select_screen('my_id_screen', verify_state=True)
+
             MainMenuButton:
                 fa_icon_text: fa_icon('search', with_spaces=False)
                 short_text: 'search people'
                 on_press: root.main_win().select_screen('search_people_screen', verify_state=True)
+
             MainMenuButton:
                 fa_icon_text: fa_icon('comments', with_spaces=False)
-                short_text: 'chat'
-                # on_press: root.main_win().select_screen('chats_screen', verify_state=True)
+                short_text: 'conversations'
+                on_press: root.main_win().select_screen('conversations_screen', verify_state=True)
+
             MainMenuButton:
                 fa_icon_text: fa_icon('address-book', with_spaces=False)
                 short_text: 'contacts'
                 on_press: root.main_win().select_screen('friends_screen', verify_state=True)
-            MainMenuButton:
-                fa_icon_text: fa_icon('hdd', with_spaces=False)
-                short_text: 'my files'
-            MainMenuButton:
-                fa_icon_text: fa_icon('user-secret', with_spaces=False)
-                short_text: 'secrets'
+
+            # MainMenuButton:
+            #     fa_icon_text: fa_icon('hdd', with_spaces=False)
+            #     short_text: 'my files'
+
+            # MainMenuButton:
+            #     fa_icon_text: fa_icon('user-secret', with_spaces=False)
+            #     short_text: 'secrets'
+
             MainMenuButton:
                 fa_icon_text: fa_icon('cogs', with_spaces=False)
                 short_text: 'settings'
                 on_press: root.main_win().select_screen('settings_screen', verify_state=True)
-            MainMenuButton:
-                fa_icon_text: fa_icon('graduation-cap', with_spaces=False)
-                short_text: 'wiki'
+
+            # MainMenuButton:
+            #     fa_icon_text: fa_icon('graduation-cap', with_spaces=False)
+            #     short_text: 'wiki'

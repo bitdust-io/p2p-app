@@ -92,6 +92,14 @@ def message_history(recipient_id=None, sender_id=None, message_type=None, offset
     }, cb=cb)
 
 
+def message_conversations_list(message_types=[], offset=0, limit=100, cb=None):
+    return run('message_conversations_list', kwargs={
+        'message_types': message_types,
+        'offset': offset,
+        'limit': limit,
+    }, cb=cb)
+
+
 def message_send(recipient_id, data, ping_timeout=30, message_ack_timeout=15, cb=None):
     return run('message_send', kwargs={
         'recipient_id': recipient_id,
@@ -99,3 +107,7 @@ def message_send(recipient_id, data, ping_timeout=30, message_ack_timeout=15, cb
         'ping_timeout': ping_timeout,
         'message_ack_timeout': message_ack_timeout,
     }, cb=cb)
+
+
+def group_create(label=None, cb=None):
+    return run('group_create', kwargs={'label': label, }, cb=cb)

@@ -22,6 +22,8 @@ def all_screens():
     from screens import screen_my_id
     from screens import screen_search_people
     from screens import screen_friends
+    from screens import screen_conversations
+    from screens import screen_create_group
     from screens import screen_private_chat
     return {
         'main_menu_screen': screen_main_menu.MainMenuScreen,
@@ -34,6 +36,8 @@ def all_screens():
         'my_id_screen': screen_my_id.MyIDScreen,
         'search_people_screen': screen_search_people.SearchPeopleScreen,
         'friends_screen': screen_friends.FriendsScreen,
+        'conversations_screen': screen_conversations.ConversationsScreen,
+        'create_group_screen': screen_create_group.CreateGroupScreen,
         'private_chat_screen': screen_private_chat.PrivateChatScreen,
     }
 

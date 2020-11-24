@@ -10,7 +10,7 @@
     height: self.minimum_height
 
 
-<NavButtonBase>:
+<NavButtonBaseOld>:
     corner_radius: 2
 	text_padding_x: app.button_text_padding_x
 	text_padding_y: app.button_text_padding_y
@@ -44,7 +44,7 @@
     bg_disabled_delta: .1
 
 
-<NavButtonActive>:
+<NavButtonActiveOld>:
     cols: 1
     rows: 1
     padding: 0
@@ -70,7 +70,7 @@
         on_press: root.on_action_area_pressed()
 
 
-<NavButtonClosable>:
+<NavButtonClosableOld>:
     cols: 2
     rows: 1
     padding: 0
@@ -117,3 +117,14 @@
         font_size: sp(14)
         text: fa_icon('times', with_spaces=False)
         on_release: root.on_close_area_pressed()
+
+
+<NavButtonBase>:
+    _radius: dp(10)
+    increment_width: dp(7)
+
+
+<NavButtonActive>:
+
+
+<NavButtonClosable>:

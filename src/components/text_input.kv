@@ -19,7 +19,7 @@
             pos: self._cursor_visual_pos
             size: root.cursor_width, -self._cursor_visual_height
         Color:
-            rgba: app.color_text_input_foreground_disabled if self.disabled else app.color_text_input_foreground
+            rgba: app.color_text_input_foreground_disabled if self.disabled else ( app.color_text_input_foreground if self.text else app.color_text_input_foreground_empty )
 
 
 <BasicTextInput>:

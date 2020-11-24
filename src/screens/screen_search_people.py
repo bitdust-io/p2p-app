@@ -35,10 +35,14 @@ class SearchPeopleScreen(AppScreen):
 
     search_started = False
 
-    def get_title(self):
-        return f"{fa_icon('search', with_spaces=False)} search people"
+    def get_icon(self):
+        return 'account-search'
 
-    def clean_search_view(self, clear_input_field=False):
+    def get_title(self):
+        # return f"{fa_icon('search', with_spaces=False)} search people"
+        return "search people"
+
+    def clean_view(self, clear_input_field=False):
         if clear_input_field:
             self.ids.search_input.text = ''
         self.ids.search_results.clear_widgets()
@@ -49,7 +53,7 @@ class SearchPeopleScreen(AppScreen):
         nickname = self.ids.search_input.text.strip().lower()
         if not nickname:
             return
-        self.clean_search_view()
+        self.clean_view()
         self.ids.search_button.disabled = True
         self.search_started = True
         api_client.user_observe(
@@ -61,7 +65,7 @@ class SearchPeopleScreen(AppScreen):
     def on_enter(self):
         if self.search_started:
             return
-        self.clean_search_view(clear_input_field=True)
+        self.clean_view(clear_input_field=True)
         self.ids.search_button.disabled = False
 
     def on_search_input_focus_changed(self):
@@ -73,7 +77,7 @@ class SearchPeopleScreen(AppScreen):
 
     def on_user_observe_results(self, resp):
         self.search_started = False
-        self.clean_search_view()
+        self.clean_view()
         self.ids.search_button.disabled = False
         if not isinstance(resp, dict):
             self.ids.search_results.add_widget(NoUsersFound(

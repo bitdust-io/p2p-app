@@ -1,61 +1,37 @@
 <NormalButton>:
-    background_color: app.color_transparent
+    # background_color: app.color_transparent
     markup: True
 	font_size: app.font_size_normal
 
 
 <BasicButton>:
-    background_color: app.color_transparent
-    color: app.color_btn_text_light
-    disabled_color: app.color_btn_disabled
-    background_disabled_normal: ''
+    # background_color: app.color_transparent
+    # color: app.color_btn_text_light
+    # disabled_color: app.color_btn_disabled
+    # background_disabled_normal: ''
 	text_padding_x: app.button_text_padding_x
 	text_padding_y: app.button_text_padding_y
     markup: True
 	font_size: app.font_size_normal
 
 
-<RoundedButtonInfo>:
-    corner_radius: 3
-    bg_normal: app.color_btn_normal
-    bg_pressed: app.color_btn_pressed
-    bg_disabled: app.color_btn_disabled
-    bg_normal_delta: .2
-    bg_disabled_delta: .1
-
-
 <RoundedButton>:
-    canvas.before:
-        Color:
-            rgba: self.bg_disabled if self.disabled else (self.bg_normal if self.state == 'normal' else self.bg_pressed) 
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
-            radius: [self.corner_radius+1, ]
-        Color:
-            rgba: (self.bg_disabled[0]+self.bg_disabled_delta,self.bg_disabled[1]+self.bg_disabled_delta,self.bg_disabled[2]+self.bg_disabled_delta,1) if self.disabled else ((self.bg_normal[0]+self.bg_normal_delta,self.bg_normal[1]+self.bg_normal_delta,self.bg_normal[2]+self.bg_normal_delta,1) if self.state == 'normal' else (self.bg_pressed[0]+self.bg_normal_delta,self.bg_pressed[1]+self.bg_normal_delta,self.bg_pressed[2]+self.bg_normal_delta,1))
-        RoundedRectangle:
-            pos: self.pos[0]+2, self.pos[1]+2
-            size: self.size[0]-4, self.size[1]-4
-            radius: [self.corner_radius, ]
+    markup: True
 
 
 <RoundedFlexWidthButton>:
-	size_hint_x: None
-	width: self.texture_size[0] + self.text_padding_x * 2
 
 
 <RoundedFlexHeightButton>:
-	size_hint_y: None
-	height: self.texture_size[1] + self.text_padding_y * 2
 
 
 <RoundedFlexButton>:
-	size_hint: None, None
-	width: self.texture_size[0] + self.text_padding_x * 2
-	height: self.texture_size[1] + self.text_padding_y * 2
 
 
 <TransparentButton>:
-	color: app.color_btn_text_dark
-	
+	# color: app.color_btn_text_dark
+    markup: True
+	font_size: app.font_size_normal
+
+
+<RoundedGreenIconButton>:

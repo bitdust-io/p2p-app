@@ -31,12 +31,18 @@ class PrivateChatScreen(AppScreen):
 
     def __init__(self, **kwargs):
         self.global_id = kwargs.pop('global_id', '')
-        self.recipient_id = 'master${}'.format(self.global_id)
+        self.recipient_id = self.global_id
+        if not self.recipient_id.count('$'):
+            self.recipient_id = 'master${}'.format(self.recipient_id)
         self.username = kwargs.pop('username', '')
         super(PrivateChatScreen, self).__init__(**kwargs)
 
+    def get_icon(self):
+        return 'comment'
+
     def get_title(self):
-        return f"{fa_icon('comment', with_spaces=False)} {self.username}"
+        # return f"{fa_icon('comment', with_spaces=False)} {self.username}"
+        return f"{self.username}"
 
     def on_enter(self, *args):
         self.ids.chat_status_label.text = ''
@@ -62,7 +68,7 @@ class PrivateChatScreen(AppScreen):
         current_direction = None
         current_sender = None
         current_messages = []
-        msg_list = list(reversed(websock.response_result(resp)))
+        msg_list = list(websock.response_result(resp))
         if _Debug:
             print('on_message_history_result', len(msg_list))
         for item in msg_list:

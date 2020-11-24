@@ -11,27 +11,6 @@ class FriendActionButton(RoundedButton):
     pass
 
 
-class FriendsScreen(AppScreen):
-
-    def populate(self, *args, **kwargs):
-        api_client.friends_list(cb=self.on_friends_list_result)
-
-    def on_pre_enter(self, *args):
-        self.populate()
-
-    def on_friends_list_result(self, resp):
-        if not isinstance(resp, dict):
-            self.ids.friends_list_view.data = []
-            return
-        result = resp.get('payload', {}).get('response' , {}).get('result', {})
-        if not result:
-            self.ids.friends_list_view.data = []
-            return
-        self.ids.friends_list_view.data = []
-        for one_friend in result:
-            self.ids.friends_list_view.data.append(one_friend)
-
-
 class FriendRecord(SelectableHorizontalRecord):
 
     def __init__(self, **kwargs):
@@ -83,6 +62,34 @@ class FriendsListView(SelectableRecycleView):
                 item.show_buttons()
             else:
                 item.hide_buttons()
+
+
+class FriendsScreen(AppScreen):
+
+    def get_icon(self):
+        return 'account-box-multiple'
+
+    def get_title(self):
+        # title: '{} contacts'.format(fa_icon('address-book', with_spaces=False))
+        return 'contacts'
+
+    def populate(self, *args, **kwargs):
+        api_client.friends_list(cb=self.on_friends_list_result)
+
+    def on_pre_enter(self, *args):
+        self.populate()
+
+    def on_friends_list_result(self, resp):
+        if not isinstance(resp, dict):
+            self.ids.friends_list_view.data = []
+            return
+        result = resp.get('payload', {}).get('response' , {}).get('result', {})
+        if not result:
+            self.ids.friends_list_view.data = []
+            return
+        self.ids.friends_list_view.data = []
+        for one_friend in result:
+            self.ids.friends_list_view.data.append(one_friend)
 
 #------------------------------------------------------------------------------
 

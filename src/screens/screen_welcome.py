@@ -10,6 +10,9 @@ class WelcomeScreen(AppScreen):
 
     verify_network_connected_task = None
 
+    def get_icon(self):
+        return 'human-greeting'
+
     def get_title(self):
         return 'welcome'
 
