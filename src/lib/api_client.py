@@ -6,7 +6,7 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@ def network_connected(wait_timeout=0, cb=None):
     return run('network_connected', kwargs={'wait_timeout': wait_timeout, }, cb=cb)
 
 
-def configs_list(sort=True, cb=None):
-    return run('configs_list', kwargs={'sort': sort, }, cb=cb)
+def configs_list(sort=True, include_info=False, cb=None):
+    return run('configs_list', kwargs={'sort': sort, 'include_info': include_info, }, cb=cb)
 
 
-def configs_tree(cb=None):
-    return run('configs_tree', cb=cb)
+def configs_tree(include_info=False, cb=None):
+    return run('configs_tree', kwargs={'include_info': include_info, }, cb=cb)
 
 
-def config_get(key, cb=None):
-    return run('config_get', kwargs={'key': key, }, cb=cb)
+def config_get(key, include_info=False, cb=None):
+    return run('config_get', kwargs={'key': key, 'include_info': include_info, }, cb=cb)
 
 
 def config_set(key, value, cb=None):
@@ -92,6 +92,14 @@ def message_history(recipient_id=None, sender_id=None, message_type=None, offset
     }, cb=cb)
 
 
+def message_conversations_list(message_types=[], offset=0, limit=100, cb=None):
+    return run('message_conversations_list', kwargs={
+        'message_types': message_types,
+        'offset': offset,
+        'limit': limit,
+    }, cb=cb)
+
+
 def message_send(recipient_id, data, ping_timeout=30, message_ack_timeout=15, cb=None):
     return run('message_send', kwargs={
         'recipient_id': recipient_id,
@@ -99,3 +107,7 @@ def message_send(recipient_id, data, ping_timeout=30, message_ack_timeout=15, cb
         'ping_timeout': ping_timeout,
         'message_ack_timeout': message_ack_timeout,
     }, cb=cb)
+
+
+def group_create(label=None, cb=None):
+    return run('group_create', kwargs={'label': label, }, cb=cb)

@@ -1,20 +1,17 @@
 from kivy.uix.button import Button
+from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDFillRoundFlatIconButton, MDFillRoundFlatButton
 
 #------------------------------------------------------------------------------
 
-class NormalButton(Button):
+class NormalButton(MDRaisedButton):
     pass
 
 
-class BasicButton(Button):
+class BasicButton(MDRaisedButton):
     pass
 
 
-class RoundedButtonInfo(BasicButton):
-    pass
-
-
-class RoundedButton(RoundedButtonInfo):
+class RoundedButton(MDFillRoundFlatButton):
     pass
 
 
@@ -30,8 +27,13 @@ class RoundedFlexButton(RoundedButton):
     pass
 
 
-class TransparentButton(BasicButton):
+class TransparentButton(MDFlatButton):
     pass
+
+
+class RoundedGreenIconButton(RoundedButton):
+    pass
+
 
 #------------------------------------------------------------------------------
 

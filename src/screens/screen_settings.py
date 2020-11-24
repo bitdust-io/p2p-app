@@ -1,4 +1,9 @@
+import re
+
+#------------------------------------------------------------------------------
+
 from kivy.clock import Clock
+from kivy.metrics import dp
 from kivy.uix.treeview import TreeView, TreeViewNode
 from kivy.properties import ListProperty, StringProperty, NumericProperty  # @UnresolvedImport
 
@@ -111,6 +116,7 @@ class OptionElement(TreeElement):
         self.option_value = kwargs.pop('option_value')
         self.option_value_default = kwargs.pop('option_value_default', None)
         self.option_description = kwargs.pop('option_description', '')
+        self.option_readonly = kwargs.pop('option_readonly', False)
         self.value_modified_callback = kwargs.pop('value_modified_callback', None)
         self.item_clicked_callback = kwargs.pop('item_clicked_callback', None)
         self.option_value_recent = self.option_value
@@ -120,7 +126,8 @@ class OptionElement(TreeElement):
         super(OptionElement, self).__init__(**kwargs)
 
     def on_option_value_input_updated(self):
-        print('on_option_value_input_updated', self.item_key, self.option_value_recent, self.ids.option_value_input.text)
+        if _Debug:
+            print('on_option_value_input_updated', self.item_key, self.option_value_recent, self.ids.option_value_input.text)
         if self.value_modified_callback:
             self.value_modified_callback(self.item_key, self.ids.option_value_input.text)
 
@@ -130,6 +137,8 @@ class BooleanElement(OptionElement, VerticalLayout):
     def __init__(self, **kwargs):
         super(BooleanElement, self).__init__(**kwargs)
         self.bind(minimum_height=self.setter('height'))
+        if self.option_readonly:
+            self.ids.option_value_checkbox.disabled = True
 
 
 class IntegerElement(OptionElement, VerticalLayout):
@@ -142,6 +151,8 @@ class IntegerElement(OptionElement, VerticalLayout):
         self.option_value_max = kwargs.pop('option_value_max', None)
         super(IntegerElement, self).__init__(**kwargs)
         self.bind(minimum_height=self.setter('height'))
+        if self.option_readonly:
+            self.ids.option_value_input.read_only = True
 
     def on_focus_changed(self):
         if self.ids.option_value_input.focus:
@@ -157,6 +168,8 @@ class DiskSpaceElement(OptionElement, VerticalLayout):
     def __init__(self, **kwargs):
         super(DiskSpaceElement, self).__init__(**kwargs)
         self.bind(minimum_height=self.setter('height'))
+        if self.option_readonly:
+            self.ids.option_value_input.read_only = True
 
     def split_value(self, txt):
         val, _, suf = txt.rpartition(' ')
@@ -184,6 +197,8 @@ class SingleChoiceElement(OptionElement, VerticalLayout):
         self.option_possible_values = kwargs.pop('option_possible_values', [])
         super(SingleChoiceElement, self).__init__(**kwargs)
         self.bind(minimum_height=self.setter('height'))
+        if self.option_readonly:
+            self.ids.option_value_input.read_only = True
 
     def on_focus_changed(self):
         if self.ids.option_value_input.focus:
@@ -201,6 +216,8 @@ class TextElement(OptionElement, VerticalLayout):
     def __init__(self, **kwargs):
         super(TextElement, self).__init__(**kwargs)
         self.bind(minimum_height=self.setter('height'))
+        if self.option_readonly:
+            self.ids.option_value_input.read_only = True
 
     def on_focus_changed(self):
         if self.ids.option_value_input.focus:
@@ -231,8 +248,7 @@ class SettingsTreeView(TreeView):
 
 class SettingsScreen(AppScreen):
 
-    def on_enter(self, *args):
-        self.populate()
+    recent_tree_index = {}
 
     def populate(self):
         api_client.services_list(cb=self.on_services_list_result)
@@ -240,8 +256,14 @@ class SettingsScreen(AppScreen):
     def populate_node(self, node):
         api_client.config_get(
             key=node.item_key,
+            include_info=True,
             cb=lambda resp: self.on_config_get_result(resp, node.item_key, node),
         )
+
+    def build_description(self, src):
+        src = re.sub(r'\*\*(.+?)\*\*', r'[b]\g<1>[/b]', src)  # bold
+        src = re.sub(r'\`(.+?)\`', r'[size=10sp][font=RobotoMono-Regular]\g<1>[/font][/size]', src)  # monospace
+        return src
 
     def build_item(self, item_key, item_data, known_tree):
         tv = self.ids.settings_tree
@@ -254,13 +276,15 @@ class SettingsScreen(AppScreen):
             cur_item_data = {} if abs_path != item_key else item_data
             if abs_path not in known_tree:
                 if abs_path.startswith('services/') and abs_path.count('/') == 1:
+                    svc_name = 'service_'+sub_path.replace('-', '_')
                     sub_element = ServiceElement(
+                        id=svc_name,
                         item_key=abs_path,
                         item_data=cur_item_data,
                         is_open=False,
                         is_leaf=False,
                         service_name=sub_path,
-                        service_state=self.services_list_result.get('service_'+sub_path.replace('-', '_'), {'state': 'OFF'})['state'],
+                        service_state=self.services_list_result.get(svc_name, {'state': 'OFF'})['state'],
                         item_clicked_callback=self.on_item_clicked,
                     )
                 else:
@@ -274,7 +298,8 @@ class SettingsScreen(AppScreen):
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value=str(bool(cur_item_data.get('value') or False)).lower().replace('false', ''),
                                 option_value_default=cur_item_data.get('default'),
-                                option_description=cur_item_data.get('info') or '',
+                                option_description=self.build_description(cur_item_data.get('info') or ''),
+                                option_readonly=cur_item_data.get('readonly', False),
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
                             )
@@ -288,7 +313,8 @@ class SettingsScreen(AppScreen):
                                 option_value='{}'.format(cur_item_data.get('value') or ''),
                                 option_value_default=cur_item_data.get('default'),
                                 option_possible_values=cur_item_data.get('possible_values', []) or [],
-                                option_description=cur_item_data.get('info') or '',
+                                option_description=self.build_description(cur_item_data.get('info') or ''),
+                                option_readonly=cur_item_data.get('readonly', False),
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
                             )
@@ -301,7 +327,8 @@ class SettingsScreen(AppScreen):
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value='{}'.format(cur_item_data.get('value') or 0),
                                 option_value_default=cur_item_data.get('default'),
-                                option_description=cur_item_data.get('info') or '',
+                                option_description=self.build_description(cur_item_data.get('info') or ''),
+                                option_readonly=cur_item_data.get('readonly', False),
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
                             )
@@ -314,9 +341,10 @@ class SettingsScreen(AppScreen):
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value='{}'.format(cur_item_data.get('value') or 0),
                                 option_value_default=cur_item_data.get('default'),
-                                option_description=cur_item_data.get('info') or '',
+                                option_description=self.build_description(cur_item_data.get('info') or ''),
                                 option_value_min=cur_item_data.get('min'),
                                 option_value_max=cur_item_data.get('max'),
+                                option_readonly=cur_item_data.get('readonly', False),
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
                             )
@@ -329,7 +357,8 @@ class SettingsScreen(AppScreen):
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value='{}'.format(cur_item_data.get('value') or ''),
                                 option_value_default=cur_item_data.get('default'),
-                                option_description=cur_item_data.get('info') or '',
+                                option_description=self.build_description(cur_item_data.get('info') or ''),
+                                option_readonly=cur_item_data.get('readonly', False),
                                 value_modified_callback=self.on_option_value_modified,
                                 item_clicked_callback=self.on_item_clicked,
                             )
@@ -357,6 +386,8 @@ class SettingsScreen(AppScreen):
         d = {}  # input elements by option key
         a = {}  # absolute path of each tree element
         t = {}  # known tree elements
+        o = []  # maintain order of the items
+        s = []  # also store order for sub elements
         for item in items_list:
             item_key = item['key']
             if item_key.startswith('interface/'):
@@ -365,16 +396,25 @@ class SettingsScreen(AppScreen):
                 continue
             if item_key.startswith('paths/'):
                 continue
+            if item_key.startswith('services/network/proxy'):
+                continue
+            if item_key.startswith('services/blockchain/explorer') or item_key.startswith('services/blockchain/wallet') or item_key.startswith('services/blockchain/miner'):
+                continue
+            if 'value' in item and not item.get('info'):
+                continue
             d[item_key] = item
+            o.append(item_key)
         if _Debug:
             print('building items:', len(d))
         count_options = 0
-        for item_key, item in d.items():
+        for item_key in o:
+            item = d[item_key]
             item_path = item_key.split('/')
             for sub_path_pos in range(len(item_path)):
                 abs_path = '/'.join(item_path[:sub_path_pos + 1])
                 if abs_path not in a:
                     a[abs_path] = {}
+                    s.append(abs_path)
                 if abs_path == item_key:
                     a[abs_path] = item.copy()
                     count_options += 1
@@ -388,10 +428,20 @@ class SettingsScreen(AppScreen):
                     opened.add(node.item_key)
         if _Debug:
             print('known nodes:', len(t), count_options)
-        if not t:
-            for abs_path in ['services', 'logs', ]:
+        count_built = 0
+        if t:
+            for abs_path in s:
+                parent_path = '/'.join(abs_path.split('/')[:-1])
                 if abs_path in t:
                     continue
+                if parent_path == abs_path:
+                    continue
+                if parent_path not in opened:
+                    continue
+                item = a[abs_path]
+                count_built += self.build_item(item_key=abs_path, item_data=item, known_tree=t)
+        else:
+            for abs_path in ['services', 'logs', ]:
                 sub_element = ParentElement(
                     item_key=abs_path,
                     item_data={},
@@ -404,25 +454,41 @@ class SettingsScreen(AppScreen):
                     node=sub_element,
                     parent=tv.get_root(),
                 )
+                count_built += 1
                 t[abs_path] = active_tree_node
-            return
-        count_built = 0
-        for abs_path in sorted(a.keys()):
-            parent_path = '/'.join(abs_path.split('/')[:-1])
-            if abs_path in t:
-                continue
-            if parent_path == abs_path:
-                continue
-            if parent_path not in opened:
-                continue
-            item = a[abs_path]
-            count_built += self.build_item(item_key=abs_path, item_data=item, known_tree=t)
         if _Debug:
             print('created elements:', count_built)
+        d.clear()
+        a.clear()
+        t.clear()
+        o.clear()
         if active_node:
             if _Debug:
                 print('active node:', active_node.item_key, active_node)
-            Clock.schedule_once(lambda *dt: self.ids.scroll_view.scroll_to(active_node, padding=10), -1)
+            Clock.schedule_once(lambda *dt: self.ids.scroll_view.scroll_to(active_node, padding=dp(5), animate=False), -1)
+        self.recent_tree_index.clear()
+        for node in list(tv.iterate_all_nodes()):
+            node_item_key = getattr(node, 'item_key', None)
+            if node_item_key:
+                if node_item_key not in t:
+                    self.recent_tree_index[node.item_key] = node
+        if _Debug:
+            print('indexed %d elements' % len(self.recent_tree_index))
+
+    def on_enter(self, *args):
+        self.populate()
+
+    def on_service_started_stopped(self, event_id, service_name):
+        element_name = 'services/{}'.format(service_name[8:].replace('_', '-'))
+        node = self.recent_tree_index.get(element_name, None)
+        if not node:
+            if _Debug:
+                print('element %r not found' % element_name)
+            return
+        current_state = node.service_state
+        node.service_state = 'ON' if event_id == 'service-started' else 'OFF'
+        if _Debug:
+            print('on_service_started_stopped', event_id, service_name, element_name, current_state, node.service_state)
 
     def on_services_list_result(self, resp):
         if not websock.is_ok(resp):
@@ -432,7 +498,7 @@ class SettingsScreen(AppScreen):
         self.services_list_result = {}
         for svc in websock.response_result(resp):
             self.services_list_result[svc['name']] = svc
-        api_client.configs_list(sort=False, cb=self.on_configs_list_result)
+        api_client.configs_list(sort=True, include_info=False, cb=self.on_configs_list_result)
 
     def on_configs_list_result(self, resp):
         if not websock.is_ok(resp):
@@ -441,7 +507,7 @@ class SettingsScreen(AppScreen):
         self.ids.status_message_label.text = ''
         items_list = websock.response_result(resp)
         if _Debug:
-            print('on_configs_list_result', items_list)
+            print('on_configs_list_result', len(items_list))
         self.build_tree(items_list)
 
     def on_item_clicked(self, option_key, node):
@@ -456,7 +522,7 @@ class SettingsScreen(AppScreen):
         self.ids.status_message_label.text = ''
         items_list = websock.response_result(resp)
         if _Debug:
-            print('on_config_get_result', items_list)
+            print('on_config_get_result', list(items_list))
         self.build_tree(items_list, active_node=node)
 
     def on_option_value_modified(self, option_key, new_value):

@@ -1,3 +1,23 @@
+<TreeElement>:
+    canvas.before:
+        Color:
+            rgba: self.color_selected if self.is_selected else self.odd_color if self.odd else self.even_color
+        Rectangle:
+            pos: [self.parent.x, self.y] if self.parent else [0, 0]
+            size: [self.parent.width, self.height] if self.parent else [1, 1]
+        Color:
+            rgba: 1, 1, 1, int(not self.is_leaf)
+        Rectangle:
+            source: 'atlas://data/images/defaulttheme/tree_%s' % ('opened' if self.is_open else 'closed')
+            size: self.height / 2.0, self.height / 2.0
+            pos: self.x - dp(20), self.center_y - dp(8)
+    canvas.after:
+        Color:
+            rgba: .5, .5, .5, .2
+        Line:
+            points: [self.parent.x, self.y, self.parent.right, self.y] if self.parent else []
+
+
 <OptionValueTextInput>:
     size_hint: None, None
     width: dp(100)
@@ -28,6 +48,7 @@
     height: self.texture_size[1] + dp(10)
     pos_hint: {'left': 1, 'center_y': .5}
     halign: 'left'
+    valign: 'top'
     padding: 0, 0
     text_size: self.width, None
     font_size: app.setting_normal_font_size
@@ -38,6 +59,7 @@
     height: self.texture_size[1]
     text_size: self.width, None
     halign: 'left'
+    valign: 'top'
     padding: dp(10), dp(0)
     font_size: app.setting_small_font_size
 
@@ -93,16 +115,20 @@
                 Rectangle:
                     pos: self.pos[0] + 7, self.pos[1] + 7
                     size: self.size[0] - 14, self.size[1] - 14
-
+			id: option_value_checkbox
             size_hint: None, None
             pos_hint: {'right': 1}
-            width: root.ids.option_label.height
-            height: root.ids.option_label.height
+            width: app.setting_record_height - dp(4)
+            height: app.setting_record_height - dp(4)
             active: bool(root.option_value)
             on_active: root.value_modified_callback(root.item_key, self.active)
 
     OptionDescriptionLabel:
         text: '{}'.format(root.option_description)
+
+	Widget:
+		size_hint: 1, None
+		height: dp(5)
 
 
 <IntegerElement>:
@@ -130,6 +156,10 @@
     OptionDescriptionLabel:
         text: '{}'.format(root.option_description)
 
+	Widget:
+		size_hint: 1, None
+		height: dp(5)
+
 
 <DiskSpaceElement>:
     size_hint: 1, None
@@ -151,6 +181,10 @@
 
     OptionDescriptionLabel:
         text: '{}'.format(root.option_description)
+
+	Widget:
+		size_hint: 1, None
+		height: dp(5)
 
 
 <SingleChoiceElement>:
@@ -174,6 +208,10 @@
     OptionDescriptionLabel:
         text: '{}'.format(root.option_description)
 
+	Widget:
+		size_hint: 1, None
+		height: dp(5)
+
 
 <TextElement>:
     size_hint: 1, None
@@ -195,6 +233,10 @@
 
     OptionDescriptionLabel:
         text: '{}'.format(root.option_description)
+
+	Widget:
+		size_hint: 1, None
+		height: dp(5)
 
 
 <SettingsTreeView>:

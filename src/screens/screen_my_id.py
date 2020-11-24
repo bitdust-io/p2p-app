@@ -31,6 +31,12 @@ identity_details_temlate_text = """[size={text_size}][color=#909090]name:[/color
 
 class MyIDScreen(AppScreen):
 
+    def get_icon(self):
+        return 'account-box'
+
+    def get_title(self):
+        return 'my identity'
+
     def on_enter(self, *args):
         api_client.identity_get(cb=self.on_identity_get_result)
 

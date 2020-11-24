@@ -22,6 +22,8 @@ def all_screens():
     from screens import screen_my_id
     from screens import screen_search_people
     from screens import screen_friends
+    from screens import screen_conversations
+    from screens import screen_create_group
     from screens import screen_private_chat
     return {
         'main_menu_screen': screen_main_menu.MainMenuScreen,
@@ -34,6 +36,8 @@ def all_screens():
         'my_id_screen': screen_my_id.MyIDScreen,
         'search_people_screen': screen_search_people.SearchPeopleScreen,
         'friends_screen': screen_friends.FriendsScreen,
+        'conversations_screen': screen_conversations.ConversationsScreen,
+        'create_group_screen': screen_create_group.CreateGroupScreen,
         'private_chat_screen': screen_private_chat.PrivateChatScreen,
     }
 
@@ -57,6 +61,7 @@ class Controller(object):
             'on_open': self.on_websocket_open,
             'on_error': self.on_websocket_error,
             'on_stream_message': self.on_websocket_stream_message,
+            'on_event': self.on_websocket_event,
         })
         self.run()
 
@@ -181,6 +186,19 @@ class Controller(object):
             self.identity_get_latest = 0
             self.network_connected_latest = 0
             self.verify_process_health()
+
+    def on_websocket_event(self, json_data):
+        if _Debug:
+            print('on_websocket_event', json_data)
+        event_id = json_data.get('payload', {}).get('event_id', '')
+        if not event_id:
+            return
+        if event_id in ['service-started', 'service-stopped', ]:
+            if self.mw().is_screen_active('settings_screen'):
+                self.mw().get_active_screen('settings_screen').on_service_started_stopped(
+                    event_id=event_id,
+                    service_name=json_data.get('payload', {}).get('data', {}).get('name', ''),
+                )
 
     def on_websocket_stream_message(self, json_data):
         if _Debug:

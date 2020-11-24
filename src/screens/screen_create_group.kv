@@ -1,0 +1,35 @@
+<CreateGroupScreen>:
+
+    VerticalLayout:
+        pos_hint: {'top': 1}
+        size_hint: 1, None
+        height: self.minimum_height
+        padding: dp(15)
+        spacing: dp(5)
+
+
+        NormalLabel:
+            id: status_message_label
+            size_hint: 1, None
+            height: self.texture_size[1]
+            text: ''
+
+        HorizontalLayout:
+            size_hint: 1, None
+            height: self.minimum_height
+
+            SingleLineTextInput:
+                id: group_label_input
+                size_hint_x: None
+                width: dp(250)
+                hint_text: 'Enter a group name'
+                text: ''
+
+        HorizontalLayout:
+            size_hint: 1, None
+            height: self.minimum_height
+
+            RoundedFlexButton:
+                id: create_group_button
+                text: fa_icon('plus')
+                on_press: root.on_create_group_button_clicked()

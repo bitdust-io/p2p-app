@@ -24,9 +24,19 @@ if _Debug:
 
 #------------------------------------------------------------------------------
 
-from kivy.app import App
-from kivy.config import Config
 from kivy.lang import Builder
+from kivy.config import Config
+
+#------------------------------------------------------------------------------
+
+Config.set('input', 'mouse', 'mouse,multitouch_on_demand')  # disable multi-touch
+Config.set('graphics', 'resizable', True)
+Config.set('graphics', 'width', '360')
+Config.set('graphics', 'height', '740')
+
+#------------------------------------------------------------------------------
+
+from kivymd.app import MDApp
 
 #------------------------------------------------------------------------------
 
@@ -45,13 +55,6 @@ if is_android():
 
 # os.environ['KIVY_METRICS_DENSITY'] = '1'
 # os.environ['KIVY_METRICS_FONTSCALE'] = '1'
-
-#------------------------------------------------------------------------------
-
-Config.set('input', 'mouse', 'mouse,multitouch_on_demand')  # disable multi-touch
-Config.set('graphics', 'resizable', True)
-Config.set('graphics', 'width', '360')
-Config.set('graphics', 'height', '740')
 
 #------------------------------------------------------------------------------
 
@@ -79,7 +82,7 @@ if is_android():
 
 #------------------------------------------------------------------------------
 
-class BitDustApp(App):
+class BitDustApp(MDApp):
 
     control = None
     main_window = None
@@ -87,6 +90,10 @@ class BitDustApp(App):
     def build(self):
         if _Debug:
             print('BitDustApp.build')
+        self.theme_cls.theme_style = 'Light'
+        self.theme_cls.primary_palette = 'Indigo'
+        self.theme_cls.accent_palette = 'Yellow'
+        # self.theme_cls.icon_color = (1, 1, 1, 1)
         from components import styles
         from components import layouts
         from components import labels

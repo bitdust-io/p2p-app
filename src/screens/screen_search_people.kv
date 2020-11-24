@@ -1,30 +1,30 @@
 <NoUsersFound>:
     width: self.texture_size[0]
-	height: self.texture_size[1]
-	size_hint: None, None
-	pos_hint: {'left': 1}
-	text: 'no users found'
+    height: self.texture_size[1]
+    size_hint: None, None
+    pos_hint: {'left': 1}
+    text: 'no users found'
 
 
 <SearchResult>:
-	size_hint: 1, None
-	height: self.minimum_height
-	spacing: dp(5)
+    size_hint: 1, None
+    height: self.minimum_height
+    spacing: dp(5)
 
-	RoundedFlexButton:
-		pos_hint: {'center_y': 0.5, 'right': 1}
-		font_size: '14sp'
-		text: fa_icon('plus')
-		on_press: root.on_search_result_add_clicked()
+    RoundedFlexButton:
+        pos_hint: {'center_y': 0.5, 'right': 1}
+        font_size: '14sp'
+        text: fa_icon('plus')
+        on_press: root.on_search_result_add_clicked()
 
-	Label:
-		id: search_result_label
-		pos_hint: {'left': 1, 'center_y': 0.5}
-		size_hint: None, None
-	    width: self.texture_size[0]
-		height: self.texture_size[1]
-		font_size: '14sp'
-		text: ''
+    Label:
+        id: search_result_label
+        pos_hint: {'left': 1, 'center_y': 0.5}
+        size_hint: None, None
+        width: self.texture_size[0]
+        height: self.texture_size[1]
+        font_size: '14sp'
+        text: ''
 
 
 <SearchPeopleScreen>:
@@ -34,31 +34,33 @@
         pos_hint: {'top': 1}
         padding: 15
 
-		HorizontalLayout:
-			size_hint: 1, None
-        	height: self.minimum_height
-	        pos_hint: {'top': 1}
+        HorizontalLayout:
+            size_hint: 1, None
+            height: self.minimum_height
+            pos_hint: {'top': 1}
 
-			SingleLineTextInput:
-				id: search_input
-				size_hint_x: None
-				width: dp(150)
-				hint_text: 'alice'
-				text: ''
-				# on_text_validate: self.on_enter()
+            SingleLineTextInput:
+                id: search_input
+                size_hint_x: None
+                width: dp(150)
+                hint_text: 'alice'
+                text: ''
+                on_focus: root.on_search_input_focus_changed()
 
-			RoundedFlexButton:
-				id: search_button
+            RoundedFlexButton:
+                id: search_button
+                size_hint_y: None
+                height: root.ids.search_input.height
                 disabled: False
-				text: fa_icon('search')
-				on_press: root.on_search_button_clicked()
+                text: fa_icon('search')
+                on_press: root.on_search_button_clicked()
 
-	    VerticalScrollView:
+        VerticalScrollView:
 
-			VerticalLayout:
-		    	id: search_results
-				size_hint: 1, None
-				height: self.minimum_height
-		    	pos_hint: {'top': 1}
-				padding: 5
-				spacing: 5
+            VerticalLayout:
+                id: search_results
+                size_hint: 1, None
+                height: self.minimum_height
+                pos_hint: {'top': 1}
+                padding: 5
+                spacing: 5

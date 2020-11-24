@@ -46,9 +46,14 @@ def init(app):
     app.color_btn_pressed = (.3,.6,.9,1)
     app.color_btn_inactive = (.1,.4,.7,1)
     app.color_btn_disabled = (.8,.8,.8,1)
+    app.color_btn_normal_green = (.2,.8,.5,1)
+    app.color_btn_pressed_green = (.3,.9,.6,1)
+    app.color_btn_inactive_green = (.1,.7,.4,1)
+    app.color_btn_disabled_green = (.7,.9,.7,1)
 
     app.color_text_input_foreground = (.1,.1,.1,1)
-    app.color_text_input_foreground_disabled = (.2,.2,.2,1)
+    app.color_text_input_foreground_empty = (.5,.5,.5,1)
+    app.color_text_input_foreground_disabled = (.5,.5,.5,1)
     app.color_text_input_background = (.92,.92,.92,1)
     app.color_text_input_background_active = (.96,.96,.96,1)
     app.color_text_input_background_disabled = (.8,.8,.8,1)
@@ -63,6 +68,11 @@ def init(app):
     app.friend_record_padding_x = dp(5)
     app.friend_record_padding_y = dp(5)
     app.friend_record_height = sp(16) + dp(12)
+
+    #--- SCREEN CONVERSATIONS
+    app.conversation_record_padding_x = dp(5)
+    app.conversation_record_padding_y = dp(5)
+    app.conversation_record_height = sp(16) + dp(12)
 
     #--- SCREEN PRIVATE CHAT
     app.chat_input_font_size = sp(app.font_size_normal_absolute)
