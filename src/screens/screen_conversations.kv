@@ -1,0 +1,110 @@
+<ConversationsScreen>:
+
+    VerticalLayout:
+        size_hint: 1, 1
+        pos_hint: {'top': 1}
+
+		Label:
+			id: chat_status_label
+			size_hint: 1, None
+			height: self.texture_size[1]
+			text: ''
+
+        HorizontalLayout:
+            size_hint: 1, None
+            height: self.minimum_height
+	        pos_hint: {'bottom': 1}
+			padding: dp(5)
+
+			Widget:
+				size_hint: 1, None
+				height: 1
+
+            RoundedGreenIconButton:
+            	id: create_new_group_button
+				# size_hint: None, None
+				# width: self.texture_size[0] + self.text_padding_x * 2
+				# height: self.texture_size[1] + self.text_padding_y * 2
+            	font_size: app.font_size_icon
+                text: fa_icon('user-plus')
+                on_release: root.on_create_new_group_button_clicked()
+
+	    VerticalScrollView:
+
+			VerticalLayout:
+		    	id: conversations_list
+		    	pos_hint: {'top': 1}
+				size_hint: 1, 1
+				padding: dp(5)
+				spacing: dp(5)
+
+				ConversationsListView:
+		            id: conversations_list_view
+		            size_hint: 1, 1
+
+
+
+<ConversationRecord>:
+
+    canvas.before:
+        Color:
+            rgba: (.95, .95, 95, 1) if self.selected else (1, 1, 1, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+	padding: 0
+	spacing: 1
+	text_padding_x: app.conversation_record_padding_x
+	text_padding_y: app.conversation_record_padding_y
+    height: app.conversation_record_height
+    size_hint_y: None
+    size_hint_x: 1
+
+    conversation_id: 'conversation_id'
+    global_id: 'global_id'
+    state: 'state'
+    label: 'label'
+
+    Label:
+        id: label_field
+        text: '[color=#000000]{}[/color]'.format(root.label)
+        halign: 'left'
+        font_size: '16sp'
+        size_hint: None, 1
+        width: self.texture_size[0] + root.text_padding_x * 2
+
+	Widget:
+		size_hint: 1, None
+		height: 1
+
+	RoundedFlexWidthButton:
+		size_hint_y: None
+		height: app.conversation_record_height
+		text: fa_icon('bars')
+
+
+<ConversationsListView>:
+    viewclass: 'ConversationRecord'
+
+    SelectableRecycleBoxLayout:
+        default_size: None, app.conversation_record_height
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: False
+
+
+<ConversationActionButton>:
+	text_padding_x: dp(5)
+	text_padding_y: dp(5)
+    markup: True
+    background_color: app.color_transparent
+    color: app.color_btn_text_light
+    disabled_color: app.color_btn_disabled
+    background_disabled_normal: ''
+    width: self.texture_size[0] + self.text_padding_x * 2
+    height: app.conversation_record_height
+    size_hint: None, None
