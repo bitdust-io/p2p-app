@@ -1,4 +1,5 @@
 <MainWindow>:
+
     canvas.before:
         Color:
             rgba: app.color_white
@@ -22,24 +23,15 @@
             size_hint: 1, None
             height: self.minimum_height
 
-            Button:
-                id: main_nav_button
-                disabled: True
-
-			    background_color: app.color_transparent
-			    color: app.color_btn_inactive
-			    disabled_color: app.color_btn_disabled
-			    background_disabled_normal: ''
-
-			    text_padding_x: app.button_text_padding_x
-			    text_padding_y: app.button_text_padding_y
-			    width: self.texture_size[0] + self.text_padding_x * 2
-			    height: self.texture_size[1] + self.text_padding_y * 2
-			    size_hint: None, None
-				font_size: app.font_size_large
-			    text: fa_icon('bars')
-
-                on_press: root.select_screen('main_menu_screen', verify_state=True)
+	        MDIconButton:
+	            id: main_nav_button
+	            disabled: True
+	            icon: 'src/images/logo-color-28x28.png'
+	            padding: (0, 0)
+	            pos_hint: {"center_x": .5, "center_y": .5}
+	            size_hint: None, None
+	            size: (app.nav_height, app.nav_height)
+	        	on_press: root.select_screen('main_menu_screen', verify_state=True)
 
         ScreenManagement:
             id: screen_manager
