@@ -26,15 +26,15 @@
 
 
 <NavButtonBase>:
-    md_bg_color: root.theme_cls.primary_color
+    md_bg_color: root.theme_cls.primary_color if self.selected else root.theme_cls.primary_dark
     theme_text_color: 'Custom'
-    text_color: root.specific_text_color
+    text_color: root.specific_text_color if self.selected else root.specific_secondary_text_color
 
 
 <NavButtonActive>:
     lbl_txt: lbl_txt
     lbl_icn_left: lbl_icn_left
-    height: dp(36) if not root._height else root._height
+    height: app.nav_height
     width: lbl_txt.texture_size[0] + lbl_icn_left.texture_size[0] + root.increment_width
     padding: (0, 0)
     theme_text_color: 'Primary' if not root.text_color else 'Custom'
@@ -44,7 +44,7 @@
         padding: dp(1)
         spacing: dp(0)
 
-        MDIcon:
+        NavIcon:
             id: lbl_icn_left
             icon: root.icon
             theme_text_color: 'Custom'
@@ -52,6 +52,7 @@
             size_hint_x: None
             width: self.texture_size[0]
             font_size: sp(root.icon_left_size)
+            on_press: root.on_action_area_pressed()
 
 	    NavLabel:
 	        id: lbl_txt
@@ -63,14 +64,15 @@
 		    theme_text_color: root.theme_text_color
 		    text_color: root.text_color
 		    opposite_colors: root.opposite_colors
+            on_press: root.on_action_area_pressed()
 
 
 <NavButtonClosable>:
     lbl_txt: lbl_txt
     lbl_icn_left: lbl_icn_left
     lbl_icn_right: lbl_icn_right
-    height: dp(36) if not root._height else root._height
-    width: lbl_txt.texture_size[0] + lbl_icn_left.texture_size[0] + root._height + root.increment_width
+    height: app.nav_height
+    width: lbl_txt.texture_size[0] + lbl_icn_left.texture_size[0] + lbl_icn_right.width + root.increment_width
     padding: (0, 0)
     theme_text_color: 'Primary' if not root.text_color else 'Custom'
     markup: False
@@ -79,7 +81,7 @@
         padding: dp(1)
         spacing: dp(0)
 
-        MDIcon:
+        NavIcon:
             id: lbl_icn_left
             icon: root.icon
             theme_text_color: 'Custom'
@@ -87,6 +89,7 @@
             size_hint_x: None
             width: self.texture_size[0]
             font_size: sp(root.icon_left_size)
+            on_press: root.on_action_area_pressed()
 
 	    NavLabel:
 	        id: lbl_txt
@@ -98,6 +101,7 @@
 		    theme_text_color: root.theme_text_color
 		    text_color: root.text_color
 		    opposite_colors: root.opposite_colors
+            on_press: root.on_action_area_pressed()
 
         MDIconButton:
             id: lbl_icn_right
@@ -107,7 +111,7 @@
             padding: (0, 0)
             pos_hint: {"center_x": .5, "center_y": .5}
             size_hint: None, None
-            font_size: root.icon_right_size
+            font_size: sp(root.icon_right_size)
             user_font_size: root.icon_right_size
-            size: (root._height - dp(2), root._height - dp(2))
+            size: (app.nav_height - dp(6), app.nav_height - dp(2))
         	on_press: root.on_close_area_pressed()

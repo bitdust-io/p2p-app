@@ -1,7 +1,7 @@
 from kivy.properties import StringProperty  # @UnresolvedImport
 from kivy.properties import NumericProperty  # @UnresolvedImport
-
 from kivy.uix.floatlayout import FloatLayout
+from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-class MainWindow(FloatLayout):
+class MainWindow(FloatLayout, ThemableBehavior):
 
     screens_map = {}
     control = None

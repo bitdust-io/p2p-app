@@ -16,19 +16,23 @@ class ScreenManagement(ScreenManager):
     pass
 
 
-class NavLabel(MDLabel):
+class NavIcon(ButtonBehavior, MDIcon):
     pass
 
-class NavCloseIcon(MDIcon, ButtonBehavior):
+
+class NavLabel(ButtonBehavior, MDLabel):
+    pass
+
+
+class NavCloseIcon(ButtonBehavior, MDIcon):
     pass
 
 
 class NavBaseRectangularButton(BaseRectangularButton):
 
-    icon_left_size = 16
+    icon_left_size = 17
     increment_width = dp(1)
-    _radius = dp(3)
-    _height = dp(24)
+    _radius = dp(2)
 
 
 class NavButtonBase(NavBaseRectangularButton, RectangularElevationBehavior, BaseRaisedButton, BasePressedButton):
@@ -49,6 +53,8 @@ class NavButtonBase(NavBaseRectangularButton, RectangularElevationBehavior, Base
         return self.get_main_window().ids.screen_manager
 
     def on_action_area_pressed(self):
+        if _Debug:
+            print('on_action_area_pressed', self.screen)
         self.get_main_window().select_screen(self.screen)
 
 
@@ -58,7 +64,7 @@ class NavButtonActive(NavButtonBase):
 
 class NavButtonClosable(NavButtonBase):
 
-    icon_right_size = 16
+    icon_right_size = 18
 
     def on_close_area_pressed(self):
         prev_screen_name = self.get_screen_manager().previous()
