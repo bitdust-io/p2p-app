@@ -2,129 +2,112 @@
     transition: NoTransition()
 
 
-<NavButtonWrap>:
-    spacing: 0
-    padding: 0
-    size_hint: None, None
-    width: self.minimum_width
-    height: self.minimum_height
+<NavLabel>:
+    padding_x: dp(1)
+    size_hint_x: None
+    width: self.texture_size[0]
+    height: self.texture_size[1]
+    markup: False
+    disabled: False
+    valign: 'middle'
+    halign: 'left'
 
 
-<NavButtonBaseOld>:
-    corner_radius: 2
-	text_padding_x: app.button_text_padding_x
-	text_padding_y: app.button_text_padding_y
-	font_size: '15sp'
-    width: self.texture_size[0] + self.text_padding_x * 2
-    height: self.texture_size[1] + self.text_padding_y * 2
-    size_hint: None, None
-    background_color: app.color_transparent
-    color: app.color_white
-    disabled_color: app.color_btn_disabled
-    background_disabled_normal: ''
-    bg_normal: app.color_btn_normal
-    bg_pressed: app.color_btn_pressed
-    bg_disabled: app.color_btn_disabled
-    bg_normal_delta: .1
-    bg_disabled_delta: .1
+<NavBaseRectangularButton>:
 
-
-<NavButtonCloseArea>:
-    size_hint: None, None
-    corner_radius: 2
-    markup: True
-    background_color: app.color_transparent
-    color: app.color_btn_text_dark
-    disabled_color: app.color_btn_disabled
-    background_disabled_normal: ''
-    bg_normal: app.color_btn_normal
-    bg_pressed: app.color_btn_pressed
-    bg_disabled: app.color_btn_disabled
-    bg_normal_delta: 0
-    bg_disabled_delta: .1
-
-
-<NavButtonActiveOld>:
-    cols: 1
-    rows: 1
-    padding: 0
-    spacing: 0
-
-    NavButtonBase:
-
-        canvas.before:
-            Color:
-                rgba: self.bg_normal if (self.state == 'normal' and not root.selected) else self.bg_pressed 
-            RoundedRectangle:
-                pos: self.pos
-                size: self.size
-                radius: [self.corner_radius+1, self.corner_radius+1, self.corner_radius+1, self.corner_radius+1, ]
-            Color:
-                rgba: (self.bg_normal[0]+self.bg_normal_delta,self.bg_normal[1]+self.bg_normal_delta,self.bg_normal[2]+self.bg_normal_delta,1) if (self.state == 'normal' and not root.selected) else (self.bg_pressed[0]+self.bg_normal_delta,self.bg_pressed[1]+self.bg_normal_delta,self.bg_pressed[2]+self.bg_normal_delta,1)
-            RoundedRectangle:
-                pos: self.pos[0]+2, self.pos[1]+2
-                size: self.size[0]-4, self.size[1]-4
-                radius: [self.corner_radius, self.corner_radius, self.corner_radius, self.corner_radius, ]
-
-	    text: root.nav_btn_text
-        on_press: root.on_action_area_pressed()
-
-
-<NavButtonClosableOld>:
-    cols: 2
-    rows: 1
-    padding: 0
-    spacing: 0
-
-    NavButtonBase:
-    	id: inner_button
-
-        canvas.before:
-            Color:
-                rgba: self.bg_normal if (self.state == 'normal' and not root.selected) else self.bg_pressed 
-            RoundedRectangle:
-                pos: self.pos
-                size: self.size
-                radius: [self.corner_radius+1, 0, 0, self.corner_radius+1, ]
-            Color:
-                rgba: (self.bg_normal[0]+self.bg_normal_delta,self.bg_normal[1]+self.bg_normal_delta,self.bg_normal[2]+self.bg_normal_delta,1) if (self.state == 'normal' and not root.selected) else (self.bg_pressed[0]+self.bg_normal_delta,self.bg_pressed[1]+self.bg_normal_delta,self.bg_pressed[2]+self.bg_normal_delta,1)
-            RoundedRectangle:
-                pos: self.pos[0]+2, self.pos[1]+2
-                size: self.size[0]-2, self.size[1]-4
-                radius: [self.corner_radius, 0, 0, self.corner_radius, ]
-
-	    text: root.nav_btn_text
-        on_press: root.on_action_area_pressed()
-
-    NavButtonCloseArea:
-
-        canvas.before:
-            Color:
-                rgba: self.bg_normal
-            RoundedRectangle:
-                pos: self.pos
-                size: self.size
-                radius: [0, self.corner_radius+1, self.corner_radius+1, 0, ]
-            Color:
-                rgba: (self.bg_normal[0]+self.bg_normal_delta,self.bg_normal[1]+self.bg_normal_delta,self.bg_normal[2]+self.bg_normal_delta,1) if self.state == 'normal' else (self.bg_pressed[0]+self.bg_normal_delta,self.bg_pressed[1]+self.bg_normal_delta,self.bg_pressed[2]+self.bg_normal_delta,1)
-            RoundedRectangle:
-                pos: self.pos[0]+2, self.pos[1]+2
-                size: self.size[0]-4, self.size[1]-4
-                radius: [0, self.corner_radius, self.corner_radius, 0, ]
-
-	    width: dp(20)
-	    height: root.ids.inner_button.texture_size[1] + root.ids.inner_button.text_padding_y * 2
-        font_size: sp(14)
-        text: fa_icon('times', with_spaces=False)
-        on_release: root.on_close_area_pressed()
+    canvas:
+        Clear
+        Color:
+            rgba: self._current_button_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: (root._radius, )
 
 
 <NavButtonBase>:
-    _radius: dp(10)
-    increment_width: dp(7)
+    md_bg_color: root.theme_cls.primary_color
+    theme_text_color: 'Custom'
+    text_color: root.specific_text_color
 
 
 <NavButtonActive>:
+    lbl_txt: lbl_txt
+    lbl_icn_left: lbl_icn_left
+    height: dp(36) if not root._height else root._height
+    width: lbl_txt.texture_size[0] + lbl_icn_left.texture_size[0] + root.increment_width
+    padding: (0, 0)
+    theme_text_color: 'Primary' if not root.text_color else 'Custom'
+    markup: False
+
+    BoxLayout:
+        padding: dp(1)
+        spacing: dp(0)
+
+        MDIcon:
+            id: lbl_icn_left
+            icon: root.icon
+            theme_text_color: 'Custom'
+            text_color: root.theme_cls.primary_color if not root.text_color else root.text_color
+            size_hint_x: None
+            width: self.texture_size[0]
+            font_size: sp(root.icon_left_size)
+
+	    NavLabel:
+	        id: lbl_txt
+		    text: root.text if root.button_label else ''
+		    font_size: sp(root.font_size)
+		    font_name: root.font_name if root.font_name is not None else self.font_name
+		    can_capitalize: root.can_capitalize
+		    text_size: (None, root.height)
+		    theme_text_color: root.theme_text_color
+		    text_color: root.text_color
+		    opposite_colors: root.opposite_colors
 
 
 <NavButtonClosable>:
+    lbl_txt: lbl_txt
+    lbl_icn_left: lbl_icn_left
+    lbl_icn_right: lbl_icn_right
+    height: dp(36) if not root._height else root._height
+    width: lbl_txt.texture_size[0] + lbl_icn_left.texture_size[0] + root._height + root.increment_width
+    padding: (0, 0)
+    theme_text_color: 'Primary' if not root.text_color else 'Custom'
+    markup: False
+
+    BoxLayout:
+        padding: dp(1)
+        spacing: dp(0)
+
+        MDIcon:
+            id: lbl_icn_left
+            icon: root.icon
+            theme_text_color: 'Custom'
+            text_color: root.theme_cls.primary_color if not root.text_color else root.text_color
+            size_hint_x: None
+            width: self.texture_size[0]
+            font_size: sp(root.icon_left_size)
+
+	    NavLabel:
+	        id: lbl_txt
+		    text: root.text if root.button_label else ''
+		    font_size: sp(root.font_size)
+		    font_name: root.font_name if root.font_name is not None else self.font_name
+		    can_capitalize: root.can_capitalize
+		    text_size: (None, root.height)
+		    theme_text_color: root.theme_text_color
+		    text_color: root.text_color
+		    opposite_colors: root.opposite_colors
+
+        MDIconButton:
+            id: lbl_icn_right
+            icon: 'close'
+            theme_text_color: 'Custom'
+            text_color: root.theme_cls.primary_color if not root.text_color else root.text_color
+            padding: (0, 0)
+            pos_hint: {"center_x": .5, "center_y": .5}
+            size_hint: None, None
+            font_size: root.icon_right_size
+            user_font_size: root.icon_right_size
+            size: (root._height - dp(2), root._height - dp(2))
+        	on_press: root.on_close_area_pressed()

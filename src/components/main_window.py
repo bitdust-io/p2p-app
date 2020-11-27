@@ -60,9 +60,9 @@ class MainWindow(FloatLayout):
         closable = screen.is_closable()
         if title:
             if closable:
-                btn = NavButtonClosable(text='           ' + title, icon=icn, screen=screen_id)
+                btn = NavButtonClosable(text=title, icon=icn, screen=screen_id)
             else:
-                btn = NavButtonActive(text='           ' + title, icon=icn, screen=screen_id)
+                btn = NavButtonActive(text=title, icon=icn, screen=screen_id)
             self.ids.nav_buttons_layout.add_widget(btn)
         else:
             btn = None
