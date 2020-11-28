@@ -11,7 +11,7 @@ from kivy.properties import ListProperty, StringProperty, NumericProperty  # @Un
 
 from components.screen import AppScreen
 from components.labels import NormalLabel
-from components.buttons import NormalButton
+from components.buttons import NormalButton, TransparentButton
 from components.text_input import SingleLineTextInput
 from components.layouts import HorizontalLayout, VerticalLayout
 
@@ -84,7 +84,7 @@ class TreeElement(TreeViewNode):
             print('erased element %r : %r' % (self.item_key, id(self), ))
 
 
-class ParentElement(TreeElement, NormalButton):
+class ParentElement(TreeElement, TransparentButton):
 
     def __init__(self, **kwargs):
         self.item_clicked_callback = kwargs.pop('item_clicked_callback', None)

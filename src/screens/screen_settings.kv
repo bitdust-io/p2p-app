@@ -44,8 +44,8 @@
 
 <OptionNameLabel@NormalButton>:
     size_hint: 1, None
-    width: self.texture_size[0] + dp(10)
-    height: self.texture_size[1] + dp(10)
+    # width: self.texture_size[0] + dp(10)
+    # height: self.texture_size[1] + dp(10)
     pos_hint: {'left': 1, 'center_y': .5}
     halign: 'left'
     valign: 'top'
@@ -67,8 +67,8 @@
 <ParentElement>:
     pos_hint: {'left': 0}
     font_size: app.setting_normal_font_size
-    width: self.texture_size[0]
-    height: self.texture_size[1] + dp(10)
+    # width: self.texture_size[0]
+    # height: self.texture_size[1] + dp(10)
     text_size: self.width, None
     on_press: self.item_clicked_callback(self.item_key, self)
 

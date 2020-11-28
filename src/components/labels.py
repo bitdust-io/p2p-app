@@ -1,8 +1,8 @@
-from kivy.uix.label import Label
+from kivymd.uix.label import MDLabel
 
 #------------------------------------------------------------------------------
 
-class NormalLabel(Label):
+class NormalLabel(MDLabel):
     pass
 
 #------------------------------------------------------------------------------

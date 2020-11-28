@@ -12,11 +12,11 @@ def init(app):
         print('sp(1.0):', sp(1.0))
 
     #--- FONT SIZE
-    app.font_size_extra_small_absolute = 11
-    app.font_size_small_absolute = 13
-    app.font_size_normal_absolute = 15
-    app.font_size_large_absolute = 18
-    app.font_size_icon_absolute = 15
+    app.font_size_extra_small_absolute = 9
+    app.font_size_small_absolute = 10
+    app.font_size_normal_absolute = 12
+    app.font_size_large_absolute = 16
+    app.font_size_icon_absolute = 12
 
     app.font_size_normal = sp(app.font_size_normal_absolute)
     app.font_size_small = sp(app.font_size_small_absolute)
