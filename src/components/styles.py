@@ -12,11 +12,11 @@ def init(app):
         print('sp(1.0):', sp(1.0))
 
     #--- FONT SIZE
-    app.font_size_extra_small_absolute = 9
-    app.font_size_small_absolute = 10
-    app.font_size_normal_absolute = 12
-    app.font_size_large_absolute = 16
-    app.font_size_icon_absolute = 12
+    app.font_size_extra_small_absolute = 10
+    app.font_size_small_absolute = 12
+    app.font_size_normal_absolute = 14
+    app.font_size_large_absolute = 18
+    app.font_size_icon_absolute = 14
 
     app.font_size_normal = sp(app.font_size_normal_absolute)
     app.font_size_small = sp(app.font_size_small_absolute)
@@ -64,8 +64,10 @@ def init(app):
 
     #--- SCREEN SETTINGS
     app.setting_record_height = sp(app.font_size_large_absolute) + dp(12)
-    app.setting_normal_font_size = sp(app.font_size_normal_absolute)
-    app.setting_small_font_size = sp(app.font_size_small_absolute)
+    app.setting_normal_font_size_absolute = app.font_size_normal_absolute
+    app.setting_small_font_size_absolute = app.font_size_small_absolute
+    app.setting_normal_font_size = sp(app.setting_normal_font_size_absolute)
+    app.setting_small_font_size = sp(app.setting_small_font_size_absolute)
 
     #--- SCREEN FRIENDS
     app.friend_record_padding_x = dp(5)

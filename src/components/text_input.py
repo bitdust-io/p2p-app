@@ -1,8 +1,9 @@
 from kivy.uix.textinput import TextInput
+from kivymd.uix.textfield import MDTextField
 
 #------------------------------------------------------------------------------
 
-class BasicTextInput(TextInput):
+class BasicTextInput(MDTextField):
     pass
 
 

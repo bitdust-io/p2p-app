@@ -39,7 +39,6 @@ class SearchPeopleScreen(AppScreen):
         return 'account-search'
 
     def get_title(self):
-        # return f"{fa_icon('search', with_spaces=False)} search people"
         return "search people"
 
     def clean_view(self, clear_input_field=False):

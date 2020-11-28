@@ -2,6 +2,7 @@ import re
 
 #------------------------------------------------------------------------------
 
+from kivy.app import App
 from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.uix.treeview import TreeView, TreeViewNode
@@ -25,7 +26,6 @@ _Debug = True
 #------------------------------------------------------------------------------
 
 class OptionValueTextInput(SingleLineTextInput):
-
     pass
 
 
@@ -53,12 +53,10 @@ class OptionValueIntInput(OptionValueTextInput):
 
 
 class OptionValueDiskSpaceInput(OptionValueTextInput):
-
     pass
 
 
 class OptionValueSingleChoiceInput(OptionValueTextInput):
-
     pass
 
 
@@ -84,7 +82,9 @@ class TreeElement(TreeViewNode):
             print('erased element %r : %r' % (self.item_key, id(self), ))
 
 
-class ParentElement(TreeElement, TransparentButton):
+class ParentElement(TransparentButton, TreeElement):
+
+    text_halign = 'left'
 
     def __init__(self, **kwargs):
         self.item_clicked_callback = kwargs.pop('item_clicked_callback', None)
@@ -249,6 +249,12 @@ class SettingsTreeView(TreeView):
 class SettingsScreen(AppScreen):
 
     recent_tree_index = {}
+
+    def get_icon(self):
+        return 'cogs'
+
+    def get_title(self):
+        return "settings"
 
     def populate(self):
         api_client.services_list(cb=self.on_services_list_result)

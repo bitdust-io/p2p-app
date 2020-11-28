@@ -1,6 +1,5 @@
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
-from kivy.properties import StringProperty  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
