@@ -1,27 +1,3 @@
-<NormalButton>:
-
-
-<BasicButton>:
-
-
-<RoundedButton>:
-    markup: True
-
-
-<RoundedFlexWidthButton>:
-
-
-<RoundedFlexHeightButton>:
-
-
-<RoundedFlexButton>:
-
-
-<CustomFlatButton>:
-
-
-<RoundedGreenIconButton>:
-
 
 <CustomRectangularButton>:
     canvas:
@@ -48,7 +24,6 @@
         can_capitalize: root.can_capitalize
         size_hint_x: None
         text_size: (None, root.height)
-        # text_size: root.width, root.height
         height: self.texture_size[1]
         theme_text_color: root.theme_text_color
         text_color: root.text_color
@@ -59,7 +34,7 @@
         opposite_colors: root.opposite_colors
 
 
-<CustomRoundButton>
+<CustomRoundButton>:
     canvas:
         Clear
         Color:
@@ -72,7 +47,7 @@
     size:
         (dp(48), dp(48)) \
         if not root.user_font_size \
-        else (dp(root.user_font_size + 23), dp(root.user_font_size + 23))
+        else (dp(root.user_font_size + root.increment_diameter), dp(root.user_font_size + root.increment_diameter))
     lbl_txt: lbl_txt
     padding: dp(12) if md_icon(root.icon) else 0
     theme_text_color: 'Primary'
@@ -93,9 +68,15 @@
         opposite_colors: root.opposite_colors
 
 
-<CustomIconButton>:
-	markup: True
-	text: md_icon(self.icon)
+<CustomFlatButton>:
+
+
+<CustomRaisedButton>:
+    md_bg_color: app.theme_cls.primary_color
+    theme_text_color: 'Custom'
+    text_color: root.specific_text_color
+    elevation_normal: 0
+    elevation_raised: 0
 
 
 <CustomFloatingActionButton>:
@@ -103,3 +84,19 @@
     md_bg_color: app.theme_cls.accent_color
     theme_text_color: 'Custom'
     text_color: root.specific_text_color
+
+
+<RoundedButton>:
+    _radius: 8
+    increment_width: dp(20)
+    markup: True
+
+
+<RoundedFlexWidthButton>:
+
+
+<RoundedFlexHeightButton>:
+
+
+<RoundedFlexButton>:
+

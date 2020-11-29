@@ -9,38 +9,11 @@ from kivymd.uix.button import (
     BaseFlatButton,
     BaseRaisedButton,
     BasePressedButton,
-    BaseRoundButton,
-    MDRaisedButton,
-    MDFillRoundFlatButton,
 )
 from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
-from kivymd.uix.behaviors.elevation import CircularElevationBehavior
+from kivymd.uix.behaviors.elevation import CircularElevationBehavior, RectangularElevationBehavior
 
 #------------------------------------------------------------------------------
-
-class NormalButton(MDRaisedButton):
-    pass
-
-
-class BasicButton(MDRaisedButton):
-    pass
-
-
-class RoundedButton(MDFillRoundFlatButton):
-    pass
-
-
-class RoundedFlexWidthButton(RoundedButton):
-    pass
-
-
-class RoundedFlexHeightButton(RoundedButton):
-    pass
-
-
-class RoundedFlexButton(RoundedButton):
-    pass
-
 
 class CustomRectangularButton(RectangularRippleBehavior, BaseButton):
     width = BoundedNumericProperty(
@@ -55,28 +28,42 @@ class CustomRectangularButton(RectangularRippleBehavior, BaseButton):
     text_halign = StringProperty('center')
 
 
-class CustomIconButton(RoundedButton):
-    icon = StringProperty("circle")
-
-
 class CustomRoundButton(CircularRippleBehavior, BaseButton):
-    pass
-
-
-class IconButton(CustomRoundButton, BaseFlatButton, BasePressedButton):
-    icon = StringProperty("circle")
+    increment_diameter = NumericProperty(12)
+    ripple_scale = 10
 
 
 class CustomFlatButton(CustomRectangularButton, BaseFlatButton, BasePressedButton):
     increment_width = 0
 
 
-class CustomFloatingActionButton(
-    CustomRoundButton, CircularElevationBehavior, BaseRaisedButton
-):
-    icon = StringProperty("android")
+class CustomRaisedButton(CustomRectangularButton, RectangularElevationBehavior, BaseRaisedButton, BasePressedButton):
+    pass
+
+
+class CustomFloatingActionButton(CustomRoundButton, CircularElevationBehavior, BaseRaisedButton):
+    icon = StringProperty("circle")
     background_palette = StringProperty("Accent")
 
+
+class IconButton(CustomRoundButton, BaseFlatButton, BasePressedButton):
+    icon = StringProperty("circle")
+
+
+class RoundedButton(CustomRaisedButton):
+    pass
+
+
+class RoundedFlexWidthButton(RoundedButton):
+    pass
+
+
+class RoundedFlexHeightButton(RoundedButton):
+    pass
+
+
+class RoundedFlexButton(RoundedButton):
+    pass
 
 #------------------------------------------------------------------------------
 

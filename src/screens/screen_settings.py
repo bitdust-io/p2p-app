@@ -2,7 +2,6 @@ import re
 
 #------------------------------------------------------------------------------
 
-from kivy.app import App
 from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.uix.treeview import TreeView, TreeViewNode
@@ -12,7 +11,7 @@ from kivy.properties import ListProperty, StringProperty, NumericProperty  # @Un
 
 from components.screen import AppScreen
 from components.labels import NormalLabel
-from components.buttons import NormalButton, CustomFlatButton
+from components.buttons import CustomFlatButton
 from components.text_input import SingleLineTextInput
 from components.layouts import HorizontalLayout, VerticalLayout
 
