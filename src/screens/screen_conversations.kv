@@ -20,20 +20,12 @@
 				size_hint: 1, None
 				height: 1
 
-            MDFloatingActionButton:
+            CustomFloatingActionButton:
             	id: create_new_group_button
-                icon: 'src/images/chat-plus.png'
-                # md_bg_color: app.theme_cls.primary_color
-	            # size_hint: None, None
+            	icon: 'chat-plus'
+	            size_hint: None, None
 	            size: (dp(36), dp(36))
-				# size_hint: None, None
-				# width: self.texture_size[0] + self.text_padding_x * 2
-				# height: self.texture_size[1] + self.text_padding_y * 2
-            	# font_size: app.font_size_icon
-                # text: fa_icon('user-plus')
-			    # md_bg_color: app.theme_cls.accent_color
-			    # theme_text_color: 'Custom'
-			    # text_color: app.theme_cls.primary_color
+	            padding: dp(8)
                 on_release: root.on_create_new_group_button_clicked()
 
 	    VerticalScrollView:

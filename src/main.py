@@ -62,6 +62,7 @@ Builder.load_string("""
 #:import NoTransition kivy.uix.screenmanager.NoTransition
 #:import Window kivy.core.window.Window
 #:import fa_icon components.webfont.fa_icon
+#:import md_icon components.webfont.md_icon
 """)
 
 #------------------------------------------------------------------------------
@@ -92,8 +93,8 @@ class BitDustApp(MDApp):
             print('BitDustApp.build')
         self.theme_cls.theme_style = 'Light'
         self.theme_cls.primary_palette = 'Indigo'
-        self.theme_cls.accent_palette = 'Yellow'
-        # self.theme_cls.icon_color = (1, 1, 1, 1)
+        self.theme_cls.accent_palette = 'Green'
+
         from components import styles
         from components import layouts
         from components import labels

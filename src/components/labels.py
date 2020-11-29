@@ -1,6 +1,10 @@
-from kivymd.uix.label import MDLabel
+from kivymd.uix.label import MDLabel, MDIcon
 
 #------------------------------------------------------------------------------
+
+class CustomIcon(MDIcon):
+    pass
+
 
 class NormalLabel(MDLabel):
     pass

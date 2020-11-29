@@ -1,18 +1,7 @@
 <NormalButton>:
-    # background_color: app.color_transparent
-    # markup: True
-	# font_size: app.font_size_normal
 
 
 <BasicButton>:
-    # background_color: app.color_transparent
-    # color: app.color_btn_text_light
-    # disabled_color: app.color_btn_disabled
-    # background_disabled_normal: ''
-	# text_padding_x: app.button_text_padding_x
-	# text_padding_y: app.button_text_padding_y
-    # markup: True
-	# font_size: app.font_size_normal
 
 
 <RoundedButton>:
@@ -29,9 +18,6 @@
 
 
 <TransparentButton>:
-	# color: app.color_btn_text_dark
-    # markup: True
-	font_size: '9sp'
 
 
 <RoundedGreenIconButton>:
@@ -104,3 +90,49 @@
         valign: 'middle'
         halign: 'center'
         opposite_colors: root.opposite_colors
+
+
+<BaseRoundButtonCustomIcon>
+    canvas:
+        Clear
+        Color:
+            rgba: self._current_button_color if md_icon(root.icon) else (0, 0, 0, 0)
+        Ellipse:
+            size: self.size
+            pos: self.pos
+            source: self.source if hasattr(self, "source") else ""
+
+    size:
+        (dp(48), dp(48)) \
+        if not root.user_font_size \
+        else (dp(root.user_font_size + 23), dp(root.user_font_size + 23))
+    lbl_txt: lbl_txt
+    padding: dp(12) if md_icon(root.icon) else 0
+    theme_text_color: 'Primary'
+
+    CustomIcon:
+        id: lbl_txt
+        icon: root.icon
+        font_size:
+            root.user_font_size \
+            if root.user_font_size \
+            else self.font_size
+        font_name: root.font_name if root.font_name is not None else self.font_name
+        theme_text_color: root.theme_text_color
+        text_color: root.text_color
+        disabled: root.disabled
+        valign: 'middle'
+        halign: 'center'
+        opposite_colors: root.opposite_colors
+
+
+<CustomIconButton>:
+	markup: True
+	text: md_icon(self.icon)
+
+
+<CustomFloatingActionButton>:
+    size: (dp(56), dp(56))
+    md_bg_color: app.theme_cls.accent_color
+    theme_text_color: 'Custom'
+    text_color: root.specific_text_color

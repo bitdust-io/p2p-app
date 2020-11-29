@@ -2,11 +2,13 @@ from kivy.properties import StringProperty  # @UnresolvedImport
 from kivymd.uix.button import (
     BaseRectangularButton,
     BaseFlatButton,
+    BaseRaisedButton,
     BasePressedButton,
     BaseRoundButton,
     MDRaisedButton,
     MDFillRoundFlatButton,
 )
+from kivymd.uix.behaviors.elevation import CircularElevationBehavior
 
 #------------------------------------------------------------------------------
 
@@ -35,11 +37,18 @@ class RoundedFlexButton(RoundedButton):
 
 
 class BaseRectangularButtonAligned(BaseRectangularButton):
-
     text_halign = StringProperty('center')
 
 
 class BaseRoundButtonCustom(BaseRoundButton):
+    pass
+
+
+class CustomIconButton(RoundedButton):
+    icon = StringProperty("circle")
+
+
+class BaseRoundButtonCustomIcon(BaseRoundButton):
     pass
 
 
@@ -48,12 +57,14 @@ class IconButton(BaseRoundButtonCustom, BaseFlatButton, BasePressedButton):
 
 
 class TransparentButton(BaseRectangularButtonAligned, BaseFlatButton, BasePressedButton):
-
     increment_width = 0
 
 
-class RoundedGreenIconButton(RoundedButton):
-    pass
+class CustomFloatingActionButton(
+    BaseRoundButtonCustomIcon, CircularElevationBehavior, BaseRaisedButton
+):
+    icon = StringProperty("android")
+    background_palette = StringProperty("Accent")
 
 
 #------------------------------------------------------------------------------
