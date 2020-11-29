@@ -42,7 +42,7 @@
     width: dp(60)
 
 
-<OptionNameLabel@TransparentButton>:
+<OptionNameLabel>:
     height: app.setting_record_height
     pos_hint: {'left': 0, 'center_y': .5}
     halign: 'left'
@@ -52,7 +52,7 @@
     font_size: app.setting_normal_font_size_absolute
 
 
-<OptionDescriptionLabel@NormalLabel>:
+<OptionDescriptionLabel>:
     size_hint: 1, None
     height: self.texture_size[1]
     text_size: self.width, None
@@ -76,9 +76,10 @@
     padding: 0
     spacing: 1
 
-    MDIcon:
+    CustomIcon:
 		size_hint_x: None
-		width: dp(25)
+		width: dp(16)
+		font_size: '12sp'
         icon: 'circle'
         color: (.7, .7, .7, 1) if root.service_state != 'ON' else (.6, 1, .6, 1)
 
@@ -262,7 +263,7 @@
     height: self.minimum_height
     root_options: {'text': 'settings'}
     indent_start: dp(15)
-    indent_level: dp(5)
+    indent_level: dp(15)
     hide_root: True
 
 

@@ -1,29 +1,5 @@
-<NormalButton>:
 
-
-<BasicButton>:
-
-
-<RoundedButton>:
-    markup: True
-
-
-<RoundedFlexWidthButton>:
-
-
-<RoundedFlexHeightButton>:
-
-
-<RoundedFlexButton>:
-
-
-<TransparentButton>:
-
-
-<RoundedGreenIconButton>:
-
-
-<BaseRectangularButtonAligned>:
+<CustomRectangularButton>:
     canvas:
         Clear
         Color:
@@ -36,7 +12,7 @@
     lbl_txt: lbl_txt
     height: dp(36) if not root._height else root._height
     width: lbl_txt.texture_size[0] + root.increment_width
-    padding: (dp(0), 0)
+    padding: (dp(8), 0)
     theme_text_color: 'Primary' if not root.text_color else 'Custom'
     markup: False
 
@@ -47,7 +23,7 @@
         font_name: root.font_name if root.font_name is not None else self.font_name
         can_capitalize: root.can_capitalize
         size_hint_x: None
-        text_size: root.width, root.height
+        text_size: (None, root.height)
         height: self.texture_size[1]
         theme_text_color: root.theme_text_color
         text_color: root.text_color
@@ -58,41 +34,7 @@
         opposite_colors: root.opposite_colors
 
 
-<BaseRoundButtonCustom>
-    canvas:
-        Clear
-        Color:
-            rgba: self._current_button_color if root.icon in md_icons else (0, 0, 0, 0)
-        Ellipse:
-            size: self.size
-            pos: self.pos
-            source: self.source if hasattr(self, "source") else ""
-
-    size:
-        (dp(48), dp(48)) \
-        if not root.user_font_size \
-        else (dp(root.user_font_size + 23), dp(root.user_font_size + 23))
-    lbl_txt: lbl_txt
-    padding: dp(12) if root.icon in md_icons else 0
-    theme_text_color: 'Primary'
-
-    MDIcon:
-        id: lbl_txt
-        icon: root.icon
-        font_size:
-            root.user_font_size \
-            if root.user_font_size \
-            else root.font_size
-        font_name: root.font_name if root.font_name is not None else self.font_name
-        theme_text_color: root.theme_text_color
-        text_color: root.text_color
-        disabled: root.disabled
-        valign: 'middle'
-        halign: 'center'
-        opposite_colors: root.opposite_colors
-
-
-<BaseRoundButtonCustomIcon>
+<CustomRoundButton>:
     canvas:
         Clear
         Color:
@@ -105,7 +47,7 @@
     size:
         (dp(48), dp(48)) \
         if not root.user_font_size \
-        else (dp(root.user_font_size + 23), dp(root.user_font_size + 23))
+        else (dp(root.user_font_size + root.increment_diameter), dp(root.user_font_size + root.increment_diameter))
     lbl_txt: lbl_txt
     padding: dp(12) if md_icon(root.icon) else 0
     theme_text_color: 'Primary'
@@ -126,9 +68,15 @@
         opposite_colors: root.opposite_colors
 
 
-<CustomIconButton>:
-	markup: True
-	text: md_icon(self.icon)
+<CustomFlatButton>:
+
+
+<CustomRaisedButton>:
+    md_bg_color: app.theme_cls.primary_color
+    theme_text_color: 'Custom'
+    text_color: root.specific_text_color
+    elevation_normal: 0
+    elevation_raised: 0
 
 
 <CustomFloatingActionButton>:
@@ -136,3 +84,19 @@
     md_bg_color: app.theme_cls.accent_color
     theme_text_color: 'Custom'
     text_color: root.specific_text_color
+
+
+<RoundedButton>:
+    _radius: 8
+    increment_width: dp(20)
+    markup: True
+
+
+<RoundedFlexWidthButton>:
+
+
+<RoundedFlexHeightButton>:
+
+
+<RoundedFlexButton>:
+

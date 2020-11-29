@@ -1,9 +1,10 @@
-from kivymd.uix.label import MDLabel, MDIcon
+from kivy.properties import StringProperty  # @UnresolvedImport
+from kivymd.uix.label import MDLabel
 
 #------------------------------------------------------------------------------
 
-class CustomIcon(MDIcon):
-    pass
+class CustomIcon(MDLabel):
+    icon = StringProperty("ab-testing")
 
 
 class NormalLabel(MDLabel):

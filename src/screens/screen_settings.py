@@ -2,7 +2,6 @@ import re
 
 #------------------------------------------------------------------------------
 
-from kivy.app import App
 from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.uix.treeview import TreeView, TreeViewNode
@@ -12,7 +11,7 @@ from kivy.properties import ListProperty, StringProperty, NumericProperty  # @Un
 
 from components.screen import AppScreen
 from components.labels import NormalLabel
-from components.buttons import NormalButton, TransparentButton
+from components.buttons import CustomFlatButton
 from components.text_input import SingleLineTextInput
 from components.layouts import HorizontalLayout, VerticalLayout
 
@@ -24,6 +23,14 @@ from lib import websock
 _Debug = True
 
 #------------------------------------------------------------------------------
+
+class OptionNameLabel(CustomFlatButton):
+    pass
+
+
+class OptionDescriptionLabel(NormalLabel):
+    pass
+
 
 class OptionValueTextInput(SingleLineTextInput):
     pass
@@ -82,7 +89,7 @@ class TreeElement(TreeViewNode):
             print('erased element %r : %r' % (self.item_key, id(self), ))
 
 
-class ParentElement(TransparentButton, TreeElement):
+class ParentElement(CustomFlatButton, TreeElement):
 
     text_halign = 'left'
 
@@ -91,7 +98,7 @@ class ParentElement(TransparentButton, TreeElement):
         super(ParentElement, self).__init__(**kwargs)
 
 
-class ServiceElement(TreeElement, HorizontalLayout):
+class ServiceElement(HorizontalLayout, TreeElement):
 
     service_name = StringProperty('')
     service_state = StringProperty('')
