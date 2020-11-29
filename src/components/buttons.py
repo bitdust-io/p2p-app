@@ -1,6 +1,11 @@
-from kivy.properties import StringProperty  # @UnresolvedImport
+from kivy.properties import (
+    BooleanProperty,  # @UnresolvedImport
+    StringProperty,  # @UnresolvedImport
+    NumericProperty,  # @UnresolvedImport
+    BoundedNumericProperty,  # @UnresolvedImport
+)
 from kivymd.uix.button import (
-    BaseRectangularButton,
+    BaseButton,
     BaseFlatButton,
     BaseRaisedButton,
     BasePressedButton,
@@ -8,6 +13,7 @@ from kivymd.uix.button import (
     MDRaisedButton,
     MDFillRoundFlatButton,
 )
+from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
 from kivymd.uix.behaviors.elevation import CircularElevationBehavior
 
 #------------------------------------------------------------------------------
@@ -36,32 +42,37 @@ class RoundedFlexButton(RoundedButton):
     pass
 
 
-class BaseRectangularButtonAligned(BaseRectangularButton):
+class CustomRectangularButton(RectangularRippleBehavior, BaseButton):
+    width = BoundedNumericProperty(
+        10, min=10, max=None, errorhandler=lambda x: 10
+    )
+    text = StringProperty("")
+    increment_width = NumericProperty("0dp")
+    button_label = BooleanProperty(True)
+    can_capitalize = BooleanProperty(True)
+    _radius = NumericProperty("2dp")
+    _height = NumericProperty(0)
     text_halign = StringProperty('center')
-
-
-class BaseRoundButtonCustom(BaseRoundButton):
-    pass
 
 
 class CustomIconButton(RoundedButton):
     icon = StringProperty("circle")
 
 
-class BaseRoundButtonCustomIcon(BaseRoundButton):
+class CustomRoundButton(CircularRippleBehavior, BaseButton):
     pass
 
 
-class IconButton(BaseRoundButtonCustom, BaseFlatButton, BasePressedButton):
+class IconButton(CustomRoundButton, BaseFlatButton, BasePressedButton):
     icon = StringProperty("circle")
 
 
-class TransparentButton(BaseRectangularButtonAligned, BaseFlatButton, BasePressedButton):
+class CustomFlatButton(CustomRectangularButton, BaseFlatButton, BasePressedButton):
     increment_width = 0
 
 
 class CustomFloatingActionButton(
-    BaseRoundButtonCustomIcon, CircularElevationBehavior, BaseRaisedButton
+    CustomRoundButton, CircularElevationBehavior, BaseRaisedButton
 ):
     icon = StringProperty("android")
     background_palette = StringProperty("Accent")
