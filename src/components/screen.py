@@ -1,5 +1,6 @@
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
+from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
 
@@ -8,7 +9,7 @@ _Debug = True
 #------------------------------------------------------------------------------
 
 
-class AppScreen(Screen):
+class AppScreen(ThemableBehavior, Screen):
 
     def __init__(self, **kw):
         super(AppScreen, self).__init__(**kw)

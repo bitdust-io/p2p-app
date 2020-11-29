@@ -1,6 +1,12 @@
 from kivy.properties import StringProperty  # @UnresolvedImport
-from kivy.uix.button import Button
-from kivymd.uix.button import BaseRectangularButton, BaseFlatButton, BasePressedButton, MDFlatButton, MDRaisedButton, MDFillRoundFlatIconButton, MDFillRoundFlatButton
+from kivymd.uix.button import (
+    BaseRectangularButton,
+    BaseFlatButton,
+    BasePressedButton,
+    BaseRoundButton,
+    MDRaisedButton,
+    MDFillRoundFlatButton,
+)
 
 #------------------------------------------------------------------------------
 
@@ -31,6 +37,14 @@ class RoundedFlexButton(RoundedButton):
 class BaseRectangularButtonAligned(BaseRectangularButton):
 
     text_halign = StringProperty('center')
+
+
+class BaseRoundButtonCustom(BaseRoundButton):
+    pass
+
+
+class IconButton(BaseRoundButtonCustom, BaseFlatButton, BasePressedButton):
+    icon = StringProperty("circle")
 
 
 class TransparentButton(BaseRectangularButtonAligned, BaseFlatButton, BasePressedButton):

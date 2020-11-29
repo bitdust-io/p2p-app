@@ -6,6 +6,8 @@ from kivymd.uix.button import BaseRectangularButton, BaseRaisedButton, BasePress
 from kivymd.uix.label import MDIcon, MDLabel
 from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
 
+from components.buttons import IconButton
+
 #------------------------------------------------------------------------------
 
 _Debug = True
@@ -24,7 +26,7 @@ class NavLabel(ButtonBehavior, MDLabel):
     pass
 
 
-class NavCloseIcon(ButtonBehavior, MDIcon):
+class NavCloseIcon(IconButton):
     pass
 
 
@@ -63,8 +65,6 @@ class NavButtonActive(NavButtonBase):
 
 
 class NavButtonClosable(NavButtonBase):
-
-    icon_right_size = 18
 
     def on_close_area_pressed(self):
         prev_screen_name = self.get_screen_manager().previous()
