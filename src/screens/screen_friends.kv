@@ -25,9 +25,9 @@
         id: contact_state_field
         size_hint: None, 1
         width: self.texture_size[0] + root.text_padding_x
-        font_size: '10sp'
         color: (.7, .7, .7, 1) if root.contact_state != 'CONNECTED' else (.6, 1, .6, 1)
         markup: True
+        font_size: '10sp'
         text: md_icon('circle')
 
     Label:
