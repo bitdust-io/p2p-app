@@ -7,7 +7,19 @@ class CustomIcon(MDLabel):
     icon = StringProperty("ab-testing")
 
 
-class NormalLabel(MDLabel):
+class BaseLabel(MDLabel):
+    pass
+
+
+class MarkupLabel(BaseLabel):
+    pass
+
+
+class FlexMarkupLabel(MarkupLabel):
+    pass
+
+
+class NormalLabel(MarkupLabel):
     pass
 
 #------------------------------------------------------------------------------

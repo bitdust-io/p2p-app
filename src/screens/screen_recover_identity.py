@@ -15,6 +15,9 @@ _Debug = True
 
 class RecoverIdentityScreen(AppScreen):
 
+    def get_title(self):
+        return 'recover identity'
+
     def is_closable(self):
         return False
 
@@ -36,7 +39,6 @@ class RecoverIdentityScreen(AppScreen):
         self.main_win().close_screen('new_identity_screen')
         self.main_win().close_screen('recover_identity_screen')
         self.main_win().select_screen('connecting_screen')
-        # self.control().run()
         self.control().identity_get_latest = time.time()
         self.main_win().state_identity_get = 1
 

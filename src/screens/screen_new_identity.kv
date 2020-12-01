@@ -1,5 +1,4 @@
 <NewIdentityScreen>:
-	title: 'new identity'
 
     BoxLayout:
         orientation: 'horizontal'
@@ -40,14 +39,10 @@
                 pos_hint: {'center_x': .5}
                 on_release: root.on_create_identity_button_clicked()
 
-            Label:
-            	id: create_identity_result_message
-                valign: 'bottom'
-                halign: 'right'
-                text: ""
+            FlexMarkupLabel:
+                id: create_identity_result_message
                 height: dp(20)
-                size_hint: None, None
-                pos_hint: {'center_x': .5}
+                text: ''
 
             Widget:
                 size_hint: 1, 0.3

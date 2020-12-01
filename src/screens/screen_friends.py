@@ -66,12 +66,11 @@ class FriendsListView(SelectableRecycleView):
 
 class FriendsScreen(AppScreen):
 
+    def get_title(self):
+        return 'contacts'
+
     def get_icon(self):
         return 'account-box-multiple'
-
-    def get_title(self):
-        # title: '{} contacts'.format(fa_icon('address-book', with_spaces=False))
-        return 'contacts'
 
     def populate(self, *args, **kwargs):
         api_client.friends_list(cb=self.on_friends_list_result)

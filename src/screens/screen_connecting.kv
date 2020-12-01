@@ -1,10 +1,22 @@
 <ConnectingScreen>:
 
-    GridLayout:
-        cols: 1
+    VLayout:
         size_hint: 1, 1
 
-        Label:
-            text: '[size=26]connecting to other nodes ...[/size]'
-            # height: 200
-            # size_hint_y: None
+        VEmptySpace:
+            size_hint_y: 0.5
+
+        HLayout:
+            size_hint: 1, .01
+    
+            HEmptySpace:
+                size_hint_x: 0.5
+
+            FlexMarkupLabel:
+                text: '[size=26sp]connecting to other nodes ...[/size]'
+
+            HEmptySpace:
+                size_hint_x: 0.5
+
+        VEmptySpace:
+            size_hint_y: 0.5

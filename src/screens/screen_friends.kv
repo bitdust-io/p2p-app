@@ -12,8 +12,8 @@
 	text_padding_x: app.friend_record_padding_x
 	text_padding_y: app.friend_record_padding_y
     height: app.friend_record_height
-    size_hint_y: None
     size_hint_x: 1
+    size_hint_y: None
 
     global_id: 'global_id'
 	username: 'username'
@@ -40,8 +40,8 @@
         text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
 
 	Widget:
-		height: 1
 		size_hint: 1, None
+		height: 1
 
 
 <FriendsListView>:

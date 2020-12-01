@@ -10,11 +10,11 @@ class ConnectingScreen(AppScreen):
 
     verify_network_connected_task = None
 
-    def is_closable(self):
-        return False
-
     def get_title(self):
         return 'connecting...'
+
+    def is_closable(self):
+        return False
 
     def on_enter(self, *args):
         if not self.verify_network_connected_task:

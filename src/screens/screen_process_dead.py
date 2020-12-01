@@ -14,6 +14,9 @@ class ProcessDeadScreen(AppScreen):
 
     verify_process_health_task = None
 
+    def get_title(self):
+        return 'starting...'
+
     def is_closable(self):
         return False
 

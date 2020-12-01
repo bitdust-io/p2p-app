@@ -15,6 +15,9 @@ _Debug = True
 
 class NewIdentityScreen(AppScreen):
 
+    def get_title(self):
+        return 'new identity'
+
     def is_closable(self):
         return False
 

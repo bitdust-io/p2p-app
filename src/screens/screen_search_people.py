@@ -4,7 +4,6 @@ from kivy.uix.label import Label
 
 from components.layouts import HorizontalLayout
 from components.screen import AppScreen
-from components.webfont import fa_icon
 
 from lib import api_client
 
@@ -35,11 +34,11 @@ class SearchPeopleScreen(AppScreen):
 
     search_started = False
 
-    def get_icon(self):
-        return 'account-search'
-
     def get_title(self):
         return "search people"
+
+    def get_icon(self):
+        return 'account-search'
 
     def clean_view(self, clear_input_field=False):
         if clear_input_field:
