@@ -72,6 +72,9 @@ def init(app):
     app.setting_normal_font_size = sp(app.setting_normal_font_size_absolute)
     app.setting_small_font_size = sp(app.setting_small_font_size_absolute)
 
+    #--- SCREEN SEARCH_PEOPLE
+    app.search_result_record_height = sp(16) + dp(12)
+
     #--- SCREEN FRIENDS
     app.friend_record_padding_x = dp(5)
     app.friend_record_padding_y = dp(5)

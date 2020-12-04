@@ -33,9 +33,16 @@ class CustomRoundButton(CircularRippleBehavior, BaseButton):
     ripple_scale = 10
 
 
-class CustomFlatButton(CustomRectangularButton, BaseFlatButton, BasePressedButton):
-    increment_width = 0
+class CustomRectangularIconButton(RectangularRippleBehavior, BaseButton):
+    increment_width = NumericProperty("0dp")
+    _radius = NumericProperty("2dp")
 
+
+class CustomFlatButton(CustomRectangularButton, BaseFlatButton, BasePressedButton):
+    width = BoundedNumericProperty(
+        10, min=10, max=None, errorhandler=lambda x: 10
+    )
+    increment_width = 0
 
 class CustomRaisedButton(CustomRectangularButton, RectangularElevationBehavior, BaseRaisedButton, BasePressedButton):
     pass
@@ -66,6 +73,10 @@ class IconButton(CustomRoundButton, BaseFlatButton, BasePressedButton):
     icon = StringProperty("circle")
 
 
+class RaisedIconButton(CustomRectangularIconButton, RectangularElevationBehavior, BaseRaisedButton, BasePressedButton):
+    icon = StringProperty("circle")
+
+
 class CustomIconButton(IconButton):
     pass
 
@@ -73,6 +84,9 @@ class CustomIconButton(IconButton):
 class CloseIconButton(IconButton):
     pass
 
+
+class CustomRaisedIconButton(RaisedIconButton):
+    pass
 
 #------------------------------------------------------------------------------
 
