@@ -1,63 +1,17 @@
-<ConversationsScreen>:
-
-    VerticalLayout:
-        size_hint: 1, 1
-        pos_hint: {'top': 1}
-
-		Label:
-			id: chat_status_label
-			size_hint: 1, None
-			height: self.texture_size[1]
-			text: ''
-
-        HorizontalLayout:
-            size_hint: 1, None
-            height: self.minimum_height
-	        pos_hint: {'bottom': 1}
-			padding: dp(5)
-
-			Widget:
-				size_hint: 1, None
-				height: 1
-
-            CustomFloatingActionButton:
-            	id: create_new_group_button
-            	icon: 'chat-plus'
-	            size_hint: None, None
-	            size: (dp(36), dp(36))
-	            padding: dp(8)
-	            text_color: app.color_white
-	            user_font_size: '26sp'
-                on_release: root.on_create_new_group_button_clicked()
-
-	    VerticalScrollView:
-
-			VerticalLayout:
-		    	id: conversations_list
-		    	pos_hint: {'top': 1}
-				size_hint: 1, 1
-				padding: dp(5)
-				spacing: dp(5)
-
-				ConversationsListView:
-		            id: conversations_list_view
-		            size_hint: 1, 1
-
+<ConversationActionButton>:
 
 
 <ConversationRecord>:
 
     canvas.before:
         Color:
-            rgba: (.95, .95, 95, 1) if self.selected else (1, 1, 1, 1)
+            rgba: app.color_row_seleted if self.selected else app.color_white
         Rectangle:
             pos: self.pos
             size: self.size
 
 	padding: 0
 	spacing: 1
-	text_padding_x: app.conversation_record_padding_x
-	text_padding_y: app.conversation_record_padding_y
     height: app.conversation_record_height
     size_hint_y: None
     size_hint_x: 1
@@ -67,22 +21,23 @@
     state: 'state'
     label: 'label'
 
-    Label:
-        id: label_field
-        text: '[color=#000000]{}[/color]'.format(root.label)
-        halign: 'left'
-        font_size: '16sp'
+    CustomIcon:
+        id: conversation_state_field
         size_hint: None, 1
-        width: self.texture_size[0] + root.text_padding_x * 2
+        width: dp(16)
+        color: app.color_circle_offline if root.state not in ['IN_SYNC!', 'CONNECTED'] else app.color_circle_online
+        icon: 'circle'
+        font_size: '12sp'
 
-	Widget:
-		size_hint: 1, None
-		height: 1
+    HFlexMarkupLabel:
+        id: label_field
+        height: root.height
+        text: root.label
+        halign: 'left'
+        valign: 'middle'
 
-	RoundedFlexWidthButton:
-		size_hint_y: None
-		height: app.conversation_record_height
-		text: fa_icon('bars')
+    HFixedEmptySpace:
+        width: dp(5)
 
 
 <ConversationsListView>:
@@ -98,14 +53,47 @@
         touch_multiselect: False
 
 
-<ConversationActionButton>:
-	text_padding_x: dp(5)
-	text_padding_y: dp(5)
-    markup: True
-    background_color: app.color_transparent
-    color: app.color_btn_text_light
-    disabled_color: app.color_btn_disabled
-    background_disabled_normal: ''
-    width: self.texture_size[0] + self.text_padding_x * 2
-    height: app.conversation_record_height
-    size_hint: None, None
+<ConversationsScreen>:
+
+    VerticalLayout:
+        size_hint: 1, 1
+        pos_hint: {'top': 1}
+
+        Label:
+            id: chat_status_label
+            size_hint: 1, None
+            height: self.texture_size[1]
+            text: ''
+
+        HorizontalLayout:
+            size_hint: 1, None
+            height: self.minimum_height
+            pos_hint: {'bottom': 1}
+            padding: dp(5)
+
+            Widget:
+                size_hint: 1, None
+                height: 1
+
+            CustomFloatingActionButton:
+                id: create_new_group_button
+                icon: 'chat-plus'
+                size_hint: None, None
+                size: (dp(24), dp(24))
+                padding: dp(6)
+                text_color: app.color_white
+                user_font_size: '18sp'
+                on_release: root.on_create_new_group_button_clicked()
+
+        VerticalScrollView:
+
+            VerticalLayout:
+                id: conversations_list
+                pos_hint: {'top': 1}
+                size_hint: 1, 1
+                padding: dp(5)
+                spacing: dp(5)
+
+                ConversationsListView:
+                    id: conversations_list_view
+                    size_hint: 1, 1

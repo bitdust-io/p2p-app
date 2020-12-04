@@ -28,6 +28,14 @@ class VEmptySpace(Widget):
     pass
 
 
+class HFixedEmptySpace(Widget):
+    pass
+
+
+class VFixedEmptySpace(Widget):
+    pass
+
+
 class VerticalScrollView(ScrollView):
     pass
 

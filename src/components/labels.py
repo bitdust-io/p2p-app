@@ -19,6 +19,10 @@ class FlexMarkupLabel(MarkupLabel):
     pass
 
 
+class HFlexMarkupLabel(MarkupLabel):
+    pass
+
+
 class NormalLabel(MarkupLabel):
     pass
 

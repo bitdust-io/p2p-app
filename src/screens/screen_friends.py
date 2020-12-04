@@ -1,13 +1,12 @@
-from components.buttons import RoundedButton
+from components.buttons import CustomIconButton
 from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
-from components.webfont import fa_icon
 
 from lib import api_client
 
 #------------------------------------------------------------------------------
 
-class FriendActionButton(RoundedButton):
+class FriendActionButton(CustomIconButton):
     pass
 
 
@@ -20,13 +19,13 @@ class FriendRecord(SelectableHorizontalRecord):
     def show_buttons(self):
         if not self.visible_buttons:
             chat_button = FriendActionButton(
-                text=fa_icon('comments'),
+                icon='comment-multiple',
                 on_release=self.on_chat_button_clicked,
             )
             self.visible_buttons.append(chat_button)
             self.add_widget(chat_button)
             delete_button = FriendActionButton(
-                text=fa_icon('trash'),
+                icon='trash-can',
                 on_release=self.on_delete_button_clicked,
             )
             self.visible_buttons.append(delete_button)
@@ -47,11 +46,11 @@ class FriendRecord(SelectableHorizontalRecord):
         )
 
     def on_delete_button_clicked(self, *args):
-        self.parent.parent.parent.parent.main_win().close_screen(
+        self.parent.parent.parent.parent.parent.main_win().close_screen(
             screen_id='private_chat_{}'.format(self.global_id),
         )
         self.parent.parent.clear_selection()
-        api_client.friend_remove(global_user_id=self.global_id, cb=self.parent.parent.parent.parent.populate)
+        api_client.friend_remove(global_user_id=self.global_id, cb=self.parent.parent.parent.parent.parent.populate)
 
 
 class FriendsListView(SelectableRecycleView):

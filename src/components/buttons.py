@@ -46,10 +46,6 @@ class CustomFloatingActionButton(CustomRoundButton, CircularElevationBehavior, B
     background_palette = StringProperty("Accent")
 
 
-class IconButton(CustomRoundButton, BaseFlatButton, BasePressedButton):
-    icon = StringProperty("circle")
-
-
 class RoundedButton(CustomRaisedButton):
     pass
 
@@ -64,6 +60,19 @@ class RoundedFlexHeightButton(RoundedButton):
 
 class RoundedFlexButton(RoundedButton):
     pass
+
+
+class IconButton(CustomRoundButton, BaseFlatButton, BasePressedButton):
+    icon = StringProperty("circle")
+
+
+class CustomIconButton(IconButton):
+    pass
+
+
+class CloseIconButton(IconButton):
+    pass
+
 
 #------------------------------------------------------------------------------
 

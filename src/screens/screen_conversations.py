@@ -1,4 +1,4 @@
-from components.buttons import RoundedButton
+from components.buttons import RoundedButton, CustomIconButton
 from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
 from components.webfont import fa_icon
@@ -7,7 +7,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-class ConversationActionButton(RoundedButton):
+class ConversationActionButton(CustomIconButton):
     pass
 
 
@@ -20,7 +20,7 @@ class ConversationRecord(SelectableHorizontalRecord):
     def show_buttons(self):
         if not self.visible_buttons:
             chat_button = ConversationActionButton(
-                text=fa_icon('comments'),
+                icon='comments-multiple',
                 on_release=self.on_chat_button_clicked,
             )
             self.visible_buttons.append(chat_button)

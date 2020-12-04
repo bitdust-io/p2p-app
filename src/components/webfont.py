@@ -3,7 +3,7 @@ from fonts.materialdesignicons_map import materialdesignicons_codes
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 # Font Awesome

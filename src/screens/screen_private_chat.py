@@ -1,7 +1,6 @@
 from components.screen import AppScreen
 from components.labels import NormalLabel
 from components.text_input import BasicTextInput
-from components.webfont import fa_icon
 
 from lib import api_client
 from lib import websock
@@ -41,7 +40,6 @@ class PrivateChatScreen(AppScreen):
         return 'comment'
 
     def get_title(self):
-        # return f"{fa_icon('comment', with_spaces=False)} {self.username}"
         return f"{self.username}"
 
     def on_enter(self, *args):
