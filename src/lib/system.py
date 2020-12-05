@@ -1,5 +1,10 @@
 from kivy.utils import platform
 
+
+def is_windows():
+    return platform == 'win'
+
+
 def is_android():
     return platform == 'android'
 

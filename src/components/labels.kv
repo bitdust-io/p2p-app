@@ -3,12 +3,28 @@
 
 <MarkupLabel>:
     markup: True
+    shorten: False
+    strip_reflow: False
 
 
-<FlexMarkupLabel>:
+<HFlexMarkupLabel>:
     size_hint: None, None
     size: self.texture_size
-    text_size: None, None
+    text_size: None, self.label_height
+    markup: True
+    color: (0, 0, 0, 1)
+    halign: 'left'
+    valign: 'middle'
+
+
+<VFlexMarkupLabel>:
+    size_hint: None, None
+    size: self.texture_size
+    text_size: self.label_width, None
+    markup: True
+    color: (0, 0, 0, 1)
+    halign: 'left'
+    valign: 'top'
 
 
 <NormalLabel>:

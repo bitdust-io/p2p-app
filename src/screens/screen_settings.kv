@@ -49,7 +49,7 @@
     valign: 'top'
     padding: 0, 0
     text_size: self.width, None
-    font_size: app.setting_normal_font_size_absolute
+    font_size: app.setting_normal_font_size
 
 
 <OptionDescriptionLabel>:
@@ -65,7 +65,7 @@
 <ParentElement>:
     pos_hint: {'left': 0}
     halign: 'left'
-    font_size: app.setting_normal_font_size_absolute
+    font_size: app.setting_normal_font_size
     text_size: self.width, None
     on_press: self.item_clicked_callback(self.item_key, self)
 

@@ -39,6 +39,9 @@ def init(app):
     app.color_transparent = (0,0,0,0)
     app.color_black = (0,0,0,1)
     app.color_white = (1,1,1,1)
+    app.color_row_seleted = (.96, .96, 1, 1)
+    app.color_circle_offline = (.7, .7, .7, 1)
+    app.color_circle_online = (.5, .9, .5, 1)
 
     app.color_btn_text_light = (1,1,1,1)
     app.color_btn_text_dark = (.3,.7,1,1)
@@ -68,6 +71,9 @@ def init(app):
     app.setting_small_font_size_absolute = app.font_size_small_absolute
     app.setting_normal_font_size = sp(app.setting_normal_font_size_absolute)
     app.setting_small_font_size = sp(app.setting_small_font_size_absolute)
+
+    #--- SCREEN SEARCH_PEOPLE
+    app.search_result_record_height = sp(16) + dp(12)
 
     #--- SCREEN FRIENDS
     app.friend_record_padding_x = dp(5)

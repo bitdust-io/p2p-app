@@ -1,7 +1,6 @@
 from components.screen import AppScreen
 from components.labels import NormalLabel
 from components.text_input import BasicTextInput
-from components.webfont import fa_icon
 
 from lib import api_client
 from lib import websock
@@ -41,7 +40,6 @@ class PrivateChatScreen(AppScreen):
         return 'comment'
 
     def get_title(self):
-        # return f"{fa_icon('comment', with_spaces=False)} {self.username}"
         return f"{self.username}"
 
     def on_enter(self, *args):
@@ -113,9 +111,12 @@ class PrivateChatScreen(AppScreen):
         self.ids.chat_messages_view.scroll_y = 0
 
     def on_chat_send_button_clicked(self, *args):
+        msg = self.ids.chat_input.text
+        if _Debug:
+            print('on_chat_send_button_clicked', self.recipient_id, msg)
         api_client.message_send(
             recipient_id=self.recipient_id,
-            data={'message': self.ids.chat_input.text, },
+            data={'message': msg, },
             cb=self.on_message_sent,
         )
         self.ids.chat_status_label.text = ''

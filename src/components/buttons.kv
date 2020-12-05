@@ -19,7 +19,7 @@
     MDLabel:
         id: lbl_txt
         text: root.text if root.button_label else ''
-        font_size: sp(root.font_size)
+        font_size: root.font_size
         font_name: root.font_name if root.font_name is not None else self.font_name
         can_capitalize: root.can_capitalize
         size_hint_x: None
@@ -68,7 +68,38 @@
         opposite_colors: root.opposite_colors
 
 
+<CustomRectangularIconButton>:
+    canvas:
+        Clear
+        Color:
+            rgba: self._current_button_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: (root._radius, )
+
+    lbl_txt: lbl_txt
+    height: dp(36)
+    width: dp(36)
+    padding: (0, 0)
+    theme_text_color: 'Primary'
+    markup: False
+
+    CustomIcon:
+        id: lbl_txt
+        icon: root.icon
+        font_size: root.font_size
+        font_name: root.font_name if root.font_name is not None else self.font_name
+        theme_text_color: root.theme_text_color
+        text_color: root.text_color
+        disabled: root.disabled
+        valign: 'middle'
+        halign: 'center'
+        opposite_colors: root.opposite_colors
+
+
 <CustomFlatButton>:
+    font_size: sp(16)
 
 
 <CustomRaisedButton>:
@@ -77,6 +108,7 @@
     text_color: root.specific_text_color
     elevation_normal: 0
     elevation_raised: 0
+    font_size: sp(16)
 
 
 <CustomFloatingActionButton>:
@@ -100,3 +132,41 @@
 
 <RoundedFlexButton>:
 
+
+<IconButton>:
+
+
+<RaisedIconButton>:
+    md_bg_color: app.theme_cls.primary_color
+    theme_text_color: 'Custom'
+    text_color: root.specific_text_color
+    elevation_normal: 0
+    elevation_raised: 0
+
+
+<CustomIconButton>:
+    icon: 'circle'
+    theme_text_color: 'Custom'
+    padding: (0, 0)
+    pos_hint: {"center_x": .5, "center_y": .5}
+    size_hint: None, None
+    size: (dp(26), dp(26))
+    font_size: sp(22)
+
+
+<CloseIconButton>:
+    icon: 'close'
+    theme_text_color: 'Custom'
+    padding: (0, 0)
+    pos_hint: {"center_x": .5, "center_y": .5}
+    size_hint: None, None
+    size: (dp(26), dp(26))
+    font_size: sp(22)
+
+
+<CustomRaisedIconButton>:
+    icon: 'circle'
+    theme_text_color: 'Primary'
+    opposite_colors: True
+    pos_hint: {"center_x": .5, "center_y": .5}
+    font_size: sp(22)

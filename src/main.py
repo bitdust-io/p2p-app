@@ -1,5 +1,19 @@
+#!/usr/bin/env python -u
+# -*- coding: utf-8 -*-
+
+#------------------------------------------------------------------------------
+
 import os
 import sys
+
+#------------------------------------------------------------------------------
+
+import locale
+locale.setlocale(locale.LC_CTYPE, 'en_US.UTF-8')
+
+import codecs
+sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())
 
 #------------------------------------------------------------------------------ 
 

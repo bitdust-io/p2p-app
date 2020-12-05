@@ -1,45 +1,3 @@
-<PrivateChatScreen>:
-
-    VerticalLayout:
-        size_hint: 1, 1
-        pos_hint: {'top': 1}
-
-		Label:
-			id: chat_status_label
-			size_hint: 1, None
-			height: self.texture_size[1]
-			text: ''
-
-	    VerticalScrollView:
-	    	id: chat_messages_view
-
-			VerticalLayout:
-				id: chat_messages
-				size_hint: 1, None
-				height: self.minimum_height
-		        padding: 5
-		        spacing: 5
-
-        HorizontalLayout:
-            size_hint: 1, None
-            height: self.minimum_height
-	        pos_hint: {'bottom': 1}
-
-            DynamicHeightTextInput:
-                id: chat_input
-                size_hint_x: 1
-				text: ''
-
-            RoundedButton:
-            	id: chat_send_button
-				size_hint: None, None
-				width: self.texture_size[0] + self.text_padding_x * 2
-				height: self.texture_size[1] + self.text_padding_y * 2
-            	font_size: app.font_size_icon
-                text: fa_icon('paper-plane')
-                on_release: root.on_chat_send_button_clicked()
-
-
 <DynamicHeightTextInput>:
 	max_lines: 7
     size_hint_y: None
@@ -48,8 +6,52 @@
 
 
 <ChatMessageLabel>:
+    pos_hint: {'left': 0}
 	size_hint: None, None
-	pos_hint: {'left': 0}
 	width: self.texture_size[0]
 	height: self.texture_size[1]
+	text_size: None, None
 	halign: 'left'
+
+
+<PrivateChatScreen>:
+
+    VerticalLayout:
+        size_hint: 1, 1
+        pos_hint: {'top': 1}
+
+        Label:
+            id: chat_status_label
+            size_hint: 1, None
+            height: self.texture_size[1]
+            text: ''
+
+        VerticalScrollView:
+            id: chat_messages_view
+
+            VerticalLayout:
+                id: chat_messages
+                size_hint: 1, None
+                height: self.minimum_height
+                padding: 5
+                spacing: 5
+
+        HorizontalLayout:
+            size_hint: 1, None
+            height: self.minimum_height
+            pos_hint: {'bottom': 1}
+
+            DynamicHeightTextInput:
+                id: chat_input
+                size_hint_x: 1
+                text: ''
+
+            CustomIconButton:
+                id: chat_send_button
+                icon: 'send'
+                increment_diameter: dp(0)
+                padding: dp(0)
+                width: dp(22)
+                height: root.ids.chat_input.height
+                font_size: '12sp'
+                on_release: root.on_chat_send_button_clicked()

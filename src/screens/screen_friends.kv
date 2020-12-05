@@ -1,19 +1,19 @@
+<FriendActionButton>:
+
+
 <FriendRecord>:
 
     canvas.before:
         Color:
-            rgba: (.95, .95, 95, 1) if self.selected else (1, 1, 1, 1)
+            rgba: app.color_row_seleted if self.selected else app.color_white
         Rectangle:
             pos: self.pos
             size: self.size
 
-	padding: 0
-	spacing: 1
-	text_padding_x: app.friend_record_padding_x
-	text_padding_y: app.friend_record_padding_y
+    size_hint: 1, None
     height: app.friend_record_height
-    size_hint_x: 1
-    size_hint_y: None
+    padding: 0
+    spacing: 1
 
     global_id: 'global_id'
 	username: 'username'
@@ -21,31 +21,26 @@
 	alias: 'alias'
     contact_state: 'contact_state'
 
-    Label:
+    CustomIcon:
         id: contact_state_field
         size_hint: None, 1
-        width: self.texture_size[0] + root.text_padding_x
-        color: (.7, .7, .7, 1) if root.contact_state != 'CONNECTED' else (.6, 1, .6, 1)
-        markup: True
-        font_size: '10sp'
-        text: md_icon('circle')
+        width: dp(20)
+        font_size: '14sp'
+        color: app.color_circle_offline if root.contact_state != 'CONNECTED' else app.color_circle_online
+        icon: 'lan-disconnect' if root.contact_state != 'CONNECTED' else 'circle'
 
-    Label:
+    HFlexMarkupLabel:
         id: label_field
-        size_hint: None, 1
-        width: self.texture_size[0] + root.text_padding_x * 2
-        markup: True        
-        halign: 'left'
-        font_size: '16sp'
+        label_height: root.height
         text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
 
-	Widget:
-		size_hint: 1, None
-		height: 1
+	HFixedEmptySpace:
+		width: dp(5)
 
 
 <FriendsListView>:
     viewclass: 'FriendRecord'
+
     SelectableRecycleBoxLayout:
         default_size: None, app.friend_record_height
         default_size_hint: 1, None
@@ -54,19 +49,6 @@
         orientation: 'vertical'
         multiselect: False
         touch_multiselect: False
-
-
-<FriendActionButton>:
-	text_padding_x: dp(5)
-	text_padding_y: dp(5)
-    markup: True
-    background_color: app.color_transparent
-    color: app.color_btn_text_light
-    disabled_color: app.color_btn_disabled
-    background_disabled_normal: ''
-    width: self.texture_size[0] + self.text_padding_x * 2
-    height: app.friend_record_height
-    size_hint: None, None
 
 
 <FriendsScreen>:

@@ -31,7 +31,7 @@ update:
 	@git reset --hard origin/master
 
 run:
-	@$(PYTHON) src/main.py
+	@$(PYTHON) -u src/main.py
 
 
 ### Requirements & Dependencies

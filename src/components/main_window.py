@@ -99,6 +99,8 @@ class MainWindow(FloatLayout, ThemableBehavior):
     def select_screen(self, screen_id, verify_state=False, screen_type=None, **kwargs):
         if screen_type is None:
             screen_type = screen_id
+            if screen_type.startswith('private_chat_'):
+                screen_type = 'private_chat_screen'
         if verify_state:
             if self.state_process_health != 1 or self.state_identity_get != 1:
                 if _Debug:

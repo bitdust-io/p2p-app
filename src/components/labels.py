@@ -1,5 +1,7 @@
-from kivy.properties import StringProperty  # @UnresolvedImport
+from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
+from kivy.uix.label import Label
 from kivymd.uix.label import MDLabel
+from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
 
@@ -15,12 +17,16 @@ class MarkupLabel(BaseLabel):
     pass
 
 
-class FlexMarkupLabel(MarkupLabel):
-    pass
-
-
 class NormalLabel(MarkupLabel):
     pass
+
+
+class HFlexMarkupLabel(ThemableBehavior, Label):
+    label_height = NumericProperty('32dp')
+
+
+class VFlexMarkupLabel(ThemableBehavior, Label):
+    label_width = NumericProperty('100dp')
 
 #------------------------------------------------------------------------------
 

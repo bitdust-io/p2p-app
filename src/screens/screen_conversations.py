@@ -1,13 +1,16 @@
-from components.buttons import RoundedButton
+from components.buttons import CustomIconButton
 from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
-from components.webfont import fa_icon
 
 from lib import api_client
 
 #------------------------------------------------------------------------------
 
-class ConversationActionButton(RoundedButton):
+_Debug = True
+
+#------------------------------------------------------------------------------
+
+class ConversationActionButton(CustomIconButton):
     pass
 
 
@@ -20,7 +23,7 @@ class ConversationRecord(SelectableHorizontalRecord):
     def show_buttons(self):
         if not self.visible_buttons:
             chat_button = ConversationActionButton(
-                text=fa_icon('comments'),
+                icon='comment-multiple',
                 on_release=self.on_chat_button_clicked,
             )
             self.visible_buttons.append(chat_button)
@@ -33,11 +36,13 @@ class ConversationRecord(SelectableHorizontalRecord):
             self.visible_buttons.clear()
 
     def on_chat_button_clicked(self, *args):
-        if self.global_id.startswith('master$'):
+        if _Debug:
+            print('on_chat_button_clicked', self.key_id)
+        if self.key_id.startswith('master$'):
             self.parent.parent.parent.parent.parent.parent.main_win().select_screen(
-                screen_id='private_chat_{}'.format(self.global_id.replace('master$', '')),
+                screen_id='private_chat_{}'.format(self.key_id.replace('master$', '')),
                 screen_type='private_chat_screen',
-                global_id=self.global_id,
+                global_id=self.key_id,
                 username=self.label,
             )
 
@@ -54,12 +59,11 @@ class ConversationsListView(SelectableRecycleView):
 
 class ConversationsScreen(AppScreen):
 
-    def get_icon(self):
-        return 'comment-text-multiple'
-
     def get_title(self):
         return 'conversations'
 
+    def get_icon(self):
+        return 'comment-text-multiple'
 
     def populate(self, *args, **kwargs):
         api_client.message_conversations_list(cb=self.on_message_conversations_list_result)
