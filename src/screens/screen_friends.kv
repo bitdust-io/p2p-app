@@ -30,13 +30,28 @@
         font_size: '12sp'
 
     HFlexMarkupLabel:
+
+	    canvas.before:
+	        Color:
+	            rgba: (.5,.5,1,1)
+	        Rectangle:
+	            pos: self.pos
+	            size: self.size
+
         id: label_field
-        height: root.height
-        text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
+        label_height: root.height
+        # text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
+        text: '{}@{}'.format(root.username, root.idhost)
         halign: 'left'
         valign: 'middle'
 
 	HFixedEmptySpace:
+	    canvas.before:
+	        Color:
+	            rgba: (1,.5,1,1)
+	        Rectangle:
+	            pos: self.pos
+	            size: self.size
 		width: dp(5)
 
 
