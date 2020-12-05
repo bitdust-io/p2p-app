@@ -111,9 +111,14 @@ class PrivateChatScreen(AppScreen):
         self.ids.chat_messages_view.scroll_y = 0
 
     def on_chat_send_button_clicked(self, *args):
+        msg = self.ids.chat_input.text
+        # from json.encoder import py_encode_basestring_ascii
+        # msg = py_encode_basestring_ascii(msg)
+        if _Debug:
+            print('on_chat_send_button_clicked', self.recipient_id, msg)
         api_client.message_send(
             recipient_id=self.recipient_id,
-            data={'message': self.ids.chat_input.text, },
+            data={'message': msg, },
             cb=self.on_message_sent,
         )
         self.ids.chat_status_label.text = ''

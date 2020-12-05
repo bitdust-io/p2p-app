@@ -1,5 +1,25 @@
+# -*- coding: utf-8 -*-
+
+#------------------------------------------------------------------------------
+
 import os
 import sys
+# import platform
+
+#------------------------------------------------------------------------------
+
+# if sys.version_info[0] == 2:
+#     reload(sys)  # @UndefinedVariable
+#     if platform.uname()[0] == "Windows":
+#         if hasattr(sys, "setdefaultencoding"):
+#             import locale
+#             denc = locale.getpreferredencoding()
+#             if not denc:
+#                 sys.setdefaultencoding('UTF8')
+#             else:
+#                 sys.setdefaultencoding(denc)
+#     else:
+#         sys.setdefaultencoding('UTF8')
 
 #------------------------------------------------------------------------------ 
 
