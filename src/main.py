@@ -1,25 +1,19 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 #------------------------------------------------------------------------------
 
 import os
 import sys
-# import platform
 
 #------------------------------------------------------------------------------
 
-# if sys.version_info[0] == 2:
-#     reload(sys)  # @UndefinedVariable
-#     if platform.uname()[0] == "Windows":
-#         if hasattr(sys, "setdefaultencoding"):
-#             import locale
-#             denc = locale.getpreferredencoding()
-#             if not denc:
-#                 sys.setdefaultencoding('UTF8')
-#             else:
-#                 sys.setdefaultencoding(denc)
-#     else:
-#         sys.setdefaultencoding('UTF8')
+import locale
+locale.setlocale(locale.LC_CTYPE, 'en_US.UTF-8')
+
+import codecs
+sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())
 
 #------------------------------------------------------------------------------ 
 

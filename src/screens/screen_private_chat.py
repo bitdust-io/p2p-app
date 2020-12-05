@@ -112,8 +112,6 @@ class PrivateChatScreen(AppScreen):
 
     def on_chat_send_button_clicked(self, *args):
         msg = self.ids.chat_input.text
-        # from json.encoder import py_encode_basestring_ascii
-        # msg = py_encode_basestring_ascii(msg)
         if _Debug:
             print('on_chat_send_button_clicked', self.recipient_id, msg)
         api_client.message_send(
