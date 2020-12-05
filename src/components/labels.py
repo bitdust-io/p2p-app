@@ -1,6 +1,7 @@
-from kivy.metrics import dp
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
+from kivy.uix.label import Label
 from kivymd.uix.label import MDLabel
+from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
 
@@ -20,11 +21,11 @@ class NormalLabel(MarkupLabel):
     pass
 
 
-class HFlexMarkupLabel(MarkupLabel):
+class HFlexMarkupLabel(ThemableBehavior, Label):
     label_height = NumericProperty('32dp')
 
 
-class VFlexMarkupLabel(MarkupLabel):
+class VFlexMarkupLabel(ThemableBehavior, Label):
     label_width = NumericProperty('100dp')
 
 #------------------------------------------------------------------------------

@@ -10,31 +10,28 @@
             pos: self.pos
             size: self.size
 
-	padding: 0
-	spacing: 1
+    size_hint: 1, None
     height: app.conversation_record_height
-    size_hint_y: None
-    size_hint_x: 1
+    padding: 0
+    spacing: 1
 
     conversation_id: 'conversation_id'
-    global_id: 'global_id'
+    key_id: 'key_id'
     state: 'state'
     label: 'label'
 
     CustomIcon:
         id: conversation_state_field
         size_hint: None, 1
-        width: dp(16)
+        width: dp(20)
+        font_size: '18sp' if root.state not in ['IN_SYNC!', 'CONNECTED'] else '14sp'
         color: app.color_circle_offline if root.state not in ['IN_SYNC!', 'CONNECTED'] else app.color_circle_online
-        icon: 'circle'
-        font_size: '12sp'
+        icon: 'lan-disconnect' if root.state not in ['IN_SYNC!', 'CONNECTED'] else 'circle'
 
     HFlexMarkupLabel:
         id: label_field
-        height: root.height
+        label_height: root.height
         text: root.label
-        halign: 'left'
-        valign: 'middle'
 
     HFixedEmptySpace:
         width: dp(5)
@@ -79,10 +76,9 @@
                 id: create_new_group_button
                 icon: 'chat-plus'
                 size_hint: None, None
-                size: (dp(20), dp(20))
-                padding: dp(5)
+                padding: dp(0)
                 text_color: app.color_white
-                user_font_size: '18sp'
+                user_font_size: '14sp'
                 on_release: root.on_create_new_group_button_clicked()
 
         VerticalScrollView:

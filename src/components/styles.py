@@ -41,7 +41,7 @@ def init(app):
     app.color_white = (1,1,1,1)
     app.color_row_seleted = (.96, .96, 1, 1)
     app.color_circle_offline = (.7, .7, .7, 1)
-    app.color_circle_online = (.6, 1, .6, 1)
+    app.color_circle_online = (.5, .9, .5, 1)
 
     app.color_btn_text_light = (1,1,1,1)
     app.color_btn_text_dark = (.3,.7,1,1)

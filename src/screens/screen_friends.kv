@@ -24,34 +24,17 @@
     CustomIcon:
         id: contact_state_field
         size_hint: None, 1
-        width: dp(16)
+        width: dp(20)
+        font_size: '14sp'
         color: app.color_circle_offline if root.contact_state != 'CONNECTED' else app.color_circle_online
-        icon: 'circle'
-        font_size: '12sp'
+        icon: 'lan-disconnect' if root.contact_state != 'CONNECTED' else 'circle'
 
     HFlexMarkupLabel:
-
-	    canvas.before:
-	        Color:
-	            rgba: (.5,.5,1,1)
-	        Rectangle:
-	            pos: self.pos
-	            size: self.size
-
         id: label_field
         label_height: root.height
-        # text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
-        text: '{}@{}'.format(root.username, root.idhost)
-        halign: 'left'
-        valign: 'middle'
+        text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
 
 	HFixedEmptySpace:
-	    canvas.before:
-	        Color:
-	            rgba: (1,.5,1,1)
-	        Rectangle:
-	            pos: self.pos
-	            size: self.size
 		width: dp(5)
 
 

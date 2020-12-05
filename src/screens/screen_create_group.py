@@ -1,5 +1,4 @@
 from components.screen import AppScreen
-from components.webfont import fa_icon
 
 from lib import api_client
 from lib import websock
@@ -8,13 +7,10 @@ from lib import websock
 
 class CreateGroupScreen(AppScreen):
 
-    search_started = False
-
     def get_icon(self):
-        return 'user-plus'
+        return 'chat-plus'
 
     def get_title(self):
-        # return f"{fa_icon('user-plus', with_spaces=False)} create group"
         return "create group"
 
     def clean_view(self, clear_input_field=False):
