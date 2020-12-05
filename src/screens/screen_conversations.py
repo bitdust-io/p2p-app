@@ -1,7 +1,6 @@
-from components.buttons import RoundedButton, CustomIconButton
+from components.buttons import CustomIconButton
 from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
-from components.webfont import fa_icon
 
 from lib import api_client
 
