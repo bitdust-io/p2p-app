@@ -3,6 +3,7 @@
     height: self.texture_size[1]
     size_hint: None, None
     pos_hint: {'left': 1}
+    font_size: '16sp'
     text: 'no users found'
 
 
@@ -15,9 +16,9 @@
 
     CustomRaisedIconButton:
         icon: 'account-plus'
-        width: root.height
-        height: root.height
-        font_size: '14sp'
+        width: root.height - dp(6)
+        height: root.height - dp(6)
+        font_size: '16sp'
         on_press: root.on_search_result_add_clicked()
 
     HFixedEmptySpace:
@@ -26,10 +27,7 @@
     HFlexMarkupLabel:
         id: search_result_label
         pos_hint: {'left': 1, 'center_y': 0.5}
-        # size_hint: None, None
-        # width: self.texture_size[0]
-        # height: self.texture_size[1]
-        font_size: '14sp'
+        font_size: '16sp'
         text: ''
 
 
@@ -50,15 +48,16 @@
                 size_hint_x: None
                 width: dp(150)
                 hint_text: 'alice'
+                helper_text: 'Enter username to search'
+                helper_text_mode: 'persistent'
                 text: ''
                 on_focus: root.on_search_input_focus_changed()
 
-            RoundedFlexButton:
+            CustomRaisedIconButton:
                 id: search_button
-                size_hint_y: None
+                width: root.ids.search_input.height
                 height: root.ids.search_input.height
-                disabled: False
-                text: fa_icon('search')
+                icon: 'magnify'
                 on_press: root.on_search_button_clicked()
 
         VerticalScrollView:

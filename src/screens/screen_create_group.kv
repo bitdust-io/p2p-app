@@ -7,7 +7,6 @@
         padding: dp(15)
         spacing: dp(5)
 
-
         NormalLabel:
             id: status_message_label
             size_hint: 1, None
@@ -25,11 +24,9 @@
                 hint_text: 'Enter a group name'
                 text: ''
 
-        HorizontalLayout:
-            size_hint: 1, None
-            height: self.minimum_height
-
-            RoundedFlexButton:
+            CustomRaisedIconButton:
                 id: create_group_button
-                text: fa_icon('plus')
-                on_press: root.on_create_group_button_clicked()
+                width: root.ids.group_label_input.height
+                height: root.ids.group_label_input.height
+                icon: 'plus'
+                on_release: root.on_create_group_button_clicked()
