@@ -41,24 +41,31 @@
         HorizontalLayout:
             size_hint: 1, None
             height: self.minimum_height
-            pos_hint: {'top': 1}
 
             SingleLineTextInput:
                 id: search_input
                 size_hint_x: None
-                width: dp(150)
-                hint_text: 'alice'
-                helper_text: 'Enter username to search'
-                helper_text_mode: 'persistent'
+                width: dp(220)
+                hint_text: 'Enter username to search'
                 text: ''
                 on_focus: root.on_search_input_focus_changed()
 
-            CustomRaisedIconButton:
-                id: search_button
-                width: root.ids.search_input.height
-                height: root.ids.search_input.height
-                icon: 'magnify'
-                on_press: root.on_search_button_clicked()
+            VerticalLayout:
+                size_hint: None, None
+                width: self.minimum_width
+                height: self.minimum_height
+
+                CustomRaisedIconButton:
+                    id: search_button
+                    width: dp(28)
+                    height: dp(28)
+                    _radius: dp(3)
+                    icon: 'magnify'
+                    on_press: root.on_search_button_clicked()
+
+                Widget:
+                    size_hint: None, None
+                    size: dp(16), dp(16)
 
         VerticalScrollView:
 

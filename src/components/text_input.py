@@ -1,4 +1,4 @@
-from kivymd.uix.textfield import MDTextField
+from kivymd.uix.textfield import MDTextField, MDTextFieldRect, MDTextFieldRound
 
 #------------------------------------------------------------------------------
 
@@ -10,7 +10,11 @@ class SingleLineTextInput(BasicTextInput):
     pass
 
 
-class MultiLineTextInput(BasicTextInput):
+class RoundedTextInput(MDTextFieldRound):
+    pass
+
+
+class MultiLineTextInput(MDTextFieldRect):
     pass
 
 #------------------------------------------------------------------------------

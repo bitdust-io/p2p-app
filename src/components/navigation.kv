@@ -7,7 +7,7 @@
     size_hint_x: None
     width: self.texture_size[0]
     height: self.texture_size[1]
-    markup: False
+    markup: True
     disabled: False
     valign: 'middle'
     halign: 'left'
@@ -69,7 +69,6 @@
 		    text: root.text if root.button_label else ''
 		    font_size: sp(root.font_size)
 		    font_name: root.font_name if root.font_name is not None else self.font_name
-		    can_capitalize: root.can_capitalize
 		    text_size: (None, root.height)
 		    padding_x: dp(5)
 		    theme_text_color: root.theme_text_color
@@ -107,7 +106,6 @@
 		    text: root.text if root.button_label else ''
 		    font_size: sp(root.font_size)
 		    font_name: root.font_name if root.font_name is not None else self.font_name
-		    can_capitalize: root.can_capitalize
 		    text_size: (None, root.height)
 		    theme_text_color: root.theme_text_color
 		    text_color: root.text_color

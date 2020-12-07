@@ -25,6 +25,7 @@
 <BasicTextInput>:
 	text_padding_x: app.text_input_padding_x_absolute
 	text_padding_y: app.text_input_padding_y_absolute
+	# color_mode: ''
     # cursor_color: app.color_black
     # cursor_width: '2sp'
     # border: (1,1,1,1)
@@ -38,8 +39,9 @@
 
 <SingleLineTextInput>:
 	multiline: False
-	size_hint_y: None
-	height: self.line_height + self.text_padding_y * 2
+	# size_hint_y: None
+	# foreground_color:
+	# height: self.line_height + self.text_padding_y * 2
 
 
 <MultiLineTextInput>:
@@ -47,3 +49,6 @@
 	multiline: True
 	size_hint_y: None
 	height: self.line_height * self.num_lines + self.text_padding_y * 2
+
+
+<RoundedTextInput>:
