@@ -36,8 +36,8 @@ version.filename = %(source.dir)s/version.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy,
-requirements = kivy,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,twisted==20.3.0,python3
-# requirements = incremental,kivy
+requirements = kivy==1.11.1,kivymd,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,twisted==20.3.0,python3
+# requirements = incremental,kivy==1.11.1
 # there is an issue with incremental/twisted build... first you need to build only incremental and then twisted in second run
 
 
