@@ -34,6 +34,10 @@ class SearchPeopleScreen(AppScreen):
 
     search_started = False
 
+    def init_kwargs(self, **kw):
+        self.return_screen_id = kw.pop('return_screen_id', 'friends_screen')
+        return kw
+
     def get_title(self):
         return "search people"
 

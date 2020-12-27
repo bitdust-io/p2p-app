@@ -3,6 +3,8 @@ from kivy.uix.label import Label
 from kivymd.uix.label import MDLabel
 from kivymd.theming import ThemableBehavior
 
+from lib import websock
+
 #------------------------------------------------------------------------------
 
 class CustomIcon(MDLabel):
@@ -27,6 +29,23 @@ class HFlexMarkupLabel(ThemableBehavior, Label):
 
 class VFlexMarkupLabel(ThemableBehavior, Label):
     label_width = NumericProperty('100dp')
+
+
+class ChatMessageLabel(NormalLabel):
+    pass
+
+
+class StatusLabel(NormalLabel):
+
+    def from_api_response(self, response):
+        if websock.is_ok(response):
+            self.text = ''
+            return
+        errors = websock.response_errors(response)
+        if not isinstance(errors, list):
+            errors = [errors, ]
+        txt = ', '.join(errors)
+        self.text = '[color=#f00]%s[/color]' % txt
 
 #------------------------------------------------------------------------------
 

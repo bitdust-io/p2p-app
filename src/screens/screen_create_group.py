@@ -33,7 +33,6 @@ class CreateGroupScreen(AppScreen):
     def on_group_create_result(self, resp):
         if not websock.is_ok(resp):
             self.ids.status_message_label.text = str(websock.response_errors(resp))
-            self.ids.status_message_label.text = ''
             self.ids.create_group_button.disabled = False
             self.ids.group_label_input.disabled = False
             return

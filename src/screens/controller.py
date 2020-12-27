@@ -22,9 +22,11 @@ def all_screens():
     from screens import screen_my_id
     from screens import screen_search_people
     from screens import screen_friends
+    from screens import screen_select_friend
     from screens import screen_conversations
     from screens import screen_create_group
     from screens import screen_private_chat
+    from screens import screen_group_chat
     return {
         'main_menu_screen': screen_main_menu.MainMenuScreen,
         'process_dead_screen': screen_process_dead.ProcessDeadScreen,
@@ -36,9 +38,11 @@ def all_screens():
         'my_id_screen': screen_my_id.MyIDScreen,
         'search_people_screen': screen_search_people.SearchPeopleScreen,
         'friends_screen': screen_friends.FriendsScreen,
+        'select_friend_screen': screen_select_friend.SelectFriendScreen,
         'conversations_screen': screen_conversations.ConversationsScreen,
         'create_group_screen': screen_create_group.CreateGroupScreen,
         'private_chat_screen': screen_private_chat.PrivateChatScreen,
+        'group_chat_screen': screen_group_chat.GroupChatScreen,
     }
 
 #------------------------------------------------------------------------------
@@ -203,14 +207,22 @@ class Controller(object):
     def on_websocket_stream_message(self, json_data):
         if _Debug:
             print('on_websocket_stream_message', json_data)
-        msg_type = json_data.get('payload', {}).get('payload', {}).get('data', {}).get('msg_type', '')
+        msg_type = json_data.get('payload', {}).get('payload', {}).get('msg_type', '')
         if msg_type == 'private_message':
             self.on_private_message_received(json_data)
+            return
+        if msg_type == 'group_message':
+            self.on_group_message_received(json_data)
             return
 
     def on_private_message_received(self, json_data):
         cb_list = self.callbacks.get('on_private_message_received', [])
-        for cb, cb_id in cb_list:
+        for cb, _ in cb_list:
+            cb(json_data)
+
+    def on_group_message_received(self, json_data):
+        cb_list = self.callbacks.get('on_group_message_received', [])
+        for cb, _ in cb_list:
             cb(json_data)
 
     def on_state_process_health(self, instance, value):

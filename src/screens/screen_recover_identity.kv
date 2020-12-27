@@ -15,7 +15,7 @@
             Widget:
                 size_hint: 1, 0.01
 
-            Label:
+            MarkupLabel:
                 valign: 'bottom'
                 halign: 'right'
                 text: "private key:"
@@ -43,7 +43,7 @@
                 pos_hint: {'center_x': .5}
                 on_release: root.on_start_recover_identity_button_clicked()
 
-            Label:
+            StatusLabel:
             	id: recover_identity_result_message
                 valign: 'bottom'
                 halign: 'right'

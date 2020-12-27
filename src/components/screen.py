@@ -12,9 +12,13 @@ _Debug = True
 class AppScreen(ThemableBehavior, Screen):
 
     def __init__(self, **kw):
+        kw = self.init_kwargs(**kw)
         super(AppScreen, self).__init__(**kw)
         if _Debug:
             print('screen %r created' % self.name)
+
+    def init_kwargs(self, **kw):
+        return kw
 
     def get_icon(self):
         return ''

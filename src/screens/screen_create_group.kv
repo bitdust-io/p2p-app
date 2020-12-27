@@ -21,12 +21,16 @@
                 id: group_label_input
                 size_hint_x: None
                 width: dp(250)
-                hint_text: 'Enter a group name'
+                hint_text: 'Enter a group chat name'
                 text: ''
 
-            CustomRaisedIconButton:
-                id: create_group_button
-                width: root.ids.group_label_input.height
-                height: root.ids.group_label_input.height
-                icon: 'plus'
-                on_release: root.on_create_group_button_clicked()
+            HorizontalLayout:
+                size_hint: 1, None
+                height: self.minimum_height
+                padding: 0, 0, 0, dp(16)
+
+                CustomRaisedIconButton:
+                    id: create_group_button
+                    _radius: dp(2)
+                    icon: 'plus'
+                    on_release: root.on_create_group_button_clicked()
