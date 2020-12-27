@@ -1,3 +1,5 @@
+from kivy.properties import StringProperty  # @UnresolvedImport
+
 from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
 
@@ -21,12 +23,15 @@ class SelectFriendListView(SelectableRecycleView):
 
 class SelectFriendScreen(AppScreen):
 
+    screen_header = StringProperty('Select user')
+
     def init_kwargs(self, **kw):
         self.return_screen_id = kw.pop('return_screen_id', '')
+        self.screen_header = kw.pop('screen_header', 'Select user')
         return kw
 
     def get_title(self):
-        return 'contacts'
+        return 'select user'
 
     def get_icon(self):
         return 'target-account'

@@ -122,6 +122,7 @@ class GroupChatScreen(AppScreen):
         self.main_win().select_screen(
             screen_id='select_friend_screen',
             return_screen_id='group_chat_screen',
+            screen_header='Invite user to the group'
         )
 
 #------------------------------------------------------------------------------

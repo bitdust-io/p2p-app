@@ -60,6 +60,9 @@
             pos_hint: {'bottom': 1}
             padding: dp(5)
 
+            NormalLabel:
+                text: root.screen_header
+
             Widget:
                 size_hint: 1, None
                 height: 1
@@ -82,6 +85,6 @@
     			padding: dp(5)
     			spacing: dp(5)
 
-    			FriendsListView:
+    			SelectFriendListView:
     	            id: friends_list_view
     	            size_hint: 1, 1

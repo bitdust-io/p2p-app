@@ -111,7 +111,7 @@ class MainWindow(FloatLayout, ThemableBehavior):
         if screen_id not in self.active_screens:
             self.open_screen(screen_id, screen_type, **kwargs)
         else:
-            self.active_screens[screen_id].init_kwargs(**kwargs)
+            self.active_screens[screen_id][0].init_kwargs(**kwargs)
         self.ids.main_nav_button.disabled = bool(screen_id in ['process_dead_screen', 'connecting_screen', ])
         if self.selected_screen:
             if self.selected_screen == screen_id:

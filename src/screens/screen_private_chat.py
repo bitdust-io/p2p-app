@@ -44,7 +44,6 @@ class PrivateChatScreen(AppScreen):
     def on_message_history_result(self, resp):
         self.ids.chat_status_label.from_api_response(resp)
         if not websock.is_ok(resp):
-            # self.ids.chat_status_label.text = '[color=#f00]%s[/color]' % (', '.join(websock.response_errors(resp)))
             return
         self.ids.chat_status_label.text = ''
         self.ids.chat_messages.clear_widgets()

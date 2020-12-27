@@ -8,7 +8,6 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-
 class AppScreen(ThemableBehavior, Screen):
 
     def __init__(self, **kw):
