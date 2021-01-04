@@ -40,10 +40,9 @@ class NewIdentityScreen(AppScreen):
             print('on_identity_create_result', resp)
         self.ids.create_identity_button.disabled = False
         self.ids.recover_identity_button.disabled = False
+        self.ids.create_identity_result_message.from_api_response(resp)
         if not websock.is_ok(resp):
-            self.ids.create_identity_result_message.text = '[color=#ff0000]{}[/color]'.format('\n'.join(websock.response_errors(resp)))
             return
-        self.ids.create_identity_result_message.text = ''
         self.main_win().select_screen('welcome_screen')
         self.main_win().close_screen('new_identity_screen')
         self.main_win().close_screen('recover_identity_screen')

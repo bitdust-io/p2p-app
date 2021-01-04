@@ -15,7 +15,7 @@
             Widget:
                 size_hint: 1, 0.3
 
-            Label:
+            MarkupLabel:
                 text_size: self.size
                 valign: "bottom"
                 halign: "center"
@@ -39,10 +39,14 @@
                 pos_hint: {'center_x': .5}
                 on_release: root.on_create_identity_button_clicked()
 
-            HFlexMarkupLabel:
+            StatusLabel:
                 id: create_identity_result_message
-                label_height: dp(20)
-                text: ''
+                valign: 'bottom'
+                halign: 'right'
+                height: dp(20)
+                size_hint: None, None
+                pos_hint: {'center_x': .5}
+                text: ""
 
             Widget:
                 size_hint: 1, 0.3

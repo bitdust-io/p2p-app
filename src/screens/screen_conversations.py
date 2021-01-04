@@ -3,6 +3,7 @@ from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
 
 from lib import api_client
+from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -28,6 +29,20 @@ class ConversationRecord(SelectableHorizontalRecord):
             )
             self.visible_buttons.append(chat_button)
             self.add_widget(chat_button)
+            if self.key_id.startswith('group_'):
+                join_button = ConversationActionButton(
+                    icon='lan-connect',
+                    on_release=self.on_join_button_clicked,
+                )
+                self.visible_buttons.append(join_button)
+                self.add_widget(join_button)
+                leave_button = ConversationActionButton(
+                    icon='account-tie-voice-off-outline',
+                    on_release=self.on_leave_button_clicked,
+                )
+                self.visible_buttons.append(leave_button)
+                self.add_widget(leave_button)
+
 
     def hide_buttons(self):
         if self.visible_buttons:
@@ -45,6 +60,31 @@ class ConversationRecord(SelectableHorizontalRecord):
                 global_id=self.key_id,
                 username=self.label,
             )
+        elif self.key_id.startswith('group_'):
+            self.parent.parent.parent.parent.parent.parent.main_win().select_screen(
+                screen_id=self.key_id,
+                screen_type='group_chat_screen',
+                global_id=self.key_id,
+                label=self.label,
+            )
+
+    def on_join_button_clicked(self, *args):
+        if _Debug:
+            print('on_join_button_clicked', self.key_id)
+        api_client.group_join(group_key_id=self.key_id, cb=self.on_group_join_result)
+
+    def on_group_join_result(self, resp):
+        self.parent.parent.parent.parent.parent.parent.ids.chat_status_label.from_api_response(resp)
+        self.parent.parent.parent.parent.parent.parent.populate()
+
+    def on_leave_button_clicked(self, *args):
+        if _Debug:
+            print('on_leave_button_clicked', self.key_id)
+        api_client.group_leave(group_key_id=self.key_id, erase_key=False, cb=self.on_group_leave_result)
+
+    def on_group_leave_result(self, resp):
+        self.parent.parent.parent.parent.parent.parent.ids.chat_status_label.from_api_response(resp)
+        self.parent.parent.parent.parent.parent.parent.populate()
 
 
 class ConversationsListView(SelectableRecycleView):
@@ -72,15 +112,12 @@ class ConversationsScreen(AppScreen):
         self.populate()
 
     def on_message_conversations_list_result(self, resp):
-        if not isinstance(resp, dict):
-            self.ids.conversations_list_view.data = []
-            return
-        result = resp.get('payload', {}).get('response' , {}).get('result', {})
-        if not result:
+        self.ids.chat_status_label.from_api_response(resp)
+        if not websock.is_ok(resp):
             self.ids.conversations_list_view.data = []
             return
         self.ids.conversations_list_view.data = []
-        for one_conversation in result:
+        for one_conversation in websock.response_result(resp):
             self.ids.conversations_list_view.data.append(one_conversation)
 
     def on_create_new_group_button_clicked(self, *args):

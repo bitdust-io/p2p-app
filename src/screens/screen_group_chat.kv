@@ -1,8 +1,27 @@
-<PrivateChatScreen>:
+<GroupChatScreen>:
 
     VerticalLayout:
         size_hint: 1, 1
         pos_hint: {'top': 1}
+
+        HorizontalLayout:
+            size_hint: 1, None
+            height: self.minimum_height
+            pos_hint: {'bottom': 1}
+            padding: dp(5)
+
+            Widget:
+                size_hint: 1, None
+                height: 1
+
+            CustomFloatingActionButton:
+                id: invite_user_button
+                icon: 'chat-plus'
+                size_hint: None, None
+                padding: dp(0)
+                text_color: app.color_white
+                user_font_size: '14sp'
+                on_release: root.on_invite_user_button_clicked()
 
         StatusLabel:
             id: chat_status_label

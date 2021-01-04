@@ -56,12 +56,6 @@
         size_hint: 1, 1
         pos_hint: {'top': 1}
 
-        Label:
-            id: chat_status_label
-            size_hint: 1, None
-            height: self.texture_size[1]
-            text: ''
-
         HorizontalLayout:
             size_hint: 1, None
             height: self.minimum_height
@@ -80,6 +74,12 @@
                 text_color: app.color_white
                 user_font_size: '14sp'
                 on_release: root.on_create_new_group_button_clicked()
+
+        StatusLabel:
+            id: chat_status_label
+            size_hint: 1, None
+            height: self.texture_size[1]
+            text: ''
 
         VerticalScrollView:
 

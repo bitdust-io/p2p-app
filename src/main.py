@@ -11,9 +11,10 @@ import sys
 import locale
 locale.setlocale(locale.LC_CTYPE, 'en_US.UTF-8')
 
-import codecs
-sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
-sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())
+if 'ANDROID_ARGUMENT' not in os.environ:
+    import codecs
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())
 
 #------------------------------------------------------------------------------ 
 

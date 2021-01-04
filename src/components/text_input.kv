@@ -1,45 +1,10 @@
-<-TextInput>:
-    canvas.before:
-        Color:
-            rgba: app.color_text_input_border
-        Rectangle:
-            size: self.size
-            pos: self.pos
-        Color:
-            rgba: app.color_text_input_background_active if self.focus else (app.color_text_input_background_disabled if self.disabled else app.color_text_input_background)
-        Rectangle:
-            size: (self.width - self.border[1] - self.border[3], self.height - self.border[0] - self.border[2])
-            pos: (self.x + self.border[3], self.y + self.border[0])
-        Color:
-            rgba:
-                (self.cursor_color
-                if self.focus and not self._cursor_blink
-                else (0, 0, 0, 0))
-        Rectangle:
-            pos: self._cursor_visual_pos
-            size: root.cursor_width, -self._cursor_visual_height
-        Color:
-            rgba: app.color_text_input_foreground_disabled if self.disabled else ( app.color_text_input_foreground if self.text else app.color_text_input_foreground_empty )
-
-
 <BasicTextInput>:
 	text_padding_x: app.text_input_padding_x_absolute
 	text_padding_y: app.text_input_padding_y_absolute
-    cursor_color: app.color_black
-    cursor_width: '2sp'
-    border: (1,1,1,1)
-    padding: (app.text_input_padding_x_absolute, app.text_input_padding_y_absolute)
-    background_normal: ''
-    background_active: ''
-    foreground_color: app.color_text_input_foreground
-    background_color: app.color_text_input_background
-	font_size: app.font_size_normal
 
 
 <SingleLineTextInput>:
 	multiline: False
-	size_hint_y: None
-	height: self.line_height + self.text_padding_y * 2
 
 
 <MultiLineTextInput>:
@@ -47,3 +12,13 @@
 	multiline: True
 	size_hint_y: None
 	height: self.line_height * self.num_lines + self.text_padding_y * 2
+
+
+<RoundedTextInput>:
+
+
+<DynamicHeightTextInput>:
+    max_lines: 7
+    size_hint_y: None
+    font_size: app.chat_input_font_size
+    height: self.line_height * 1 + self.padding[1] + self.padding[3]

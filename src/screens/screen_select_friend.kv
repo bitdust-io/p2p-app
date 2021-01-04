@@ -1,7 +1,4 @@
-<FriendActionButton>:
-
-
-<FriendRecord>:
+<SelectFriendRecord>:
 
     canvas.before:
         Color:
@@ -38,7 +35,7 @@
 		width: dp(5)
 
 
-<FriendsListView>:
+<SelectFriendListView>:
     viewclass: 'FriendRecord'
 
     SelectableRecycleBoxLayout:
@@ -51,7 +48,7 @@
         touch_multiselect: False
 
 
-<FriendsScreen>:
+<SelectFriendScreen>:
 
     VerticalLayout:
         size_hint: 1, 1
@@ -62,6 +59,9 @@
             height: self.minimum_height
             pos_hint: {'bottom': 1}
             padding: dp(5)
+
+            NormalLabel:
+                text: root.screen_header
 
             Widget:
                 size_hint: 1, None
@@ -85,6 +85,6 @@
     			padding: dp(5)
     			spacing: dp(5)
 
-    			FriendsListView:
+    			SelectFriendListView:
     	            id: friends_list_view
     	            size_hint: 1, 1

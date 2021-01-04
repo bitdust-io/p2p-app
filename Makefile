@@ -58,7 +58,7 @@ update_p4a:
 	@cd ./python-for-android; git fetch --all; git reset --hard origin/master; cd ..;
 
 make_link_engine_repo:
-	@rm -rf ./src/bitdust; ln -s ../../bitdust ./src/bitdust;
+	@rm -rf ./src/bitdust; ln -v -s ../../bitdust ./src/bitdust;
 
 update_engine_repo:
 	@cd ./src/bitdust; git fetch origin -v; git reset --hard origin/master; cd ../..;
