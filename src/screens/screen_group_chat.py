@@ -13,15 +13,25 @@ _Debug = True
 class GroupChatScreen(AppScreen):
 
     def __init__(self, **kwargs):
-        self.global_id = kwargs.pop('global_id', '')
-        self.label = kwargs.pop('label', '')
+        self.global_id = ''
+        self.label = ''
         super(GroupChatScreen, self).__init__(**kwargs)
+
+    def init_kwargs(self, **kw):
+        if not self.global_id and kw.get('global_id'):
+            self.global_id = kw.pop('global_id', '')
+        if not self.label and kw.get('label'):
+            self.label = kw.pop('label', '')
+        return kw
 
     def get_icon(self):
         return 'comment'
 
     def get_title(self):
-        return f"{self.label}"
+        l = self.label
+        if len(l) > 10:
+            l = l[:10] + '...'
+        return l
 
     def on_enter(self, *args):
         self.ids.chat_status_label.text = ''
@@ -121,9 +131,29 @@ class GroupChatScreen(AppScreen):
             print('on_invite_user_button_clicked')
         self.main_win().select_screen(
             screen_id='select_friend_screen',
-            return_screen_id='group_chat_screen',
+            result_callback=self.on_user_selected,
             screen_header='Invite user to the group'
         )
+
+    def on_user_selected(self, user_global_id):
+        if _Debug:
+            print('on_user_selected', user_global_id)
+        self.main_win().select_screen(
+            screen_id=self.global_id,
+            screen_type='group_chat_screen',
+            global_id=self.global_id,
+            label=self.label,
+        )
+        self.main_win().close_screen('select_friend_screen')
+        api_client.group_share(
+            group_key_id=self.global_id,
+            trusted_user_id=user_global_id,
+            cb=self.on_group_share_result,
+        )
+
+    def on_group_share_result(self, resp):
+        if _Debug:
+            print('on_group_share_result', resp)
 
 #------------------------------------------------------------------------------
 
