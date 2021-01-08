@@ -24,7 +24,7 @@ class PrivateChatScreen(AppScreen):
         return 'comment'
 
     def get_title(self):
-        return f"{self.username}"
+        return self.username
 
     def on_enter(self, *args):
         self.ids.chat_status_label.text = ''

@@ -8,6 +8,10 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
+_Debug = True
+
+#------------------------------------------------------------------------------
+
 class SelectFriendRecord(SelectableHorizontalRecord):
 
     def __init__(self, **kwargs):
@@ -18,7 +22,11 @@ class SelectFriendRecord(SelectableHorizontalRecord):
 class SelectFriendListView(SelectableRecycleView):
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
-        print('on_selection_applied', item.global_id)
+        if _Debug:
+            print('on_selection_applied', item.global_id, self.selected_item, self.parent.parent.parent.parent)
+        if self.selected_item:
+            if self.parent.parent.parent.parent.result_callback:
+                self.parent.parent.parent.parent.result_callback(item.global_id)
 
 
 class SelectFriendScreen(AppScreen):
@@ -26,7 +34,7 @@ class SelectFriendScreen(AppScreen):
     screen_header = StringProperty('Select user')
 
     def init_kwargs(self, **kw):
-        self.return_screen_id = kw.pop('return_screen_id', '')
+        self.result_callback = kw.pop('result_callback', None)
         self.screen_header = kw.pop('screen_header', 'Select user')
         return kw
 

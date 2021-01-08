@@ -42,6 +42,12 @@ class ConversationRecord(SelectableHorizontalRecord):
                 )
                 self.visible_buttons.append(leave_button)
                 self.add_widget(leave_button)
+                delete_button = ConversationActionButton(
+                    icon='trash-can',
+                    on_release=self.on_group_delete_button_clicked,
+                )
+                self.visible_buttons.append(delete_button)
+                self.add_widget(delete_button)
 
 
     def hide_buttons(self):
@@ -85,6 +91,11 @@ class ConversationRecord(SelectableHorizontalRecord):
     def on_group_leave_result(self, resp):
         self.parent.parent.parent.parent.parent.parent.ids.chat_status_label.from_api_response(resp)
         self.parent.parent.parent.parent.parent.parent.populate()
+
+    def on_group_delete_button_clicked(self, *args):
+        if _Debug:
+            print('on_group_delete_button_clicked', self.key_id)
+        api_client.group_leave(group_key_id=self.key_id, erase_key=True, cb=self.on_group_leave_result)
 
 
 class ConversationsListView(SelectableRecycleView):
