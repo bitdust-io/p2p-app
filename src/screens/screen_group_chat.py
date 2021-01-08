@@ -53,7 +53,6 @@ class GroupChatScreen(AppScreen):
         if not websock.is_ok(resp):
             return
         self.ids.chat_messages.clear_widgets()
-        current_direction = None
         current_sender = None
         current_messages = []
         msg_list = list(websock.response_result(resp))
@@ -62,42 +61,26 @@ class GroupChatScreen(AppScreen):
         for item in msg_list:
             msg_id = item['doc']['payload']['message_id']
             msg = item['doc']['payload']['data']['message']
-            sender = item['doc']['sender']['glob_id'].replace('master$', '')
-            direction = item['doc']['direction']
-            if current_direction is None:
-                current_direction = direction
+            sender = item['doc']['sender']['glob_id']
             if current_sender is None:
                 current_sender = sender
             sender_name, sender_host = current_sender.split('@')
-            if current_direction == direction:
+            if current_sender == sender:
                 current_messages.append(msg)
             else:
-                if current_direction == 'in':
-                    self.ids.chat_messages.add_widget(ChatMessageLabel(
-                        id=msg_id,
-                        text='[color=#3f4eda]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
-                    ))
-                else:
-                    self.ids.chat_messages.add_widget(ChatMessageLabel(
-                        id=msg_id,
-                        text='[color=#00b11c]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
-                    ))
-                current_direction = direction
+                self.ids.chat_messages.add_widget(ChatMessageLabel(
+                    id=msg_id,
+                    text='[color=#3f4eda]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                ))
                 current_sender = sender
                 sender_name, sender_host = current_sender.split('@')
                 current_messages = []
                 current_messages.append(msg)
         if current_messages:
-            if current_direction == 'in':
-                self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    id=msg_id,
-                    text='[color=#3f4eda]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
-                ))
-            else:
-                self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    id=msg_id,
-                    text='[color=#00b11c]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
-                ))
+            self.ids.chat_messages.add_widget(ChatMessageLabel(
+                id=msg_id,
+                text='[color=#3f4eda]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+            ))
         self.ids.chat_messages_view.scroll_y = 0
 
     def on_chat_send_button_clicked(self, *args):
