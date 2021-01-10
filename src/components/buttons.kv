@@ -1,9 +1,8 @@
-
 <CustomRectangularButton>:
     canvas:
         Clear
         Color:
-            rgba: self._current_button_color
+            rgba: self.md_bg_color
         RoundedRectangle:
             size: self.size
             pos: self.pos
@@ -20,7 +19,6 @@
         id: lbl_txt
         text: root.text if root.button_label else ''
         font_size: root.font_size
-        font_name: root.font_name if root.font_name is not None else self.font_name
         can_capitalize: root.can_capitalize
         size_hint_x: None
         text_size: (None, root.height)
@@ -38,7 +36,7 @@
     canvas:
         Clear
         Color:
-            rgba: self._current_button_color if md_icon(root.icon) else (0, 0, 0, 0)
+            rgba: self.md_bg_color if md_icon(root.icon) else (0, 0, 0, 0)
         Ellipse:
             size: self.size
             pos: self.pos
@@ -48,8 +46,8 @@
         (dp(48), dp(48)) \
         if not root.user_font_size \
         else (dp(root.user_font_size + root.increment_diameter), dp(root.user_font_size + root.increment_diameter))
-    lbl_txt: lbl_txt
     padding: dp(12) if md_icon(root.icon) else 0
+    lbl_txt: lbl_txt
     theme_text_color: 'Primary'
 
     CustomIcon:
@@ -59,7 +57,7 @@
             root.user_font_size \
             if root.user_font_size \
             else self.font_size
-        font_name: root.font_name if root.font_name is not None else self.font_name
+        font_name: root.font_name if root.font_name else self.font_name
         theme_text_color: root.theme_text_color
         text_color: root.text_color
         disabled: root.disabled
@@ -72,16 +70,15 @@
     canvas:
         Clear
         Color:
-            rgba: self._current_button_color
+            rgba: self.md_bg_color
         RoundedRectangle:
             size: self.size
             pos: self.pos
             radius: (root._radius, )
 
     lbl_txt: lbl_txt
-    height: dp(36)
-    width: dp(36)
-    padding: (0, 0)
+    size: dp(36), dp(36)
+    padding: dp(0)
     theme_text_color: 'Primary'
     markup: False
 
@@ -89,7 +86,10 @@
         id: lbl_txt
         icon: root.icon
         font_size: root.font_size
-        font_name: root.font_name if root.font_name is not None else self.font_name
+        font_name: root.font_name if root.font_name else self.font_name
+        padding: (dp(0), dp(0))
+        size_hint_x: None
+        text_size: (None, root.height)
         theme_text_color: root.theme_text_color
         text_color: root.text_color
         disabled: root.disabled
@@ -112,10 +112,42 @@
 
 
 <CustomFloatingActionButton>:
-    size: (dp(56), dp(56))
     md_bg_color: app.theme_cls.accent_color
     theme_text_color: 'Custom'
     text_color: root.specific_text_color
+    button_size: '32dp'
+    user_font_size: '20sp'
+
+    canvas:
+        Clear
+        Color:
+            rgba:
+                (self.md_bg_color if root.icon in md_icons else (0, 0, 0, 0)) \
+                if not root.disabled else \
+                (root.md_bg_color_disabled if root.md_bg_color_disabled \
+                else root.theme_cls.disabled_hint_text_color)
+        Ellipse:
+            size: self.size
+            pos: self.pos
+            source: self.source if hasattr(self, "source") else ""
+
+    lbl_txt: lbl_txt
+    padding: "0dp" if root.icon in md_icons else (0, 0, 0, 0)
+
+    MDIcon:
+        id: lbl_txt
+        icon: root.icon
+        font_size: root.user_font_size if root.user_font_size else self.font_size
+        font_name: root.font_name if root.font_name else self.font_name
+        theme_text_color: root.theme_text_color
+        text_color:
+            root.text_color if not root.disabled else \
+            (root.md_bg_color_disabled if root.md_bg_color_disabled \
+            else root.theme_cls.disabled_hint_text_color)
+        disabled: root.disabled
+        valign: "middle"
+        halign: "center"
+        opposite_colors: root.opposite_colors
 
 
 <RoundedButton>:
@@ -134,6 +166,44 @@
 
 
 <IconButton>:
+    md_bg_color: app.color_transparent
+    theme_text_color: 'Custom'
+    text_color: app.color_black
+    button_size: '28dp'
+    user_font_size: '14sp'
+    always_release: True
+
+    canvas:
+        Clear
+        Color:
+            rgba:
+                (self.md_bg_color if root.icon in md_icons else (0, 0, 0, 0)) \
+                if not root.disabled else \
+                (root.md_bg_color_disabled if root.md_bg_color_disabled \
+                else root.theme_cls.disabled_hint_text_color)
+        Ellipse:
+            size: self.size
+            pos: self.pos
+            source: self.source if hasattr(self, "source") else ""
+
+    size: "28dp", "28dp"
+    lbl_txt: lbl_txt
+    padding: "0dp" if root.icon in md_icons else (0, 0, 0, 0)
+
+    MDIcon:
+        id: lbl_txt
+        icon: root.icon
+        font_size: root.user_font_size if root.user_font_size else self.font_size
+        font_name: root.font_name if root.font_name else self.font_name
+        theme_text_color: root.theme_text_color
+        text_color:
+            root.text_color if not root.disabled else \
+            (root.md_bg_color_disabled if root.md_bg_color_disabled \
+            else root.theme_cls.disabled_hint_text_color)
+        disabled: root.disabled
+        valign: "middle"
+        halign: "center"
+        opposite_colors: root.opposite_colors
 
 
 <RaisedIconButton>:
@@ -146,22 +216,10 @@
 
 <CustomIconButton>:
     icon: 'circle'
-    theme_text_color: 'Custom'
-    padding: (0, 0)
-    pos_hint: {"center_x": .5, "center_y": .5}
-    size_hint: None, None
-    size: (dp(26), dp(26))
-    font_size: sp(22)
 
 
 <CloseIconButton>:
     icon: 'close'
-    theme_text_color: 'Custom'
-    padding: (0, 0)
-    pos_hint: {"center_x": .5, "center_y": .5}
-    size_hint: None, None
-    size: (dp(26), dp(26))
-    font_size: sp(22)
 
 
 <CustomRaisedIconButton>:

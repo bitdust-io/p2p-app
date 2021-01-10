@@ -291,7 +291,7 @@ class SettingsScreen(AppScreen):
                 if abs_path.startswith('services/') and abs_path.count('/') == 1:
                     svc_name = 'service_'+sub_path.replace('-', '_')
                     sub_element = ServiceElement(
-                        id=svc_name,
+                        # name=svc_name,
                         item_key=abs_path,
                         item_data=cur_item_data,
                         is_open=False,
@@ -478,7 +478,7 @@ class SettingsScreen(AppScreen):
         if active_node:
             if _Debug:
                 print('active node:', active_node.item_key, active_node)
-            Clock.schedule_once(lambda *dt: self.ids.scroll_view.scroll_to(active_node, padding=dp(5), animate=False), -1)
+            # Clock.schedule_once(lambda *dt: self.ids.scroll_view.scroll_to(active_node, padding=dp(5), animate=False), -1)
         self.recent_tree_index.clear()
         for node in list(tv.iterate_all_nodes()):
             node_item_key = getattr(node, 'item_key', None)

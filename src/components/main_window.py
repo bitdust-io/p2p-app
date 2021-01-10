@@ -52,7 +52,7 @@ class MainWindow(FloatLayout, ThemableBehavior):
                 print('screen %r already opened' % screen_id)
             return
         screen_class = self.screens_map[screen_type]
-        screen = screen_class(name=screen_id, id=screen_id, **kwargs)
+        screen = screen_class(name=screen_id, **kwargs)
         screen.on_opened()
         self.ids.screen_manager.add_widget(screen)
         title = screen.get_title()

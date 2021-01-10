@@ -37,7 +37,8 @@ class VFixedEmptySpace(Widget):
 
 
 class VerticalScrollView(ScrollView):
-    pass
+    scroll_type = ['content', 'bars']
+    effect_cls = None
 
 #------------------------------------------------------------------------------
 

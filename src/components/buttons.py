@@ -6,12 +6,15 @@ from kivy.properties import (
 )
 from kivymd.uix.button import (
     BaseButton,
-    BaseFlatButton,
-    BaseRaisedButton,
+    BaseElevationButton,
     BasePressedButton,
+    MDFloatingActionButton,
+    MDIconButton,
+    MDFlatButton,
 )
 from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
-from kivymd.uix.behaviors.elevation import CircularElevationBehavior, RectangularElevationBehavior
+from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
+from kivymd.uix.behaviors.backgroundcolor_behavior import SpecificBackgroundColorBehavior
 
 #------------------------------------------------------------------------------
 
@@ -31,6 +34,7 @@ class CustomRectangularButton(RectangularRippleBehavior, BaseButton):
 class CustomRoundButton(CircularRippleBehavior, BaseButton):
     increment_diameter = NumericProperty(12)
     ripple_scale = 10
+    _radius = 0
 
 
 class CustomRectangularIconButton(RectangularRippleBehavior, BaseButton):
@@ -38,19 +42,26 @@ class CustomRectangularIconButton(RectangularRippleBehavior, BaseButton):
     _radius = NumericProperty("2dp")
 
 
-class CustomFlatButton(CustomRectangularButton, BaseFlatButton, BasePressedButton):
-    width = BoundedNumericProperty(
-        10, min=10, max=None, errorhandler=lambda x: 10
-    )
-    increment_width = 0
+# class CustomFlatButton(CustomRectangularButton, BaseFlatButton, BasePressedButton):
+#     width = BoundedNumericProperty(
+#         10, min=10, max=None, errorhandler=lambda x: 10
+#     )
+#     increment_width = 0
 
-class CustomRaisedButton(CustomRectangularButton, RectangularElevationBehavior, BaseRaisedButton, BasePressedButton):
+class CustomFlatButton(MDFlatButton):
     pass
 
 
-class CustomFloatingActionButton(CustomRoundButton, CircularElevationBehavior, BaseRaisedButton):
-    icon = StringProperty("circle")
-    background_palette = StringProperty("Accent")
+class CustomRaisedButton(CustomRectangularButton, RectangularElevationBehavior, SpecificBackgroundColorBehavior, BaseElevationButton, BasePressedButton):
+    pass
+
+
+class CustomFloatingActionButton(SpecificBackgroundColorBehavior, MDFloatingActionButton):
+    button_size = NumericProperty('32dp')
+
+    def set_size(self, interval):
+        self.width = self.button_size
+        self.height = self.button_size
 
 
 class RoundedButton(CustomRaisedButton):
@@ -69,11 +80,15 @@ class RoundedFlexButton(RoundedButton):
     pass
 
 
-class IconButton(CustomRoundButton, BaseFlatButton, BasePressedButton):
-    icon = StringProperty("circle")
+class IconButton(SpecificBackgroundColorBehavior, MDIconButton):
+    button_size = NumericProperty('32dp')
+
+    def set_size(self, interval):
+        self.width = self.button_size
+        self.height = self.button_size
 
 
-class RaisedIconButton(CustomRectangularIconButton, RectangularElevationBehavior, BaseRaisedButton, BasePressedButton):
+class RaisedIconButton(CustomRectangularIconButton, RectangularElevationBehavior, SpecificBackgroundColorBehavior, BaseElevationButton, BasePressedButton):
     icon = StringProperty("circle")
 
 

@@ -23,14 +23,18 @@
             size_hint: 1, None
             height: self.minimum_height
 
-	        MDIconButton:
+	        IconButton:
 	            id: main_nav_button
 	            disabled: True
-	            icon: 'src/images/logo-color-28x28.png'
-	            padding: (0, 0)
+	            icon: 'menu'
+	            padding: dp(0)
+	            font_size: sp(20)
 	            pos_hint: {"center_x": .5, "center_y": .5}
 	            size_hint: None, None
 	            size: (app.nav_height, app.nav_height)
+	            md_bg_color: app.color_white
+                theme_text_color: 'Custom'
+                text_color: app.color_gray
 	        	on_press: root.select_screen('main_menu_screen', verify_state=True)
 
         ScreenManagement:

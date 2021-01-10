@@ -4,13 +4,14 @@
 
 <NavLabel>:
     padding_x: dp(1)
-    size_hint_x: None
+    size_hint: None, None
     width: self.texture_size[0]
-    height: self.texture_size[1]
+    height: app.nav_height
     markup: True
     disabled: False
     valign: 'middle'
     halign: 'left'
+    font_size: app.font_size_normal
 
 
 <NavCloseIcon>:
@@ -20,15 +21,14 @@
     pos_hint: {"center_x": .5, "center_y": .5}
     size_hint: None, None
     size: (app.nav_height - dp(6), app.nav_height - dp(2))
-    font_size: '22sp'
+    font_size: '20sp'
 
 
 <NavBaseRectangularButton>:
-
     canvas:
         Clear
         Color:
-            rgba: self._current_button_color
+            rgba: self.md_bg_color
         RoundedRectangle:
             size: self.size
             pos: self.pos
@@ -42,15 +42,15 @@
 
 
 <NavButtonActive>:
+    size_hint: None, None
+    size: (lbl_txt.texture_size[0] + lbl_icn_left.texture_size[0] + root.increment_width, app.nav_height)
+    padding: (0, 0)
     lbl_txt: lbl_txt
     lbl_icn_left: lbl_icn_left
-    height: app.nav_height
-    width: lbl_txt.texture_size[0] + lbl_icn_left.texture_size[0] + root.increment_width
-    padding: (0, 0)
     theme_text_color: 'Primary' if not root.text_color else 'Custom'
-    markup: False
+    markup: True
 
-    BoxLayout:
+    HorizontalLayout:
         padding: dp(1)
         spacing: dp(0)
 
@@ -67,10 +67,7 @@
 	    NavLabel:
 	        id: lbl_txt
 		    text: root.text if root.button_label else ''
-		    font_size: sp(root.font_size)
-		    font_name: root.font_name if root.font_name is not None else self.font_name
 		    text_size: (None, root.height)
-		    padding_x: dp(5)
 		    theme_text_color: root.theme_text_color
 		    text_color: root.text_color
 		    opposite_colors: root.opposite_colors
@@ -78,16 +75,16 @@
 
 
 <NavButtonClosable>:
+    size_hint: None, None
+    size: (lbl_txt.texture_size[0] + lbl_icn_left.texture_size[0] + lbl_icn_right.texture_size[0] + root.increment_width, app.nav_height)
+    padding: (0, 0)
     lbl_txt: lbl_txt
     lbl_icn_left: lbl_icn_left
     lbl_icn_right: lbl_icn_right
-    height: app.nav_height
-    width: lbl_txt.texture_size[0] + lbl_icn_left.texture_size[0] + lbl_icn_right.width + root.increment_width
-    padding: (0, 0)
     theme_text_color: 'Primary' if not root.text_color else 'Custom'
-    markup: False
+    markup: True
 
-    BoxLayout:
+    HorizontalLayout:
         padding: dp(1)
         spacing: dp(0)
 
@@ -104,8 +101,6 @@
 	    NavLabel:
 	        id: lbl_txt
 		    text: root.text if root.button_label else ''
-		    font_size: sp(root.font_size)
-		    font_name: root.font_name if root.font_name is not None else self.font_name
 		    text_size: (None, root.height)
 		    theme_text_color: root.theme_text_color
 		    text_color: root.text_color

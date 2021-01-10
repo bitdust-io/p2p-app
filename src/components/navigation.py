@@ -2,11 +2,13 @@ from kivy.properties import BooleanProperty  # @UnresolvedImport
 from kivy.metrics import dp
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.screenmanager import ScreenManager
-from kivymd.uix.button import BaseRectangularButton, BaseRaisedButton, BasePressedButton
+from kivymd.uix.button import BaseRectangularButton, BaseElevationButton, BasePressedButton
 from kivymd.uix.label import MDIcon, MDLabel
 from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
+from kivymd.uix.behaviors.backgroundcolor_behavior import SpecificBackgroundColorBehavior
+from kivymd.uix.behaviors.ripple_behavior import RectangularRippleBehavior
 
-from components.buttons import IconButton
+from components.buttons import IconButton, CloseIconButton
 
 #------------------------------------------------------------------------------
 
@@ -26,18 +28,18 @@ class NavLabel(ButtonBehavior, MDLabel):
     pass
 
 
-class NavCloseIcon(IconButton):
+class NavCloseIcon(ButtonBehavior, MDIcon):
     pass
 
 
-class NavBaseRectangularButton(BaseRectangularButton):
+class NavBaseRectangularButton(RectangularElevationBehavior, SpecificBackgroundColorBehavior, BasePressedButton):
 
     icon_left_size = 17
     increment_width = dp(1)
     _radius = dp(2)
 
 
-class NavButtonBase(NavBaseRectangularButton, RectangularElevationBehavior, BaseRaisedButton, BasePressedButton):
+class NavButtonBase(NavBaseRectangularButton):
 
     selected = BooleanProperty(False)
 
