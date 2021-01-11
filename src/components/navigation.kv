@@ -2,26 +2,37 @@
     transition: NoTransition()
 
 
+<NavIcon>:
+    font_size: sp(17)
+    size_hint: None, None
+    size: (self.texture_size[0], app.nav_height - dp(2))
+    theme_text_color: 'Custom'
+    text_color: app.color_white
+
+
 <NavLabel>:
     padding_x: dp(1)
     size_hint: None, None
-    width: self.texture_size[0]
-    height: app.nav_height
+    size: self.texture_size
+    pos_hint: {"center_y": .5}
     markup: True
     disabled: False
     valign: 'middle'
     halign: 'left'
     font_size: app.font_size_normal
+    theme_text_color: 'Custom'
+    text_color: app.color_white
 
 
 <NavCloseIcon>:
     icon: 'close'
-    theme_text_color: 'Custom'
-    padding: (0, 0)
-    pos_hint: {"center_x": .5, "center_y": .5}
     size_hint: None, None
-    size: (app.nav_height - dp(6), app.nav_height - dp(2))
+    size: (app.nav_height - dp(6), app.nav_height - dp(4))
+    pos_hint: {"center_x": .5, "center_y": .5}
+    padding: (0, 0)
     font_size: '20sp'
+    theme_text_color: 'Custom'
+    text_color: app.theme_cls.primary_light
 
 
 <NavBaseRectangularButton>:
@@ -57,20 +68,15 @@
         NavIcon:
             id: lbl_icn_left
             icon: root.icon
-            theme_text_color: 'Custom'
-            text_color: app.theme_cls.primary_color if not root.text_color else root.text_color
-            size_hint_x: None
-            width: self.texture_size[0]
-            font_size: sp(root.icon_left_size)
             on_press: root.on_action_area_pressed()
 
 	    NavLabel:
 	        id: lbl_txt
 		    text: root.text if root.button_label else ''
 		    text_size: (None, root.height)
-		    theme_text_color: root.theme_text_color
-		    text_color: root.text_color
-		    opposite_colors: root.opposite_colors
+		    # theme_text_color: root.theme_text_color
+		    # text_color: root.text_color
+		    # opposite_colors: root.opposite_colors
             on_press: root.on_action_area_pressed()
 
 
@@ -91,23 +97,18 @@
         NavIcon:
             id: lbl_icn_left
             icon: root.icon
-            theme_text_color: 'Custom'
-            text_color: app.theme_cls.primary_color if not root.text_color else root.text_color
-            size_hint_x: None
-            width: self.texture_size[0]
-            font_size: sp(root.icon_left_size)
             on_press: root.on_action_area_pressed()
 
 	    NavLabel:
 	        id: lbl_txt
 		    text: root.text if root.button_label else ''
 		    text_size: (None, root.height)
-		    theme_text_color: root.theme_text_color
-		    text_color: root.text_color
-		    opposite_colors: root.opposite_colors
+		    # theme_text_color: root.theme_text_color
+		    # text_color: root.text_color
+		    # opposite_colors: root.opposite_colors
             on_press: root.on_action_area_pressed()
 
         NavCloseIcon:
             id: lbl_icn_right
-		    text_color: app.theme_cls.primary_color if not root.text_color else root.text_color
+		    # text_color: app.theme_cls.primary_color if not root.text_color else root.text_color
         	on_press: root.on_close_area_pressed()

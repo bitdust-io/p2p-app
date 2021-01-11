@@ -36,7 +36,7 @@ class NavBaseRectangularButton(RectangularElevationBehavior, SpecificBackgroundC
 
     icon_left_size = 17
     increment_width = dp(1)
-    _radius = dp(2)
+    _radius = dp(3)
 
 
 class NavButtonBase(NavBaseRectangularButton):

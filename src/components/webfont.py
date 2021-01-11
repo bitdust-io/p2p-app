@@ -25,9 +25,9 @@ def fa_icon(name, font_file=None, with_spaces=True):
 # https://materialdesignicons.com/
 
 def md_icon(name, font_file=None, with_spaces=False):
-    if _Debug:
-        print('md_icon', name)
     from kivymd.icon_definitions import md_icons
+    if _Debug:
+        print('md_icon', name, name in md_icons)
     s = '[font=Icons]{}[/font]'.format(md_icons[name])
     if not with_spaces:
         return s
