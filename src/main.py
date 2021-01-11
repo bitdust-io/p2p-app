@@ -78,6 +78,7 @@ Builder.load_string("""
 #:import Window kivy.core.window.Window
 #:import fa_icon components.webfont.fa_icon
 #:import md_icon components.webfont.md_icon
+#:import md_icons kivymd.icon_definitions.md_icons
 """)
 
 #------------------------------------------------------------------------------

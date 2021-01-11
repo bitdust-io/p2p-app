@@ -1,3 +1,11 @@
+import os
+
+materialdesignicons_ttf_filepath = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'materialdesignicons-webfont.ttf')
+
+from kivy.utils import platform
+if platform == 'android': 
+    materialdesignicons_ttf_filepath = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts', 'materialdesignicons-webfont.ttf')
+
 materialdesignicons_codes = {
     "ab-testing": "\U000F01C9",
     "abjad-arabic": "\U000F1328",

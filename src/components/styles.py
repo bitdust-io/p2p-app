@@ -38,6 +38,7 @@ def init(app):
     #--- COLORS
     app.color_transparent = (0,0,0,0)
     app.color_black = (0,0,0,1)
+    app.color_gray = (.5,.5,.5,1)
     app.color_white = (1,1,1,1)
     app.color_row_seleted = (.96, .96, 1, 1)
     app.color_circle_offline = (.7, .7, .7, 1)
@@ -63,7 +64,7 @@ def init(app):
     app.color_text_input_border = (.75,.75,.75,1)
 
     #--- NAVIGATION
-    app.nav_height = dp(28)
+    app.nav_height = dp(26)
 
     #--- SCREEN SETTINGS
     app.setting_record_height = sp(app.font_size_large_absolute) + dp(12)
@@ -87,4 +88,3 @@ def init(app):
 
     #--- SCREEN PRIVATE CHAT
     app.chat_input_font_size = sp(app.font_size_normal_absolute)
-    # app.chat_input_height = sp(app.font_size_normal_absolute) * 3
