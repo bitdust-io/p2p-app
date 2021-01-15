@@ -2,13 +2,12 @@ from kivy.properties import BooleanProperty  # @UnresolvedImport
 from kivy.metrics import dp
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.screenmanager import ScreenManager
-from kivymd.uix.button import BaseRectangularButton, BaseElevationButton, BasePressedButton
-from kivymd.uix.label import MDIcon, MDLabel
+from kivymd.uix.button import BasePressedButton
+from kivymd.uix.label import MDLabel
 from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
 from kivymd.uix.behaviors.backgroundcolor_behavior import SpecificBackgroundColorBehavior
-from kivymd.uix.behaviors.ripple_behavior import RectangularRippleBehavior
 
-from components.buttons import IconButton, CloseIconButton
+from components.labels import CustomIcon
 
 #------------------------------------------------------------------------------
 
@@ -20,7 +19,7 @@ class ScreenManagement(ScreenManager):
     pass
 
 
-class NavIcon(ButtonBehavior, MDIcon):
+class NavIcon(ButtonBehavior, CustomIcon):
     pass
 
 
@@ -28,7 +27,7 @@ class NavLabel(ButtonBehavior, MDLabel):
     pass
 
 
-class NavCloseIcon(ButtonBehavior, MDIcon):
+class NavCloseIcon(ButtonBehavior, CustomIcon):
     pass
 
 

@@ -2,8 +2,6 @@ import re
 
 #------------------------------------------------------------------------------
 
-from kivy.clock import Clock
-from kivy.metrics import dp
 from kivy.uix.treeview import TreeView, TreeViewNode
 from kivy.properties import ListProperty, StringProperty, NumericProperty  # @UnresolvedImport
 
@@ -13,7 +11,7 @@ from components.screen import AppScreen
 from components.labels import NormalLabel
 from components.buttons import CustomFlatButton
 from components.text_input import SingleLineTextInput
-from components.layouts import HorizontalLayout, VerticalLayout
+from components.layouts import VerticalLayout
 
 from lib import api_client
 from lib import websock
@@ -25,7 +23,8 @@ _Debug = True
 #------------------------------------------------------------------------------
 
 class OptionNameLabel(CustomFlatButton):
-    pass
+
+    _no_ripple_effect = True
 
 
 class OptionDescriptionLabel(NormalLabel):
@@ -89,8 +88,9 @@ class TreeElement(TreeViewNode):
             print('erased element %r : %r' % (self.item_key, id(self), ))
 
 
-class ParentElement(CustomFlatButton, TreeElement):
+class ParentElement(TreeElement, CustomFlatButton):
 
+    _no_ripple_effect = True
     text_halign = 'left'
 
     def __init__(self, **kwargs):
@@ -98,7 +98,7 @@ class ParentElement(CustomFlatButton, TreeElement):
         super(ParentElement, self).__init__(**kwargs)
 
 
-class ServiceElement(HorizontalLayout, TreeElement):
+class ServiceElement(TreeElement, VerticalLayout):
 
     service_name = StringProperty('')
     service_state = StringProperty('')
@@ -108,6 +108,7 @@ class ServiceElement(HorizontalLayout, TreeElement):
         self.service_state = kwargs.pop('service_state')
         self.item_clicked_callback = kwargs.pop('item_clicked_callback', None)
         super(ServiceElement, self).__init__(**kwargs)
+        self.bind(minimum_height=self.setter('height'))
 
 
 class OptionElement(TreeElement):

@@ -1,4 +1,3 @@
 kivy>=2.0.0
-# kivymd
 https://github.com/kivymd/KivyMD/archive/master.zip
 six

@@ -1,15 +1,22 @@
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 from kivy.uix.label import Label
-from kivymd.uix.label import MDLabel, MDIcon
+from kivymd.uix.label import MDLabel
 from kivymd.theming import ThemableBehavior
 
 from lib import websock
+from components.webfont import md_icon, fa_icon, is_md_icon, is_fa_icon
 
 #------------------------------------------------------------------------------
 
-class CustomIcon(MDIcon):
-    pass
-    # icon = StringProperty("ab-testing")
+_Debug = True
+
+#------------------------------------------------------------------------------
+
+class CustomIcon(ThemableBehavior, Label):
+
+    icon = StringProperty("ab-testing")
+    icon_width = NumericProperty("32dp")
+    icon_height = NumericProperty("32dp")
 
 
 class BaseLabel(MDLabel):

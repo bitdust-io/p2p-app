@@ -6,8 +6,7 @@
     font_size: sp(17)
     size_hint: None, None
     size: (self.texture_size[0], app.nav_height - dp(2))
-    theme_text_color: 'Custom'
-    text_color: app.color_white
+    color: app.color_white
 
 
 <NavLabel>:
@@ -31,8 +30,7 @@
     pos_hint: {"center_x": .5, "center_y": .5}
     padding: (0, 0)
     font_size: '20sp'
-    theme_text_color: 'Custom'
-    text_color: app.theme_cls.primary_light
+    color: app.theme_cls.primary_light
 
 
 <NavBaseRectangularButton>:

@@ -22,9 +22,9 @@ from jnius import autoclass  # @UnresolvedImport
 
 import encodings.idna
 
-PACKAGE_NAME = 'org.bitdust_io.bitdust_p2p'
+PACKAGE_NAME = 'org.bitdust_io.bitdust1'
 
-PythonActivity = autoclass('org.bitdust_io.bitdust_p2p.BitDustActivity')
+PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
 
 
 def set_foreground():
@@ -40,7 +40,7 @@ def set_foreground():
     notification_channel = NotificationChannel(channel_id, AndroidString('BitDust Channel'.encode('utf-8')), NotificationManager.IMPORTANCE_HIGH)
     Notification = autoclass(u'android.app.Notification')
     # service = autoclass('org.kivy.android.PythonService').mService
-    service = autoclass('org.bitdust_io.bitdust_p2p.BitDustService').mService
+    service = autoclass('org.bitdust_io.bitdust1.BitDustService').mService
     notification_service = service.getSystemService(Context.NOTIFICATION_SERVICE)
     notification_service.createNotificationChannel(notification_channel)
     app_context = service.getApplication().getApplicationContext()

@@ -76,15 +76,15 @@ if is_android():
 Builder.load_string("""
 #:import NoTransition kivy.uix.screenmanager.NoTransition
 #:import Window kivy.core.window.Window
+#:import md_icons kivymd.icon_definitions.md_icons
 #:import fa_icon components.webfont.fa_icon
 #:import md_icon components.webfont.md_icon
-#:import md_icons kivymd.icon_definitions.md_icons
 """)
 
 #------------------------------------------------------------------------------
 
 if is_android():
-    PACKAGE_NAME = 'org.bitdust_io.bitdust_p2p'
+    PACKAGE_NAME = 'org.bitdust_io.bitdust1'
     SERVICE_NAME = '{packagename}.Service{servicename}'.format(
         packagename=PACKAGE_NAME,
         servicename='Bitdustnode'
@@ -95,9 +95,20 @@ if is_android():
         Permission.WRITE_EXTERNAL_STORAGE,
         Permission.FOREGROUND_SERVICE,
     ]
-    PythonActivity = autoclass('org.bitdust_io.bitdust_p2p.BitDustActivity')
+    PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
 
 #------------------------------------------------------------------------------
+
+orig_resolve_font_name = None
+
+def my_resolve_font_name(cls):
+    global orig_resolve_font_name
+    fn = cls.options['font_name']
+    ret = orig_resolve_font_name(cls)
+    if _Debug:
+        print('resolve_font_name', fn, cls.options['font_name_r'], len(cls.options['text']))
+    return ret
+
 
 class BitDustApp(MDApp):
 
@@ -105,8 +116,10 @@ class BitDustApp(MDApp):
     main_window = None
 
     def build(self):
+        global orig_resolve_font_name
         if _Debug:
             print('BitDustApp.build')
+
         self.theme_cls.theme_style = 'Light'
         self.theme_cls.primary_palette = 'Indigo'
         self.theme_cls.accent_palette = 'Green'

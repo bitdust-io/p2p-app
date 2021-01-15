@@ -23,18 +23,21 @@
             size_hint: 1, None
             height: self.minimum_height
 
-	        IconButton:
+	        TransparentIconButton:
 	            id: main_nav_button
 	            disabled: True
 	            icon: 'menu'
-	            padding: dp(0)
+	            # padding: dp(0), dp(0)
 	            font_size: sp(22)
-	            pos_hint: {"center_x": .5, "center_y": .5}
-	            size_hint: None, None
-	            size: (app.nav_height, app.nav_height)
-	            md_bg_color: app.color_white
-                theme_text_color: 'Custom'
-                text_color: app.color_gray
+	            # pos_hint: {"center_x": .5, "center_y": .5}
+	            # size_hint: None, None
+	            button_width: app.nav_height
+	            button_height: app.nav_height
+	            color: app.color_gray
+	            # md_bg_color: app.color_white
+	            # md_bg_color_disabled: app.color_white
+                # theme_text_color: 'Custom'
+                # text_color: app.color_gray
 	        	on_press: root.select_screen('main_menu_screen', verify_state=True)
 
         ScreenManagement:

@@ -1387,7 +1387,6 @@ materialdesignicons_codes = {
     "comment-multiple-outline": "\uF181",
     "comment-outline": "\uF182",
     "comment-plus": "\uF9E4",
-    "chat-plus": "\U0000F9E4",
     "comment-plus-outline": "\uF183",
     "comment-processing": "\uF184",
     "comment-processing-outline": "\uF185",
