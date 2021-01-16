@@ -11,15 +11,15 @@
 
 set -e
 
-rm -rf buildozer.spec.bk
+rm -rf buildozer.spec.building
 
-cp -v buildozer.spec buildozer.spec.bk
+cp -v buildozer.spec buildozer.spec.building
 
 echo "__version__ = \"$1\"" > src/version.py
 
 make release_android
 
-mv -v -f buildozer.spec.bk buildozer.spec
+mv -v -f buildozer.spec.building buildozer.spec
 
 # jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/keystores/bitdust.keystore bin/BitDustAndroid_unsigned.apk bitdust
 jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/keystores/bitdust.keystore bin/BitDustAndroid_unsigned.apk -storepass "$2" bitdust
