@@ -1,3 +1,7 @@
+#:import make_icon components.webfont.make_icon
+#:import md_icon components.webfont.md_icon
+
+
 <CustomRectangularButton>:
     canvas:
         Clear
@@ -109,6 +113,9 @@
     font_size: sp(16)
 
 
+# <-MDFloatingActionButton>:
+
+
 <CustomFloatingActionButton>:
     canvas:
         Clear
@@ -133,6 +140,7 @@
     CustomIcon:
         id: lbl_txt
         icon: root.icon
+        icon_pack: root.icon_pack
         icon_width: root.button_size
         icon_height: root.button_size
         font_size: root.user_font_size if root.user_font_size else self.font_size
@@ -176,7 +184,7 @@
     background_disabled_normal: ''
     background_disabled_down: ''
     markup: True
-    text: md_icon(self.icon)
+    text: make_icon(self.icon, self.icon_pack)
 
 
 <TransparentIconButton>:

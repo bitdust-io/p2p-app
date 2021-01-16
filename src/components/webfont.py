@@ -1,4 +1,5 @@
 from fonts.fontawesome_map import fontawesome_codes, fontawesome_ttf_filepath
+from fonts.icofont_map import icofont_codes, icofont_ttf_filepath
 from fonts.materialdesignicons_map import materialdesignicons_codes, materialdesignicons_ttf_filepath
 
 #------------------------------------------------------------------------------
@@ -27,6 +28,30 @@ def fa_icon(name, font_file=None, with_spaces=True):
         return s
     return ' {} '.format(s)
 
+
+#------------------------------------------------------------------------------
+# Font Awesome
+# https://fontawesome.com/cheatsheet
+
+def is_icofont_icon(name):
+    return name in icofont_codes
+
+
+def icofont_icon(name, font_file=None, with_spaces=True):
+    if name not in icofont_codes:
+        if _Debug:
+            print('icofont_icon', name, '???')
+        return ''
+    if font_file is None:
+        font_file = icofont_ttf_filepath
+    s = '[font={}]{}[/font]'.format(font_file, icofont_codes[name])
+    if _Debug:
+        print('icofont_icon', font_file, name)
+    if not with_spaces:
+        return s
+    return ' {} '.format(s)
+
+
 #------------------------------------------------------------------------------
 # Material Design Icons
 # https://materialdesignicons.com/
@@ -50,3 +75,14 @@ def md_icon(name, font_file=None, with_spaces=False):
     if not with_spaces:
         return s
     return ' {} '.format(s)
+
+#------------------------------------------------------------------------------
+
+def make_icon(name, icon_pack='materialdesignicons', font_file=None, with_spaces=False):
+    if icon_pack in ['md', 'materialdesignicons', ]:
+        return md_icon(name, font_file=font_file, with_spaces=with_spaces)
+    if icon_pack in ['fa', 'fontawesome', ]:
+        return fa_icon(name, font_file=font_file, with_spaces=with_spaces)
+    if icon_pack in ['ico', 'icofont', ]:
+        return icofont_icon(name, font_file=font_file, with_spaces=with_spaces)
+    raise Exception('unknown icon pack: %r' % icon_pack)

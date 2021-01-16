@@ -15,6 +15,7 @@ _Debug = True
 class CustomIcon(ThemableBehavior, Label):
 
     icon = StringProperty("ab-testing")
+    icon_pack = StringProperty("md")
     icon_width = NumericProperty("32dp")
     icon_height = NumericProperty("32dp")
 

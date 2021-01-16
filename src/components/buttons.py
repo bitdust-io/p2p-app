@@ -66,6 +66,7 @@ class CustomRaisedButton(CustomRectangularButton, RectangularElevationBehavior, 
 class CustomFloatingActionButton(MDFloatingActionButton):
 
     button_size = NumericProperty('32dp')
+    icon_pack = StringProperty('md')
 
     def set_size(self, interval):
         self.width = self.button_size
@@ -91,6 +92,7 @@ class RoundedFlexButton(RoundedButton):
 class CustomIconButton(ThemableBehavior, Button):
 
     icon = StringProperty("circle")
+    icon_pack = StringProperty("md")
     button_width = NumericProperty("32dp")
     button_height = NumericProperty("32dp")
 
