@@ -52,6 +52,7 @@ Config.set('graphics', 'height', '740')
 #------------------------------------------------------------------------------
 
 from kivymd.app import MDApp
+from kivy.core.window import Window
 
 #------------------------------------------------------------------------------
 
@@ -149,38 +150,13 @@ class BitDustApp(MDApp):
         from components import navigation
         from components import main_window
         styles.init(self)
+
         self.control = controller.Controller(self)
         self.main_window = main_window.MainWindow()
+
+        Window.bind(on_keyboard=self.on_key_input)
+
         return self.main_window
-
-    def on_start(self):
-        if _Debug:
-            print('BitDustApp.on_start()')
-        self.main_window.register_screens(controller.all_screens())
-        self.main_window.register_controller(self.control)
-        self.main_window.select_screen('process_dead_screen')
-        self.control.start()
-        if is_android():
-            self.start_android_service()
-        else:
-            self.check_restart_bitdust_engine()
-
-    def on_stop(self):
-        if _Debug:
-            print('BitDustApp.on_stop()')
-        self.control.stop()
-        self.main_window.unregister_controller()
-        self.main_window.unregister_screens()
-        # TODO: check if we need to stop BitDust engine after App closes
-
-    def on_pause(self):
-        if _Debug:
-            print('BitDustApp.on_pause()')
-        return True
-
-    def on_resume(self):
-        if _Debug:
-            print('BitDustApp.on_resume()')
 
     def start_android_service(self, finishing=False):
         if not is_android():
@@ -219,6 +195,45 @@ class BitDustApp(MDApp):
         if is_android():
             return None
         # TODO: to be implemented ...
+
+    def on_start(self):
+        if _Debug:
+            print('BitDustApp.on_start()')
+        self.main_window.register_screens(controller.all_screens())
+        self.main_window.register_controller(self.control)
+        self.main_window.select_screen('process_dead_screen')
+        self.control.start()
+        if is_android():
+            self.start_android_service()
+        else:
+            self.check_restart_bitdust_engine()
+
+    def on_stop(self):
+        if _Debug:
+            print('BitDustApp.on_stop()')
+        self.control.stop()
+        self.main_window.unregister_controller()
+        self.main_window.unregister_screens()
+        # TODO: check if we need to stop BitDust engine after App closes
+
+    def on_pause(self):
+        if _Debug:
+            print('BitDustApp.on_pause()')
+        return True
+
+    def on_resume(self):
+        if _Debug:
+            print('BitDustApp.on_resume()')
+
+    def on_key_input(self, window_obj, key_code, scancode, codepoint, modifier):
+        if _Debug:
+            print('BitDustApp.on_key_input', key_code, scancode, modifier)
+        if is_android():
+            if key_code == 27:
+                return True
+            else:
+                return False
+        return False
 
 #------------------------------------------------------------------------------
 
