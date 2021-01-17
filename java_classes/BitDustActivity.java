@@ -358,8 +358,6 @@ public class BitDustActivity extends PythonActivity {
 
 
 
-
-
     /**
      * Used by android.permissions p4a module to register a call back after
      * requesting runtime permissions
@@ -379,7 +377,7 @@ public class BitDustActivity extends PythonActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        Log.v(TAG, "onRequestPermissionsResult()");
+        Log.v(TAG, "onRequestPermissionsResult() grantResults=" + grantResults);
         if (havePermissionsCallback) {
             Log.v(TAG, "onRequestPermissionsResult passed to callback");
             permissionCallback.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -424,6 +422,7 @@ public class BitDustActivity extends PythonActivity {
     }
 
     public void requestPermissions(String[] permissions) {
+        Log.v(TAG, "requestPermissions() permissions=" + permissions);
         requestPermissionsWithRequestCode(permissions, 1);
     }
 

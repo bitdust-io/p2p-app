@@ -1,7 +1,7 @@
 [app]
 
 # (str) Title of your application
-title = BitDust p2p-app
+title = BitDust
 
 # (str) Package name
 package.name = bitdust1
@@ -36,7 +36,7 @@ version.filename = %(source.dir)s/version.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy,
-requirements = kivy==2.0.0,https://github.com/kivymd/KivyMD/archive/master.zip,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,twisted==20.3.0,python3
+requirements = kivy==2.0.0,https://github.com/kivymd/KivyMD/archive/master.zip,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,twisted==20.3.0,python3
 # requirements = incremental
 # there is an issue with incremental/twisted build... first you need to build only incremental and then twisted in second run
 
@@ -159,7 +159,7 @@ android.add_src = java_classes/
 
 # (list) Android AAR archives to add (currently works only with sdl2_gradle
 # bootstrap)
-#android.add_aars =
+android.add_aars = support-compat-27.0.0.aar
 
 #android.bootstrap = webview
 

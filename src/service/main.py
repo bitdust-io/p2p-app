@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-import logging
+import time
 
 from twisted.internet import reactor
 
@@ -22,7 +22,7 @@ _Debug = True
 #------------------------------------------------------------------------------
 
 if _Debug:
-    logging.basicConfig(level=logging.DEBUG)
+    # logging.basicConfig(level=logging.DEBUG)
     from twisted.internet.defer import setDebugging
     setDebugging(True)
     from twisted.python.log import startLogging
@@ -81,31 +81,44 @@ def set_foreground():
 
 #------------------------------------------------------------------------------
 
-def request_app_permissions():
-    from android.permissions import request_permissions, Permission  # @UnresolvedImport
-    APP_STARTUP_PERMISSIONS = [
-        Permission.INTERNET,
-        Permission.READ_EXTERNAL_STORAGE,
-        Permission.WRITE_EXTERNAL_STORAGE,
-        Permission.FOREGROUND_SERVICE,
-    ]
-    ret = request_permissions(APP_STARTUP_PERMISSIONS)
-    if _Debug:
-        print('BitDustService.request_app_permissions() result : %r' % ret)
-    return ret
-
-#------------------------------------------------------------------------------
-
 def start_bitdust():
     executable_path = os.getcwd()
     if _Debug:
         print('BitDustService.start_bitdust() executable_path=%r' % executable_path)
     try:
         os.chdir('bitdust')
-    except:
-        pass
+    except Exception as exc:
+        if _Debug:
+            print('BitDustService.start_bitdust() error changing current path to "bitdust" sub-folder:', exc)
     if _Debug:
         print('BitDustService.start_bitdust() executable_path after : %r' % os.getcwd())
+
+    permissions_ok = False
+    count = 0
+    while True:
+        count += 1
+        if count >= 90:
+            if _Debug:
+                print('BitDustService.start_bitdust() failed after %d attempts' % count)
+            break
+        try:
+            if not os.path.isdir('/storage/emulated/0/.bitdust'):
+                os.makedirs('/storage/emulated/0/.bitdust', 0o777)
+            if not os.path.isfile('/storage/emulated/0/.bitdust/deployed'):
+                open('/storage/emulated/0/.bitdust/deployed', 'w').write('ok\n')
+        except Exception as exc:
+            if _Debug:
+                print('BitDustService.start_bitdust() attempt', count, ':', exc)
+            time.sleep(1)
+            continue
+        permissions_ok = True
+        break
+
+    if not permissions_ok:
+        return False
+
+    if _Debug:
+        print('BitDustService.start_bitdust() executing the entry point')
     from main.bpmain import main
     # reactor.callLater(0, main, executable_path, start_reactor=False)  # @UndefinedVariable
     main(executable_path, start_reactor=False)
@@ -142,7 +155,7 @@ def run_service():
         stop_bitdust()
         return
 
-    request_app_permissions()
+    # request_app_permissions()
 
     try:
         set_foreground()

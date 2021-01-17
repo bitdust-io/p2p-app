@@ -42,12 +42,15 @@ if _Debug:
 from kivy.lang import Builder
 from kivy.config import Config
 
+from lib.system import is_android
+
 #------------------------------------------------------------------------------
 
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')  # disable multi-touch
 Config.set('graphics', 'resizable', True)
-Config.set('graphics', 'width', '360')
-Config.set('graphics', 'height', '740')
+if is_android(): 
+    Config.set('graphics', 'width', '360')
+    Config.set('graphics', 'height', '740')
 
 #------------------------------------------------------------------------------
 
@@ -55,8 +58,6 @@ from kivymd.app import MDApp
 from kivy.core.window import Window
 
 #------------------------------------------------------------------------------
-
-from lib.system import is_android
 
 from screens import controller
 
@@ -99,30 +100,17 @@ if is_android():
         Permission.FOREGROUND_SERVICE,
     ]
     PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
+    Context = autoclass('android.content.Context')
+    ContextCompat = autoclass('android.support.v4.content.ContextCompat')
 
 #------------------------------------------------------------------------------
 
-orig_resolve_font_name = None
-
-def my_resolve_font_name(cls):
-    global orig_resolve_font_name
-    fn = cls.options['font_name']
-    ret = orig_resolve_font_name(cls)
+def request_app_permissions(permissions=[], activity=PythonActivity.mActivity):
+    if not permissions:
+        permissions = APP_STARTUP_PERMISSIONS
+    ret = PythonActivity.mActivity.requestPermissions(permissions)
     if _Debug:
-        print('resolve_font_name', fn, cls.options['font_name_r'], len(cls.options['text']))
-    return ret
-
-#------------------------------------------------------------------------------
-
-def request_app_permissions(list_permissions=[]):
-    if not is_android():
-        return None
-    global APP_STARTUP_PERMISSIONS
-    if _Debug:
-        print('BitDustApp.request_app_permissions() : %r' % (list_permissions or APP_STARTUP_PERMISSIONS))
-    ret = request_permissions(list_permissions or APP_STARTUP_PERMISSIONS)
-    if _Debug:
-        print('BitDustApp.request_app_permissions() result : %r' % ret)
+        print('BitDustApp.request_app_permissions()', permissions, activity, ret)
     return ret
 
 #------------------------------------------------------------------------------
@@ -199,6 +187,9 @@ class BitDustApp(MDApp):
     def on_start(self):
         if _Debug:
             print('BitDustApp.on_start()')
+
+        request_app_permissions()
+
         self.main_window.register_screens(controller.all_screens())
         self.main_window.register_controller(self.control)
         self.main_window.select_screen('process_dead_screen')
@@ -240,7 +231,6 @@ class BitDustApp(MDApp):
 def main():
     if _Debug:
         print('BitDustApp.main() process is starting')
-    request_app_permissions()
     BitDustApp().run()
     if _Debug:
         print('BitDustApp.main() process is finishing')
