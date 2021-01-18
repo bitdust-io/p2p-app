@@ -93,29 +93,39 @@ def start_bitdust():
     if _Debug:
         print('BitDustService.start_bitdust() executable_path after : %r' % os.getcwd())
 
-    permissions_ok = False
-    count = 0
-    while True:
-        count += 1
-        if count >= 90:
-            if _Debug:
-                print('BitDustService.start_bitdust() failed after %d attempts' % count)
-            break
-        try:
-            if not os.path.isdir('/storage/emulated/0/.bitdust'):
-                os.makedirs('/storage/emulated/0/.bitdust', 0o777)
-            if not os.path.isfile('/storage/emulated/0/.bitdust/deployed'):
-                open('/storage/emulated/0/.bitdust/deployed', 'w').write('ok\n')
-        except Exception as exc:
-            if _Debug:
-                print('BitDustService.start_bitdust() attempt', count, ':', exc)
-            time.sleep(1)
-            continue
-        permissions_ok = True
-        break
+    try:
+        os.makedirs('/storage/emulated/0/bitdust_is_ok', 0o777)
+    except Exception as exc:
+        import traceback
+        traceback.print_exc()
 
-    if not permissions_ok:
-        return False
+#     permissions_ok = False
+#     count = 0
+#     while True:
+#         count += 1
+#         if count >= 90:
+#             if _Debug:
+#                 print('BitDustService.start_bitdust() failed after %d attempts' % count)
+#             break
+#         try:
+#             if not os.path.isdir('/storage/emulated/0/.bitdust'):
+#                 os.makedirs('/storage/emulated/0/.bitdust', 0o777)
+#             if not os.path.isfile('/storage/emulated/0/.bitdust/deployed'):
+#                 open('/storage/emulated/0/.bitdust/deployed', 'w').write('ok')
+#             ok = open('/storage/emulated/0/.bitdust/deployed', 'r').read().strip()
+#             if ok != 'ok':
+#                 raise Exception('reading from app folder failed')
+#         except Exception as exc:
+#             import traceback
+#             traceback.print_exc()
+#             # if _Debug:
+#             #     print('BitDustService.start_bitdust() attempt', count, ':', exc)
+#             time.sleep(1)
+#             continue
+#         permissions_ok = True
+#         break
+#     if not permissions_ok:
+#         return False
 
     if _Debug:
         print('BitDustService.start_bitdust() executing the entry point')

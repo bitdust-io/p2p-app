@@ -412,17 +412,15 @@ public class BitDustActivity extends PythonActivity {
         if (android.os.Build.VERSION.SDK_INT < 23)
             return;
         try {
-            java.lang.reflect.Method methodRequestPermission =
-                Activity.class.getMethod("requestPermissions",
-                String[].class, int.class);
+            java.lang.reflect.Method methodRequestPermission = Activity.class.getMethod("requestPermissions", String[].class, int.class);
             methodRequestPermission.invoke(this, permissions, requestCode);
-        } catch (IllegalAccessException | NoSuchMethodException |
-                 InvocationTargetException e) {
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        	Log.v(TAG, "requestPermissions() error: " + e);
         }
     }
 
     public void requestPermissions(String[] permissions) {
-        Log.v(TAG, "requestPermissions() permissions=" + permissions);
+        Log.v(TAG, "requestPermissions()");
         requestPermissionsWithRequestCode(permissions, 1);
     }
 

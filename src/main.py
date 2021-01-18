@@ -5,6 +5,7 @@
 
 import os
 import sys
+import time
 
 #------------------------------------------------------------------------------
 
@@ -65,7 +66,8 @@ from screens import controller
 
 if is_android(): 
     from jnius import autoclass  # @UnresolvedImport
-    from android.permissions import request_permissions, Permission  # @UnresolvedImport
+    from android.permissions import request_permissions  # @UnresolvedImport
+    from android.storage import app_storage_path, primary_external_storage_path  # @UnresolvedImport
     import encodings.idna
 
 #------------------------------------------------------------------------------
@@ -92,12 +94,13 @@ if is_android():
     SERVICE_NAME = '{packagename}.Service{servicename}'.format(
         packagename=PACKAGE_NAME,
         servicename='Bitdustnode'
-    )
+    )    
     APP_STARTUP_PERMISSIONS = [
-        Permission.INTERNET,
-        Permission.READ_EXTERNAL_STORAGE,
-        Permission.WRITE_EXTERNAL_STORAGE,
-        Permission.FOREGROUND_SERVICE,
+        'android.permission.INTERNET',
+        'android.permission.READ_EXTERNAL_STORAGE',
+        'android.permission.WRITE_EXTERNAL_STORAGE',
+        'android.permission.MANAGE_EXTERNAL_STORAGE',
+        'android.permission.FOREGROUND_SERVICE',
     ]
     PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
     Context = autoclass('android.content.Context')
@@ -105,13 +108,25 @@ if is_android():
 
 #------------------------------------------------------------------------------
 
+def check_app_permission(permission, activity=PythonActivity.mActivity):
+    if not is_android():
+        return True
+    permission_status = ContextCompat.checkSelfPermission(activity, permission)
+    permission_granted = (0 == permission_status)
+    if _Debug:
+        print('BitDustApp.check_app_permission() %r : %r' % (permission, permission_status, ))
+    return permission_granted
+
+
 def request_app_permissions(permissions=[], activity=PythonActivity.mActivity):
+    if not is_android():
+        return True
     if not permissions:
         permissions = APP_STARTUP_PERMISSIONS
-    ret = PythonActivity.mActivity.requestPermissions(permissions)
     if _Debug:
-        print('BitDustApp.request_app_permissions()', permissions, activity, ret)
-    return ret
+        print('BitDustApp.request_app_permissions()', permissions, activity)
+    PythonActivity.mActivity.requestPermissions(permissions)
+    return True
 
 #------------------------------------------------------------------------------
 
@@ -145,6 +160,19 @@ class BitDustApp(MDApp):
         Window.bind(on_keyboard=self.on_key_input)
 
         return self.main_window
+
+    def do_start(self):
+        if _Debug:
+            print('BitDust.do_start()')
+        self.main_window.register_screens(controller.all_screens())
+        self.main_window.register_controller(self.control)
+        self.main_window.select_screen('process_dead_screen')
+        self.control.start()
+        if is_android():
+            self.start_android_service()
+        else:
+            self.check_restart_bitdust_engine()
+        return True
 
     def start_android_service(self, finishing=False):
         if not is_android():
@@ -185,19 +213,41 @@ class BitDustApp(MDApp):
         # TODO: to be implemented ...
 
     def on_start(self):
+        global APP_STARTUP_PERMISSIONS
         if _Debug:
-            print('BitDustApp.on_start()')
+            print('BitDustApp.on_start() APP_STARTUP_PERMISSIONS=%r' % APP_STARTUP_PERMISSIONS)
 
-        request_app_permissions()
+        missed_permissions = []
+        for perm in APP_STARTUP_PERMISSIONS:
+            if not check_app_permission(perm):
+                missed_permissions.append(perm)
+        if _Debug:
+            print('BitDust.on_start() missed_permissions=%r' % missed_permissions)
 
-        self.main_window.register_screens(controller.all_screens())
-        self.main_window.register_controller(self.control)
-        self.main_window.select_screen('process_dead_screen')
-        self.control.start()
-        if is_android():
-            self.start_android_service()
-        else:
-            self.check_restart_bitdust_engine()
+        if not missed_permissions:
+            return self.do_start() 
+
+        request_app_permissions(permissions=missed_permissions)
+
+        attempts = 0
+        while True:
+            attempts += 1
+            if attempts > 90:
+                if _Debug:
+                    print('BitDust.on_start() FAILED after %d attempts' % attempts)
+                return
+            still_missing = []
+            for perm in APP_STARTUP_PERMISSIONS:
+                if not check_app_permission(perm):
+                    still_missing.append(perm)
+            if not still_missing:
+                break
+            time.sleep(1)
+            if _Debug:
+                print('BitDust.on_start() missed_permissions=%r' % missed_permissions)
+        if _Debug:
+            print('BitDust.on_start() is okay to start now, storage path is %r' % primary_external_storage_path())
+        return self.do_start()
 
     def on_stop(self):
         if _Debug:
