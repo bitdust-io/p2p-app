@@ -4,6 +4,9 @@
 
 REQUIREMENTS_TXT:=requirements.txt
 
+REQUIREMENTS_ANDROID:="kivy==2.0.0,https://github.com/kivymd/KivyMD/archive/master.zip,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python2"
+
+
 OS=$(shell lsb_release -si 2>/dev/null || uname)
 PIP:="venv/bin/pip"
 PYTHON="venv/bin/python"
@@ -46,11 +49,13 @@ install: system_dependencies clean venv
 install_buildozer:
 	@rm -rf buildozer/
 	@git clone https://github.com/vesellov/buildozer buildozer
+	# @git clone https://github.com/kivy/buildozer buildozer
 	@cd ./buildozer/; ../venv/bin/python setup.py build; ../venv/bin/pip install -e .; cd ..
 
 install_p4a:
 	@rm -rf python-for-android/
 	@git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
+	# @git clone --single-branch --branch master https://github.com/vesellov/python-for-android.git
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 
@@ -89,29 +94,18 @@ rewrite_android_dist_files:
 	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 
 refresh_android_environment: update_p4a rewrite_android_dist_files
+	$(MAKE) spec requirements=$(REQUIREMENTS_ANDROID)
 
 refresh_android_environment_full: update_p4a update_engine_repo rewrite_android_dist_files
+	$(MAKE) spec requirements=$(REQUIREMENTS_ANDROID)
 
-.build_android_incremental:
-	# @python3 -c "import os, re; s = re.sub('(requirements = .+?python3)','# \g<1>',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
-	# @python3 -c "import os, re; s = re.sub('# requirements = incremental','requirements = incremental',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
-	# @VIRTUAL_ENV=1 ./venv/bin/buildozer -v android debug
-	# @python3 -c "import os, re; s = re.sub('# (requirements = .+?python3)','\g<1>',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
-	# @python3 -c "import os, re; s = re.sub('requirements = incremental','# requirements = incremental',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
-	@echo '1' > .build_android_incremental
+spec:
+	@P_requirements="$(requirements)" ./venv/bin/python3 -c "tpl=open('buildozer.spec.template').read();import os,sys;sys.stdout.write(tpl.format(requirements=os.environ['P_requirements']));" > buildozer.spec
 
-build_android: refresh_android_environment .build_android_incremental
+build_android: refresh_android_environment
 	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android debug
 
-.release_android_incremental:
-	# @python3 -c "import os, re; s = re.sub('(requirements = .+?python3)','# \g<1>',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
-	# @python3 -c "import os, re; s = re.sub('# requirements = incremental','requirements = incremental',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
-	# @VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
-	# @python3 -c "import os, re; s = re.sub('# (requirements = .+?python3)','\g<1>',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
-	# @python3 -c "import os, re; s = re.sub('requirements = incremental','# requirements = incremental',open('buildozer.spec','r').read()); open('buildozer.spec','w').write(s);"
-	@echo '1' > .release_android_incremental
-
-release_android: refresh_android_environment .release_android_incremental
+release_android: refresh_android_environment
 	@rm -rfv ./bin/*.apk
 	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
 	# @VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release

@@ -1,5 +1,6 @@
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.stacklayout import StackLayout
 from kivymd.uix.boxlayout import BoxLayout
 
 #------------------------------------------------------------------------------
@@ -17,6 +18,10 @@ class VerticalLayout(BoxLayout):
 
 
 class VLayout(BoxLayout):
+    pass
+
+
+class HorizontalStackLayout(StackLayout):
     pass
 
 

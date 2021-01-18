@@ -4,11 +4,20 @@ from kivymd.uix.label import MDLabel
 from kivymd.theming import ThemableBehavior
 
 from lib import websock
+from components.webfont import md_icon, fa_icon, is_md_icon, is_fa_icon
 
 #------------------------------------------------------------------------------
 
-class CustomIcon(MDLabel):
+_Debug = True
+
+#------------------------------------------------------------------------------
+
+class CustomIcon(ThemableBehavior, Label):
+
     icon = StringProperty("ab-testing")
+    icon_pack = StringProperty("md")
+    icon_width = NumericProperty("32dp")
+    icon_height = NumericProperty("32dp")
 
 
 class BaseLabel(MDLabel):

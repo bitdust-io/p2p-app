@@ -1,3 +1,6 @@
+#:import make_icon components.webfont.make_icon
+
+
 <BaseLabel>:
 
 
@@ -32,9 +35,23 @@
 	font_size: app.font_size_normal
 
 
+
 <CustomIcon>:
+    size_hint: None, None
+    size: self.icon_width, self.icon_height
+    text_size: self.size
+    valign: 'middle'
+    halign: 'center'
+    pos_hint: {"center_x": .5, "center_y": .5}
+    color: (0, 0, 0, 1)
+    background_color: (0, 0, 0, 0)
+    background_normal: ''
+    background_down: ''
+    background_disabled_normal: ''
+    background_disabled_down: ''
     markup: True
-    text: md_icon(self.icon)
+    text: make_icon(self.icon, self.icon_pack)
+
 
 
 <ChatMessageLabel>:
@@ -47,3 +64,4 @@
 
 
 <StatusLabel>:
+

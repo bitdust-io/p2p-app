@@ -1,4 +1,6 @@
 <FriendActionButton>:
+    button_width: app.friend_record_height - dp(1)
+    button_height: app.friend_record_height - dp(1)
 
 
 <FriendRecord>:
@@ -73,7 +75,7 @@
                 size_hint: None, None
                 padding: dp(0)
                 text_color: app.color_white
-                user_font_size: '14sp'
+                user_font_size: '20sp'
                 on_release: root.on_search_people_button_clicked()
 
         VerticalScrollView:

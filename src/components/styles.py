@@ -67,7 +67,7 @@ def init(app):
     app.nav_height = dp(26)
 
     #--- SCREEN SETTINGS
-    app.setting_record_height = sp(app.font_size_large_absolute) + dp(12)
+    app.setting_record_height = sp(app.font_size_large_absolute) + dp(10)
     app.setting_normal_font_size_absolute = app.font_size_normal_absolute
     app.setting_small_font_size_absolute = app.font_size_small_absolute
     app.setting_normal_font_size = sp(app.setting_normal_font_size_absolute)

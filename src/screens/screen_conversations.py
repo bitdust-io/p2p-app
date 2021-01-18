@@ -1,4 +1,4 @@
-from components.buttons import CustomIconButton
+from components.buttons import TransparentIconButton
 from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
 
@@ -11,7 +11,7 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-class ConversationActionButton(CustomIconButton):
+class ConversationActionButton(TransparentIconButton):
     pass
 
 

@@ -1,4 +1,4 @@
-package org.bitdust_io.bitdust_p2p;
+package org.bitdust_io.bitdust1;
  
 import java.io.InputStreamReader;
 import java.io.BufferedReader;

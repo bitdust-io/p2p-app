@@ -1,21 +1,21 @@
-<TreeElement>:
-    canvas.before:
-        Color:
-            rgba: self.color_selected if self.is_selected else self.odd_color if self.odd else self.even_color
-        Rectangle:
-            pos: [self.parent.x, self.y] if self.parent else [0, 0]
-            size: [self.parent.width, self.height] if self.parent else [1, 1]
-        Color:
-            rgba: 1, 1, 1, int(not self.is_leaf)
-        Rectangle:
-            source: 'atlas://data/images/defaulttheme/tree_%s' % ('opened' if self.is_open else 'closed')
-            size: self.height / 2.0, self.height / 2.0
-            pos: self.x - dp(20), self.center_y - dp(8)
-    canvas.after:
-        Color:
-            rgba: .5, .5, .5, .2
-        Line:
-            points: [self.parent.x, self.y, self.parent.right, self.y] if self.parent else []
+# <TreeElement>:
+#     canvas.before:
+#         Color:
+#             rgba: self.color_selected if self.is_selected else self.odd_color if self.odd else self.even_color
+#         Rectangle:
+#             pos: [self.parent.x, self.y] if self.parent else [0, 0]
+#             size: [self.parent.width, self.height] if self.parent else [1, 1]
+#         Color:
+#             rgba: 1, 1, 1, int(not self.is_leaf)
+#         Rectangle:
+#             source: 'atlas://data/images/defaulttheme/tree_%s' % ('opened' if self.is_open else 'closed')
+#             size: (self.height / (3. if dp(1) > 1 else 2.)) * 0.75, (self.height / (3. if dp(1) > 1 else 2.)) * 0.75
+#             pos: self.x - dp(10), int(self.center_y - (self.height / (3. if dp(1) > 1 else 2.)) * .5)
+#     canvas.after:
+#         Color:
+#             rgba: .5, .5, .5, .2
+#         Line:
+#             points: [self.parent.x, self.y, self.parent.right, self.y] if self.parent else []
 
 
 <OptionValueTextInput>:
@@ -43,7 +43,8 @@
 
 
 <OptionNameLabel>:
-    height: app.setting_record_height
+    size_hint_y: None
+    fixed_height: app.setting_record_height
     pos_hint: {'left': 0, 'center_y': .5}
     halign: 'left'
     valign: 'top'
@@ -58,38 +59,42 @@
     text_size: self.width, None
     halign: 'left'
     valign: 'top'
-    padding: dp(10), dp(0)
+    padding: dp(15), dp(0)
     font_size: app.setting_small_font_size
 
 
 <ParentElement>:
+    size_hint_y: None
+    fixed_height: app.setting_record_height
     pos_hint: {'left': 0}
-    height: app.setting_record_height
     halign: 'left'
-    font_size: app.setting_normal_font_size
     text_size: self.width, None
+    font_size: app.setting_normal_font_size
     on_press: self.item_clicked_callback(self.item_key, self)
 
 
 <ServiceElement>:
-    size_hint: 1, None
-    height: app.setting_record_height
-    padding: 0
-    spacing: 1
 
-    CustomIcon:
-		size_hint_x: None
-		width: dp(16)
-		font_size: '14sp'
-        icon: 'circle'
-        color: (.7, .7, .7, 1) if root.service_state != 'ON' else (.6, 1, .6, 1)
+    HorizontalLayout:
+        size_hint: 1, None
+        height: self.minimum_height
 
-    OptionNameLabel:
-        id: option_label
-	    pos_hint: {'left': 0, 'center_y': 0.5}
-	    halign: 'left'
-        text: '{}'.format(root.service_name)
-        on_press: root.item_clicked_callback(root.item_key, root)
+        Widget:
+            size_hint: None, 1
+            width: dp(8)
+
+        CustomIcon:
+            size_hint: None, None
+            size: (dp(12), app.setting_record_height)
+            pos_hint: {'right': 1, 'center_y': 0.5}
+            font_size: '11sp'
+            icon: 'circle'
+            color: (.7, .7, .7, 1) if root.service_state != 'ON' else (.6, 1, .6, 1)
+    
+        OptionNameLabel:
+            id: option_label
+            text: '{}'.format(root.service_name)
+            on_press: root.item_clicked_callback(root.item_key, root)
 
 
 <BooleanElement>:
@@ -122,8 +127,8 @@
 			id: option_value_checkbox
             size_hint: None, None
             pos_hint: {'right': 1, 'center_y': 0.5}
-            width: app.setting_record_height - dp(6)
-            height: app.setting_record_height - dp(6)
+            width: dp(24)
+            height: dp(24)
             active: bool(root.option_value)
             on_active: root.value_modified_callback(root.item_key, self.active)
 
@@ -263,8 +268,8 @@
     size_hint: 1, None
     height: self.minimum_height
     root_options: {'text': 'settings'}
-    indent_start: dp(20)
-    indent_level: dp(20)
+    indent_start: dp(5)
+    indent_level: dp(8)
     hide_root: True
 
 

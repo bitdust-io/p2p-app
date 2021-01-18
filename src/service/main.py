@@ -1,34 +1,46 @@
-from io import open
-
 import os
 import sys
 import json
+import time
 
 from twisted.internet import reactor
-from twisted.internet import endpoints
-from twisted.web.server import Site
-from twisted.web.static import File
-
-import logging
-# logging.basicConfig(level=logging.DEBUG)
-
-# from twisted.internet.defer import setDebugging
-# setDebugging(True)
-
-# from twisted.python.log import startLogging
-# startLogging(sys.stdout)
 
 from jnius import autoclass  # @UnresolvedImport
 
 import encodings.idna
 
-PACKAGE_NAME = 'org.bitdust_io.bitdust_p2p'
+#------------------------------------------------------------------------------
 
-PythonActivity = autoclass('org.bitdust_io.bitdust_p2p.BitDustActivity')
+PACKAGE_NAME = 'org.bitdust_io.bitdust1'
 
+PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
+
+#------------------------------------------------------------------------------ 
+
+_Debug = True
+
+#------------------------------------------------------------------------------
+
+if _Debug:
+    # logging.basicConfig(level=logging.DEBUG)
+    from twisted.internet.defer import setDebugging
+    setDebugging(True)
+    from twisted.python.log import startLogging
+    startLogging(sys.stdout)
+
+#------------------------------------------------------------------------------
+
+if _Debug:
+    print('BitDustService __file__', os.path.dirname(os.path.abspath(__file__)))
+    print('BitDustService os.getcwd', os.path.abspath(os.getcwd()))
+    print('BitDustService sys.path', sys.path)
+    print('BitDustService os.listdir', os.listdir(os.getcwd()))
+
+#------------------------------------------------------------------------------
 
 def set_foreground():
-    print('set_foreground')
+    if _Debug:
+        print('BitDustService.set_foreground')
     channel_id = f'{PACKAGE_NAME}.Bitdustnode'
     Context = autoclass(u'android.content.Context')
     Intent = autoclass(u'android.content.Intent')
@@ -40,7 +52,7 @@ def set_foreground():
     notification_channel = NotificationChannel(channel_id, AndroidString('BitDust Channel'.encode('utf-8')), NotificationManager.IMPORTANCE_HIGH)
     Notification = autoclass(u'android.app.Notification')
     # service = autoclass('org.kivy.android.PythonService').mService
-    service = autoclass('org.bitdust_io.bitdust_p2p.BitDustService').mService
+    service = autoclass('org.bitdust_io.bitdust1.BitDustService').mService
     notification_service = service.getSystemService(Context.NOTIFICATION_SERVICE)
     notification_service.createNotificationChannel(notification_channel)
     app_context = service.getApplication().getApplicationContext()
@@ -64,17 +76,59 @@ def set_foreground():
     notification_builder.setCategory(Notification.CATEGORY_SERVICE)
     new_notification = notification_builder.getNotification()
     service.startForeground(1, new_notification)
-    print('set_foreground DONE : %r' % service)
+    if _Debug:
+        print('BitDustService.set_foreground() DONE : %r' % service)
 
+#------------------------------------------------------------------------------
 
 def start_bitdust():
     executable_path = os.getcwd()
-    print('start_bitdust executable_path=%r' % executable_path)
+    if _Debug:
+        print('BitDustService.start_bitdust() executable_path=%r' % executable_path)
     try:
         os.chdir('bitdust')
-    except:
-        pass
-    print('executable_path after : %r' % os.getcwd())
+    except Exception as exc:
+        if _Debug:
+            print('BitDustService.start_bitdust() error changing current path to "bitdust" sub-folder:', exc)
+    if _Debug:
+        print('BitDustService.start_bitdust() executable_path after : %r' % os.getcwd())
+
+    try:
+        os.makedirs('/storage/emulated/0/bitdust_is_ok', 0o777)
+    except Exception as exc:
+        import traceback
+        traceback.print_exc()
+
+#     permissions_ok = False
+#     count = 0
+#     while True:
+#         count += 1
+#         if count >= 90:
+#             if _Debug:
+#                 print('BitDustService.start_bitdust() failed after %d attempts' % count)
+#             break
+#         try:
+#             if not os.path.isdir('/storage/emulated/0/.bitdust'):
+#                 os.makedirs('/storage/emulated/0/.bitdust', 0o777)
+#             if not os.path.isfile('/storage/emulated/0/.bitdust/deployed'):
+#                 open('/storage/emulated/0/.bitdust/deployed', 'w').write('ok')
+#             ok = open('/storage/emulated/0/.bitdust/deployed', 'r').read().strip()
+#             if ok != 'ok':
+#                 raise Exception('reading from app folder failed')
+#         except Exception as exc:
+#             import traceback
+#             traceback.print_exc()
+#             # if _Debug:
+#             #     print('BitDustService.start_bitdust() attempt', count, ':', exc)
+#             time.sleep(1)
+#             continue
+#         permissions_ok = True
+#         break
+#     if not permissions_ok:
+#         return False
+
+    if _Debug:
+        print('BitDustService.start_bitdust() executing the entry point')
     from main.bpmain import main
     # reactor.callLater(0, main, executable_path, start_reactor=False)  # @UndefinedVariable
     main(executable_path, start_reactor=False)
@@ -83,64 +137,59 @@ def start_bitdust():
 
 def stop_bitdust():
     executable_path = os.getcwd()
-    print('stop_bitdust executable_path=%r' % executable_path)
+    if _Debug:
+        print('BitDustService.stop_bitdust() executable_path=%r' % executable_path)
     try:
         os.chdir('bitdust')
     except:
         pass
-    print('executable_path after : %r' % os.getcwd())
+    if _Debug:
+        print('BitDustService.stop_bitdust() executable_path after : %r' % os.getcwd())
     from main import shutdowner
     # reactor.callLater(0, shutdowner.A, 'stop', 'exit')  # @UndefinedVariable
     shutdowner.A('stop', 'exit')
     return True
 
-
-def start_web_server(web_port_number=8888):
-    """
-    Not in use.
-    """
-    resource = File(f'/data/user/0/{PACKAGE_NAME}/files/app/www/')
-    factory = Site(resource)
-    endpoint = endpoints.TCP4ServerEndpoint(reactor, web_port_number)
-    endpoint.listen(factory)
-    # fout = open(SERVICE_STARTED_MARKER_FILENAME, 'w')
-    # fout.write('localhost %d' % web_port_number)
-    # fout.flush()
-    # os.fsync(fout.fileno())
-    # fout.close()
-    # print('start_web_server file written', SERVICE_STARTED_MARKER_FILENAME)
-    return endpoint
-
+#------------------------------------------------------------------------------
 
 def run_service():
-    print('run_service()')
     argument = os.environ.get('PYTHON_SERVICE_ARGUMENT', 'null')
     argument = json.loads(argument) if argument else None
     argument = {} if argument is None else argument
-    print('run_service() argument : %r' % argument)
+    if _Debug:
+        print('BitDustService.run_service() argument : %r' % argument)
 
     if argument.get('stop_service'):
-        print('run_service() service to be stopped now')
+        if _Debug:
+            print('BitDustService.run_service() service to be stopped now')
         stop_bitdust()
         return
+
+    # request_app_permissions()
 
     try:
         set_foreground()
 
-        # reactor.callWhenRunning(start_web_server)  # @UndefinedVariable
         reactor.callWhenRunning(start_bitdust)  # @UndefinedVariable
         reactor.run(installSignalHandlers=False)  # @UndefinedVariable
 
-        print('run_service() Twisted reactor stopped')
-
-        # if os.path.isfile(SERVICE_STARTED_MARKER_FILENAME):
-        #     os.remove(SERVICE_STARTED_MARKER_FILENAME)
-        #     print('run_service() file erased:', SERVICE_STARTED_MARKER_FILENAME)
+        if _Debug:
+            print('BitDustService.run_service() Twisted reactor stopped')
 
     except Exception as exc:
-        print('Exception in run_service() : %r' % exc)
+        if _Debug:
+            print('BitDustService.run_service()  Exception : %r' % exc)
 
+#------------------------------------------------------------------------------
+
+def main():
+    if _Debug:
+        print('BitDustService.main() process is starting')
+    run_service()
+    if _Debug:
+        print('BitDustService.main() process is finishing')
+
+#------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    run_service()
-    print('EXIT')
+    main()

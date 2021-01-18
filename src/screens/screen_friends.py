@@ -1,4 +1,4 @@
-from components.buttons import CustomIconButton
+from components.buttons import TransparentIconButton
 from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
 
@@ -6,7 +6,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-class FriendActionButton(CustomIconButton):
+class FriendActionButton(TransparentIconButton):
     pass
 
 
@@ -46,11 +46,11 @@ class FriendRecord(SelectableHorizontalRecord):
         )
 
     def on_delete_button_clicked(self, *args):
-        self.parent.parent.parent.parent.parent.main_win().close_screen(
+        self.parent.parent.parent.parent.parent.parent.main_win().close_screen(
             screen_id='private_chat_{}'.format(self.global_id),
         )
         self.parent.parent.clear_selection()
-        api_client.friend_remove(global_user_id=self.global_id, cb=self.parent.parent.parent.parent.parent.populate)
+        api_client.friend_remove(global_user_id=self.global_id, cb=self.parent.parent.parent.parent.parent.parent.populate)
 
 
 class FriendsListView(SelectableRecycleView):
