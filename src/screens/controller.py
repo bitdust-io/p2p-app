@@ -12,6 +12,7 @@ _Debug = True
 #------------------------------------------------------------------------------
 
 def all_screens():
+    from screens import screen_startup
     from screens import screen_main_menu
     from screens import screen_welcome
     from screens import screen_process_dead
@@ -28,6 +29,7 @@ def all_screens():
     from screens import screen_private_chat
     from screens import screen_group_chat
     return {
+        'startup_screen': screen_startup.StartUpScreen,
         'main_menu_screen': screen_main_menu.MainMenuScreen,
         'process_dead_screen': screen_process_dead.ProcessDeadScreen,
         'connecting_screen': screen_connecting.ConnectingScreen,

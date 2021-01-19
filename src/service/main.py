@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import time
 
 from twisted.internet import reactor
 
@@ -51,7 +50,6 @@ def set_foreground():
     NotificationChannel = autoclass(u'android.app.NotificationChannel')
     notification_channel = NotificationChannel(channel_id, AndroidString('BitDust Channel'.encode('utf-8')), NotificationManager.IMPORTANCE_HIGH)
     Notification = autoclass(u'android.app.Notification')
-    # service = autoclass('org.kivy.android.PythonService').mService
     service = autoclass('org.bitdust_io.bitdust1.BitDustService').mService
     notification_service = service.getSystemService(Context.NOTIFICATION_SERVICE)
     notification_service.createNotificationChannel(notification_channel)
@@ -91,46 +89,8 @@ def start_bitdust():
         if _Debug:
             print('BitDustService.start_bitdust() error changing current path to "bitdust" sub-folder:', exc)
     if _Debug:
-        print('BitDustService.start_bitdust() executable_path after : %r' % os.getcwd())
-
-    try:
-        os.makedirs('/storage/emulated/0/bitdust_is_ok', 0o777)
-    except Exception as exc:
-        import traceback
-        traceback.print_exc()
-
-#     permissions_ok = False
-#     count = 0
-#     while True:
-#         count += 1
-#         if count >= 90:
-#             if _Debug:
-#                 print('BitDustService.start_bitdust() failed after %d attempts' % count)
-#             break
-#         try:
-#             if not os.path.isdir('/storage/emulated/0/.bitdust'):
-#                 os.makedirs('/storage/emulated/0/.bitdust', 0o777)
-#             if not os.path.isfile('/storage/emulated/0/.bitdust/deployed'):
-#                 open('/storage/emulated/0/.bitdust/deployed', 'w').write('ok')
-#             ok = open('/storage/emulated/0/.bitdust/deployed', 'r').read().strip()
-#             if ok != 'ok':
-#                 raise Exception('reading from app folder failed')
-#         except Exception as exc:
-#             import traceback
-#             traceback.print_exc()
-#             # if _Debug:
-#             #     print('BitDustService.start_bitdust() attempt', count, ':', exc)
-#             time.sleep(1)
-#             continue
-#         permissions_ok = True
-#         break
-#     if not permissions_ok:
-#         return False
-
-    if _Debug:
-        print('BitDustService.start_bitdust() executing the entry point')
+        print('BitDustService.start_bitdust() executing the entry point     os.getcwd() : %r' % os.getcwd())
     from main.bpmain import main
-    # reactor.callLater(0, main, executable_path, start_reactor=False)  # @UndefinedVariable
     main(executable_path, start_reactor=False)
     return True
 
@@ -146,7 +106,6 @@ def stop_bitdust():
     if _Debug:
         print('BitDustService.stop_bitdust() executable_path after : %r' % os.getcwd())
     from main import shutdowner
-    # reactor.callLater(0, shutdowner.A, 'stop', 'exit')  # @UndefinedVariable
     shutdowner.A('stop', 'exit')
     return True
 
@@ -164,8 +123,6 @@ def run_service():
             print('BitDustService.run_service() service to be stopped now')
         stop_bitdust()
         return
-
-    # request_app_permissions()
 
     try:
         set_foreground()

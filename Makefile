@@ -54,7 +54,8 @@ install_buildozer:
 
 install_p4a:
 	@rm -rf python-for-android/
-	@git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
+	@git clone --single-branch --branch develop_more https://github.com/vesellov/python-for-android.git
+	# @git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
 	# @git clone --single-branch --branch master https://github.com/vesellov/python-for-android.git
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
@@ -74,12 +75,12 @@ update_engine_repo:
 
 ### Android release & development
 
-clean_android_build:
+clean_android_environment:
 	@rm -rf .build_incremental
 	@rm -rf .release_incremental
 	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android clean
 
-clean_android_build_full:
+clean_android_environment_full:
 	@rm -rf .build_incremental
 	@rm -rf .release_incremental
 	@rm -rf .buildozer

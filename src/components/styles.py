@@ -64,7 +64,7 @@ def init(app):
     app.color_text_input_border = (.75,.75,.75,1)
 
     #--- NAVIGATION
-    app.nav_height = dp(26)
+    app.nav_height = dp(28)
 
     #--- SCREEN SETTINGS
     app.setting_record_height = sp(app.font_size_large_absolute) + dp(10)
