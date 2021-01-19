@@ -15,6 +15,10 @@ _Debug = True
 
 class NewIdentityScreen(AppScreen):
 
+
+    def get_icon(self):
+        return 'passport'
+
     def get_title(self):
         return 'new identity'
 

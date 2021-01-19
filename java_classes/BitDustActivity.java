@@ -87,13 +87,26 @@ public class BitDustActivity extends PythonActivity {
     @Override
     protected void onDestroy() {
         Log.v(TAG, "onDestroy()");
-        String process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
-        Log.v(TAG, "onDestroy() process_stop_result : " + process_stop_result);
+        String process_stop_result = "";
+        process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
+        Log.v(TAG, "onDestroy() process_stop_result 1 time : " + process_stop_result);
+        process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
+        Log.v(TAG, "onDestroy() process_stop_result 2 time : " + process_stop_result);
+        process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
+        Log.v(TAG, "onDestroy() process_stop_result 3 time : " + process_stop_result);
+
+        /*
         String process_health_result = "ok";
+        int attempts = 0;
         while (process_health_result != "") {
+            attempts = attempts + 1;
+            if (attempts >= 5) {
+                break;
+            }
             process_health_result = requestGetURL("http://localhost:8180/process/health/v1");
             Log.v(TAG, "onDestroy() process_health_result : " + process_health_result);
         }
+        */
         Log.v(TAG, "onDestroy()   about to call super onDestroy");
         super.onDestroy();
     }

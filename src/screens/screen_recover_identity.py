@@ -15,11 +15,14 @@ _Debug = True
 
 class RecoverIdentityScreen(AppScreen):
 
+    def get_icon(self):
+        return 'account-key'
+
     def get_title(self):
         return 'recover identity'
 
     def is_closable(self):
-        return False
+        return True
 
     def on_start_recover_identity_button_clicked(self, *args):
         self.ids.recover_identity_button.disabled = True
