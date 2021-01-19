@@ -54,14 +54,15 @@ install_buildozer:
 
 install_p4a:
 	@rm -rf python-for-android/
-	@git clone --single-branch --branch develop_more https://github.com/vesellov/python-for-android.git
-	# @git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
 	# @git clone --single-branch --branch master https://github.com/vesellov/python-for-android.git
+	# @git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
+	@git clone --single-branch --branch develop_more https://github.com/vesellov/python-for-android.git
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 
 update_p4a:
-	@cd ./python-for-android; git fetch --all; git reset --hard origin/develop; cd ..;
+	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop; cd ..;
+	@cd ./python-for-android; git fetch --all; git reset --hard origin/develop_more; cd ..;
 
 update_kivymd_icons:
 	@./venv/bin/python ./venv/lib/python3.6/site-packages/kivymd/tools/update_icons.py
