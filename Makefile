@@ -48,8 +48,8 @@ install: system_dependencies clean venv
 
 install_buildozer:
 	@rm -rf buildozer/
-	@git clone https://github.com/vesellov/buildozer buildozer
 	# @git clone https://github.com/kivy/buildozer buildozer
+	@git clone https://github.com/vesellov/buildozer buildozer
 	@cd ./buildozer/; ../venv/bin/python setup.py build; ../venv/bin/pip install -e .; cd ..
 
 install_p4a:

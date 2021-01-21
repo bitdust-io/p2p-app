@@ -92,6 +92,8 @@ def start_bitdust():
         print('BitDustService.start_bitdust() executing the entry point     os.getcwd() : %r' % os.getcwd())
     from main.bpmain import main
     main(executable_path, start_reactor=False)
+    if _Debug:
+        print('BitDustService.start_bitdust() OK!')
     return True
 
 

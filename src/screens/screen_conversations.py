@@ -59,6 +59,7 @@ class ConversationRecord(SelectableHorizontalRecord):
     def on_chat_button_clicked(self, *args):
         if _Debug:
             print('on_chat_button_clicked', self.key_id)
+        self.parent.clear_selection()
         if self.key_id.startswith('master$'):
             self.parent.parent.parent.parent.parent.parent.main_win().select_screen(
                 screen_id='private_chat_{}'.format(self.key_id.replace('master$', '')),
@@ -77,6 +78,7 @@ class ConversationRecord(SelectableHorizontalRecord):
     def on_join_button_clicked(self, *args):
         if _Debug:
             print('on_join_button_clicked', self.key_id)
+        self.parent.clear_selection()
         api_client.group_join(group_key_id=self.key_id, cb=self.on_group_join_result)
 
     def on_group_join_result(self, resp):
@@ -86,6 +88,7 @@ class ConversationRecord(SelectableHorizontalRecord):
     def on_leave_button_clicked(self, *args):
         if _Debug:
             print('on_leave_button_clicked', self.key_id)
+        self.parent.clear_selection()
         api_client.group_leave(group_key_id=self.key_id, erase_key=False, cb=self.on_group_leave_result)
 
     def on_group_leave_result(self, resp):
@@ -95,6 +98,7 @@ class ConversationRecord(SelectableHorizontalRecord):
     def on_group_delete_button_clicked(self, *args):
         if _Debug:
             print('on_group_delete_button_clicked', self.key_id)
+        self.parent.clear_selection()
         api_client.group_leave(group_key_id=self.key_id, erase_key=True, cb=self.on_group_leave_result)
 
 
@@ -120,6 +124,9 @@ class ConversationsScreen(AppScreen):
         api_client.message_conversations_list(cb=self.on_message_conversations_list_result)
 
     def on_pre_enter(self, *args):
+        if self.ids.conversations_list_view.selected_item:
+            self.ids.conversations_list_view.selected_item.hide_buttons()
+        self.ids.conversations_list_view.clear_selection()
         self.populate()
 
     def on_message_conversations_list_result(self, resp):
