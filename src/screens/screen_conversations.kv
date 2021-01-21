@@ -26,9 +26,9 @@
         id: conversation_state_field
         size_hint: None, 1
         width: dp(20)
-        font_size: '18sp' if root.state not in ['IN_SYNC!', 'CONNECTED'] else '14sp'
-        color: app.color_circle_offline if root.state not in ['IN_SYNC!', 'CONNECTED'] else app.color_circle_online
-        icon: 'lan-disconnect' if root.state not in ['IN_SYNC!', 'CONNECTED'] else 'circle'
+        font_size: '14sp'
+        color: root.get_icon_color(root.state)
+        icon: 'circle'
 
     HFlexMarkupLabel:
         id: label_field

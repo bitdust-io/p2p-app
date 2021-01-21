@@ -5,7 +5,7 @@ from fonts.materialdesignicons5455_map import materialdesignicons5455_codes, mat
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 # Font Awesome

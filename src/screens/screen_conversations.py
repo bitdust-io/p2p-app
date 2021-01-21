@@ -1,6 +1,7 @@
 from components.buttons import TransparentIconButton
 from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
+from components.styles import style
 
 from lib import api_client
 from lib import websock
@@ -21,29 +22,42 @@ class ConversationRecord(SelectableHorizontalRecord):
         super(ConversationRecord, self).__init__(**kwargs)
         self.visible_buttons = []
 
+    def get_icon_color(self, state):
+        if state in ['IN_SYNC!', 'CONNECTED', ]:
+            return style.color_circle_online
+        if state in ['OFFLINE', 'DISCONNECTED', ]:
+            return style.color_circle_offline
+        return style.color_circle_connecting
+
     def show_buttons(self):
         if not self.visible_buttons:
             chat_button = ConversationActionButton(
                 icon='comment-multiple',
+                color=style.color_btn_normal,
                 on_release=self.on_chat_button_clicked,
             )
             self.visible_buttons.append(chat_button)
             self.add_widget(chat_button)
             if self.key_id.startswith('group_'):
-                join_button = ConversationActionButton(
-                    icon='lan-connect',
-                    on_release=self.on_join_button_clicked,
-                )
-                self.visible_buttons.append(join_button)
-                self.add_widget(join_button)
-                leave_button = ConversationActionButton(
-                    icon='account-tie-voice-off-outline',
-                    on_release=self.on_leave_button_clicked,
-                )
-                self.visible_buttons.append(leave_button)
-                self.add_widget(leave_button)
+                if self.state in ['IN_SYNC!', 'CONNECTED', ]:
+                    leave_button = ConversationActionButton(
+                        icon='lan-disconnect',
+                        color=style.color_btn_normal_red,
+                        on_release=self.on_leave_button_clicked,
+                    )
+                    self.visible_buttons.append(leave_button)
+                    self.add_widget(leave_button)
+                else:
+                    join_button = ConversationActionButton(
+                        icon='lan-connect',
+                        color=style.color_btn_normal,
+                        on_release=self.on_join_button_clicked,
+                    )
+                    self.visible_buttons.append(join_button)
+                    self.add_widget(join_button)
                 delete_button = ConversationActionButton(
                     icon='trash-can',
+                    color=style.color_btn_normal,
                     on_release=self.on_group_delete_button_clicked,
                 )
                 self.visible_buttons.append(delete_button)
@@ -77,7 +91,7 @@ class ConversationRecord(SelectableHorizontalRecord):
 
     def on_join_button_clicked(self, *args):
         if _Debug:
-            print('on_join_button_clicked', self.key_id)
+            print('on_join_button_clicked', self.key_id, )
         self.parent.clear_selection()
         api_client.group_join(group_key_id=self.key_id, cb=self.on_group_join_result)
 

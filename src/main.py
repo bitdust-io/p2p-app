@@ -62,6 +62,8 @@ from kivy.core.window import Window
 
 from screens import controller
 
+from components import styles
+
 #------------------------------------------------------------------------------
 
 if is_android(): 
@@ -129,7 +131,7 @@ def request_app_permissions(permissions=[], callback=None):
 
 #------------------------------------------------------------------------------
 
-class BitDustApp(MDApp):
+class BitDustApp(MDApp, styles.AppStyle):
 
     control = None
     main_window = None
@@ -146,7 +148,6 @@ class BitDustApp(MDApp):
         self.theme_cls.primary_palette = 'Indigo'
         self.theme_cls.accent_palette = 'Green'
 
-        from components import styles
         from components import layouts
         from components import labels
         from components import buttons
@@ -154,7 +155,6 @@ class BitDustApp(MDApp):
         from components import list_view
         from components import navigation
         from components import main_window
-        styles.init(self)
 
         self.control = controller.Controller(self)
         self.main_window = main_window.MainWindow()
@@ -162,7 +162,7 @@ class BitDustApp(MDApp):
         self.main_window.register_controller(self.control)
         self.main_window.select_screen(screen_id='startup_screen', verify_state=False)
 
-        Window.bind(on_keyboard=self.on_key_input)
+        # Window.bind(on_keyboard=self.on_key_input)
 
         return self.main_window
 

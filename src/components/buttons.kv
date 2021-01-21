@@ -1,6 +1,11 @@
 #:import make_icon components.webfont.make_icon
 #:import md_icon components.webfont.md_icon
 
+# <-MDFloatingActionButton>:
+
+
+# <-BaseButton>:
+
 
 <CustomRectangularButton>:
     canvas:
@@ -19,7 +24,7 @@
     theme_text_color: 'Primary' if not root.text_color else 'Custom'
     markup: False
 
-    MDLabel:
+    BaseLabel:
         id: lbl_txt
         text: root.text if root.button_label else ''
         font_size: root.font_size
@@ -111,9 +116,6 @@
     elevation_normal: 0
     elevation_raised: 0
     font_size: sp(16)
-
-
-# <-MDFloatingActionButton>:
 
 
 <CustomFloatingActionButton>:

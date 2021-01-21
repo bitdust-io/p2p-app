@@ -3,7 +3,6 @@ from kivy.properties import (
     StringProperty,  # @UnresolvedImport
     NumericProperty,  # @UnresolvedImport
     BoundedNumericProperty,  # @UnresolvedImport
-    ColorProperty,  # @UnresolvedImport
 )
 from kivy.uix.button import Button
 from kivymd.theming import ThemableBehavior

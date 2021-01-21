@@ -4,7 +4,6 @@ from kivymd.uix.label import MDLabel
 from kivymd.theming import ThemableBehavior
 
 from lib import websock
-from components.webfont import md_icon, fa_icon, is_md_icon, is_fa_icon
 
 #------------------------------------------------------------------------------
 
