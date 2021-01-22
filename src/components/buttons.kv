@@ -1,10 +1,10 @@
 #:import make_icon components.webfont.make_icon
 #:import md_icon components.webfont.md_icon
 
-# <-MDFloatingActionButton>:
+<-MDFloatingActionButton>:
 
 
-# <-BaseButton>:
+<-BaseButton>:
 
 
 <CustomRectangularButton>:
@@ -181,12 +181,26 @@
     pos_hint: {"center_x": .5, "center_y": .5}
     color: app.color_black
     background_color: app.color_white
-    background_normal: ''
-    background_down: ''
-    background_disabled_normal: ''
-    background_disabled_down: ''
     markup: True
     text: make_icon(self.icon, self.icon_pack)
+    disabled_color: app.color_btn_disabled
+
+    state_image: self.background_normal if self.state == 'normal' else self.background_down
+    disabled_image: self.background_disabled_normal if self.state == 'normal' else self.background_disabled_down
+    canvas:
+        Color:
+            rgba: self.background_color
+        BorderImage:
+            border: self.border
+            pos: self.pos
+            size: self.size
+            source: self.disabled_image if self.disabled else self.state_image
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            texture: self.texture
+            size: self.texture_size
+            pos: int(self.center_x - self.texture_size[0] / 2.), int(self.center_y - self.texture_size[1] / 2.)
 
 
 <TransparentIconButton>:

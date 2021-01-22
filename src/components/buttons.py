@@ -3,9 +3,13 @@ from kivy.properties import (
     StringProperty,  # @UnresolvedImport
     NumericProperty,  # @UnresolvedImport
     BoundedNumericProperty,  # @UnresolvedImport
+    ColorProperty,  # @UnresolvedImport
+    ListProperty,  # @UnresolvedImport
 )
 from kivy.uix.button import Button
+from kivy.uix.behaviors import ButtonBehavior
 from kivymd.theming import ThemableBehavior
+from kivymd.uix.label import MDLabel
 from kivymd.uix.button import (
     BaseButton,
     BaseElevationButton,
@@ -88,12 +92,17 @@ class RoundedFlexButton(RoundedButton):
     pass
 
 
-class CustomIconButton(ThemableBehavior, Button):
-
+class CustomIconButton(ButtonBehavior, MDLabel):
     icon = StringProperty("circle")
     icon_pack = StringProperty("md")
     button_width = NumericProperty("32dp")
     button_height = NumericProperty("32dp")
+    background_color = ColorProperty([1, 1, 1, 1])
+    background_normal = StringProperty('')
+    background_down = StringProperty('')
+    background_disabled_normal = StringProperty('')
+    background_disabled_down = StringProperty('')
+    border = ListProperty([0, 0, 0, 0])
 
 
 class TransparentIconButton(CustomIconButton):

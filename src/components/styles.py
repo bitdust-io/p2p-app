@@ -8,6 +8,12 @@ _Debug = True
 
 base_element_height = 32
 
+# those can be used to manipulate button's gamma
+btn_clr_rgb_top = .7
+btn_clr_rgb_mid = .5
+btn_clr_rgb_low = .3
+
+#------------------------------------------------------------------------------
 
 class AppStyle(object):
 
@@ -40,31 +46,32 @@ class AppStyle(object):
     #--- COLORS
     color_transparent = (0,0,0,0)
     color_black = (0,0,0,1)
-    color_gray = (.5,.5,.5,1)
+    color_gray = (btn_clr_rgb_mid,btn_clr_rgb_mid,btn_clr_rgb_mid,1)
     color_white = (1,1,1,1)
     color_row_seleted = (.96, .96, 1, 1)
-    color_circle_connecting = (.8, .8, .3, 1)
-    color_circle_offline = (.9, .9, .9, 1)
-    color_circle_online = (.5, .9, .5, 1)
+    color_circle_connecting = (btn_clr_rgb_top, btn_clr_rgb_top, btn_clr_rgb_low+.1, 1)
+    color_circle_offline = (btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, 1)
+    color_circle_online = (btn_clr_rgb_mid, btn_clr_rgb_top+.1, btn_clr_rgb_mid, 1)
 
     color_btn_text_light = (1,1,1,1)
-    color_btn_text_dark = (.3,.7,1,1)
-    color_btn_normal = (.2,.5,.8,1)
-    color_btn_pressed = (.3,.6,.9,1)
-    color_btn_inactive = (.1,.4,.7,1)
-    color_btn_disabled = (.8,.8,.8,1)
-    color_btn_normal_green = (.2,.8,.5,1)
-    color_btn_normal_red = (.8,.5,.2,1)
-    color_btn_pressed_green = (.3,.9,.6,1)
-    color_btn_inactive_green = (.1,.7,.4,1)
-    color_btn_disabled_green = (.7,.9,.7,1)
+    color_btn_text_dark = (btn_clr_rgb_low+.1,btn_clr_rgb_top-.1,btn_clr_rgb_top+.1,1)
+    color_btn_normal = (btn_clr_rgb_low,btn_clr_rgb_mid,btn_clr_rgb_top,1)
+    color_btn_normal_blue = (btn_clr_rgb_low,btn_clr_rgb_mid,btn_clr_rgb_top,1)
+    color_btn_normal_green = (btn_clr_rgb_low,btn_clr_rgb_top,btn_clr_rgb_mid,1)
+    color_btn_normal_red = (btn_clr_rgb_top,btn_clr_rgb_mid,btn_clr_rgb_low,1)
+    color_btn_pressed = (btn_clr_rgb_low+.1,btn_clr_rgb_mid+.1,btn_clr_rgb_top+.1,1)
+    color_btn_inactive = (btn_clr_rgb_low-.1,btn_clr_rgb_mid-.1,btn_clr_rgb_top-.1,1)
+    color_btn_disabled = (btn_clr_rgb_top,btn_clr_rgb_top,btn_clr_rgb_top,1)
+    color_btn_pressed_green = (btn_clr_rgb_low+.1,btn_clr_rgb_top+.1,.6,1)
+    color_btn_inactive_green = (btn_clr_rgb_low-.1,btn_clr_rgb_top-.1,btn_clr_rgb_mid-.1,1)
+    color_btn_disabled_green = (btn_clr_rgb_top-.1,btn_clr_rgb_top+.1,btn_clr_rgb_top-.1,1)
 
     color_text_input_foreground = (.1,.1,.1,1)
     color_text_input_foreground_empty = (.5,.5,.5,1)
     color_text_input_foreground_disabled = (.5,.5,.5,1)
     color_text_input_background = (.92,.92,.92,1)
     color_text_input_background_active = (.96,.96,.96,1)
-    color_text_input_background_disabled = (.8,.8,.8,1)
+    color_text_input_background_disabled = (btn_clr_rgb_top,btn_clr_rgb_top,btn_clr_rgb_top,1)
     color_text_input_border = (.75,.75,.75,1)
 
     #--- NAVIGATION

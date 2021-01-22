@@ -103,8 +103,8 @@ def md5455_icon(name, font_file=None, with_spaces=False):
 
 def make_icon(name, icon_pack='materialdesignicons', font_file=None, with_spaces=False):
     if icon_pack in ['md', 'materialdesignicons', ]:
-        # return md_icon(name, font_file=font_file, with_spaces=with_spaces)
-        return md5455_icon(name, font_file=font_file, with_spaces=with_spaces)
+        return md_icon(name, font_file=font_file, with_spaces=with_spaces)
+        # return md5455_icon(name, font_file=font_file, with_spaces=with_spaces)
     if icon_pack in ['fa', 'fontawesome', ]:
         return fa_icon(name, font_file=font_file, with_spaces=with_spaces)
     if icon_pack in ['ico', 'icofont', ]:

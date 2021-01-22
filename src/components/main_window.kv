@@ -25,12 +25,14 @@
 
 	        TransparentIconButton:
 	            id: main_nav_button
-	            disabled: True
+	            # disabled: True
 	            icon: 'menu'
 	            font_size: sp(18)
 	            button_width: app.nav_height
 	            button_height: app.nav_height
-	            color: app.color_gray
+	            color: app.color_btn_normal
+	            # app.color_black
+	            #  if self.disabled else app.color_gray
 	        	on_press: root.select_screen('main_menu_screen', verify_state=True)
 
         ScreenManagement:

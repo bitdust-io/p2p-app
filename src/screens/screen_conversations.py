@@ -119,6 +119,8 @@ class ConversationRecord(SelectableHorizontalRecord):
 class ConversationsListView(SelectableRecycleView):
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
+        if _Debug:
+            print('on_selection_applied() %r %d %r %r' % (item, index, is_selected, prev_selected, ))
         if is_selected != prev_selected:
             if is_selected:
                 item.show_buttons()

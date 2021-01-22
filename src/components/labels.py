@@ -11,7 +11,7 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-class CustomIcon(ThemableBehavior, Label):
+class CustomIcon(ThemableBehavior, MDLabel):
 
     icon = StringProperty("ab-testing")
     icon_pack = StringProperty("md")
