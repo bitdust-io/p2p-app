@@ -148,7 +148,7 @@ class LabeledIconButton(ButtonBehavior, VerticalLayout, ThemableBehavior):
         if self.icon_color is None:
             self.icon_color = self.theme_cls.primary_color
         if self.label_color is None:
-            self.label_color = self.theme_cls.primary_dark
+            self.label_color = self.theme_cls.secondary_text_color
 
 
 class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, SpecificBackgroundColorBehavior, BaseElevationButton, BasePressedButton):

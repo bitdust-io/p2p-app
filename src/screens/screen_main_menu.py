@@ -1,19 +1,7 @@
-from kivy.uix.button import Button
-from kivy.properties import (
-    StringProperty,  # @UnresolvedImport
-)
-
-#------------------------------------------------------------------------------
-
-from components.layouts import VerticalLayout
 from components.screen import AppScreen
-from components.buttons import RaisedIconButton, TransparentIconButton, LabeledIconButton
+from components.buttons import LabeledIconButton
 
 #------------------------------------------------------------------------------
-
-class MainMenuIconButton(TransparentIconButton):
-    pass
-
 
 class MainMenuButton(LabeledIconButton):
     pass

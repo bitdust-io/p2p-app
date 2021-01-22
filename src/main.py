@@ -148,7 +148,8 @@ class BitDustApp(MDApp, styles.AppStyle):
                 print('BitDustApp.build() ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
 
         self.theme_cls.theme_style = 'Light'
-        self.theme_cls.primary_palette = 'Indigo'
+        self.theme_cls.primary_palette = 'Blue'
+        self.theme_cls.primary_hue = "400"
         self.theme_cls.accent_palette = 'Green'
 
         LabelBase.register(name="IconMD", fn_regular="./src/fonts/md.ttf")
