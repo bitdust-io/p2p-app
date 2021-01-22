@@ -1,3 +1,6 @@
+# this is automatically generated from ./buildozer.spec.template file
+buildozer.spec
+
 venv
 buildozer
 .buildozer

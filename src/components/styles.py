@@ -6,85 +6,111 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-def init(app):
-    if _Debug:
-        print('dp(1.0):', dp(1.0))
-        print('sp(1.0):', sp(1.0))
+base_element_height = 32
+
+# those can be used to manipulate button's gamma
+btn_clr_rgb_top = .7
+btn_clr_rgb_mid = .5
+btn_clr_rgb_low = .3
+
+#------------------------------------------------------------------------------
+
+class AppStyle(object):
 
     #--- FONT SIZE
-    app.font_size_extra_small_absolute = 10
-    app.font_size_small_absolute = 12
-    app.font_size_normal_absolute = 14
-    app.font_size_large_absolute = 18
-    app.font_size_icon_absolute = 14
+    font_size_extra_small_absolute = 10
 
-    app.font_size_normal = sp(app.font_size_normal_absolute)
-    app.font_size_small = sp(app.font_size_small_absolute)
-    app.font_size_large = sp(app.font_size_large_absolute)
-    app.font_size_icon = sp(app.font_size_icon_absolute)
+    font_size_small_absolute = 12
+    font_size_small = sp(12)
+
+    font_size_normal_absolute = 14
+    font_size_normal = sp(14)
+
+    font_size_large_absolute = 18
+    font_size_large = sp(18)
+
+    font_size_icon_absolute = 14
+    font_size_icon = sp(14)
 
     #--- PADDING
-    app.button_text_padding_x = dp(5)
-    app.button_text_padding_y = dp(5)
+    button_text_padding_x = dp(5)
+    button_text_padding_y = dp(5)
 
-    app.text_input_padding_x_absolute = 5
-    app.text_input_padding_y_absolute = 5
-    app.text_input_padding_x = dp(app.text_input_padding_x_absolute)
-    app.text_input_padding_y = dp(app.text_input_padding_y_absolute)
+    text_input_padding_x_absolute = 5
+    text_input_padding_x = dp(5)
+    text_input_padding_y_absolute = 5
+    text_input_padding_y = dp(5)
 
     #--- SCROLL BAR
-    app.scroll_bar_width = dp(15)
+    scroll_bar_width = dp(15)
 
     #--- COLORS
-    app.color_transparent = (0,0,0,0)
-    app.color_black = (0,0,0,1)
-    app.color_gray = (.5,.5,.5,1)
-    app.color_white = (1,1,1,1)
-    app.color_row_seleted = (.96, .96, 1, 1)
-    app.color_circle_offline = (.7, .7, .7, 1)
-    app.color_circle_online = (.5, .9, .5, 1)
+    color_transparent = (0,0,0,0)
+    color_black = (0,0,0,1)
+    color_gray = (btn_clr_rgb_mid,btn_clr_rgb_mid,btn_clr_rgb_mid,1)
+    color_white = (1,1,1,1)
+    color_row_seleted = (.96, .96, 1, 1)
+    color_circle_connecting = (btn_clr_rgb_top, btn_clr_rgb_top, btn_clr_rgb_low+.1, 1)
+    color_circle_offline = (btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, 1)
+    color_circle_online = (btn_clr_rgb_mid, btn_clr_rgb_top+.1, btn_clr_rgb_mid, 1)
 
-    app.color_btn_text_light = (1,1,1,1)
-    app.color_btn_text_dark = (.3,.7,1,1)
-    app.color_btn_normal = (.2,.5,.8,1)
-    app.color_btn_pressed = (.3,.6,.9,1)
-    app.color_btn_inactive = (.1,.4,.7,1)
-    app.color_btn_disabled = (.8,.8,.8,1)
-    app.color_btn_normal_green = (.2,.8,.5,1)
-    app.color_btn_pressed_green = (.3,.9,.6,1)
-    app.color_btn_inactive_green = (.1,.7,.4,1)
-    app.color_btn_disabled_green = (.7,.9,.7,1)
+    color_btn_text_light = (1,1,1,1)
+    color_btn_text_dark = (btn_clr_rgb_low+.1,btn_clr_rgb_top-.1,btn_clr_rgb_top+.1,1)
+    color_btn_normal = (btn_clr_rgb_low,btn_clr_rgb_mid,btn_clr_rgb_top,1)
+    color_btn_normal_blue = (btn_clr_rgb_low,btn_clr_rgb_mid,btn_clr_rgb_top,1)
+    color_btn_normal_green = (btn_clr_rgb_low,btn_clr_rgb_top,btn_clr_rgb_mid,1)
+    color_btn_normal_red = (btn_clr_rgb_top,btn_clr_rgb_mid,btn_clr_rgb_low,1)
+    color_btn_pressed = (btn_clr_rgb_low+.1,btn_clr_rgb_mid+.1,btn_clr_rgb_top+.1,1)
+    color_btn_inactive = (btn_clr_rgb_low-.1,btn_clr_rgb_mid-.1,btn_clr_rgb_top-.1,1)
+    color_btn_disabled = (btn_clr_rgb_top,btn_clr_rgb_top,btn_clr_rgb_top,1)
+    color_btn_pressed_green = (btn_clr_rgb_low+.1,btn_clr_rgb_top+.1,.6,1)
+    color_btn_inactive_green = (btn_clr_rgb_low-.1,btn_clr_rgb_top-.1,btn_clr_rgb_mid-.1,1)
+    color_btn_disabled_green = (btn_clr_rgb_top-.1,btn_clr_rgb_top+.1,btn_clr_rgb_top-.1,1)
 
-    app.color_text_input_foreground = (.1,.1,.1,1)
-    app.color_text_input_foreground_empty = (.5,.5,.5,1)
-    app.color_text_input_foreground_disabled = (.5,.5,.5,1)
-    app.color_text_input_background = (.92,.92,.92,1)
-    app.color_text_input_background_active = (.96,.96,.96,1)
-    app.color_text_input_background_disabled = (.8,.8,.8,1)
-    app.color_text_input_border = (.75,.75,.75,1)
+    color_text_input_foreground = (.1,.1,.1,1)
+    color_text_input_foreground_empty = (.5,.5,.5,1)
+    color_text_input_foreground_disabled = (.5,.5,.5,1)
+    color_text_input_background = (.92,.92,.92,1)
+    color_text_input_background_active = (.96,.96,.96,1)
+    color_text_input_background_disabled = (btn_clr_rgb_top,btn_clr_rgb_top,btn_clr_rgb_top,1)
+    color_text_input_border = (.75,.75,.75,1)
+
+    #--- BUTTONS
+    btn_icon_small_width = dp(26)
+    btn_icon_small_height = dp(26)
+    btn_icon_normal_width = dp(32)
+    btn_icon_normal_height = dp(32)
 
     #--- NAVIGATION
-    app.nav_height = dp(26)
+    nav_height = dp(base_element_height)
+
+    #--- TEXT INPUT
+    text_input_height = 26
 
     #--- SCREEN SETTINGS
-    app.setting_record_height = sp(app.font_size_large_absolute) + dp(10)
-    app.setting_normal_font_size_absolute = app.font_size_normal_absolute
-    app.setting_small_font_size_absolute = app.font_size_small_absolute
-    app.setting_normal_font_size = sp(app.setting_normal_font_size_absolute)
-    app.setting_small_font_size = sp(app.setting_small_font_size_absolute)
+    setting_record_height = dp(base_element_height)
+    setting_normal_font_size_absolute = 14
+    setting_normal_font_size = sp(14)
+    setting_small_font_size_absolute = 12
+    setting_small_font_size = sp(12)
 
     #--- SCREEN SEARCH_PEOPLE
-    app.search_result_record_height = sp(16) + dp(12)
+    search_result_record_height = dp(base_element_height)
 
     #--- SCREEN FRIENDS
-    app.friend_record_padding_x = dp(5)
-    app.friend_record_padding_y = dp(5)
-    app.friend_record_height = sp(16) + dp(12)
+    friend_record_padding_x = dp(5)
+    friend_record_padding_y = dp(5)
+    friend_record_height = dp(base_element_height)
 
     #--- SCREEN CONVERSATIONS
-    app.conversation_record_padding_x = dp(5)
-    app.conversation_record_padding_y = dp(5)
-    app.conversation_record_height = sp(16) + dp(12)
+    conversation_record_padding_x = dp(5)
+    conversation_record_padding_y = dp(5)
+    conversation_record_height = dp(base_element_height)
 
     #--- SCREEN PRIVATE CHAT
-    app.chat_input_font_size = sp(app.font_size_normal_absolute)
+    chat_input_font_size = sp(14)
+
+#------------------------------------------------------------------------------
+
+style = AppStyle()
+

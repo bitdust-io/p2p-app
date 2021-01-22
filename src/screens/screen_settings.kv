@@ -1,29 +1,10 @@
-# <TreeElement>:
-#     canvas.before:
-#         Color:
-#             rgba: self.color_selected if self.is_selected else self.odd_color if self.odd else self.even_color
-#         Rectangle:
-#             pos: [self.parent.x, self.y] if self.parent else [0, 0]
-#             size: [self.parent.width, self.height] if self.parent else [1, 1]
-#         Color:
-#             rgba: 1, 1, 1, int(not self.is_leaf)
-#         Rectangle:
-#             source: 'atlas://data/images/defaulttheme/tree_%s' % ('opened' if self.is_open else 'closed')
-#             size: (self.height / (3. if dp(1) > 1 else 2.)) * 0.75, (self.height / (3. if dp(1) > 1 else 2.)) * 0.75
-#             pos: self.x - dp(10), int(self.center_y - (self.height / (3. if dp(1) > 1 else 2.)) * .5)
-#     canvas.after:
-#         Color:
-#             rgba: .5, .5, .5, .2
-#         Line:
-#             points: [self.parent.x, self.y, self.parent.right, self.y] if self.parent else []
-
-
 <OptionValueTextInput>:
-    size_hint: None, None
+    size_hint_x: None
+    size_hint_y: None
     width: dp(100)
-    height: self.line_height + dp(4)
+    height: self.line_height + dp(8)
     pos_hint: {'right': 1, 'center_y': .5}
-    padding: dp(4), dp(2)
+    padding: dp(5), dp(4)
     halign: 'left'
     valign: 'center'
     font_size: app.setting_small_font_size
@@ -268,8 +249,8 @@
     size_hint: 1, None
     height: self.minimum_height
     root_options: {'text': 'settings'}
-    indent_start: dp(5)
-    indent_level: dp(8)
+    indent_start: dp(10)
+    indent_level: dp(6)
     hide_root: True
 
 

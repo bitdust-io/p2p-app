@@ -10,6 +10,9 @@ class ConnectingScreen(AppScreen):
 
     verify_network_connected_task = None
 
+    def get_icon(self):
+        return 'lan-pending'
+
     def get_title(self):
         return 'connecting...'
 

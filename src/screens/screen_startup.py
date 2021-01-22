@@ -1,16 +1,19 @@
 from components.screen import AppScreen
-from components.buttons import LabeledIconButton
 
 #------------------------------------------------------------------------------
 
-class MainMenuButton(LabeledIconButton):
-    pass
+class StartUpScreen(AppScreen):
 
+    def get_icon(self):
+        return 'progress-clock'
 
-class MainMenuScreen(AppScreen):
-    pass
+    def get_title(self):
+        return 'initializing...'
+
+    def is_closable(self):
+        return False
 
 #------------------------------------------------------------------------------
 
 from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_main_menu.kv')
+Builder.load_file('./screens/screen_startup.kv')

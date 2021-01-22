@@ -1,5 +1,5 @@
 from kivy.uix.textinput import TextInput
-from kivymd.uix.textfield import MDTextField, MDTextFieldRect, MDTextFieldRound
+from kivymd.uix.textfield import MDTextFieldRect, MDTextFieldRound, MDTextField
 from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
@@ -8,11 +8,15 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-class BasicTextInput(MDTextField):
+class BasicTextInput(ThemableBehavior, TextInput):
     pass
 
 
 class SingleLineTextInput(BasicTextInput):
+    pass
+
+
+class CustomTextField(MDTextField):
     pass
 
 

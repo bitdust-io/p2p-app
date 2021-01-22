@@ -114,7 +114,7 @@ class MainWindow(FloatLayout, ThemableBehavior):
             self.open_screen(screen_id, screen_type, **kwargs)
         else:
             self.active_screens[screen_id][0].init_kwargs(**kwargs)
-        self.ids.main_nav_button.disabled = bool(screen_id in ['process_dead_screen', 'connecting_screen', ])
+        self.ids.main_nav_button.disabled = bool(screen_id in ['process_dead_screen', 'connecting_screen', 'startup_screen', ])
         if self.selected_screen:
             if self.selected_screen == screen_id:
                 if _Debug:
@@ -129,7 +129,7 @@ class MainWindow(FloatLayout, ThemableBehavior):
             another_btn.selected = True
         self.ids.screen_manager.current = screen_id
         self.selected_screen = screen_id
-        if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
+        if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
             self.latest_screen = self.selected_screen
         return True
 
