@@ -6,7 +6,7 @@
     font_size: sp(19)
     size_hint: None, None
     size: (self.texture_size[0], app.nav_height)
-    color: app.color_white
+    color: self.specific_secondary_text_color
 
 
 <NavLabel>:
@@ -20,7 +20,7 @@
     halign: 'left'
     font_size: app.font_size_normal
     theme_text_color: 'Custom'
-    text_color: app.color_white
+    text_color: self.specific_secondary_text_color
 
 
 <NavCloseIcon>:
@@ -30,7 +30,7 @@
     pos_hint: {"center_x": .5, "center_y": .5}
     padding: (0, 0)
     font_size: '20sp'
-    color: app.theme_cls.primary_light
+    color: self.specific_secondary_text_color
 
 
 <NavBaseRectangularButton>:
@@ -72,9 +72,6 @@
 	        id: lbl_txt
 		    text: root.text if root.button_label else ''
 		    text_size: (None, root.height)
-		    # theme_text_color: root.theme_text_color
-		    # text_color: root.text_color
-		    # opposite_colors: root.opposite_colors
             on_press: root.on_action_area_pressed()
 
 
@@ -101,12 +98,8 @@
 	        id: lbl_txt
 		    text: root.text if root.button_label else ''
 		    text_size: (None, root.height)
-		    # theme_text_color: root.theme_text_color
-		    # text_color: root.text_color
-		    # opposite_colors: root.opposite_colors
             on_press: root.on_action_area_pressed()
 
         NavCloseIcon:
             id: lbl_icn_right
-		    # text_color: app.theme_cls.primary_color if not root.text_color else root.text_color
         	on_press: root.on_close_area_pressed()

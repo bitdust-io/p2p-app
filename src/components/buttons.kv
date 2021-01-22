@@ -1,10 +1,11 @@
 #:import make_icon components.webfont.make_icon
+#:import get_icon_code components.webfont.get_icon_code
 #:import md_icon components.webfont.md_icon
 
-<-MDFloatingActionButton>:
+# <-MDFloatingActionButton>:
 
 
-<-BaseButton>:
+# <-BaseButton>:
 
 
 <CustomRectangularButton>:
@@ -95,6 +96,7 @@
     CustomIcon:
         id: lbl_txt
         icon: root.icon
+        icon_pack: root.icon_pack
         font_size: root.font_size
         font_name: root.font_name if root.font_name else self.font_name
         color: root.text_color if root.text_color is not None else app.color_white
@@ -173,20 +175,6 @@
 
 
 <CustomIconButton>:
-    size_hint: None, None
-    size: self.button_width, self.button_height
-    text_size: self.size
-    valign: 'middle'
-    halign: 'center'
-    pos_hint: {"center_x": .5, "center_y": .5}
-    color: app.color_black
-    background_color: app.color_white
-    markup: True
-    text: make_icon(self.icon, self.icon_pack)
-    disabled_color: app.color_btn_disabled
-
-    state_image: self.background_normal if self.state == 'normal' else self.background_down
-    disabled_image: self.background_disabled_normal if self.state == 'normal' else self.background_disabled_down
     canvas:
         Color:
             rgba: self.background_color
@@ -196,32 +184,77 @@
             size: self.size
             source: self.disabled_image if self.disabled else self.state_image
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: (1,.5,.5,1)
         Rectangle:
             texture: self.texture
             size: self.texture_size
             pos: int(self.center_x - self.texture_size[0] / 2.), int(self.center_y - self.texture_size[1] / 2.)
+
+    size_hint: None, None
+    size: self.button_width, self.button_height
+    pos_hint: {"center_x": .5, "center_y": .5}
+    text_size: self.size
+    valign: 'middle'
+    halign: 'center'
+    disabled_color: self.theme_cls.disabled_hint_text_color
+    markup: True
+    font_style: self.icon_pack
+    text: get_icon_code(self.icon, self.icon_pack)
+    state_image: self.background_normal if self.state == 'normal' else self.background_down
+    disabled_image: self.background_disabled_normal if self.state == 'normal' else self.background_disabled_down
 
 
 <TransparentIconButton>:
     background_color: app.color_transparent
 
 
-<RaisedIconButton>:
-    md_bg_color: app.theme_cls.primary_color
-    theme_text_color: 'Custom'
-    text_color: root.specific_text_color
-    elevation_normal: 0
-    elevation_raised: 0
-
-
 <CloseIconButton>:
     icon: 'close'
 
 
-<CustomRaisedIconButton>:
-    icon: 'circle'
-    theme_text_color: 'Primary'
-    opposite_colors: True
+<LabeledIconButton>:
+    size_hint: None, None
+    width: self.button_width
+    height: self.button_height + self.label_height
+    spacing: dp(0)
+    padding: dp(0)
+	btn_icon: btn_icon
+	btn_label: btn_label
+
+	CustomIcon:
+		id: btn_icon
+	    pos_hint: {'center_x': 0.5}
+	    icon_width: root.button_width
+	    icon_height: root.button_height
+	    theme_text_color: 'Custom'
+	    text_color: root.icon_color
+	    md_bg_color: app.color_transparent
+	    font_size: root.icon_size
+		icon_pack: root.icon_pack
+		icon: root.icon
+
+	NormalLabel:
+		id: btn_label
+	    pos_hint: {'center_x': 0.5}
+		size_hint: None, None
+		size: (self.texture_size[0], root.label_height)
+	    text_size: None, None
+	    font_size: root.label_font_size
+	    theme_text_color: 'Custom'
+	    text_color: root.label_color
+	    md_bg_color: app.color_transparent
+	    text: root.label_text
+
+
+<RaisedIconButton>:
+    size_hint: None, None
     pos_hint: {"center_x": .5, "center_y": .5}
-    font_size: sp(22)
+    text_size: self.size
+    valign: 'middle'
+    halign: 'center'
+    md_bg_color: app.theme_cls.primary_color if self.selected else app.theme_cls.primary_dark
+    theme_text_color: 'Custom'
+    text_color: self.specific_text_color if self.selected else self.specific_secondary_text_color
+    markup: True
+    font_style: self.icon_pack
+    text: get_icon_code(self.icon, self.icon_pack)

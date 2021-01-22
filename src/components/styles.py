@@ -17,6 +17,7 @@ btn_clr_rgb_low = .3
 
 class AppStyle(object):
 
+    #--- FONT SIZE
     font_size_extra_small_absolute = 10
 
     font_size_small_absolute = 12
@@ -73,6 +74,12 @@ class AppStyle(object):
     color_text_input_background_active = (.96,.96,.96,1)
     color_text_input_background_disabled = (btn_clr_rgb_top,btn_clr_rgb_top,btn_clr_rgb_top,1)
     color_text_input_border = (.75,.75,.75,1)
+
+    #--- BUTTONS
+    btn_icon_small_width = dp(26)
+    btn_icon_small_height = dp(26)
+    btn_icon_normal_width = dp(32)
+    btn_icon_normal_height = dp(32)
 
     #--- NAVIGATION
     nav_height = dp(base_element_height)

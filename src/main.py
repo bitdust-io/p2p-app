@@ -56,7 +56,10 @@ if is_android():
 #------------------------------------------------------------------------------
 
 from kivymd.app import MDApp
+from kivymd.font_definitions import theme_font_styles
+
 from kivy.core.window import Window
+from kivy.core.text import LabelBase
 
 #------------------------------------------------------------------------------
 
@@ -147,6 +150,18 @@ class BitDustApp(MDApp, styles.AppStyle):
         self.theme_cls.theme_style = 'Light'
         self.theme_cls.primary_palette = 'Indigo'
         self.theme_cls.accent_palette = 'Green'
+
+        LabelBase.register(name="IconMD", fn_regular="./src/fonts/md.ttf")
+        theme_font_styles.append('IconMD')
+        self.theme_cls.font_styles["IconMD"] = ["IconMD", 22, False, 0.15, ]
+
+        LabelBase.register(name="IconFA", fn_regular="./src/fonts/fa-solid.ttf")
+        theme_font_styles.append('IconFA')
+        self.theme_cls.font_styles["IconFA"] = ["IconFA", 22, False, 0.15, ]
+
+        LabelBase.register(name="IconICO", fn_regular="./src/fonts/icofont.ttf")
+        theme_font_styles.append('IconICO')
+        self.theme_cls.font_styles["IconICO"] = ["IconICO", 22, False, 0.15, ]
 
         from components import layouts
         from components import labels

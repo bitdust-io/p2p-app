@@ -1,6 +1,9 @@
 <ConversationActionButton>:
     button_width: app.conversation_record_height - dp(1)
     button_height: app.conversation_record_height - dp(1)
+    theme_text_color: 'Custom'
+    text_color: app.theme_cls.primary_color
+    md_bg_color: app.color_transparent
 
 
 <ConversationRecord>:
@@ -71,7 +74,7 @@
             CustomFloatingActionButton:
                 id: create_new_group_button
                 icon: 'plus'
-                icon_pack: 'icofont'
+                icon_pack: 'IconICO'
                 size_hint: None, None
                 padding: dp(0)
                 text_color: app.color_white

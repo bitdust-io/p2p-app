@@ -14,10 +14,10 @@
     padding: 0
     spacing: 1
 
-    CustomRaisedIconButton:
+    RaisedIconButton:
         icon: 'account-plus'
-        width: root.height - dp(6)
-        height: root.height - dp(6)
+        button_width: app.btn_icon_small_width
+        button_height: app.btn_icon_small_height
         font_size: '16sp'
         on_press: root.on_search_result_add_clicked()
 
@@ -42,7 +42,7 @@
             size_hint: 1, None
             height: self.minimum_height
 
-            SingleLineTextInput:
+            CustomTextField:
                 id: search_input
                 size_hint_x: None
                 width: dp(220)
@@ -55,10 +55,8 @@
                 width: self.minimum_width
                 height: self.minimum_height
 
-                CustomRaisedIconButton:
+                RaisedIconButton:
                     id: search_button
-                    width: dp(28)
-                    height: dp(28)
                     _radius: dp(3)
                     icon: 'search-web'
                     on_press: root.on_search_button_clicked()

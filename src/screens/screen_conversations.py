@@ -33,7 +33,7 @@ class ConversationRecord(SelectableHorizontalRecord):
         if not self.visible_buttons:
             chat_button = ConversationActionButton(
                 icon='comment-multiple',
-                color=style.color_btn_normal,
+                # color=style.color_btn_normal,
                 on_release=self.on_chat_button_clicked,
             )
             self.visible_buttons.append(chat_button)
@@ -42,7 +42,7 @@ class ConversationRecord(SelectableHorizontalRecord):
                 if self.state in ['IN_SYNC!', 'CONNECTED', ]:
                     leave_button = ConversationActionButton(
                         icon='lan-disconnect',
-                        color=style.color_btn_normal_red,
+                        # color=style.color_btn_normal_red,
                         on_release=self.on_leave_button_clicked,
                     )
                     self.visible_buttons.append(leave_button)
@@ -50,14 +50,14 @@ class ConversationRecord(SelectableHorizontalRecord):
                 else:
                     join_button = ConversationActionButton(
                         icon='lan-connect',
-                        color=style.color_btn_normal,
+                        # color=style.color_btn_normal,
                         on_release=self.on_join_button_clicked,
                     )
                     self.visible_buttons.append(join_button)
                     self.add_widget(join_button)
                 delete_button = ConversationActionButton(
                     icon='trash-can',
-                    color=style.color_btn_normal,
+                    # color=style.color_btn_normal,
                     on_release=self.on_group_delete_button_clicked,
                 )
                 self.visible_buttons.append(delete_button)
