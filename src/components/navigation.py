@@ -11,7 +11,7 @@ from components.labels import CustomIcon
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ class NavButtonBase(NavBaseRectangularButton):
 
     def on_action_area_pressed(self):
         if _Debug:
-            print('on_action_area_pressed', self.screen)
+            print('NavButtonBase.on_action_area_pressed', self.screen)
         self.get_main_window().select_screen(self.screen)
 
 
@@ -70,7 +70,7 @@ class NavButtonClosable(NavButtonBase):
     def on_close_area_pressed(self):
         prev_screen_name = self.get_screen_manager().previous()
         if _Debug:
-            print('on_close_area_pressed', prev_screen_name)
+            print('NavButtonClosable.on_close_area_pressed', prev_screen_name)
         if prev_screen_name:
             self.get_main_window().select_screen(prev_screen_name)
         self.get_main_window().close_screen(self.screen)

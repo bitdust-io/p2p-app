@@ -47,7 +47,7 @@ from lib.system import is_android
 
 #------------------------------------------------------------------------------
 
-Config.set('input', 'mouse', 'mouse,multitouch_on_demand')  # disable multi-touch
+Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
 Config.set('graphics', 'resizable', True)
 if is_android(): 
     Config.set('graphics', 'width', '360')
@@ -152,15 +152,19 @@ class BitDustApp(MDApp, styles.AppStyle):
         self.theme_cls.primary_hue = "400"
         self.theme_cls.accent_palette = 'Green'
 
-        LabelBase.register(name="IconMD", fn_regular="./src/fonts/md.ttf")
+        fonts_path = './src/fonts'
+        if is_android():
+            fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
+
+        LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
         theme_font_styles.append('IconMD')
         self.theme_cls.font_styles["IconMD"] = ["IconMD", 22, False, 0.15, ]
 
-        LabelBase.register(name="IconFA", fn_regular="./src/fonts/fa-solid.ttf")
+        LabelBase.register(name="IconFA", fn_regular=os.path.join(fonts_path, "fa-solid.ttf"))
         theme_font_styles.append('IconFA')
         self.theme_cls.font_styles["IconFA"] = ["IconFA", 22, False, 0.15, ]
 
-        LabelBase.register(name="IconICO", fn_regular="./src/fonts/icofont.ttf")
+        LabelBase.register(name="IconICO", fn_regular=os.path.join(fonts_path, "icofont.ttf"))
         theme_font_styles.append('IconICO')
         self.theme_cls.font_styles["IconICO"] = ["IconICO", 22, False, 0.15, ]
 
@@ -184,7 +188,7 @@ class BitDustApp(MDApp, styles.AppStyle):
 
     def do_start(self, *args, **kwargs):
         if _Debug:
-            print('BitDust.do_start()', args, kwargs)
+            print('BitDustApp.do_start()', args, kwargs)
 
         if is_android():
             if args:
@@ -192,10 +196,10 @@ class BitDustApp(MDApp, styles.AppStyle):
                     if args[1] and isinstance(args[1], list):
                         if False in args[1]:
                             if _Debug:
-                                print('BitDust.do_start() FAILED : some of the requested permissions was not granted', args)
+                                print('BitDustApp.do_start() FAILED : some of the requested permissions was not granted', args)
                             return False
             if _Debug:
-                print('BitDust.do_start() is okay to start now, storage path is %r' % primary_external_storage_path())
+                print('BitDustApp.do_start() is okay to start now, storage path is %r' % primary_external_storage_path())
 
         self.control.start()
 
@@ -258,7 +262,7 @@ class BitDustApp(MDApp, styles.AppStyle):
             if not check_app_permission(perm):
                 missed_permissions.append(perm)
         if _Debug:
-            print('BitDust.on_start() missed_permissions=%r' % missed_permissions)
+            print('BitDustApp.on_start() missed_permissions=%r' % missed_permissions)
 
         if not missed_permissions:
             return self.do_start() 

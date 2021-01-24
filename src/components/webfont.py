@@ -126,7 +126,6 @@ def get_icon_code(name, icon_pack='IconMD'):
 def make_icon(name, icon_pack='IconMD', font_file=None, with_spaces=False):
     if icon_pack in ['md', 'materialdesignicons', 'IconMD', ]:
         return md_icon(name, font_file=font_file, with_spaces=with_spaces)
-        # return md5455_icon(name, font_file=font_file, with_spaces=with_spaces)
     if icon_pack in ['fa', 'fontawesome', 'IconFA', ]:
         return fa_icon(name, font_file=font_file, with_spaces=with_spaces)
     if icon_pack in ['ico', 'icofont', 'IconICO', ]:

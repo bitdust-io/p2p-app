@@ -81,11 +81,11 @@ class TreeElement(TreeViewNode):
         self.even_color = (1, 1, 1, 1)
         self.odd_color = (1, 1, 1, 1)
         if _Debug:
-            print('created element %r : %r' % (self.item_key, id(self), ))
+            print('TreeElement.init   created element %r : %r' % (self.item_key, id(self), ))
 
     def __del__(self, **kwargs):
         if _Debug:
-            print('erased element %r : %r' % (self.item_key, id(self), ))
+            print('TreeElement.del   erased element %r : %r' % (self.item_key, id(self), ))
 
 
 class ParentElement(TreeElement, CustomFlatButton):
@@ -135,7 +135,7 @@ class OptionElement(TreeElement):
 
     def on_option_value_input_updated(self):
         if _Debug:
-            print('on_option_value_input_updated', self.item_key, self.option_value_recent, self.ids.option_value_input.text)
+            print('OptionElement.on_option_value_input_updated', self.item_key, self.option_value_recent, self.ids.option_value_input.text)
         if self.value_modified_callback:
             self.value_modified_callback(self.item_key, self.ids.option_value_input.text)
 
@@ -245,12 +245,12 @@ class SettingsTreeView(TreeView):
 
     def on_node_expand(self, node):
         if _Debug:
-            print('on_node_expand', node.item_key, node.item_data)
+            print('SettingsTreeView.on_node_expand', node.item_key, node.item_data)
         self.parent.parent.parent.populate_node(node)
 
     def on_node_collapse(self, node):
         if _Debug:
-            print('on_node_collapse', node.item_key, node.item_data)
+            print('SettingsTreeView.on_node_collapse', node.item_key, node.item_data)
 
 #------------------------------------------------------------------------------
 
@@ -292,7 +292,6 @@ class SettingsScreen(AppScreen):
                 if abs_path.startswith('services/') and abs_path.count('/') == 1:
                     svc_name = 'service_'+sub_path.replace('-', '_')
                     sub_element = ServiceElement(
-                        # name=svc_name,
                         item_key=abs_path,
                         item_data=cur_item_data,
                         is_open=False,
@@ -419,7 +418,7 @@ class SettingsScreen(AppScreen):
             d[item_key] = item
             o.append(item_key)
         if _Debug:
-            print('building items:', len(d))
+            print('SettingsScreen.build_tree  items:', len(d))
         count_options = 0
         for item_key in o:
             item = d[item_key]
@@ -441,7 +440,7 @@ class SettingsScreen(AppScreen):
                 if node.is_open:
                     opened.add(node.item_key)
         if _Debug:
-            print('known nodes:', len(t), count_options)
+            print('SettingsScreen.build_tree     known nodes:', len(t), count_options)
         count_built = 0
         if t:
             for abs_path in s:
@@ -471,14 +470,14 @@ class SettingsScreen(AppScreen):
                 count_built += 1
                 t[abs_path] = active_tree_node
         if _Debug:
-            print('created elements:', count_built)
+            print('SettingsScreen.build_tree    created elements:', count_built)
         d.clear()
         a.clear()
         t.clear()
         o.clear()
         if active_node:
             if _Debug:
-                print('active node:', active_node.item_key, active_node)
+                print('SettingsScreen.build_tree   active node:', active_node.item_key, active_node)
             # Clock.schedule_once(lambda *dt: self.ids.scroll_view.scroll_to(active_node, padding=dp(5), animate=False), -1)
         self.recent_tree_index.clear()
         for node in list(tv.iterate_all_nodes()):
@@ -487,7 +486,7 @@ class SettingsScreen(AppScreen):
                 if node_item_key not in t:
                     self.recent_tree_index[node.item_key] = node
         if _Debug:
-            print('indexed %d elements' % len(self.recent_tree_index))
+            print('SettingsScreen.build_tree   indexed %d elements' % len(self.recent_tree_index))
 
     def on_enter(self, *args):
         self.populate()
@@ -497,12 +496,12 @@ class SettingsScreen(AppScreen):
         node = self.recent_tree_index.get(element_name, None)
         if not node:
             if _Debug:
-                print('element %r not found' % element_name)
+                print('SettingsScreen.on_service_started_stopped   element %r not found' % element_name)
             return
         current_state = node.service_state
         node.service_state = 'ON' if event_id == 'service-started' else 'OFF'
         if _Debug:
-            print('on_service_started_stopped', event_id, service_name, element_name, current_state, node.service_state)
+            print('SettingsScreen.on_service_started_stopped', event_id, service_name, element_name, current_state, node.service_state)
 
     def on_services_list_result(self, resp):
         if not websock.is_ok(resp):
@@ -526,7 +525,7 @@ class SettingsScreen(AppScreen):
 
     def on_item_clicked(self, option_key, node):
         if _Debug:
-            print('on_item_clicked', option_key, node)
+            print('SettingsScreen.on_item_clicked', option_key, node)
         self.ids.settings_tree.toggle_node(node)
 
     def on_config_get_result(self, resp, option_key, node):
@@ -536,12 +535,12 @@ class SettingsScreen(AppScreen):
         self.ids.status_message_label.text = ''
         items_list = websock.response_result(resp)
         if _Debug:
-            print('on_config_get_result', list(items_list))
+            print('SettingsScreen.on_config_get_result', list(items_list))
         self.build_tree(items_list, active_node=node)
 
     def on_option_value_modified(self, option_key, new_value):
         if _Debug:
-            print('on_option_value_modified', option_key, new_value)
+            print('SettingsScreen.on_option_value_modified', option_key, new_value)
         api_client.config_set(key=option_key, value=new_value)
 
 #------------------------------------------------------------------------------
