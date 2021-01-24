@@ -6,7 +6,7 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -69,8 +69,7 @@ class GroupChatScreen(AppScreen):
                 current_messages.append(msg)
             else:
                 self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    # id=msg_id,
-                    text='[color=#3f4eda]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                    text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
                 ))
                 current_sender = sender
                 sender_name, sender_host = current_sender.split('@')
@@ -78,8 +77,7 @@ class GroupChatScreen(AppScreen):
                 current_messages.append(msg)
         if current_messages:
             self.ids.chat_messages.add_widget(ChatMessageLabel(
-                # id=msg_id,
-                text='[color=#3f4eda]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
             ))
         self.ids.chat_messages_view.scroll_y = 0
 

@@ -54,7 +54,6 @@ class PrivateChatScreen(AppScreen):
         if _Debug:
             print('on_message_history_result', len(msg_list))
         for item in msg_list:
-            # msg_id = item['doc']['payload']['message_id']
             msg = item['doc']['payload']['data']['message']
             sender = item['doc']['sender']['glob_id'].replace('master$', '')
             direction = item['doc']['direction']
@@ -68,13 +67,11 @@ class PrivateChatScreen(AppScreen):
             else:
                 if current_direction == 'in':
                     self.ids.chat_messages.add_widget(ChatMessageLabel(
-                        # id=msg_id,
-                        text='[color=#3f4eda]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                        text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, '\n'.join(current_messages)),
                     ))
                 else:
                     self.ids.chat_messages.add_widget(ChatMessageLabel(
-                        # id=msg_id,
-                        text='[color=#00b11c]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                        text='[color=#00b11c]{}[/color]\n{}'.format(sender_name, '\n'.join(current_messages)),
                     ))
                 current_direction = direction
                 current_sender = sender
@@ -84,13 +81,11 @@ class PrivateChatScreen(AppScreen):
         if current_messages:
             if current_direction == 'in':
                 self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    # id=msg_id,
-                    text='[color=#3f4eda]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                    text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
                 ))
             else:
                 self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    # id=msg_id,
-                    text='[color=#00b11c]{}[/color][color=#b0b0b0]@{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                    text='[color=#00b11c]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
                 ))
         self.ids.chat_messages_view.scroll_y = 0
 

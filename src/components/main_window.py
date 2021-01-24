@@ -9,7 +9,7 @@ from components.navigation import NavButtonActive, NavButtonClosable
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ class MainWindow(FloatLayout, ThemableBehavior):
     def open_screen(self, screen_id, screen_type, **kwargs):
         if screen_id in self.active_screens:
             if _Debug:
-                print('screen %r already opened' % screen_id)
+                print('main_window.open_screen   screen %r already opened' % screen_id)
             return
         screen_class = self.screens_map[screen_type]
         screen = screen_class(name=screen_id, **kwargs)
@@ -69,12 +69,12 @@ class MainWindow(FloatLayout, ThemableBehavior):
         self.ids.screen_manager.current = screen_id
         self.active_screens[screen_id] = (screen, btn, )
         if _Debug:
-            print('opened screen %r with button %r' % (screen_id, bool(btn), ))
+            print('main_window.open_screen   opened screen %r with button %r' % (screen_id, bool(btn), ))
 
     def close_screen(self, screen_id):
         if screen_id not in self.active_screens:
             if _Debug:
-                print('screen %r has not been opened' % screen_id)
+                print('main_window.close_screen   screen %r has not been opened' % screen_id)
             return
         scrn, btn = self.active_screens.pop(screen_id)
         self.ids.screen_manager.remove_widget(scrn)
@@ -84,7 +84,7 @@ class MainWindow(FloatLayout, ThemableBehavior):
         scrn.on_closed()
         del scrn
         if _Debug:
-            print('closed screen %r' % screen_id)
+            print('main_window.close_screen  closed screen %r' % screen_id)
 
     def close_screens(self, screen_ids_list):
         for screen_id in screen_ids_list:
@@ -106,10 +106,10 @@ class MainWindow(FloatLayout, ThemableBehavior):
         if verify_state:
             if self.state_process_health != 1 or self.state_identity_get != 1:
                 if _Debug:
-                    print('selecting screen %r not possible, state verify failed' % screen_id)
+                    print('main_window.select_screen   selecting screen %r not possible, state verify failed' % screen_id)
                 return False
         if _Debug:
-            print('selecting screen %r' % screen_id)
+            print('main_window.select_screen  %r' % screen_id)
         if screen_id not in self.active_screens:
             self.open_screen(screen_id, screen_type, **kwargs)
         else:
@@ -118,7 +118,7 @@ class MainWindow(FloatLayout, ThemableBehavior):
         if self.selected_screen:
             if self.selected_screen == screen_id:
                 if _Debug:
-                    print('skip, selected screen is already %r' % screen_id)
+                    print('main_window.select_screen   skip, selected screen is already %r' % screen_id)
                 return True
             if self.selected_screen in self.active_screens:
                 _, selected_btn = self.active_screens[self.selected_screen]

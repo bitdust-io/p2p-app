@@ -7,7 +7,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -76,10 +76,7 @@ class Controller(object):
 
     def run(self):
         if _Debug:
-            print('control.run %r/%r %r/%r %r/%r' % (
-                self.mw().state_process_health, self.process_health_latest,
-                self.mw().state_identity_get, self.identity_get_latest,
-                self.mw().state_network_connected, self.network_connected_latest, ))
+            print('Controller.run %r %r %r' % (self.mw().state_process_health, self.mw().state_identity_get, self.mw().state_network_connected, ))
         # BitDust node process must be running already
         if self.mw().state_process_health == 0:
             return self.verify_process_health()
@@ -112,7 +109,7 @@ class Controller(object):
 
     def verify_network_connected(self, *args, **kwargs):
         if _Debug:
-            print('verify_network_connected', time.asctime())
+            print('Controller.verify_network_connected', time.asctime())
         return api_client.network_connected(cb=self.on_network_connected_result)
 
     #------------------------------------------------------------------------------
@@ -176,7 +173,7 @@ class Controller(object):
 
     def on_websocket_open(self, websocket_instance):
         if _Debug:
-            print('on_websocket_open', websocket_instance)
+            print('Controller.on_websocket_open', websocket_instance)
         if self.mw().state_process_health != 1:
             self.process_health_latest = 0
             self.identity_get_latest = 0
@@ -185,7 +182,7 @@ class Controller(object):
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:
-            print('on_websocket_error', websocket_instance, error)
+            print('Controller.on_websocket_error', websocket_instance, error)
         if self.mw().state_process_health != -1:
             self.mw().state_process_health = -1
             self.process_health_latest = 0
@@ -195,7 +192,7 @@ class Controller(object):
 
     def on_websocket_event(self, json_data):
         if _Debug:
-            print('on_websocket_event', json_data)
+            print('Controller.on_websocket_event', json_data)
         event_id = json_data.get('payload', {}).get('event_id', '')
         if not event_id:
             return
@@ -208,7 +205,7 @@ class Controller(object):
 
     def on_websocket_stream_message(self, json_data):
         if _Debug:
-            print('on_websocket_stream_message', json_data)
+            print('Controller.on_websocket_stream_message', json_data)
         msg_type = json_data.get('payload', {}).get('payload', {}).get('msg_type', '')
         if msg_type == 'private_message':
             self.on_private_message_received(json_data)
@@ -229,7 +226,7 @@ class Controller(object):
 
     def on_state_process_health(self, instance, value):
         if _Debug:
-            print('on_state_process_health', value)
+            print('Controller.on_state_process_health', value)
         if value == -1:
             if self.mw().selected_screen:
                 if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
@@ -249,7 +246,7 @@ class Controller(object):
 
     def on_state_identity_get(self, instance, value):
         if _Debug:
-            print('on_state_identity_get', value)
+            print('Controller.on_state_identity_get', value)
         if self.mw().state_process_health != 1:
             return
         if value == -1:
@@ -270,7 +267,7 @@ class Controller(object):
 
     def on_state_network_connected(self, instance, value):
         if _Debug:
-            print('on_state_network_connected', value)
+            print('Controller.on_state_network_connected', value)
         if self.mw().state_process_health != 1:
             return
         if value == -1:
@@ -291,7 +288,7 @@ class Controller(object):
 
     def on_state_success(self):
         if _Debug:
-            print('on_state_success %r %r %r, latest_screen=%r selected_screen=%r' % (
+            print('Controller.on_state_success %r %r %r, latest_screen=%r selected_screen=%r' % (
                 self.mw().state_process_health, self.mw().state_identity_get, self.mw().state_network_connected,
                 self.mw().latest_screen, self.mw().selected_screen, ))
         if self.mw().state_process_health == 1 and self.mw().state_identity_get == 1 and self.mw().state_network_connected == 1:

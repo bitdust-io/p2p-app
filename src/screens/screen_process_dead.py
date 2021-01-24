@@ -6,7 +6,7 @@ from components.screen import AppScreen
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -25,13 +25,13 @@ class ProcessDeadScreen(AppScreen):
 
     def on_enter(self, *args):
         if _Debug:
-            print('ProcessDeadScreen.on_enter')
+            print('screen_process_dead.on_enter')
         if not self.verify_process_health_task:
             self.verify_process_health_task = Clock.schedule_interval(self.control().verify_process_health, 3)
 
     def on_leave(self, *args):
         if _Debug:
-            print('ProcessDeadScreen.on_leave')
+            print('screen_process_dead.on_leave')
         if self.verify_process_health_task:
             Clock.unschedule(self.verify_process_health_task)
             self.verify_process_health_task = None

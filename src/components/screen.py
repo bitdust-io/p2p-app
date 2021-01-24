@@ -14,7 +14,7 @@ class AppScreen(ThemableBehavior, Screen):
         kw = self.init_kwargs(**kw)
         kw.pop('id', None)
         if _Debug:
-            print('screen %r creating with kwargs=%r' % (kw.get('name'), kw))
+            print('AppScreen.init   %r creating with kwargs=%r' % (kw.get('name'), kw))
         super(AppScreen, self).__init__(**kw)
 
     def init_kwargs(self, **kw):
