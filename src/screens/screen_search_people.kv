@@ -34,9 +34,17 @@
 <SearchPeopleScreen>:
 
     VerticalLayout:
-        size_hint: 1, 1
         pos_hint: {'top': 1}
-        padding: 15
+        size_hint: 1, None
+        height: self.minimum_height
+        padding: dp(15)
+        spacing: dp(5)
+
+        NormalLabel:
+            id: status_message_label
+            size_hint: 1, None
+            height: self.texture_size[1]
+            text: ''
 
         HorizontalLayout:
             size_hint: 1, None
