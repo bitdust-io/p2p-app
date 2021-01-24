@@ -17,22 +17,24 @@
             size_hint: 1, None
             height: self.minimum_height
 
-            SingleLineTextInput:
+            CustomTextField:
                 id: group_label_input
                 size_hint_x: None
                 width: dp(250)
-                hint_text: 'Enter a group chat name'
+                hint_text: 'Enter a name for the new group'
                 text: ''
 
-            HorizontalLayout:
-                size_hint: 1, None
+            VerticalLayout:
+                size_hint: None, None
+                width: self.minimum_width
                 height: self.minimum_height
-                padding: 0, 0, 0, dp(16)
 
                 RaisedIconButton:
                     id: create_group_button
-                    width: dp(28)
-                    height: dp(28)
                     _radius: dp(3)
                     icon: 'plus'
-                    on_release: root.on_create_group_button_clicked()
+                    on_press: root.on_create_group_button_clicked()
+
+                Widget:
+                    size_hint: None, None
+                    size: dp(16), dp(16)
