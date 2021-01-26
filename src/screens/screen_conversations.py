@@ -71,20 +71,20 @@ class ConversationRecord(SelectableHorizontalRecord):
         if _Debug:
             print('on_chat_button_clicked', self.key_id)
         self.parent.clear_selection()
-        if self.key_id.startswith('master$'):
-            self.parent.parent.parent.parent.parent.parent.main_win().select_screen(
-                screen_id='private_chat_{}'.format(self.key_id.replace('master$', '')),
-                screen_type='private_chat_screen',
-                global_id=self.key_id,
-                username=self.label,
-            )
-        elif self.key_id.startswith('group_'):
+        if self.key_id.startswith('group_'):
             self.parent.parent.parent.parent.parent.parent.main_win().select_screen(
                 screen_id=self.key_id,
                 screen_type='group_chat_screen',
                 global_id=self.key_id,
                 label=self.label,
             )
+            return
+        self.parent.parent.parent.parent.parent.parent.main_win().select_screen(
+            screen_id='private_chat_{}'.format(self.key_id.replace('master$', '')),
+            screen_type='private_chat_screen',
+            global_id=self.key_id,
+            username=self.label,
+        )
 
     def on_join_button_clicked(self, *args):
         if _Debug:

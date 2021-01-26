@@ -1,6 +1,7 @@
 from components.screen import AppScreen
 from components.labels import ChatMessageLabel
 
+from lib import colorhash
 from lib import api_client
 from lib import websock
 
@@ -68,16 +69,18 @@ class GroupChatScreen(AppScreen):
             if current_sender == sender:
                 current_messages.append(msg)
             else:
+                sender_clr = colorhash.ColorHash(sender_name).hex
                 self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, '\n'.join(current_messages)),
+                    text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
                 ))
                 current_sender = sender
                 sender_name, sender_host = current_sender.split('@')
                 current_messages = []
                 current_messages.append(msg)
         if current_messages:
+            sender_clr = colorhash.ColorHash(sender_name).hex
             self.ids.chat_messages.add_widget(ChatMessageLabel(
-                text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, '\n'.join(current_messages)),
+                text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
             ))
         self.ids.chat_messages_view.scroll_y = 0
 

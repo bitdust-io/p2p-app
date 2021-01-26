@@ -9,7 +9,7 @@ from components.navigation import NavButtonActive, NavButtonClosable
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
