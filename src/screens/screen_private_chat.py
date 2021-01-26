@@ -81,11 +81,11 @@ class PrivateChatScreen(AppScreen):
         if current_messages:
             if current_direction == 'in':
                 self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                    text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, '\n'.join(current_messages)),
                 ))
             else:
                 self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    text='[color=#00b11c]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                    text='[color=#00b11c]{}[/color]\n{}'.format(sender_name, '\n'.join(current_messages)),
                 ))
         self.ids.chat_messages_view.scroll_y = 0
 

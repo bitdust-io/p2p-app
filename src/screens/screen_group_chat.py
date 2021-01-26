@@ -69,7 +69,7 @@ class GroupChatScreen(AppScreen):
                 current_messages.append(msg)
             else:
                 self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                    text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, '\n'.join(current_messages)),
                 ))
                 current_sender = sender
                 sender_name, sender_host = current_sender.split('@')
@@ -77,7 +77,7 @@ class GroupChatScreen(AppScreen):
                 current_messages.append(msg)
         if current_messages:
             self.ids.chat_messages.add_widget(ChatMessageLabel(
-                text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, '\n'.join(current_messages)),
             ))
         self.ids.chat_messages_view.scroll_y = 0
 
