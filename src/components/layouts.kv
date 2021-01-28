@@ -55,15 +55,17 @@
 
 
 <HEmptySpace>:
-    size_hint_x: 0.5
+    size_hint_x: 0.99
     size_hint_y: None
     height: 1
+    opacity: 0
 
 
 <VEmptySpace>:
-    size_hint_y: 0.5
+    size_hint_y: 0.99
     size_hint_x: None
     width: 1
+    opacity: 0
 
 
 <HFixedEmptySpace>:
@@ -125,6 +127,7 @@
 <HorizontalContainerLayout>:
     size_hint_y: None
     height: self.minimum_height
+    pos_hint: {'top': 1, 'left': 0}
     padding: dp(10), dp(5)
 
 

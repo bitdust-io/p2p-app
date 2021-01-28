@@ -2,40 +2,43 @@
 
     AppScreenLayout:
 
-        VerticalLayout:
-            pos_hint: {'top': 1}
-            size_hint: 1, 1
-            padding: dp(10)
-            spacing: dp(5)
+        PageContainerWithPaddingLayout:
 
-            NormalLabel:
-                id: status_message_label
-                size_hint: 1, None
-                height: self.texture_size[1]
-                text: ''
-    
+            HorizontalContainerLayout:
+                pos_hint: {'top': 1, 'left': 0}
+
+                NormalLabel:
+                    id: status_message_label
+                    size_hint: 1, None
+                    height: self.texture_size[1]
+                    text: ''
+
             HorizontalLayout:
+
                 size_hint: 1, None
                 height: self.minimum_height
-    
+                pos_hint: {'top': 1, 'left': 0}
+
                 CustomTextField:
                     id: group_label_input
                     size_hint_x: None
                     width: dp(250)
                     hint_text: 'Enter a name for the new group'
                     text: ''
-    
+
                 VerticalLayout:
                     size_hint: None, None
                     width: self.minimum_width
                     height: self.minimum_height
-    
+
                     RaisedIconButton:
                         id: create_group_button
                         _radius: dp(3)
                         icon: 'plus'
                         on_press: root.on_create_group_button_clicked()
-    
+
                     Widget:
                         size_hint: None, None
                         size: dp(16), dp(16)
+
+            VEmptySpace:

@@ -75,6 +75,10 @@ class AppStyle(object):
     color_text_input_background_disabled = (btn_clr_rgb_top,btn_clr_rgb_top,btn_clr_rgb_top,1)
     color_text_input_border = (.75,.75,.75,1)
 
+    color_debug1 = (.99, .5, .5, .5)
+    color_debug2 = (.5, .99, .5, .5)
+    color_debug3 = (.5, .5, .99, .5)
+
     #--- BUTTONS
     btn_icon_small_width = dp(26)
     btn_icon_small_height = dp(26)
