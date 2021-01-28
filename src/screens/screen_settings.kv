@@ -269,15 +269,14 @@
         VerticalScrollView:
             id: scroll_view
 
-            VerticalLayout:
-                pos_hint: {'top': 1}
-                size_hint: 1, None
+            PageContainerWithLeftPaddingLayout:
+                size_hint: None, None
+                width: root.width - app.scroll_bar_width
                 height: self.minimum_height
 
                 SettingsTreeView:
+
                     id: settings_tree
                     pos_hint: {'top': 1}
-                    size_hint: 1, 1
-                    # height: self.minimum_height
-                    # padding: dp(25)
-                    # spacing: dp(5)
+                    size_hint: 1, None
+                    height: self.minimum_height

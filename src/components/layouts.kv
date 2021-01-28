@@ -115,13 +115,23 @@
     padding: dp(10), dp(10), dp(0), dp(10)
 
 
+<ChatContainerLayout>:
+    size_hint: 1, None
+    height: self.minimum_height
+    padding: dp(10), dp(10), dp(0), dp(10)
+    spacing: dp(10)
+
+
 <HorizontalContainerLayout>:
+    size_hint_y: None
+    height: self.minimum_height
     padding: dp(10), dp(5)
 
 
 <VerticalScrollView>:
+    scroll_type: ['bars', 'content']
     do_scroll_x: False
-    bar_color: app.theme_cls.primary_light
-    bar_width: dp(10)
     always_overscroll: False
-
+    bar_color: app.theme_cls.primary_light
+    bar_inactive_color: app.color_btn_inactive
+    bar_width: app.scroll_bar_width

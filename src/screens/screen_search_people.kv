@@ -60,10 +60,10 @@
 
         VerticalScrollView:
 
-            VerticalLayout:
+            PageContainerWithLeftPaddingLayout:
                 id: search_results
-                size_hint: 1, None
+                size_hint: None, None
+                width: root.width - app.scroll_bar_width
                 height: self.minimum_height
                 pos_hint: {'top': 1}
-                padding: dp(10), dp(0)
                 spacing: dp(5)

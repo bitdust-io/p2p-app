@@ -1,9 +1,12 @@
 <SelectableRecycleView>:
-    bar_width: app.scroll_bar_width
-    bar_color: app.color_btn_normal
+    # effect_cls: "ScrollEffect"
+    scroll_type: ['bars', 'content']
+    do_scroll_x: False
+    always_overscroll: False
+    bar_color: app.theme_cls.primary_light
     bar_inactive_color: app.color_btn_inactive
-    effect_cls: "ScrollEffect"
-    scroll_type: ['bars']
+    bar_width: app.scroll_bar_width
+
 
 
 <SelectableHorizontalRecord>:

@@ -7,7 +7,7 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -54,6 +54,8 @@ class PrivateChatScreen(AppScreen):
         msg_list = list(websock.response_result(resp))
         if _Debug:
             print('PrivateChatScreen.on_message_history_result', len(msg_list))
+        # small hack to make sure content is pushed to the bottom
+        # self.ids.chat_messages.add_widget(ChatMessageLabel(text='\n' * 15))
         for item in msg_list:
             msg = item['doc']['payload']['data']['message']
             sender = item['doc']['sender']['glob_id'].replace('master$', '')

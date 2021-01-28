@@ -9,14 +9,14 @@
 
 <MainMenuScreen>:
 
-    ScrollView:
-        do_scroll_x: False
+    VerticalScrollView:
 
         StackLayout:
             orientation: 'lr-tb'
             padding: dp(20)
             spacing: dp(25)
-            size_hint: 1, None
+            size_hint: None, None
+            width: root.width - app.scroll_bar_width
             height: self.minimum_height
             pos_hint: {'top': 1}
 
