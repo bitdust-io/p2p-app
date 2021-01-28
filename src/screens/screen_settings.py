@@ -246,7 +246,7 @@ class SettingsTreeView(TreeView):
     def on_node_expand(self, node):
         if _Debug:
             print('SettingsTreeView.on_node_expand', node.item_key, node.item_data)
-        self.parent.parent.parent.populate_node(node)
+        self.parent.parent.parent.parent.populate_node(node)
 
     def on_node_collapse(self, node):
         if _Debug:

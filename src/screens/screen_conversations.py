@@ -8,7 +8,7 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -22,6 +22,9 @@ class ConversationRecord(SelectableHorizontalRecord):
         super(ConversationRecord, self).__init__(**kwargs)
         self.visible_buttons = []
 
+    def get_root(self):
+        return self.parent.parent.parent.parent.parent.parent
+
     def get_icon_color(self, state):
         if state in ['IN_SYNC!', 'CONNECTED', ]:
             return style.color_circle_online
@@ -30,6 +33,8 @@ class ConversationRecord(SelectableHorizontalRecord):
         return style.color_circle_connecting
 
     def show_buttons(self):
+        if _Debug:
+            print('ConversationRecord.show_buttons', self.key_id, self.state, len(self.visible_buttons))
         if not self.visible_buttons:
             chat_button = ConversationActionButton(
                 icon='comment-multiple',
@@ -62,6 +67,8 @@ class ConversationRecord(SelectableHorizontalRecord):
 
 
     def hide_buttons(self):
+        if _Debug:
+            print('ConversationRecord.hide_buttons', self.key_id, self.state, len(self.visible_buttons))
         if self.visible_buttons:
             for w in self.visible_buttons:
                 self.remove_widget(w)
@@ -69,17 +76,17 @@ class ConversationRecord(SelectableHorizontalRecord):
 
     def on_chat_button_clicked(self, *args):
         if _Debug:
-            print('on_chat_button_clicked', self.key_id)
+            print('ConversationRecord.on_chat_button_clicked', self.key_id)
         self.parent.clear_selection()
         if self.key_id.startswith('group_'):
-            self.parent.parent.parent.parent.parent.parent.main_win().select_screen(
+            self.get_root().main_win().select_screen(
                 screen_id=self.key_id,
                 screen_type='group_chat_screen',
                 global_id=self.key_id,
                 label=self.label,
             )
             return
-        self.parent.parent.parent.parent.parent.parent.main_win().select_screen(
+        self.get_root().main_win().select_screen(
             screen_id='private_chat_{}'.format(self.key_id.replace('master$', '')),
             screen_type='private_chat_screen',
             global_id=self.key_id,
@@ -88,27 +95,27 @@ class ConversationRecord(SelectableHorizontalRecord):
 
     def on_join_button_clicked(self, *args):
         if _Debug:
-            print('on_join_button_clicked', self.key_id, )
+            print('ConversationRecord.on_join_button_clicked', self.key_id, )
         self.parent.clear_selection()
         api_client.group_join(group_key_id=self.key_id, cb=self.on_group_join_result)
 
     def on_group_join_result(self, resp):
-        self.parent.parent.parent.parent.parent.parent.ids.chat_status_label.from_api_response(resp)
-        self.parent.parent.parent.parent.parent.parent.populate()
+        self.get_root().ids.chat_status_label.from_api_response(resp)
+        self.get_root().populate()
 
     def on_leave_button_clicked(self, *args):
         if _Debug:
-            print('on_leave_button_clicked', self.key_id)
+            print('ConversationRecord.on_leave_button_clicked', self.key_id)
         self.parent.clear_selection()
         api_client.group_leave(group_key_id=self.key_id, erase_key=False, cb=self.on_group_leave_result)
 
     def on_group_leave_result(self, resp):
-        self.parent.parent.parent.parent.parent.parent.ids.chat_status_label.from_api_response(resp)
-        self.parent.parent.parent.parent.parent.parent.populate()
+        self.get_root().ids.chat_status_label.from_api_response(resp)
+        self.get_root().populate()
 
     def on_group_delete_button_clicked(self, *args):
         if _Debug:
-            print('on_group_delete_button_clicked', self.key_id)
+            print('ConversationRecord.on_group_delete_button_clicked', self.key_id)
         self.parent.clear_selection()
         api_client.group_leave(group_key_id=self.key_id, erase_key=True, cb=self.on_group_leave_result)
 
@@ -117,7 +124,8 @@ class ConversationsListView(SelectableRecycleView):
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
         if _Debug:
-            print('on_selection_applied() %r %d %r %r' % (item, index, is_selected, prev_selected, ))
+            print('ConversationsListView.on_selection_applied',
+                  item, index, is_selected, prev_selected, item.selected if item else None, self.ids.selectable_layout.selected_nodes)
         if is_selected != prev_selected:
             if is_selected:
                 item.show_buttons()
@@ -136,11 +144,18 @@ class ConversationsScreen(AppScreen):
     def populate(self, *args, **kwargs):
         api_client.message_conversations_list(cb=self.on_message_conversations_list_result)
 
-    def on_pre_enter(self, *args):
+    def clear_selected_item(self):
         if self.ids.conversations_list_view.selected_item:
             self.ids.conversations_list_view.selected_item.hide_buttons()
+            self.ids.conversations_list_view.selected_item.selected = False
         self.ids.conversations_list_view.clear_selection()
+
+    def on_enter(self, *args):
+        self.clear_selected_item()
         self.populate()
+
+    def on_leave(self, *args):
+        self.clear_selected_item()
 
     def on_message_conversations_list_result(self, resp):
         self.ids.chat_status_label.from_api_response(resp)

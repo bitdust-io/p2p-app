@@ -9,11 +9,23 @@ class HorizontalLayout(BoxLayout):
     pass
 
 
+class HorizontalWithPaddingLayout(BoxLayout):
+    pass
+
+
 class HLayout(HorizontalLayout):
     pass
 
 
 class VerticalLayout(BoxLayout):
+    pass
+
+
+class VerticalWithPaddingLayout(BoxLayout):
+    pass
+
+
+class VerticalWithLeftPaddingLayout(BoxLayout):
     pass
 
 
@@ -41,9 +53,38 @@ class VFixedEmptySpace(Widget):
     pass
 
 
+class VerticalScreenLayout(VerticalLayout):
+    pass
+
+
+class VerticalScreenWithPaddingLayout(VerticalLayout):
+    pass
+
+#------------------------------------------------------------------------------
+
+class AppScreenLayout(VerticalLayout):
+    pass
+
+
+class HorizontalContainerLayout(HorizontalWithPaddingLayout):
+    pass
+
+
+class PageContainerLayout(VerticalLayout):
+    pass
+
+
+class PageContainerWithPaddingLayout(VerticalLayout):
+    pass
+
+
+class PageContainerWithLeftPaddingLayout(VerticalLayout):
+    pass
+
+#------------------------------------------------------------------------------
+
 class VerticalScrollView(ScrollView):
-    scroll_type = ['content', 'bars']
-    effect_cls = None
+    pass
 
 #------------------------------------------------------------------------------
 

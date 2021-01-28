@@ -249,24 +249,16 @@
     size_hint: 1, None
     height: self.minimum_height
     root_options: {'text': 'settings'}
-    indent_start: dp(10)
-    indent_level: dp(6)
+    indent_start: dp(20)
+    indent_level: dp(5)
     hide_root: True
 
 
 <SettingsScreen>:
 
-    ScrollView:
-        id: scroll_view
-        do_scroll_x: False
+    AppScreenLayout:
 
-        VerticalLayout:
-            id: settings_content
-            pos_hint: {'top': 1}
-            size_hint: 1, None
-            height: self.minimum_height
-            padding: dp(15)
-            spacing: dp(5)
+        HorizontalContainerLayout:
 
             SettingsStatusMessage:
                 id: status_message_label
@@ -274,5 +266,18 @@
                 height: self.texture_size[1]
                 text: ''
 
-            SettingsTreeView
-                id: settings_tree
+        VerticalScrollView:
+            id: scroll_view
+
+            VerticalLayout:
+                pos_hint: {'top': 1}
+                size_hint: 1, None
+                height: self.minimum_height
+
+                SettingsTreeView:
+                    id: settings_tree
+                    pos_hint: {'top': 1}
+                    size_hint: 1, 1
+                    # height: self.minimum_height
+                    # padding: dp(25)
+                    # spacing: dp(5)

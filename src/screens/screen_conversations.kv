@@ -46,6 +46,7 @@
     viewclass: 'ConversationRecord'
 
     SelectableRecycleBoxLayout:
+        id: selectable_layout
         default_size: None, app.conversation_record_height
         default_size_hint: 1, None
         size_hint_y: None
@@ -57,44 +58,29 @@
 
 <ConversationsScreen>:
 
-    VerticalLayout:
-        size_hint: 1, 1
-        pos_hint: {'top': 1}
+    AppScreenLayout:
 
-        HorizontalLayout:
-            size_hint: 1, None
-            height: self.minimum_height
-            pos_hint: {'bottom': 1}
-            padding: dp(5)
+        HorizontalContainerLayout:
 
-            Widget:
+            StatusLabel:
+                id: chat_status_label
                 size_hint: 1, None
-                height: 1
+                height: self.texture_size[1]
+                text: ''
 
             CustomFloatingActionButton:
                 id: create_new_group_button
-                icon: 'plus'
-                icon_pack: 'IconICO'
                 size_hint: None, None
-                padding: dp(0)
                 text_color: app.color_white
                 user_font_size: '20sp'
+                icon: 'plus'
+                icon_pack: 'IconICO'
                 on_release: root.on_create_new_group_button_clicked()
-
-        StatusLabel:
-            id: chat_status_label
-            size_hint: 1, None
-            height: self.texture_size[1]
-            text: ''
 
         VerticalScrollView:
 
-            VerticalLayout:
+            PageContainerWithLeftPaddingLayout:
                 id: conversations_list
-                pos_hint: {'top': 1}
-                size_hint: 1, 1
-                padding: dp(5)
-                spacing: dp(5)
 
                 ConversationsListView:
                     id: conversations_list_view

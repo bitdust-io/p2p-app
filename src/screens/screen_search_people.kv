@@ -1,24 +1,22 @@
 <NoUsersFound>:
-    width: self.texture_size[0]
-    height: self.texture_size[1]
-    size_hint: None, None
+    size_hint: 1, None
+    height: app.search_result_record_height
     pos_hint: {'left': 1}
     font_size: '16sp'
-    text: 'no users found'
+    # text: 'no users found'
 
 
-<SearchResult>:
+<SearchPeopleResult>:
 
     size_hint: 1, None
     height: app.search_result_record_height
+    pos_hint: {'top': 1}
     padding: 0
-    spacing: 1
+    spacing: 0
 
     RaisedIconButton:
-        icon: 'account-plus'
-        button_width: app.btn_icon_small_width
-        button_height: app.btn_icon_small_height
-        font_size: '16sp'
+        icon: 'plus'
+        _radius: dp(3)
         on_press: root.on_search_result_add_clicked()
 
     HFixedEmptySpace:
@@ -33,22 +31,9 @@
 
 <SearchPeopleScreen>:
 
-    VerticalLayout:
-        pos_hint: {'top': 1}
-        size_hint: 1, None
-        height: self.minimum_height
-        padding: dp(15)
-        spacing: dp(5)
+    AppScreenLayout:
 
-        NormalLabel:
-            id: status_message_label
-            size_hint: 1, None
-            height: self.texture_size[1]
-            text: ''
-
-        HorizontalLayout:
-            size_hint: 1, None
-            height: self.minimum_height
+        HorizontalContainerLayout:
 
             CustomTextField:
                 id: search_input
@@ -80,5 +65,5 @@
                 size_hint: 1, None
                 height: self.minimum_height
                 pos_hint: {'top': 1}
-                padding: 5
-                spacing: 5
+                padding: dp(10), dp(0)
+                spacing: dp(5)

@@ -1,6 +1,9 @@
 <FriendActionButton>:
     button_width: app.friend_record_height - dp(1)
     button_height: app.friend_record_height - dp(1)
+    theme_text_color: 'Custom'
+    text_color: app.theme_cls.primary_color
+    md_bg_color: app.color_transparent
 
 
 <FriendRecord>:
@@ -55,15 +58,9 @@
 
 <FriendsScreen>:
 
-    VerticalLayout:
-        size_hint: 1, 1
-        pos_hint: {'top': 1}
+    AppScreenLayout:
 
-        HorizontalLayout:
-            size_hint: 1, None
-            height: self.minimum_height
-            pos_hint: {'bottom': 1}
-            padding: dp(5)
+        HorizontalContainerLayout:
 
             Widget:
                 size_hint: 1, None
@@ -80,12 +77,8 @@
 
         VerticalScrollView:
 
-    		VerticalLayout:
-    	    	id: friends_list
-    	    	pos_hint: {'top': 1}
-    			size_hint: 1, 1
-    			padding: dp(5)
-    			spacing: dp(5)
+            PageContainerWithLeftPaddingLayout:
+	    	    id: friends_list
 
     			FriendsListView:
     	            id: friends_list_view

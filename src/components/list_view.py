@@ -37,9 +37,13 @@ class BaseSelectableRecord(RecycleDataViewBehavior):
         if not isinstance(touch, MouseMotionEvent):
             return False
         if self.collide_point(*touch.pos) and self.selectable:
+            if _Debug:
+                print('BaseSelectableRecord.on_touch_down  after collide_point', self.index)
             return self.parent.select_with_touch(self.index, touch)
 
     def apply_selection(self, rv, index, is_selected):
+        if _Debug:
+            print('BaseSelectableRecord.apply_selection', self.selected, rv.selected_item, index, is_selected)
         prev_selected = self.selected
         if is_selected:
             rv.selected_item = self
@@ -63,13 +67,15 @@ class SelectableRecycleView(RecycleView):
     selected_item = ObjectProperty(None, allownone=True)
 
     def clear_selection(self):
+        if _Debug:
+            print('SelectableRecycleView.clear_selection', self.selected_item, self.selected_item.selected if self.selected_item else None)
         if self.selected_item:
             self.selected_item.selected = False
             self.selected_item = None
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
         if _Debug:
-            print('BaseSelectableRecord.on_selection_applied', item, index, is_selected, prev_selected)
+            print('SelectableRecycleView.on_selection_applied', item, index, is_selected, prev_selected, item.selected)
 
 #------------------------------------------------------------------------------
 

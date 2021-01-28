@@ -1,14 +1,14 @@
 <PrivateChatScreen>:
 
-    VerticalLayout:
-        size_hint: 1, 1
-        pos_hint: {'top': 1}
+    AppScreenLayout:
 
-        StatusLabel:
-            id: chat_status_label
-            size_hint: 1, None
-            height: self.texture_size[1]
-            text: ''
+        HorizontalContainerLayout:
+
+            StatusLabel:
+                id: chat_status_label
+                size_hint: 1, None
+                height: self.texture_size[1]
+                text: ''
 
         VerticalScrollView:
             id: chat_messages_view

@@ -16,6 +16,9 @@ class FriendRecord(SelectableHorizontalRecord):
         super(FriendRecord, self).__init__(**kwargs)
         self.visible_buttons = []
 
+    def get_root(self):
+        return self.parent.parent.parent.parent.parent.parent
+
     def show_buttons(self):
         if not self.visible_buttons:
             chat_button = FriendActionButton(
@@ -38,7 +41,7 @@ class FriendRecord(SelectableHorizontalRecord):
             self.visible_buttons.clear()
 
     def on_chat_button_clicked(self, *args):
-        self.parent.parent.parent.parent.parent.parent.main_win().select_screen(
+        self.get_root().main_win().select_screen(
             screen_id='private_chat_{}'.format(self.global_id),
             screen_type='private_chat_screen',
             global_id=self.global_id,
@@ -46,11 +49,11 @@ class FriendRecord(SelectableHorizontalRecord):
         )
 
     def on_delete_button_clicked(self, *args):
-        self.parent.parent.parent.parent.parent.parent.main_win().close_screen(
+        self.get_root().main_win().close_screen(
             screen_id='private_chat_{}'.format(self.global_id),
         )
-        self.parent.parent.clear_selection()
-        api_client.friend_remove(global_user_id=self.global_id, cb=self.parent.parent.parent.parent.parent.parent.populate)
+        self.parent.clear_selection()
+        api_client.friend_remove(global_user_id=self.global_id, cb=self.get_root().populate)
 
 
 class FriendsListView(SelectableRecycleView):
@@ -74,8 +77,18 @@ class FriendsScreen(AppScreen):
     def populate(self, *args, **kwargs):
         api_client.friends_list(cb=self.on_friends_list_result)
 
-    def on_pre_enter(self, *args):
+    def clear_selected_item(self):
+        if self.ids.friends_list_view.selected_item:
+            self.ids.friends_list_view.selected_item.hide_buttons()
+            self.ids.friends_list_view.selected_item.selected = False
+        self.ids.friends_list_view.clear_selection()
+
+    def on_enter(self, *args):
+        self.clear_selected_item()
         self.populate()
+
+    def on_leave(self, *args):
+        self.clear_selected_item()
 
     def on_friends_list_result(self, resp):
         if not isinstance(resp, dict):

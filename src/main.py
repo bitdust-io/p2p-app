@@ -49,16 +49,19 @@ from lib.system import is_android
 
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
 Config.set('graphics', 'resizable', True)
-if is_android(): 
-    Config.set('graphics', 'width', '360')
-    Config.set('graphics', 'height', '740')
+if is_android():
+    pass 
+    # Config.set('graphics', 'width', '360')
+    # Config.set('graphics', 'height', '740')
+else:
+    Config.set('graphics', 'width', '600')
+    Config.set('graphics', 'height', '300')
 
 #------------------------------------------------------------------------------
 
 from kivymd.app import MDApp
 from kivymd.font_definitions import theme_font_styles
 
-from kivy.core.window import Window
 from kivy.core.text import LabelBase
 
 #------------------------------------------------------------------------------

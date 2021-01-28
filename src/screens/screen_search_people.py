@@ -1,19 +1,20 @@
-from kivy.uix.label import Label
-
-#------------------------------------------------------------------------------
-
 from components.layouts import HorizontalLayout
 from components.screen import AppScreen
+from components.labels import NormalLabel
 
 from lib import api_client
 
 #------------------------------------------------------------------------------
 
-class SearchResult(HorizontalLayout):
+_Debug = True
+
+#------------------------------------------------------------------------------
+
+class SearchPeopleResult(HorizontalLayout):
 
     def __init__(self, **kwargs):
         label_text = kwargs.pop('label_text', '')
-        super(SearchResult, self).__init__(**kwargs)
+        super(SearchPeopleResult, self).__init__(**kwargs)
         self.ids.search_result_label.text = label_text
 
     def on_search_result_add_clicked(self):
@@ -26,7 +27,7 @@ class SearchResult(HorizontalLayout):
         self.parent.parent.parent.parent.main_win().select_screen('friends_screen')
 
 
-class NoUsersFound(Label):
+class NoUsersFound(NormalLabel):
     pass
 
 
@@ -61,7 +62,7 @@ class SearchPeopleScreen(AppScreen):
         api_client.user_observe(
             nickname=nickname,
             attempts=3,
-            cb=self.on_user_observe_results,
+            cb=self.on_user_observe_result,
         )
 
     def on_enter(self):
@@ -77,10 +78,12 @@ class SearchPeopleScreen(AppScreen):
     def on_search_button_clicked(self):
         self.start_search()
 
-    def on_user_observe_results(self, resp):
+    def on_user_observe_result(self, resp):
         self.search_started = False
         self.clean_view()
         self.ids.search_button.disabled = False
+        if _Debug:
+            print('SearchPeopleScreen.on_user_observe_result', resp)
         if not isinstance(resp, dict):
             self.ids.search_results.add_widget(NoUsersFound(
                 text=str(resp),
@@ -88,10 +91,12 @@ class SearchPeopleScreen(AppScreen):
             return
         result = resp.get('payload', {}).get('response' , {}).get('result', [])
         if not result:
-            self.ids.search_results.add_widget(NoUsersFound())
+            self.ids.search_results.add_widget(NoUsersFound(
+                text='no users found'
+            ))
             return
         for r in result:
-            self.ids.search_results.add_widget(SearchResult(
+            self.ids.search_results.add_widget(SearchPeopleResult(
                 label_text=str(r['global_id']),
             ))
 
