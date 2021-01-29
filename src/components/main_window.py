@@ -6,12 +6,17 @@ from kivymd.theming import ThemableBehavior
 #------------------------------------------------------------------------------
 
 from components.navigation import NavButtonActive, NavButtonClosable
+from components.buttons import CustomIconButton
 
 #------------------------------------------------------------------------------
 
 _Debug = False
 
 #------------------------------------------------------------------------------
+
+class MainNavButton(CustomIconButton):
+    pass
+
 
 class MainWindow(FloatLayout, ThemableBehavior):
 

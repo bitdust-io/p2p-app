@@ -32,6 +32,11 @@ class ConversationRecord(SelectableHorizontalRecord):
             return style.color_circle_offline
         return style.color_circle_connecting
 
+    def clear_selection(self):
+        self.hide_buttons()
+        self.selected = False
+        self.parent.clear_selection()
+
     def show_buttons(self):
         if _Debug:
             print('ConversationRecord.show_buttons', self.key_id, self.state, len(self.visible_buttons))
@@ -43,23 +48,22 @@ class ConversationRecord(SelectableHorizontalRecord):
             self.visible_buttons.append(chat_button)
             self.add_widget(chat_button)
             if self.key_id.startswith('group_'):
-                if self.state in ['IN_SYNC!', 'CONNECTED', ]:
-                    leave_button = ConversationActionButton(
-                        icon='lan-disconnect',
-                        on_release=self.on_leave_button_clicked,
-                    )
-                    self.visible_buttons.append(leave_button)
-                    self.add_widget(leave_button)
-                else:
-                    join_button = ConversationActionButton(
-                        icon='lan-connect',
-                        on_release=self.on_join_button_clicked,
-                    )
-                    self.visible_buttons.append(join_button)
-                    self.add_widget(join_button)
+                join_button = ConversationActionButton(
+                    icon='access-point-network',
+                    disabled=self.state in ['IN_SYNC!', 'CONNECTED', ],
+                    on_release=self.on_join_button_clicked,
+                )
+                self.visible_buttons.append(join_button)
+                self.add_widget(join_button)
+                leave_button = ConversationActionButton(
+                    icon='lan-disconnect',
+                    disabled=self.state in ['OFFLINE', 'DISCONNECTED', ],
+                    on_release=self.on_leave_button_clicked,
+                )
+                self.visible_buttons.append(leave_button)
+                self.add_widget(leave_button)
                 delete_button = ConversationActionButton(
                     icon='trash-can',
-                    # color=style.color_btn_normal,
                     on_release=self.on_group_delete_button_clicked,
                 )
                 self.visible_buttons.append(delete_button)
@@ -77,7 +81,7 @@ class ConversationRecord(SelectableHorizontalRecord):
     def on_chat_button_clicked(self, *args):
         if _Debug:
             print('ConversationRecord.on_chat_button_clicked', self.key_id)
-        self.parent.clear_selection()
+        self.clear_selection()
         if self.key_id.startswith('group_'):
             self.get_root().main_win().select_screen(
                 screen_id=self.key_id,
@@ -96,7 +100,7 @@ class ConversationRecord(SelectableHorizontalRecord):
     def on_join_button_clicked(self, *args):
         if _Debug:
             print('ConversationRecord.on_join_button_clicked', self.key_id, )
-        self.parent.clear_selection()
+        self.clear_selection()
         api_client.group_join(group_key_id=self.key_id, cb=self.on_group_join_result)
 
     def on_group_join_result(self, resp):
@@ -106,7 +110,7 @@ class ConversationRecord(SelectableHorizontalRecord):
     def on_leave_button_clicked(self, *args):
         if _Debug:
             print('ConversationRecord.on_leave_button_clicked', self.key_id)
-        self.parent.clear_selection()
+        self.clear_selection()
         api_client.group_leave(group_key_id=self.key_id, erase_key=False, cb=self.on_group_leave_result)
 
     def on_group_leave_result(self, resp):
@@ -116,7 +120,7 @@ class ConversationRecord(SelectableHorizontalRecord):
     def on_group_delete_button_clicked(self, *args):
         if _Debug:
             print('ConversationRecord.on_group_delete_button_clicked', self.key_id)
-        self.parent.clear_selection()
+        self.clear_selection()
         api_client.group_leave(group_key_id=self.key_id, erase_key=True, cb=self.on_group_leave_result)
 
 
@@ -158,6 +162,8 @@ class ConversationsScreen(AppScreen):
         self.clear_selected_item()
 
     def on_message_conversations_list_result(self, resp):
+        if _Debug:
+            print('ConversationsScreen.on_message_conversations_list_result', resp)
         self.ids.chat_status_label.from_api_response(resp)
         if not websock.is_ok(resp):
             self.ids.conversations_list_view.data = []

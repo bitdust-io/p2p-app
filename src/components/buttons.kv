@@ -184,7 +184,7 @@
             size: self.size
             source: self.disabled_image if self.disabled else self.state_image
         Color:
-            rgba: (1,.5,.5,1)
+            rgba: 1, 1, 1, 1
         Rectangle:
             texture: self.texture
             size: self.texture_size
@@ -196,8 +196,6 @@
     text_size: self.size
     valign: 'middle'
     halign: 'center'
-    disabled_color: self.theme_cls.disabled_hint_text_color
-    markup: True
     font_style: self.icon_pack
     text: get_icon_code(self.icon, self.icon_pack)
     state_image: self.background_normal if self.state == 'normal' else self.background_down

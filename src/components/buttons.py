@@ -1,4 +1,4 @@
-from kivy.metrics import dp, sp
+from kivy.metrics import dp
 from kivy.clock import Clock
 from kivy.properties import (
     BooleanProperty,  # @UnresolvedImport
@@ -8,17 +8,18 @@ from kivy.properties import (
     ColorProperty,  # @UnresolvedImport
     ListProperty,  # @UnresolvedImport
 )
-from kivy.uix.button import Button
+# from kivy.uix.button import Button
 from kivy.uix.behaviors import ButtonBehavior
+
 from kivymd.theming import ThemableBehavior
-from kivymd.uix.label import MDLabel
+# from kivymd.uix.label import MDLabel
 from kivymd.uix.button import (
     BaseButton,
     BaseElevationButton,
     BasePressedButton,
     MDFloatingActionButton,
     MDFlatButton,
-    MDIconButton,
+    # MDIconButton,
 )
 from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
 from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
@@ -27,7 +28,12 @@ from kivymd.uix.behaviors.backgroundcolor_behavior import SpecificBackgroundColo
 #------------------------------------------------------------------------------
 
 from components.layouts import VerticalLayout
+from components.labels import MarkupLabel
 from components.styles import style
+
+#------------------------------------------------------------------------------
+
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -100,7 +106,7 @@ class RoundedFlexButton(RoundedButton):
     pass
 
 
-class CustomIconButton(ButtonBehavior, MDLabel):
+class CustomIconButton(ButtonBehavior, MarkupLabel):
 
     icon = StringProperty("circle")
     icon_pack = StringProperty("IconMD")
@@ -113,6 +119,9 @@ class CustomIconButton(ButtonBehavior, MDLabel):
     background_disabled_down = StringProperty('')
     border = ListProperty([0, 0, 0, 0])
     selected = BooleanProperty(False)
+
+    # def __init__(self, **kwargs):
+    #     super().__init__(**kwargs)
 
 
 class TransparentIconButton(CustomIconButton):

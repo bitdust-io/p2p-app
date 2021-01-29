@@ -3,9 +3,9 @@
 
 
 <NavIcon>:
-    font_size: sp(19)
+    font_size: sp(18)
     size_hint: None, None
-    size: (app.nav_height, app.nav_height)
+    size: (app.nav_height - dp(4), app.nav_height)
     color: self.specific_secondary_text_color
 
 
@@ -19,6 +19,7 @@
     valign: 'middle'
     halign: 'left'
     font_size: app.font_size_normal
+    md_bg_color: app.color_transparent
     theme_text_color: 'Custom'
     text_color: self.specific_secondary_text_color
 
@@ -56,8 +57,6 @@
     padding: (0, 0)
     lbl_txt: lbl_txt
     lbl_icn_left: lbl_icn_left
-    theme_text_color: 'Primary' if not root.text_color else 'Custom'
-    markup: True
 
     HorizontalLayout:
         padding: dp(1)
@@ -82,8 +81,6 @@
     lbl_txt: lbl_txt
     lbl_icn_left: lbl_icn_left
     lbl_icn_right: lbl_icn_right
-    theme_text_color: 'Primary' if not root.text_color else 'Custom'
-    markup: True
 
     HorizontalLayout:
         padding: dp(1)

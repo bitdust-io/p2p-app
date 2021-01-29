@@ -30,8 +30,6 @@ class BaseSelectableRecord(RecycleDataViewBehavior):
         return super(BaseSelectableRecord, self).refresh_view_attrs(rv, index, data)
 
     def on_touch_down(self, touch):
-        if _Debug:
-            print('BaseSelectableRecord.on_touch_down', self.selectable, touch.device, touch.is_touch, touch.__class__, isinstance(touch, MouseMotionEvent))
         if super(BaseSelectableRecord, self).on_touch_down(touch):
             return True
         if not isinstance(touch, MouseMotionEvent):
@@ -73,9 +71,9 @@ class SelectableRecycleView(RecycleView):
             self.selected_item.selected = False
             self.selected_item = None
 
-    def on_selection_applied(self, item, index, is_selected, prev_selected):
-        if _Debug:
-            print('SelectableRecycleView.on_selection_applied', item, index, is_selected, prev_selected, item.selected)
+    # def on_selection_applied(self, item, index, is_selected, prev_selected):
+    #     if _Debug:
+    #         print('SelectableRecycleView.on_selection_applied', item, index, is_selected, prev_selected, item.selected)
 
 #------------------------------------------------------------------------------
 
