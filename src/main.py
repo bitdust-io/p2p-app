@@ -49,8 +49,10 @@ from lib.system import is_android
 
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
 Config.set('graphics', 'resizable', True)
-if is_android():
-    pass 
+Config.set('graphics', 'fullscreen', False)
+
+# if is_android():
+#     pass 
     # Config.set('graphics', 'width', '360')
     # Config.set('graphics', 'height', '740')
 # else:
@@ -60,6 +62,7 @@ if is_android():
 #------------------------------------------------------------------------------
 
 from kivy.core.text import LabelBase
+from kivy.core.window import Window
 
 from kivymd.app import MDApp
 from kivymd.font_definitions import theme_font_styles
@@ -90,8 +93,6 @@ if is_android():
 
 Builder.load_string("""
 #:import NoTransition kivy.uix.screenmanager.NoTransition
-#:import Window kivy.core.window.Window
-#:import md_icons kivymd.icon_definitions.md_icons
 #:import fa_icon components.webfont.fa_icon
 #:import md_icon components.webfont.md_icon
 #:import icofont_icon components.webfont.icofont_icon
@@ -134,13 +135,6 @@ def request_app_permissions(permissions=[], callback=None):
         print('BitDustApp.request_app_permissions', permissions, callback)
     request_permissions(permissions, callback)
     return True
-
-#------------------------------------------------------------------------------
-
-if is_android():
-    from kivy.core.window import Window
-    Window.keyboard_anim_args = {"d":.2,"t":"linear"}
-    Window.softinput_mode = "resize"
 
 #------------------------------------------------------------------------------
 
@@ -190,9 +184,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.main_window.register_screens(controller.all_screens())
         self.main_window.register_controller(self.control)
         self.main_window.select_screen(screen_id='startup_screen', verify_state=False)
-
         # Window.bind(on_keyboard=self.on_key_input)
-
         return self.main_window
 
     def do_start(self, *args, **kwargs):
@@ -305,6 +297,11 @@ class BitDustApp(styles.AppStyle, MDApp):
             else:
                 return False
         return False
+
+    def on_height(self, instance, value):
+        # instance.y += Window.keyboard_height
+        if _Debug:
+            print ('BitDustApp.on_height', instance, value, Window.keyboard_height)
 
 #------------------------------------------------------------------------------
 

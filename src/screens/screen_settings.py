@@ -10,7 +10,7 @@ from kivy.properties import ListProperty, StringProperty, NumericProperty  # @Un
 from components.screen import AppScreen
 from components.labels import NormalLabel
 from components.buttons import CustomFlatButton
-from components.text_input import SingleLineTextInput
+# from components.text_input import SingleLineTextInput
 from components.layouts import VerticalLayout
 
 from lib import api_client
@@ -31,39 +31,38 @@ class OptionDescriptionLabel(NormalLabel):
     pass
 
 
-class OptionValueTextInput(SingleLineTextInput):
-    pass
+# class OptionValueTextInput(SingleLineTextInput):
+#     pass
 
 
-class OptionValueIntInput(OptionValueTextInput):
-
-    def insert_text(self, substring, from_undo=False):
-        min_value = self.parent.parent.option_value_min
-        max_value = self.parent.parent.option_value_max
-        t = self.text
-        c = self.cursor[0]
-        if c == len(t):
-            new_text = self.text + substring
-        else:
-            new_text = t[:c] + substring + t[c:]
-        if new_text != '':
-            try:
-                new_value = int(new_text)
-            except:
-                return
-            if min_value is not None and min_value > new_value:
-                return
-            if max_value is not None and max_value < new_value:
-                return
-            return super(OptionValueIntInput, self).insert_text(substring, from_undo=from_undo)
-
-
-class OptionValueDiskSpaceInput(OptionValueTextInput):
-    pass
+# class OptionValueIntInput(SingleLineTextInput):
+#     def insert_text(self, substring, from_undo=False):
+#         min_value = self.parent.parent.option_value_min
+#         max_value = self.parent.parent.option_value_max
+#         t = self.text
+#         c = self.cursor[0]
+#         if c == len(t):
+#             new_text = self.text + substring
+#         else:
+#             new_text = t[:c] + substring + t[c:]
+#         if new_text != '':
+#             try:
+#                 new_value = int(new_text)
+#             except:
+#                 return
+#             if min_value is not None and min_value > new_value:
+#                 return
+#             if max_value is not None and max_value < new_value:
+#                 return
+#             return super(OptionValueIntInput, self).insert_text(substring, from_undo=from_undo)
 
 
-class OptionValueSingleChoiceInput(OptionValueTextInput):
-    pass
+#  class OptionValueDiskSpaceInput(OptionValueTextInput):
+#     pass
+
+
+# class OptionValueSingleChoiceInput(OptionValueTextInput):
+#     pass
 
 
 #------------------------------------------------------------------------------

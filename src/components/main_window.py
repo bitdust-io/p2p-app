@@ -1,22 +1,123 @@
+from kivy.metrics import dp
 from kivy.properties import StringProperty  # @UnresolvedImport
 from kivy.properties import NumericProperty  # @UnresolvedImport
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
+
 from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
+
+from lib.system import get_android_keyboard_height, is_android, set_android_system_ui_visibility
 
 from components.navigation import NavButtonActive, NavButtonClosable
 from components.buttons import CustomIconButton
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
 class MainNavButton(CustomIconButton):
     pass
 
+#------------------------------------------------------------------------------
+
+def patch_kivy_core_window():
+    from kivy.core.window import Window
+
+    def _get_android_kheight(self=Window):
+        ret = get_android_keyboard_height()
+        # if _Debug:
+        #     print('main_window._get_android_kheight', ret)
+        return ret
+
+    def _get_size(self=Window):
+        if _Debug:
+            print('main_window._get_size', self)
+        r = self._rotation
+        w, h = self._size
+        if self._density != 1:
+            w, h = self._win._get_gl_size()
+        if self.softinput_mode == 'resize':
+            h -= get_android_keyboard_height()  # self.keyboard_height
+        if r in (0, 180):
+            return w, h
+        return h, w
+
+    def update_viewport(self=Window):
+        # if _Debug:
+        #     print('main_window.update_viewport', self.keyboard_height, Window.keyboard_height, get_android_keyboard_height())
+
+        from kivy.graphics.opengl import glViewport  # @UnresolvedImport
+        from kivy.graphics.transformation import Matrix  # @UnresolvedImport
+        from math import radians
+
+        w, h = self.system_size
+        if self._density != 1:
+            w, h = self.size
+
+        smode = self.softinput_mode
+        target = self._system_keyboard.target
+        targettop = max(0, target.to_window(0, target.y)[1]) if target else 0
+        kheight = get_android_keyboard_height()
+
+        w2, h2 = w / 2., h / 2.
+        r = radians(self.rotation)
+
+        x, y = 0, 0
+        _h = h
+        if smode == 'pan':
+            y = kheight
+        elif smode == 'below_target':
+            y = 0 if kheight < targettop else (kheight - targettop)
+        if smode == 'scale':
+            _h -= kheight
+        if smode == 'resize':
+            y += kheight
+        # prepare the viewport
+        glViewport(x, y, w, _h)
+
+        # do projection matrix
+        projection_mat = Matrix()
+        projection_mat.view_clip(0.0, w, 0.0, h, -1.0, 1.0, 0)
+        self.render_context['projection_mat'] = projection_mat
+
+        # do modelview matrix
+        modelview_mat = Matrix().translate(w2, h2, 0)
+        modelview_mat = modelview_mat.multiply(Matrix().rotate(r, 0, 0, 1))
+
+        w, h = self.size
+        w2, h2 = w / 2., h / 2.
+        modelview_mat = modelview_mat.multiply(Matrix().translate(-w2, -h2, 0))
+        self.render_context['modelview_mat'] = modelview_mat
+        frag_modelview_mat = Matrix()
+        frag_modelview_mat.set(flat=modelview_mat.get())
+        self.render_context['frag_modelview_mat'] = frag_modelview_mat
+
+        # redraw canvas
+        self.canvas.ask_update()
+
+        # and update childs
+        self.update_childsize()
+
+    Window.clearcolor = (1, 1, 1, 1)
+    Window.fullscreen = False
+
+    if is_android():
+        Window.update_viewport = update_viewport
+        # Window._get_size = _get_size
+        Window._get_android_kheight = _get_android_kheight
+        Window.keyboard_anim_args = {"d": 0,"t": "linear", }
+        softinput_mode = 'resize'
+        Window.softinput_mode = softinput_mode
+        # set_android_system_ui_visibility()
+
+    if _Debug:
+        print('main_window.patch_kivy_core_window', Window)
+
+#------------------------------------------------------------------------------
 
 class MainWindow(FloatLayout, ThemableBehavior):
 
@@ -29,6 +130,20 @@ class MainWindow(FloatLayout, ThemableBehavior):
     state_process_health = NumericProperty(0)
     state_identity_get = NumericProperty(0)
     state_network_connected = NumericProperty(0)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        patch_kivy_core_window()
+        if is_android():
+            self.ids.inner_container.padding = 1
+
+    def on_height(self, instance, value):
+        if _Debug:
+            print ('MainWindow.on_height', instance, value)
+
+    def on_size(self, instance, value):
+        if _Debug:
+            print ('MainWindow.on_size', instance, value)
 
     def register_screens(self, screens_dict):
         for screen_type, screen_class in screens_dict.items():

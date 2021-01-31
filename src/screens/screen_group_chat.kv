@@ -31,16 +31,17 @@
             size_hint: 1, None
             height: self.minimum_height
             pos_hint: {'bottom': 1}
+            padding: dp(10), dp(0)
 
             DynamicHeightTextInput:
                 id: chat_input
                 size_hint_x: 1
                 text: ''
 
-            CustomIconButton:
+            RaisedIconButton:
                 id: chat_send_button
                 icon: 'send'
-                button_width: dp(22)
+                _radius: dp(2)
+                button_width: root.ids.chat_input.height
                 button_height: root.ids.chat_input.height
-                font_size: '12sp'
                 on_release: root.on_chat_send_button_clicked()

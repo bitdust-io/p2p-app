@@ -1,26 +1,26 @@
-<OptionValueTextInput>:
-    size_hint_x: None
-    size_hint_y: None
-    width: dp(100)
-    height: self.line_height + dp(8)
-    pos_hint: {'right': 1, 'center_y': .5}
-    padding: dp(5), dp(4)
-    halign: 'left'
-    valign: 'center'
-    font_size: app.setting_small_font_size
+# <OptionValueTextInput>:
+#     size_hint_x: None
+#     size_hint_y: None
+#     width: dp(100)
+#     height: self.line_height + dp(8)
+#     pos_hint: {'right': 1, 'center_y': .5}
+#     padding: dp(5), dp(4)
+#     halign: 'left'
+#     valign: 'center'
+#     font_size: app.setting_small_font_size
 
 
-<OptionValueIntInput>:
-    input_filter: 'int'
-    width: dp(80)
+# <OptionValueIntInput>:
+#     input_filter: 'int'
+#     width: dp(80)
 
 
-<OptionValueDiskSpaceInput>:
-    width: dp(70)
+# <OptionValueDiskSpaceInput>:
+#     width: dp(70)
 
 
-<OptionValueSingleChoiceInput>:
-    width: dp(60)
+# <OptionValueSingleChoiceInput>:
+#     width: dp(60)
 
 
 <OptionNameLabel>:
@@ -138,7 +138,17 @@
 			size_hint: None, 1
 			width: dp(5)
 
-        OptionValueIntInput:
+        SingleLineTextInput:
+            size_hint_x: None
+            size_hint_y: None
+            width: dp(100)
+            height: self.line_height + dp(8)
+            pos_hint: {'right': 1, 'center_y': .5}
+            padding: dp(5), dp(4)
+            halign: 'left'
+            valign: 'center'
+            font_size: app.setting_small_font_size
+            input_filter: 'int'
             id: option_value_input
             text: '{}'.format(root.option_value)
             on_focus: root.on_focus_changed()
@@ -172,7 +182,16 @@
 			size_hint: None, 1
 			width: dp(5)
 
-        OptionValueDiskSpaceInput:
+        SingleLineTextInput:
+            size_hint_x: None
+            size_hint_y: None
+            width: dp(70)
+            height: self.line_height + dp(8)
+            pos_hint: {'right': 1, 'center_y': .5}
+            padding: dp(5), dp(4)
+            halign: 'left'
+            valign: 'center'
+            font_size: app.setting_small_font_size
             id: option_value_input
             text: '{}'.format(root.option_value)
             on_focus: root.on_focus_changed()
@@ -202,7 +221,16 @@
 			size_hint: None, 1
 			width: dp(5)
 
-        OptionValueSingleChoiceInput:
+        SingleLineTextInput:
+            size_hint_x: None
+            size_hint_y: None
+            width: dp(70)
+            height: self.line_height + dp(8)
+            pos_hint: {'right': 1, 'center_y': .5}
+            padding: dp(5), dp(4)
+            halign: 'left'
+            valign: 'center'
+            font_size: app.setting_small_font_size
             id: option_value_input
             text: '{}'.format(root.option_value)
             on_focus: root.on_focus_changed()
@@ -232,7 +260,16 @@
 			size_hint: None, 1
 			width: dp(5)
 
-        OptionValueTextInput:
+        SingleLineTextInput:
+            size_hint_x: None
+            size_hint_y: None
+            width: dp(100)
+            height: self.line_height + dp(8)
+            pos_hint: {'right': 1, 'center_y': .5}
+            padding: dp(5), dp(4)
+            halign: 'left'
+            valign: 'center'
+            font_size: app.setting_small_font_size
             id: option_value_input
             text: '{}'.format(root.option_value)
             on_focus: root.on_focus_changed()

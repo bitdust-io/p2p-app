@@ -44,6 +44,7 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.os.Process;
 import android.util.Log;
+import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -74,12 +75,15 @@ public class BitDustActivity extends PythonActivity {
 
     public static BitDustActivity mActivity = null;
     public static BitDustActivity mCustomActivity = null;
+    
+    public static int status_bar_height = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mActivity = this;
         this.mCustomActivity = this;
+        this.status_bar_height = getStatusBarHeight();
         Log.v(TAG, "onCreate() overwrote mActivity " + this.mActivity);
     }
 
@@ -107,6 +111,41 @@ public class BitDustActivity extends PythonActivity {
         super.onDestroy();
     }
 
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        Log.v(TAG, "getStatusBarHeight() " + result);
+        return result;
+    }
+
+    public int getDisplayRealHeight() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+            Log.v(TAG, "getDisplayRealHeight()   " + metrics.heightPixels);
+            return metrics.heightPixels;
+	    }
+	    return 0;
+    }
+    
+    public int getSoftButtonsBarHeight() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            int usableHeight = metrics.heightPixels;
+            getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+            int realHeight = metrics.heightPixels;
+            Log.v(TAG, "getSoftButtonsBarHeight() realHeight=" + realHeight + "   usableHeight=" + usableHeight);
+            if (realHeight > usableHeight)
+                return realHeight - usableHeight;
+            else
+                return 0;
+        }
+        return 0;
+    }
 
     private class HttpRequestGET extends AsyncTask<String, Void, String> {
 
