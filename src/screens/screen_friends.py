@@ -3,6 +3,11 @@ from components.screen import AppScreen
 from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
 
 from lib import api_client
+from lib import websock
+
+#------------------------------------------------------------------------------
+
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -53,7 +58,11 @@ class FriendRecord(SelectableHorizontalRecord):
             screen_id='private_chat_{}'.format(self.global_id),
         )
         self.parent.clear_selection()
-        api_client.friend_remove(global_user_id=self.global_id, cb=self.get_root().populate)
+        api_client.friend_remove(global_user_id=self.global_id, cb=self.on_friend_remove_result)
+
+    def on_friend_remove_result(self, resp):
+        self.get_root().ids.status_label.from_api_response(resp)
+        self.get_root().populate()
 
 
 class FriendsListView(SelectableRecycleView):
@@ -91,19 +100,64 @@ class FriendsScreen(AppScreen):
         self.clear_selected_item()
 
     def on_friends_list_result(self, resp):
-        if not isinstance(resp, dict):
+        self.ids.status_label.from_api_response(resp)
+        if not websock.is_ok(resp):
+            self.clear_selected_item()
             self.ids.friends_list_view.data = []
             return
-        result = resp.get('payload', {}).get('response' , {}).get('result', {})
-        if not result:
-            self.ids.friends_list_view.data = []
-            return
-        self.ids.friends_list_view.data = []
-        for one_friend in result:
+        friends_list = websock.response_result(resp)
+        for one_friend in friends_list:
+            item_found = False
+            for i in range(len(self.ids.friends_list_view.data)):
+                item = self.ids.friends_list_view.data[i]
+                if item['idurl'] == one_friend['idurl']:
+                    item_found = True
+                    break
+            if item_found:
+                self.ids.friends_list_view.data[i] = one_friend
+                continue
             self.ids.friends_list_view.data.append(one_friend)
+        to_be_removed = []
+        for item in self.ids.friends_list_view.data:
+            item_found = False
+            for one_friend in friends_list:
+                if one_friend['idurl'] == item['idurl']:
+                    item_found = True
+                    break
+            if item_found:
+                continue
+            to_be_removed.append(item)
+        for item in to_be_removed:
+            self.ids.friends_list_view.data.remove(item)
+        self.ids.friends_list_view.refresh_from_data()
 
     def on_search_people_button_clicked(self, *args):
         self.main_win().select_screen('search_people_screen')
+
+    def on_state_changed(self, event_data):
+        if _Debug:
+            print('FriendsScreen.on_state_changed', event_data)
+
+    def on_friend_state_changed(self, event_id, idurl, global_id, old_state, new_state):
+        if _Debug:
+            print('FriendsScreen.on_friend_state_changed', event_id, idurl, global_id)
+        item_found = False
+        for i in range(len(self.ids.friends_list_view.data)):
+            item = self.ids.friends_list_view.data[i]
+            if item['idurl'] == idurl:
+                item_found = True
+                prev_state = self.ids.friends_list_view.data[i]['contact_state']
+                if old_state != prev_state:
+                    if _Debug:
+                        print('FriendsScreen.on_friend_state_changed WARNING prev_state was %r, but expected %r' % (prev_state, old_state, ))
+                self.ids.friends_list_view.data[i]['contact_state'] = new_state
+                if _Debug:
+                    print('FriendsScreen.on_friend_state_changed %r updated : %r -> %r' % (idurl, prev_state, new_state, ))
+                break
+        if not item_found:
+            self.populate()
+        else:
+            self.ids.friends_list_view.refresh_from_data()
 
 #------------------------------------------------------------------------------
 

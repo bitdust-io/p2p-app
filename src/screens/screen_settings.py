@@ -3,14 +3,13 @@ import re
 #------------------------------------------------------------------------------
 
 from kivy.uix.treeview import TreeView, TreeViewNode
-from kivy.properties import ListProperty, StringProperty, NumericProperty  # @UnresolvedImport
+from kivy.properties import BooleanProperty, ListProperty, StringProperty, NumericProperty  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
 from components.screen import AppScreen
 from components.labels import NormalLabel
 from components.buttons import CustomFlatButton
-# from components.text_input import SingleLineTextInput
 from components.layouts import VerticalLayout
 
 from lib import api_client
@@ -117,16 +116,17 @@ class OptionElement(TreeElement):
     option_value_default = StringProperty(None, allownone=True)
     option_value_recent = StringProperty(None, allownone=True)
     option_description = StringProperty('')
+    option_readonly = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         self.option_name = kwargs.pop('option_name')
         self.option_value = kwargs.pop('option_value')
         self.option_value_default = kwargs.pop('option_value_default', None)
+        self.option_value_recent = self.option_value
         self.option_description = kwargs.pop('option_description', '')
-        self.option_readonly = kwargs.pop('option_readonly', False)
+        self.option_readonly = bool(kwargs.pop('option_readonly', False))
         self.value_modified_callback = kwargs.pop('value_modified_callback', None)
         self.item_clicked_callback = kwargs.pop('item_clicked_callback', None)
-        self.option_value_recent = self.option_value
         kwargs['size_hint'] = (1, None)
         kwargs['padding'] = 0
         kwargs['spacing'] = 0
@@ -146,6 +146,7 @@ class BooleanElement(OptionElement, VerticalLayout):
         self.bind(minimum_height=self.setter('height'))
         if self.option_readonly:
             self.ids.option_value_checkbox.disabled = True
+        self.ids.option_value_checkbox.active = bool(self.option_value)
 
 
 class IntegerElement(OptionElement, VerticalLayout):
@@ -160,8 +161,11 @@ class IntegerElement(OptionElement, VerticalLayout):
         self.bind(minimum_height=self.setter('height'))
         if self.option_readonly:
             self.ids.option_value_input.read_only = True
+        self.ids.option_value_input.text = self.option_value
 
     def on_focus_changed(self):
+        if _Debug:
+            print('IntegerElement.on_focus_changed', self.option_name, self.ids.option_value_input.focus)
         if self.ids.option_value_input.focus:
             self.option_value_recent = self.ids.option_value_input.text
         else:
@@ -177,6 +181,7 @@ class DiskSpaceElement(OptionElement, VerticalLayout):
         self.bind(minimum_height=self.setter('height'))
         if self.option_readonly:
             self.ids.option_value_input.read_only = True
+        self.ids.option_value_input.text = self.option_value
 
     def split_value(self, txt):
         val, _, suf = txt.rpartition(' ')
@@ -185,6 +190,8 @@ class DiskSpaceElement(OptionElement, VerticalLayout):
         return val, suf
 
     def on_focus_changed(self):
+        if _Debug:
+            print('DiskSpaceElement.on_focus_changed', self.option_name, self.ids.option_value_input.focus)
         if self.ids.option_value_input.focus:
             self.option_value_recent = self.ids.option_value_input.text
         else:
@@ -206,8 +213,11 @@ class SingleChoiceElement(OptionElement, VerticalLayout):
         self.bind(minimum_height=self.setter('height'))
         if self.option_readonly:
             self.ids.option_value_input.read_only = True
+        self.ids.option_value_input.text = self.option_value
 
     def on_focus_changed(self):
+        if _Debug:
+            print('SingleChoiceElement.on_focus_changed', self.option_name, self.ids.option_value_input.focus)
         if self.ids.option_value_input.focus:
             self.option_value_recent = self.ids.option_value_input.text
         else:
@@ -225,8 +235,11 @@ class TextElement(OptionElement, VerticalLayout):
         self.bind(minimum_height=self.setter('height'))
         if self.option_readonly:
             self.ids.option_value_input.read_only = True
+        self.ids.option_value_input.text = self.option_value
 
     def on_focus_changed(self):
+        if _Debug:
+            print('TextElement.on_focus_changed', self.option_name, self.ids.option_value_input.focus)
         if self.ids.option_value_input.focus:
             self.option_value_recent = self.ids.option_value_input.text
         else:
@@ -235,10 +248,6 @@ class TextElement(OptionElement, VerticalLayout):
             self.option_value_recent = None
 
 #------------------------------------------------------------------------------
-
-class SettingsStatusMessage(NormalLabel):
-    pass
-
 
 class SettingsTreeView(TreeView):
 
@@ -267,6 +276,8 @@ class SettingsScreen(AppScreen):
         api_client.services_list(cb=self.on_services_list_result)
 
     def populate_node(self, node):
+        if _Debug:
+            print('SettingsScreen.populate_node', node)
         api_client.config_get(
             key=node.item_key,
             include_info=True,
@@ -503,23 +514,19 @@ class SettingsScreen(AppScreen):
             print('SettingsScreen.on_service_started_stopped', event_id, service_name, element_name, current_state, node.service_state)
 
     def on_services_list_result(self, resp):
+        self.ids.status_label.from_api_response(resp)
         if not websock.is_ok(resp):
-            self.ids.status_message_label.text = str(websock.response_errors(resp))
             return
-        self.ids.status_message_label.text = ''
         self.services_list_result = {}
         for svc in websock.response_result(resp):
             self.services_list_result[svc['name']] = svc
         api_client.configs_list(sort=True, include_info=False, cb=self.on_configs_list_result)
 
     def on_configs_list_result(self, resp):
+        self.ids.status_label.from_api_response(resp)
         if not websock.is_ok(resp):
-            self.ids.status_message_label.text = str(websock.response_errors(resp))
             return
-        self.ids.status_message_label.text = ''
         items_list = websock.response_result(resp)
-        if _Debug:
-            print('on_configs_list_result', len(items_list))
         self.build_tree(items_list)
 
     def on_item_clicked(self, option_key, node):
@@ -528,10 +535,9 @@ class SettingsScreen(AppScreen):
         self.ids.settings_tree.toggle_node(node)
 
     def on_config_get_result(self, resp, option_key, node):
+        self.ids.status_label.from_api_response(resp)
         if not websock.is_ok(resp):
-            self.ids.status_message_label.text = str(websock.response_errors(resp))
             return
-        self.ids.status_message_label.text = ''
         items_list = websock.response_result(resp)
         if _Debug:
             print('SettingsScreen.on_config_get_result', list(items_list))

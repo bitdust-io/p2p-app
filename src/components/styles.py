@@ -36,10 +36,10 @@ class AppStyle(object):
     button_text_padding_x = dp(5)
     button_text_padding_y = dp(5)
 
-    text_input_padding_x_absolute = 5
-    text_input_padding_x = dp(5)
-    text_input_padding_y_absolute = 5
-    text_input_padding_y = dp(5)
+    text_input_padding_x_absolute = 10
+    text_input_padding_x = dp(10)
+    text_input_padding_y_absolute = 10
+    text_input_padding_y = dp(10)
 
     #--- SCROLL BAR
     scroll_bar_width = dp(15)
@@ -87,7 +87,7 @@ class AppStyle(object):
     btn_icon_normal_height = dp(32)
 
     #--- NAVIGATION
-    nav_height = dp(base_element_height)
+    nav_height = dp(22)
 
     #--- TEXT INPUT
     text_input_height = 26

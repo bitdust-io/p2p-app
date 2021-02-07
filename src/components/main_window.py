@@ -109,7 +109,7 @@ def patch_kivy_core_window():
         Window.update_viewport = update_viewport
         # Window._get_size = _get_size
         Window._get_android_kheight = _get_android_kheight
-        Window.keyboard_anim_args = {"d": 0,"t": "linear", }
+        Window.keyboard_anim_args = {"d": 0.1,"t": "linear", }
         softinput_mode = 'resize'
         Window.softinput_mode = softinput_mode
         # set_android_system_ui_visibility()

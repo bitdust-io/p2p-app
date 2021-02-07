@@ -47,9 +47,16 @@ from lib.system import is_android
 
 #------------------------------------------------------------------------------
 
-Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
-Config.set('graphics', 'resizable', True)
-Config.set('graphics', 'fullscreen', False)
+if _Debug:
+    Config.set('kivy', 'log_level', 'debug')
+
+if is_android():
+    pass
+    # Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
+else:
+    # Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
+    Config.set('graphics', 'resizable', True)
+    Config.set('graphics', 'fullscreen', False)
 
 # if is_android():
 #     pass 

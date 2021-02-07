@@ -29,22 +29,12 @@
                 size_hint_x: 1
                 text: ''
 
-#             RaisedIconButton:
-#                 id: chat_send_button
-#                 icon: 'send'
-#                 # increment_diameter: dp(0)
-#                 _radius: dp(0)
-#                 button_width: dp(32)
-#                 button_height: root.ids.chat_input.height
-#                 # font_size: '12sp'
-#                 # theme_text_color: 'Custom'
-#                 # text_color: app.theme_cls.primary_color
-#                 on_release: root.on_chat_send_button_clicked()
-
             RaisedIconButton:
                 id: chat_send_button
                 icon: 'send'
                 _radius: dp(2)
-                button_width: root.ids.chat_input.height
+                button_width: dp(32)
                 button_height: root.ids.chat_input.height
+                height: root.ids.chat_input.height
+                font_size: '12sp'
                 on_release: root.on_chat_send_button_clicked()

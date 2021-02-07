@@ -61,9 +61,11 @@
 
         HorizontalContainerLayout:
 
-            Widget:
+            StatusLabel:
+                id: status_label
                 size_hint: 1, None
-                height: 1
+                height: self.texture_size[1]
+                text: ''
 
             CustomFloatingActionButton:
                 id: search_users_button

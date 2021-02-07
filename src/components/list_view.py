@@ -6,7 +6,7 @@ from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
-from kivy.input.providers.mouse import MouseMotionEvent
+# from kivy.input.providers.mouse import MouseMotionEvent
 
 #------------------------------------------------------------------------------
 
@@ -32,8 +32,8 @@ class BaseSelectableRecord(RecycleDataViewBehavior):
     def on_touch_down(self, touch):
         if super(BaseSelectableRecord, self).on_touch_down(touch):
             return True
-        if not isinstance(touch, MouseMotionEvent):
-            return False
+        # if not isinstance(touch, MouseMotionEvent):
+        #     return False
         if self.collide_point(*touch.pos) and self.selectable:
             if _Debug:
                 print('BaseSelectableRecord.on_touch_down  after collide_point', self.index)

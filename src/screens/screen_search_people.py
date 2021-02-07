@@ -72,6 +72,8 @@ class SearchPeopleScreen(AppScreen):
         self.ids.search_button.disabled = False
 
     def on_search_input_focus_changed(self):
+        if _Debug:
+            print('SearchPeopleScreen.on_search_input_focus_changed', self.ids.search_input.focus)
         if not self.ids.search_input.focus:
             self.start_search()
 
