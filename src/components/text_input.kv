@@ -1,27 +1,30 @@
-<BasicTextInput>:
-	# text_padding_x: app.text_input_padding_x_absolute
-	# text_padding_y: app.text_input_padding_y_absolute
-
-
 <SingleLineTextInput>:
+    size_hint_y: None
+    height: self.line_height * 1 + self.padding[1] + self.padding[3] + self.extra_padding
 	multiline: False
+    padding: (app.text_input_padding_x, app.text_input_padding_y)
+    cursor_width: '3sp'
 
 
 <CustomTextField>:
 
 
 <MultiLineTextInput>:
+    size_hint_y: None
+    height: self.line_height * self.num_lines + self.text_padding_y * 2 + self.extra_padding
+    padding: (app.text_input_padding_x, app.text_input_padding_y)
 	num_lines: 3
 	multiline: True
-	size_hint_y: None
-	height: self.line_height * self.num_lines + self.text_padding_y * 2
+    cursor_width: '3sp'
 
 
 <RoundedTextInput>:
 
 
 <DynamicHeightTextInput>:
-    max_lines: 7
     size_hint_y: None
+    height: self.line_height * 1 + self.padding[1] + self.padding[3] + self.extra_padding
+    padding: (app.text_input_padding_x, app.text_input_padding_y)
     font_size: app.chat_input_font_size
-    height: self.line_height * 1 + self.padding[1] + self.padding[3]
+    cursor_width: '3sp'
+    max_lines: 7

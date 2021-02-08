@@ -5,7 +5,8 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-identity_details_temlate_text = """[size={text_size}][color=#909090]name:[/color] [b]{name}[/b]
+identity_details_temlate_text = """
+[size={text_size}][color=#909090]name:[/color] [b]{name}[/b]
 
 [color=#909090]global ID:[/color] [b]{global_id}[/b]
 
@@ -25,7 +26,8 @@ identity_details_temlate_text = """[size={text_size}][color=#909090]name:[/color
 [color=#909090]public key:[/color]
 [size={small_text_size}][font=RobotoMono-Regular]{publickey}[/font][/size]
 
-[/size]"""
+[/size]
+"""
 
 #------------------------------------------------------------------------------
 

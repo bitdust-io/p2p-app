@@ -1,3 +1,6 @@
+<MainNavButton>:
+
+
 <MainWindow>:
 
     canvas.before:
@@ -10,32 +13,56 @@
     color: app.color_black
 
     BoxLayout:
+        id: outer_container
         orientation: 'vertical'
         size_hint: 1, 1
         padding: 0
         spacing: 0
 
-        StackLayout:
-            id: nav_buttons_layout
-            orientation: 'lr-tb'
-            padding: 0, 0
-            spacing: 1, 1
-            size_hint: 1, None
-            height: self.minimum_height
+        BoxLayout:
+            id: inner_container
 
-	        TransparentIconButton:
-	            id: main_nav_button
-	            # disabled: True
-	            icon: 'menu'
-	            font_size: sp(18)
-	            button_width: app.nav_height
-	            button_height: app.nav_height
-	            color: app.color_btn_normal
-	            # app.color_black
-	            #  if self.disabled else app.color_gray
-	        	on_press: root.select_screen('main_menu_screen', verify_state=True)
+#             canvas.after:
+#                 Color:
+#                     rgba: .4, .8, .99, 1
+#                 Line:
+#                     width: 1
+#                     rectangle: (self.x + 2, self.y + 2, self.width - 4, self.height - 4)
 
-        ScreenManagement:
-            id: screen_manager
+            orientation: 'vertical'
             size_hint: 1, 1
-            pos_hint: {'top': 1}
+            padding: 1, 1, 1, dp(5)
+            spacing: 0
+
+            StackLayout:
+                id: nav_buttons_layout
+                orientation: 'lr-tb'
+                padding: 0, 0
+                spacing: 1, 1
+                size_hint: 1, None
+                height: self.minimum_height
+
+    	        MainNavButton:
+    	            id: main_nav_button
+    	            # disabled: True
+    	            icon: 'menu'
+    	            font_size: sp(18)
+    	            button_width: app.nav_height
+    	            button_height: app.nav_height
+    	            # color: app.color_btn_normal
+    	            # app.color_black
+    	            #  if self.disabled else app.color_gray
+                    theme_text_color: 'Custom'
+                    text_color: app.color_btn_normal
+    	        	on_press: root.select_screen('main_menu_screen', verify_state=True)
+
+            ScreenManagement:
+                id: screen_manager
+                size_hint: 1, 1
+                pos_hint: {'top': 1}
+
+#         Widget:
+#             id: bottom_empty_area
+#             size_hint: None, None
+#             width: 1
+#             height: 1

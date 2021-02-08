@@ -50,7 +50,7 @@ class NavButtonBase(NavBaseRectangularButton):
         super(NavButtonBase, self).__init__(**kwargs)
 
     def get_main_window(self):
-        return self.parent.parent.parent
+        return self.parent.parent.parent.parent
 
     def get_screen_manager(self):
         return self.get_main_window().ids.screen_manager

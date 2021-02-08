@@ -47,19 +47,32 @@ from lib.system import is_android
 
 #------------------------------------------------------------------------------
 
-Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
-Config.set('graphics', 'resizable', True)
-if is_android(): 
-    Config.set('graphics', 'width', '360')
-    Config.set('graphics', 'height', '740')
+if _Debug:
+    Config.set('kivy', 'log_level', 'debug')
+
+if is_android():
+    pass
+    # Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
+else:
+    # Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
+    Config.set('graphics', 'resizable', True)
+    Config.set('graphics', 'fullscreen', False)
+
+# if is_android():
+#     pass 
+    # Config.set('graphics', 'width', '360')
+    # Config.set('graphics', 'height', '740')
+# else:
+    # Config.set('graphics', 'width', '600')
+    # Config.set('graphics', 'height', '300')
 
 #------------------------------------------------------------------------------
 
+from kivy.core.text import LabelBase
+from kivy.core.window import Window
+
 from kivymd.app import MDApp
 from kivymd.font_definitions import theme_font_styles
-
-from kivy.core.window import Window
-from kivy.core.text import LabelBase
 
 #------------------------------------------------------------------------------
 
@@ -87,8 +100,6 @@ if is_android():
 
 Builder.load_string("""
 #:import NoTransition kivy.uix.screenmanager.NoTransition
-#:import Window kivy.core.window.Window
-#:import md_icons kivymd.icon_definitions.md_icons
 #:import fa_icon components.webfont.fa_icon
 #:import md_icon components.webfont.md_icon
 #:import icofont_icon components.webfont.icofont_icon
@@ -118,7 +129,7 @@ def check_app_permission(permission):
         return True
     ret = check_permission(permission)
     if _Debug:
-        print('BitDustApp.check_app_permission()', permission, ret)
+        print('BitDustApp.check_app_permission', permission, ret)
     return ret
 
 
@@ -128,24 +139,23 @@ def request_app_permissions(permissions=[], callback=None):
     if not permissions:
         permissions = APP_STARTUP_PERMISSIONS
     if _Debug:
-        print('BitDustApp.request_app_permissions()', permissions, callback)
+        print('BitDustApp.request_app_permissions', permissions, callback)
     request_permissions(permissions, callback)
     return True
 
 #------------------------------------------------------------------------------
 
-class BitDustApp(MDApp, styles.AppStyle):
+class BitDustApp(styles.AppStyle, MDApp):
 
     control = None
     main_window = None
 
     def build(self):
-        global orig_resolve_font_name
         if _Debug:
-            print('BitDustApp.build()')
+            print('BitDustApp.build')
             if is_android():
-                print('BitDustApp.build() ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
-                print('BitDustApp.build() ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
+                print('BitDustApp.build   ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
+                print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
 
         self.theme_cls.theme_style = 'Light'
         self.theme_cls.primary_palette = 'Blue'
@@ -181,14 +191,12 @@ class BitDustApp(MDApp, styles.AppStyle):
         self.main_window.register_screens(controller.all_screens())
         self.main_window.register_controller(self.control)
         self.main_window.select_screen(screen_id='startup_screen', verify_state=False)
-
         # Window.bind(on_keyboard=self.on_key_input)
-
         return self.main_window
 
     def do_start(self, *args, **kwargs):
         if _Debug:
-            print('BitDustApp.do_start()', args, kwargs)
+            print('BitDustApp.do_start', args, kwargs)
 
         if is_android():
             if args:
@@ -196,10 +204,10 @@ class BitDustApp(MDApp, styles.AppStyle):
                     if args[1] and isinstance(args[1], list):
                         if False in args[1]:
                             if _Debug:
-                                print('BitDustApp.do_start() FAILED : some of the requested permissions was not granted', args)
+                                print('BitDustApp.do_start   FAILED : some of the requested permissions was not granted', args)
                             return False
             if _Debug:
-                print('BitDustApp.do_start() is okay to start now, storage path is %r' % primary_external_storage_path())
+                print('BitDustApp.do_start   is okay to start now, storage path is %r' % primary_external_storage_path())
 
         self.control.start()
 
@@ -213,7 +221,7 @@ class BitDustApp(MDApp, styles.AppStyle):
         if not is_android():
             return None
         if _Debug:
-            print('BitDustApp.start_android_service() finishing=%r' % finishing)
+            print('BitDustApp.start_android_service finishing=%r' % finishing)
         service = autoclass(SERVICE_NAME)
         mActivity = PythonActivity.mActivity
         argument = ''
@@ -223,23 +231,23 @@ class BitDustApp(MDApp, styles.AppStyle):
         if finishing:
             self.service = None
             if _Debug:
-                print('BitDustApp.start_android_service() service expect to be STOPPED now')
+                print('BitDustApp.start_android_service service expect to be STOPPED now')
         else:
             self.service = service
             if _Debug:
-                print('BitDustApp.start_android_service() service STARTED : %r' % self.service)
+                print('BitDustApp.start_android_service service STARTED : %r' % self.service)
         return self.service
 
     def stop_android_service(self):
         if not is_android():
             return None
         if _Debug:
-            print('BitDustApp.stop_service() %r' % self.service)
+            print('BitDustApp.stop_service %r' % self.service)
         service = autoclass(SERVICE_NAME)
         service.stop(PythonActivity.mActivity)
         self.start_android_service(finishing=True)
         if _Debug:
-            print('BitDustApp.stop_service() STOPPED')
+            print('BitDustApp.stop_service STOPPED')
         return self.service
 
     def check_restart_bitdust_engine(self):
@@ -250,19 +258,19 @@ class BitDustApp(MDApp, styles.AppStyle):
     def on_start(self):
         if not is_android():
             if _Debug:
-                print('BitDustApp.on_start()')
+                print('BitDustApp.on_start')
             return self.do_start()
 
         global APP_STARTUP_PERMISSIONS
         if _Debug:
-            print('BitDustApp.on_start() APP_STARTUP_PERMISSIONS=%r' % APP_STARTUP_PERMISSIONS)
+            print('BitDustApp.on_start APP_STARTUP_PERMISSIONS=%r' % APP_STARTUP_PERMISSIONS)
 
         missed_permissions = []
         for perm in APP_STARTUP_PERMISSIONS:
             if not check_app_permission(perm):
                 missed_permissions.append(perm)
         if _Debug:
-            print('BitDustApp.on_start() missed_permissions=%r' % missed_permissions)
+            print('BitDustApp.on_start missed_permissions=%r' % missed_permissions)
 
         if not missed_permissions:
             return self.do_start() 
@@ -272,7 +280,7 @@ class BitDustApp(MDApp, styles.AppStyle):
 
     def on_stop(self):
         if _Debug:
-            print('BitDustApp.on_stop()')
+            print('BitDustApp.on_stop')
         self.control.stop()
         self.main_window.unregister_controller()
         self.main_window.unregister_screens()
@@ -280,12 +288,12 @@ class BitDustApp(MDApp, styles.AppStyle):
 
     def on_pause(self):
         if _Debug:
-            print('BitDustApp.on_pause()')
+            print('BitDustApp.on_pause')
         return True
 
     def on_resume(self):
         if _Debug:
-            print('BitDustApp.on_resume()')
+            print('BitDustApp.on_resume')
 
     def on_key_input(self, window_obj, key_code, scancode, codepoint, modifier):
         if _Debug:
@@ -297,14 +305,19 @@ class BitDustApp(MDApp, styles.AppStyle):
                 return False
         return False
 
+    def on_height(self, instance, value):
+        # instance.y += Window.keyboard_height
+        if _Debug:
+            print ('BitDustApp.on_height', instance, value, Window.keyboard_height)
+
 #------------------------------------------------------------------------------
 
 def main():
     if _Debug:
-        print('BitDustApp.main() process is starting')
+        print('BitDustApp.main   process is starting')
     BitDustApp().run()
     if _Debug:
-        print('BitDustApp.main() process is finishing')
+        print('BitDustApp.main   process is finishing')
 
 #------------------------------------------------------------------------------
 

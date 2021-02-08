@@ -2,6 +2,7 @@
 
 
 <BaseLabel>:
+    disabled_color: app.color_disabled
 
 
 <MarkupLabel>:
@@ -31,7 +32,6 @@
 
 
 <NormalLabel>:
-    markup: True
 	font_size: app.font_size_normal
 
 
@@ -39,10 +39,11 @@
     size_hint: None, None
     size: self.icon_width, self.icon_height
     text_size: self.size
+    pos_hint: {"center_x": .5, "center_y": .5}
     valign: 'middle'
     halign: 'center'
-    pos_hint: {"center_x": .5, "center_y": .5}
     background_color: (0, 0, 0, 0)
+    disabled_color: app.color_disabled
     markup: True
     font_style: self.icon_pack
     text: make_icon(self.icon, self.icon_pack)
@@ -50,11 +51,11 @@
 
 
 <ChatMessageLabel>:
-    pos_hint: {'left': 0}
     size_hint: None, None
     width: self.texture_size[0]
     height: self.texture_size[1]
     text_size: None, None
+    pos_hint: {'left': 0}
     halign: 'left'
 
 

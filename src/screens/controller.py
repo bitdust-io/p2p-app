@@ -194,13 +194,45 @@ class Controller(object):
         if _Debug:
             print('Controller.on_websocket_event', json_data)
         event_id = json_data.get('payload', {}).get('event_id', '')
+        event_data = json_data.get('payload', {}).get('data', {})
         if not event_id:
             return
         if event_id in ['service-started', 'service-stopped', ]:
             if self.mw().is_screen_active('settings_screen'):
                 self.mw().get_active_screen('settings_screen').on_service_started_stopped(
                     event_id=event_id,
-                    service_name=json_data.get('payload', {}).get('data', {}).get('name', ''),
+                    service_name=event_data.get('name', ''),
+                )
+        elif event_id == 'state-changed':
+            if event_data.get('name', '') in ['GroupMember', 'OnlineStatus', ]:
+                if self.mw().is_screen_active('conversations_screen'):
+                    self.mw().get_active_screen('conversations_screen').on_state_changed(event_data)
+                elif self.mw().is_screen_active('friends_screen'):
+                    self.mw().get_active_screen('friends_screen').on_state_changed(event_data)
+        elif event_id in ['group-synchronized', 'group-connecting', 'group-disconnected', ]:
+            if self.mw().is_screen_active('conversations_screen'):
+                self.mw().get_active_screen('conversations_screen').on_group_state_changed(
+                    event_id=event_id,
+                    group_key_id=event_data.get('group_key_id', ''),
+                    old_state=event_data.get('old_state', ''),
+                    new_state=event_data.get('new_state', ''),
+                )
+        elif event_id in ['friend-connected', 'friend-disconnected', ]:
+            if self.mw().is_screen_active('friends_screen'):
+                self.mw().get_active_screen('friends_screen').on_friend_state_changed(
+                    event_id=event_id,
+                    idurl=event_data.get('idurl', ''),
+                    global_id=event_data.get('global_id', ''),
+                    old_state=event_data.get('old_state', ''),
+                    new_state=event_data.get('new_state', ''),
+                )
+            if self.mw().is_screen_active('conversations_screen'):
+                self.mw().get_active_screen('conversations_screen').on_friend_state_changed(
+                    event_id=event_id,
+                    idurl=event_data.get('idurl', ''),
+                    global_id=event_data.get('global_id', ''),
+                    old_state=event_data.get('old_state', ''),
+                    new_state=event_data.get('new_state', ''),
                 )
 
     def on_websocket_stream_message(self, json_data):

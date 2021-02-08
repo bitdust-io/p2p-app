@@ -36,16 +36,17 @@ class AppStyle(object):
     button_text_padding_x = dp(5)
     button_text_padding_y = dp(5)
 
-    text_input_padding_x_absolute = 5
-    text_input_padding_x = dp(5)
-    text_input_padding_y_absolute = 5
-    text_input_padding_y = dp(5)
+    text_input_padding_x_absolute = 10
+    text_input_padding_x = dp(10)
+    text_input_padding_y_absolute = 10
+    text_input_padding_y = dp(10)
 
     #--- SCROLL BAR
     scroll_bar_width = dp(15)
 
     #--- COLORS
     color_transparent = (0,0,0,0)
+    color_disabled = (0,0,0,.2)
     color_black = (0,0,0,1)
     color_gray = (btn_clr_rgb_mid,btn_clr_rgb_mid,btn_clr_rgb_mid,1)
     color_white = (1,1,1,1)
@@ -62,7 +63,7 @@ class AppStyle(object):
     color_btn_normal_red = (btn_clr_rgb_top,btn_clr_rgb_mid,btn_clr_rgb_low,1)
     color_btn_pressed = (btn_clr_rgb_low+.1,btn_clr_rgb_mid+.1,btn_clr_rgb_top+.1,1)
     color_btn_inactive = (btn_clr_rgb_low-.1,btn_clr_rgb_mid-.1,btn_clr_rgb_top-.1,1)
-    color_btn_disabled = (btn_clr_rgb_top,btn_clr_rgb_top,btn_clr_rgb_top,1)
+    color_btn_disabled = (0,0,0,.2)
     color_btn_pressed_green = (btn_clr_rgb_low+.1,btn_clr_rgb_top+.1,.6,1)
     color_btn_inactive_green = (btn_clr_rgb_low-.1,btn_clr_rgb_top-.1,btn_clr_rgb_mid-.1,1)
     color_btn_disabled_green = (btn_clr_rgb_top-.1,btn_clr_rgb_top+.1,btn_clr_rgb_top-.1,1)
@@ -75,6 +76,10 @@ class AppStyle(object):
     color_text_input_background_disabled = (btn_clr_rgb_top,btn_clr_rgb_top,btn_clr_rgb_top,1)
     color_text_input_border = (.75,.75,.75,1)
 
+    color_debug1 = (.99, .5, .5, .5)
+    color_debug2 = (.5, .99, .5, .5)
+    color_debug3 = (.5, .5, .99, .5)
+
     #--- BUTTONS
     btn_icon_small_width = dp(26)
     btn_icon_small_height = dp(26)
@@ -82,7 +87,7 @@ class AppStyle(object):
     btn_icon_normal_height = dp(32)
 
     #--- NAVIGATION
-    nav_height = dp(base_element_height)
+    nav_height = dp(22)
 
     #--- TEXT INPUT
     text_input_height = 26

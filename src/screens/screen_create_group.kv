@@ -1,40 +1,44 @@
 <CreateGroupScreen>:
 
-    VerticalLayout:
-        pos_hint: {'top': 1}
-        size_hint: 1, None
-        height: self.minimum_height
-        padding: dp(15)
-        spacing: dp(5)
+    AppScreenLayout:
 
-        NormalLabel:
-            id: status_message_label
-            size_hint: 1, None
-            height: self.texture_size[1]
-            text: ''
+        PageContainerWithPaddingLayout:
 
-        HorizontalLayout:
-            size_hint: 1, None
-            height: self.minimum_height
+            HorizontalContainerLayout:
+                pos_hint: {'top': 1, 'left': 0}
 
-            CustomTextField:
-                id: group_label_input
-                size_hint_x: None
-                width: dp(250)
-                hint_text: 'Enter a name for the new group'
-                text: ''
+                NormalLabel:
+                    id: status_message_label
+                    size_hint: 1, None
+                    height: self.texture_size[1]
+                    text: ''
 
-            VerticalLayout:
-                size_hint: None, None
-                width: self.minimum_width
+            HorizontalLayout:
+
+                size_hint: 1, None
                 height: self.minimum_height
+                pos_hint: {'top': 1, 'left': 0}
 
-                RaisedIconButton:
-                    id: create_group_button
-                    _radius: dp(3)
-                    icon: 'plus'
-                    on_press: root.on_create_group_button_clicked()
+                CustomTextField:
+                    id: group_label_input
+                    size_hint_x: None
+                    width: dp(250)
+                    hint_text: 'Enter a name for the new group'
+                    text: ''
 
-                Widget:
+                VerticalLayout:
                     size_hint: None, None
-                    size: dp(16), dp(16)
+                    width: self.minimum_width
+                    height: self.minimum_height
+
+                    RaisedIconButton:
+                        id: create_group_button
+                        _radius: dp(3)
+                        icon: 'plus'
+                        on_press: root.on_create_group_button_clicked()
+
+                    Widget:
+                        size_hint: None, None
+                        size: dp(16), dp(16)
+
+            VEmptySpace:

@@ -4,10 +4,34 @@
 	spacing: 0
 
 
+<HorizontalWithPaddingLayout>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: self.minimum_height
+    padding: dp(10), dp(0)
+    spacing: 0
+
+
 <VerticalLayout>:
 	orientation: 'vertical'
 	padding: 0
 	spacing: 0
+
+
+<VerticalWithPaddingLayout>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    padding: dp(10), dp(0)
+    spacing: 0
+
+
+<VerticalWithLeftPaddingLayout>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    padding: dp(10), dp(0), dp(0), dp(0)
+    spacing: 0
 
 
 <HLayout>:
@@ -31,15 +55,17 @@
 
 
 <HEmptySpace>:
-    size_hint_x: 0.5
+    size_hint_x: 0.99
     size_hint_y: None
     height: 1
+    opacity: 0
 
 
 <VEmptySpace>:
-    size_hint_y: 0.5
+    size_hint_y: 0.99
     size_hint_x: None
     width: 1
+    opacity: 0
 
 
 <HFixedEmptySpace>:
@@ -54,5 +80,61 @@
     height: dp(10)
 
 
+<VerticalScreenLayout>:
+    pos_hint: {'top': 1}
+    size_hint: 1, 1
+    padding: 0
+
+
+<VerticalScreenWithPaddingLayout>:
+    pos_hint: {'top': 1}
+    size_hint: 1, 1
+    padding: dp(10)
+
+
+<AppScreenLayout>:
+    size_hint: 1, 1
+    pos_hint: {'top': 1, 'left': 0}
+    padding: 0
+    spacing: 0
+
+
+<PageContainerLayout>:
+    size_hint: 1, 1
+    pos_hint: {'top': 1, 'left': 0}
+    padding: dp(0)
+
+
+<PageContainerWithPaddingLayout>:
+    size_hint: 1, 1
+    pos_hint: {'top': 1, 'left': 0}
+    padding: dp(10)
+
+
+<PageContainerWithLeftPaddingLayout>:
+    size_hint: 1, 1
+    pos_hint: {'top': 1, 'left': 0}
+    padding: dp(10), dp(10), dp(0), dp(10)
+
+
+<ChatContainerLayout>:
+    size_hint: 1, None
+    height: self.minimum_height
+    padding: dp(10), dp(10), dp(0), dp(10)
+    spacing: dp(10)
+
+
+<HorizontalContainerLayout>:
+    size_hint_y: None
+    height: self.minimum_height
+    pos_hint: {'top': 1, 'left': 0}
+    padding: dp(10), dp(5)
+
+
 <VerticalScrollView>:
+    scroll_type: ['bars', 'content']
     do_scroll_x: False
+    always_overscroll: False
+    bar_color: app.theme_cls.primary_light
+    bar_inactive_color: app.color_btn_inactive
+    bar_width: app.scroll_bar_width

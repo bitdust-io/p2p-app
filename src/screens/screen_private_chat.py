@@ -1,12 +1,13 @@
 from components.screen import AppScreen
 from components.labels import ChatMessageLabel
 
+from lib import colorhash
 from lib import api_client
 from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -52,7 +53,9 @@ class PrivateChatScreen(AppScreen):
         current_messages = []
         msg_list = list(websock.response_result(resp))
         if _Debug:
-            print('on_message_history_result', len(msg_list))
+            print('PrivateChatScreen.on_message_history_result', len(msg_list))
+        # small hack to make sure content is pushed to the bottom
+        # self.ids.chat_messages.add_widget(ChatMessageLabel(text='\n' * 15))
         for item in msg_list:
             msg = item['doc']['payload']['data']['message']
             sender = item['doc']['sender']['glob_id'].replace('master$', '')
@@ -61,31 +64,35 @@ class PrivateChatScreen(AppScreen):
                 current_direction = direction
             if current_sender is None:
                 current_sender = sender
-            sender_name, sender_host = current_sender.split('@')
+            sender_name, _ = current_sender.split('@')
             if current_direction == direction:
                 current_messages.append(msg)
             else:
                 if current_direction == 'in':
+                    sender_clr = colorhash.ColorHash(sender_name).hex
                     self.ids.chat_messages.add_widget(ChatMessageLabel(
-                        text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, '\n'.join(current_messages)),
+                        text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
                     ))
                 else:
+                    sender_clr = colorhash.ColorHash(sender_name).hex
                     self.ids.chat_messages.add_widget(ChatMessageLabel(
-                        text='[color=#00b11c]{}[/color]\n{}'.format(sender_name, '\n'.join(current_messages)),
+                        text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
                     ))
                 current_direction = direction
                 current_sender = sender
-                sender_name, sender_host = current_sender.split('@')
+                sender_name, _ = current_sender.split('@')
                 current_messages = []
                 current_messages.append(msg)
         if current_messages:
             if current_direction == 'in':
+                sender_clr = colorhash.ColorHash(sender_name).hex
                 self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                    text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
                 ))
             else:
+                sender_clr = colorhash.ColorHash(sender_name).hex
                 self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    text='[color=#00b11c]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                    text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
                 ))
         self.ids.chat_messages_view.scroll_y = 0
 

@@ -1,6 +1,7 @@
 from components.screen import AppScreen
 from components.labels import ChatMessageLabel
 
+from lib import colorhash
 from lib import api_client
 from lib import websock
 
@@ -58,6 +59,8 @@ class GroupChatScreen(AppScreen):
         msg_list = list(websock.response_result(resp))
         if _Debug:
             print('on_message_history_result', len(msg_list))
+        # small hack to make sure content is pushed to the bottom
+        # self.ids.chat_messages.add_widget(ChatMessageLabel(text='\n' * 15))
         for item in msg_list:
             msg_id = item['doc']['payload']['message_id']
             msg = item['doc']['payload']['data']['message']
@@ -68,16 +71,18 @@ class GroupChatScreen(AppScreen):
             if current_sender == sender:
                 current_messages.append(msg)
             else:
+                sender_clr = colorhash.ColorHash(sender_name).hex
                 self.ids.chat_messages.add_widget(ChatMessageLabel(
-                    text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                    text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
                 ))
                 current_sender = sender
                 sender_name, sender_host = current_sender.split('@')
                 current_messages = []
                 current_messages.append(msg)
         if current_messages:
+            sender_clr = colorhash.ColorHash(sender_name).hex
             self.ids.chat_messages.add_widget(ChatMessageLabel(
-                text='[color=#3f4eda]{}[/color]\n{}'.format(sender_name, sender_host, '\n'.join(current_messages)),
+                text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
             ))
         self.ids.chat_messages_view.scroll_y = 0
 

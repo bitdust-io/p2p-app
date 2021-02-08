@@ -1,6 +1,8 @@
 <FriendActionButton>:
     button_width: app.friend_record_height - dp(1)
     button_height: app.friend_record_height - dp(1)
+    theme_text_color: 'Custom'
+    text_color: app.theme_cls.primary_color
 
 
 <FriendRecord>:
@@ -55,19 +57,15 @@
 
 <FriendsScreen>:
 
-    VerticalLayout:
-        size_hint: 1, 1
-        pos_hint: {'top': 1}
+    AppScreenLayout:
 
-        HorizontalLayout:
-            size_hint: 1, None
-            height: self.minimum_height
-            pos_hint: {'bottom': 1}
-            padding: dp(5)
+        HorizontalContainerLayout:
 
-            Widget:
+            StatusLabel:
+                id: status_label
                 size_hint: 1, None
-                height: 1
+                height: self.texture_size[1]
+                text: ''
 
             CustomFloatingActionButton:
                 id: search_users_button
@@ -80,12 +78,10 @@
 
         VerticalScrollView:
 
-    		VerticalLayout:
-    	    	id: friends_list
-    	    	pos_hint: {'top': 1}
-    			size_hint: 1, 1
-    			padding: dp(5)
-    			spacing: dp(5)
+            PageContainerWithLeftPaddingLayout:
+	    	    id: friends_list
+                size_hint_x: None
+                width: root.width - app.scroll_bar_width
 
     			FriendsListView:
     	            id: friends_list_view
