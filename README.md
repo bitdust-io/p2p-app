@@ -63,6 +63,11 @@ BitDust p2p-app APK bundle will include files from both repositories, so we need
         make install_p4a
 
 
+##### Get some additional libraries and tools provided by Google as binaries
+
+        make download_google_binaries
+
+
 ##### Prepare keystore to protect your .APK
 
 To be able to publish BitDust on Google Play Market .APK file must be digitaly signed.

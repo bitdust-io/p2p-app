@@ -46,8 +46,9 @@ endif
 
 install: system_dependencies clean venv
 
-download_support_lib:
+download_google_binaries:
 	@curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/27.0.0/support-compat-27.0.0.aar -o support-compat-27.0.0.aar
+	@curl https://www.gstatic.com/play-apps-publisher-rapid/signing-tool/prod/pepk-src.jar -o pepk.jar
 
 install_buildozer:
 	@rm -rf buildozer/

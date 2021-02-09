@@ -1,6 +1,10 @@
 # this is automatically generated from ./buildozer.spec.template file
 buildozer.spec
 
+# this should be downloaded from google with "make download_google_binaries"
+pepk.jar
+support-compat-27.0.0.aar
+
 venv
 buildozer
 .buildozer
