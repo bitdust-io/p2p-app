@@ -118,6 +118,7 @@ def patch_kivy_core_window():
 class ContentNavigationDrawer(BoxLayout):
     screen_manager = ObjectProperty()
     nav_drawer = ObjectProperty()
+    main_win = ObjectProperty()
 
 #------------------------------------------------------------------------------
 

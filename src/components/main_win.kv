@@ -3,34 +3,6 @@
 
 <ContentNavigationDrawer>:
 
-    ScrollView:
-
-        MDList:
-            id: menu_items
-
-            OneLineListItem:
-                text: "my identity"
-                on_press:
-                    root.nav_drawer.set_state("close")
-                    root.main_win.select_screen('my_id_screen', verify_state=True)
-
-            OneLineListItem:
-                text: "contacts"
-                on_press:
-                    root.nav_drawer.set_state("close")
-                    root.main_win.select_screen('friends_screen', verify_state=True)
-
-            OneLineListItem:
-                text: "chat"
-                on_press:
-                    root.nav_drawer.set_state("close")
-                    root.main_win.select_screen('conversations_screen', verify_state=True)
-
-            OneLineListItem:
-                text: "settings"
-                on_press:
-                    root.nav_drawer.set_state("close")
-                    root.main_win.select_screen('settings_screen', verify_state=True)
 
 
 <MainWin>:
@@ -46,9 +18,11 @@
     MDToolbar:
         id: toolbar
         pos_hint: {"top": 1}
-        elevation: 10
+        elevation: 5
         title: "BitDust"
-        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+        specific_text_color: app.color_white
+        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")], ]
+        right_action_items: [["search-web", lambda x: print('right menu 2')], ["dots-vertical", lambda x: print('right menu 1')], ]
 
     MDNavigationLayout:
 
@@ -66,4 +40,37 @@
                 screen_manager: screen_manager
                 nav_drawer: nav_drawer
                 main_win: main_win
-    
+
+                ScrollView:
+
+                    MDList:
+                        id: menu_items
+
+                        Widget:
+                            size_hint: None, None
+                            width: 1
+                            height: toolbar.height
+
+                        OneLineListItem:
+                            text: "my identity"
+                            on_press:
+                                nav_drawer.set_state("close")
+                                main_win.select_screen('my_id_screen', verify_state=True)
+
+                        OneLineListItem:
+                            text: "contacts"
+                            on_press:
+                                nav_drawer.set_state("close")
+                                main_win.select_screen('friends_screen', verify_state=True)
+
+                        OneLineListItem:
+                            text: "chat"
+                            on_press:
+                                nav_drawer.set_state("close")
+                                main_win.select_screen('conversations_screen', verify_state=True)
+
+                        OneLineListItem:
+                            text: "settings"
+                            on_press:
+                                nav_drawer.set_state("close")
+                                main_win.select_screen('settings_screen', verify_state=True)

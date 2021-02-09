@@ -161,5 +161,5 @@ class FriendsScreen(AppScreen):
 
 #------------------------------------------------------------------------------
 
-from kivy.lang.builder import Builder 
+from kivy.lang.builder import Builder
 Builder.load_file('./screens/screen_friends.kv')

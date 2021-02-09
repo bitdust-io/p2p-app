@@ -14,13 +14,12 @@
                     height: self.texture_size[1]
                     text: ''
 
-                CustomFloatingActionButton:
+                MDFloatingActionButton:
                     id: invite_user_button
                     icon: 'chat-plus'
-                    size_hint: None, None
-                    padding: dp(0)
-                    text_color: app.color_white
-                    user_font_size: '14sp'
+                    elevation: 5
+                    theme_text_color: "Custom"
+                    text_color: app.color_white99
                     on_release: root.on_invite_user_button_clicked()
 
             VerticalScrollView:
