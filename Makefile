@@ -10,7 +10,7 @@ REQUIREMENTS_ANDROID:="kivy==2.0.0,git+https://github.com/kivymd/KivyMD.git@a51a
 OS=$(shell lsb_release -si 2>/dev/null || uname)
 PIP:="venv/bin/pip"
 PYTHON="venv/bin/python"
-PYTHON_VERSION=python3
+PYTHON_VERSION=python3.7
 
 .PHONY: clean pyclean
 
