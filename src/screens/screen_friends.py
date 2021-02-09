@@ -18,53 +18,6 @@ class FriendActionButton(buttons.TransparentIconButton):
 class FriendRecord(list_view.SelectableHorizontalRecord):
     pass
 
-#     def __init__(self, **kwargs):
-#         super(FriendRecord, self).__init__(**kwargs)
-#         self.visible_buttons = []
-# 
-# #     def get_root(self):
-# #         return self.parent.parent.parent.parent.parent.parent
-# 
-#     def show_buttons(self):
-#         if not self.visible_buttons:
-#             chat_button = FriendActionButton(
-#                 icon='comment-multiple',
-#                 on_release=self.on_chat_button_clicked,
-#             )
-#             self.visible_buttons.append(chat_button)
-#             self.add_widget(chat_button)
-#             delete_button = FriendActionButton(
-#                 icon='trash-can',
-#                 on_release=self.on_delete_button_clicked,
-#             )
-#             self.visible_buttons.append(delete_button)
-#             self.add_widget(delete_button)
-# 
-#     def hide_buttons(self):
-#         if self.visible_buttons:
-#             for w in self.visible_buttons:
-#                 self.remove_widget(w)
-#             self.visible_buttons.clear()
-# 
-#     def on_chat_button_clicked(self, *args):
-#         self.get_root().main_win().select_screen(
-#             screen_id='private_chat_{}'.format(self.global_id),
-#             screen_type='private_chat_screen',
-#             global_id=self.global_id,
-#             username=self.username,
-#         )
-# 
-#     def on_delete_button_clicked(self, *args):
-#         self.get_root().main_win().close_screen(
-#             screen_id='private_chat_{}'.format(self.global_id),
-#         )
-#         self.parent.clear_selection()
-#         api_client.friend_remove(global_user_id=self.global_id, cb=self.on_friend_remove_result)
-# 
-#     def on_friend_remove_result(self, resp):
-#         self.get_root().ids.status_label.from_api_response(resp)
-#         self.get_root().populate()
-
 
 class FriendsListView(list_view.SelectableRecycleView):
 
@@ -91,7 +44,6 @@ class FriendsScreen(screen.AppScreen):
 
     def clear_selected_item(self):
         if self.ids.friends_list_view.selected_item:
-            # self.ids.friends_list_view.selected_item.hide_buttons()
             self.ids.friends_list_view.selected_item.selected = False
         self.ids.friends_list_view.clear_selection()
 

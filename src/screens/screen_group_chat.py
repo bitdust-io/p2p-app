@@ -30,8 +30,8 @@ class GroupChatScreen(AppScreen):
 
     def get_title(self):
         l = self.label
-        if len(l) > 10:
-            l = l[:10] + '...'
+        if len(l) > 20:
+            l = l[:20] + '...'
         return l
 
     def on_enter(self, *args):

@@ -44,6 +44,9 @@ class AppScreen(ThemableBehavior, Screen):
     def get_icon(self):
         return ''
 
+    def get_icon_pack(self):
+        return 'Icons'
+
     def get_title(self):
         return ''
 

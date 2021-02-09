@@ -1,4 +1,5 @@
 from kivy.metrics import dp
+from kivy.core.text import LabelBase
 from kivy.properties import StringProperty  # @UnresolvedImport
 from kivy.properties import NumericProperty  # @UnresolvedImport
 from kivy.properties import ObjectProperty  # @UnresolvedImport
@@ -9,10 +10,10 @@ from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
 
-from lib.system import get_android_keyboard_height, is_android, set_android_system_ui_visibility
+from lib import system
 
-# from components.navigation import NavButtonActive, NavButtonClosable
-from components.buttons import CustomIconButton
+from components import buttons
+from components import webfont
 
 #------------------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ def patch_kivy_core_window():
     from kivy.core.window import Window
 
     def _get_android_kheight(self=Window):
-        ret = get_android_keyboard_height()
+        ret = system.get_android_keyboard_height()
         # if _Debug:
         #     print('main_window._get_android_kheight', ret)
         return ret
@@ -37,7 +38,7 @@ def patch_kivy_core_window():
         if self._density != 1:
             w, h = self._win._get_gl_size()
         if self.softinput_mode == 'resize':
-            h -= get_android_keyboard_height()  # self.keyboard_height
+            h -= system.get_android_keyboard_height()  # self.keyboard_height
         if r in (0, 180):
             return w, h
         return h, w
@@ -57,7 +58,7 @@ def patch_kivy_core_window():
         smode = self.softinput_mode
         target = self._system_keyboard.target
         targettop = max(0, target.to_window(0, target.y)[1]) if target else 0
-        kheight = get_android_keyboard_height()
+        kheight = system.get_android_keyboard_height()
 
         w2, h2 = w / 2., h / 2.
         r = radians(self.rotation)
@@ -101,7 +102,7 @@ def patch_kivy_core_window():
     Window.clearcolor = (1, 1, 1, 1)
     Window.fullscreen = False
 
-    if is_android():
+    if system.is_android():
         Window.update_viewport = update_viewport
         # Window._get_size = _get_size
         Window._get_android_kheight = _get_android_kheight
@@ -137,7 +138,7 @@ class MainWin(Screen, ThemableBehavior):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         patch_kivy_core_window()
-        if is_android():
+        if system.is_android():
             self.ids.inner_container.padding = 1
 
     def on_height(self, instance, value):
@@ -169,44 +170,44 @@ class MainWin(Screen, ThemableBehavior):
     def get_active_screen(self, screen_id):
         return self.active_screens.get(screen_id, [None, ])[0]
 
+    def populate_toolbar_content(self, screen_inst=None):
+        if not screen_inst:
+            self.ids.toolbar.title = 'BitDust'
+            return
+        title = screen_inst.get_title()
+        icn = screen_inst.get_icon()
+        if icn:
+            icn_pack = screen_inst.get_icon_pack()
+            title = '[size=28sp]{}[/size]  {}'.format(webfont.make_icon(icn, icon_pack=icn_pack), title)
+        if title:
+            self.ids.toolbar.title = title
+        else:
+            self.ids.toolbar.title = 'BitDust'
+
     def open_screen(self, screen_id, screen_type, **kwargs):
         if screen_id in self.active_screens:
             if _Debug:
                 print('MainWindow.open_screen   screen %r already opened' % screen_id)
             return
         screen_class = self.screens_map[screen_type]
-        screen = screen_class(name=screen_id, **kwargs)
-        title = screen.get_title()
-        icn = screen.get_icon()
-        closable = screen.is_closable()
-        btn = None
-        # if title:
-        #     if closable:
-        #         btn = NavButtonClosable(text=title, icon=icn, screen=screen_id)
-        #     else:
-        #         btn = NavButtonActive(text=title, icon=icn, screen=screen_id)
-        #     self.ids.nav_buttons_layout.add_widget(btn)
-        # else:
-        #     btn = None
-        self.ids.screen_manager.add_widget(screen)
+        screen_inst = screen_class(name=screen_id, **kwargs)
+        self.ids.screen_manager.add_widget(screen_inst)
         self.ids.screen_manager.current = screen_id
-        self.active_screens[screen_id] = (screen, btn, )
-        screen.on_opened()
+        self.active_screens[screen_id] = (screen_inst, None, )
+        self.populate_toolbar_content(screen_inst)
+        screen_inst.on_opened()
         if _Debug:
-            print('MainWindow.open_screen   opened screen %r with button %r' % (screen_id, bool(btn), ))
+            print('MainWindow.open_screen   opened screen %r' % screen_id)
 
     def close_screen(self, screen_id):
         if screen_id not in self.active_screens:
             if _Debug:
                 print('MainWindow.close_screen   screen %r has not been opened' % screen_id)
             return
-        scrn, btn = self.active_screens.pop(screen_id)
-        self.ids.screen_manager.remove_widget(scrn)
-        # if btn:
-        #     self.ids.nav_buttons_layout.remove_widget(btn)
-        #     del btn
-        scrn.on_closed()
-        del scrn
+        screen_inst, btn = self.active_screens.pop(screen_id)
+        self.ids.screen_manager.remove_widget(screen_inst)
+        screen_inst.on_closed()
+        del screen_inst
         if _Debug:
             print('MainWindow.close_screen  closed screen %r' % screen_id)
 
@@ -238,6 +239,7 @@ class MainWin(Screen, ThemableBehavior):
             self.open_screen(screen_id, screen_type, **kwargs)
         else:
             self.active_screens[screen_id][0].init_kwargs(**kwargs)
+            self.populate_toolbar_content(self.active_screens[screen_id][0])
         # self.ids.main_nav_button.disabled = bool(screen_id in ['process_dead_screen', 'connecting_screen', 'startup_screen', ])
         if self.selected_screen:
             if self.selected_screen == screen_id:

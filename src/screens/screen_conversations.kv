@@ -1,19 +1,4 @@
-<ConversationActionButton>:
-    button_width: app.conversation_record_height - dp(1)
-    button_height: app.conversation_record_height - dp(1)
-    theme_text_color: 'Custom'
-    text_color: app.theme_cls.primary_color
-
-
 <ConversationRecord>:
-
-    canvas.before:
-        Color:
-            rgba: app.color_row_seleted if self.selected else app.color_white
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
     size_hint: 1, None
     height: app.conversation_record_height
     padding: 0

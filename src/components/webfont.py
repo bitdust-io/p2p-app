@@ -89,6 +89,9 @@ def md_icon(name, font_file=None, with_spaces=False, with_font_tag=True):
 #------------------------------------------------------------------------------
 
 def get_icon_code(name, icon_pack='IconMD'):
+    if icon_pack in ['Icon', 'Icons', ]:
+        from kivymd.icon_definitions import md_icons
+        return md_icons[name]
     if icon_pack in ['md', 'materialdesignicons', 'IconMD', ]:
         return md_icon(name, font_file=None, with_spaces=False, with_font_tag=False)
     if icon_pack in ['fa', 'fontawesome', 'IconFA', ]:
@@ -99,6 +102,14 @@ def get_icon_code(name, icon_pack='IconMD'):
 
 
 def make_icon(name, icon_pack='IconMD', font_file=None, with_spaces=False):
+    if icon_pack in ['Icon', 'Icons', ]:
+        from kivymd.icon_definitions import md_icons
+        from kivy.core.text import LabelBase
+        font_name = LabelBase._fonts['Icons'][0]
+        s = '[font={}]{}[/font]'.format(font_name, md_icons[name])
+        if not with_spaces:
+            return s
+        return ' {} '.format(s)
     if icon_pack in ['md', 'materialdesignicons', 'IconMD', ]:
         return md_icon(name, font_file=font_file, with_spaces=with_spaces)
     if icon_pack in ['fa', 'fontawesome', 'IconFA', ]:

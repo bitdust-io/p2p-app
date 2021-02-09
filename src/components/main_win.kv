@@ -19,7 +19,9 @@
         id: toolbar
         pos_hint: {"top": 1}
         elevation: 5
+        icon: "search-web"
         title: "BitDust"
+        anchor_title: 'center'
         specific_text_color: app.color_white
         left_action_items: [["menu", lambda x: nav_drawer.set_state("open")], ]
         right_action_items: [["search-web", lambda x: print('right menu 2')], ["dots-vertical", lambda x: print('right menu 1')], ]
