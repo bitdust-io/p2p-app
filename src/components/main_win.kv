@@ -1,0 +1,69 @@
+#:import NoTransition kivy.uix.screenmanager.NoTransition
+
+
+<ContentNavigationDrawer>:
+
+    ScrollView:
+
+        MDList:
+            id: menu_items
+
+            OneLineListItem:
+                text: "my identity"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.main_win.select_screen('my_id_screen', verify_state=True)
+
+            OneLineListItem:
+                text: "contacts"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.main_win.select_screen('friends_screen', verify_state=True)
+
+            OneLineListItem:
+                text: "chat"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.main_win.select_screen('conversations_screen', verify_state=True)
+
+            OneLineListItem:
+                text: "settings"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    root.main_win.select_screen('settings_screen', verify_state=True)
+
+
+<MainWin>:
+    id: main_win
+
+    canvas.before:
+        Color:
+            rgba: app.color_white
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    MDToolbar:
+        id: toolbar
+        pos_hint: {"top": 1}
+        elevation: 10
+        title: "BitDust"
+        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+
+    MDNavigationLayout:
+
+        ScreenManager:
+            id: screen_manager
+            transition: NoTransition()
+
+        MDNavigationDrawer:
+            id: nav_drawer
+            type: "modal"
+            opening_time: 0
+            closing_time: 0
+
+            ContentNavigationDrawer:
+                screen_manager: screen_manager
+                nav_drawer: nav_drawer
+                main_win: main_win
+    

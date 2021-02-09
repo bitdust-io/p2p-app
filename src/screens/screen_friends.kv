@@ -57,32 +57,36 @@
 
 <FriendsScreen>:
 
-    AppScreenLayout:
+    ScreenContainerLayout:
 
-        HorizontalContainerLayout:
+        TopEmptyScreenSpace:
 
-            StatusLabel:
-                id: status_label
-                size_hint: 1, None
-                height: self.texture_size[1]
-                text: ''
+        AppScreenLayout:
 
-            CustomFloatingActionButton:
-                id: search_users_button
-                icon: 'account-plus'
-                size_hint: None, None
-                padding: dp(0)
-                text_color: app.color_white
-                user_font_size: '20sp'
-                on_release: root.on_search_people_button_clicked()
+            HorizontalContainerLayout:
 
-        VerticalScrollView:
+                StatusLabel:
+                    id: status_label
+                    size_hint: 1, None
+                    height: self.texture_size[1]
+                    text: ''
 
-            PageContainerWithLeftPaddingLayout:
-	    	    id: friends_list
-                size_hint_x: None
-                width: root.width - app.scroll_bar_width
+                CustomFloatingActionButton:
+                    id: search_users_button
+                    icon: 'account-plus'
+                    size_hint: None, None
+                    padding: dp(0)
+                    text_color: app.color_white
+                    user_font_size: '20sp'
+                    on_release: root.on_search_people_button_clicked()
 
-    			FriendsListView:
-    	            id: friends_list_view
-    	            size_hint: 1, 1
+            VerticalScrollView:
+
+                PageContainerWithLeftPaddingLayout:
+    	    	    id: friends_list
+                    size_hint_x: None
+                    width: root.width - app.scroll_bar_width
+
+        			FriendsListView:
+        	            id: friends_list_view
+        	            size_hint: 1, 1

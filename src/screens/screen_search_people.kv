@@ -31,39 +31,43 @@
 
 <SearchPeopleScreen>:
 
-    AppScreenLayout:
+    ScreenContainerLayout:
 
-        HorizontalContainerLayout:
+        TopEmptyScreenSpace:
 
-            CustomTextField:
-                id: search_input
-                size_hint_x: None
-                width: dp(220)
-                hint_text: 'Enter user name to search'
-                text: ''
-                on_focus: root.on_search_input_focus_changed()
+        AppScreenLayout:
 
-            VerticalLayout:
-                size_hint: None, None
-                width: self.minimum_width
-                height: self.minimum_height
+            HorizontalContainerLayout:
 
-                RaisedIconButton:
-                    id: search_button
-                    _radius: dp(3)
-                    icon: 'search-web'
-                    on_press: root.on_search_button_clicked()
+                CustomTextField:
+                    id: search_input
+                    size_hint_x: None
+                    width: dp(220)
+                    hint_text: 'Enter user name to search'
+                    text: ''
+                    on_focus: root.on_search_input_focus_changed()
 
-                Widget:
+                VerticalLayout:
                     size_hint: None, None
-                    size: dp(16), dp(16)
+                    width: self.minimum_width
+                    height: self.minimum_height
 
-        VerticalScrollView:
+                    RaisedIconButton:
+                        id: search_button
+                        _radius: dp(3)
+                        icon: 'search-web'
+                        on_press: root.on_search_button_clicked()
 
-            PageContainerWithLeftPaddingLayout:
-                id: search_results
-                size_hint: None, None
-                width: root.width - app.scroll_bar_width
-                height: self.minimum_height
-                pos_hint: {'top': 1}
-                spacing: dp(5)
+                    Widget:
+                        size_hint: None, None
+                        size: dp(16), dp(16)
+
+            VerticalScrollView:
+
+                PageContainerWithLeftPaddingLayout:
+                    id: search_results
+                    size_hint: None, None
+                    width: root.width - app.scroll_bar_width
+                    height: self.minimum_height
+                    pos_hint: {'top': 1}
+                    spacing: dp(5)

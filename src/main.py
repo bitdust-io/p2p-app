@@ -50,22 +50,6 @@ from lib.system import is_android
 if _Debug:
     Config.set('kivy', 'log_level', 'debug')
 
-if is_android():
-    pass
-    # Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
-else:
-    # Config.set('input', 'mouse', 'mouse,multitouch_on_demand,disable_on_activity,disable_multitouch')  # disable multi-touch
-    Config.set('graphics', 'resizable', True)
-    Config.set('graphics', 'fullscreen', False)
-
-# if is_android():
-#     pass 
-    # Config.set('graphics', 'width', '360')
-    # Config.set('graphics', 'height', '740')
-# else:
-    # Config.set('graphics', 'width', '600')
-    # Config.set('graphics', 'height', '300')
-
 #------------------------------------------------------------------------------
 
 from kivy.core.text import LabelBase
@@ -99,7 +83,6 @@ if is_android():
 #------------------------------------------------------------------------------
 
 Builder.load_string("""
-#:import NoTransition kivy.uix.screenmanager.NoTransition
 #:import fa_icon components.webfont.fa_icon
 #:import md_icon components.webfont.md_icon
 #:import icofont_icon components.webfont.icofont_icon
@@ -183,14 +166,15 @@ class BitDustApp(styles.AppStyle, MDApp):
         from components import buttons
         from components import text_input
         from components import list_view
-        from components import navigation
-        from components import main_window
+        # from components import navigation
+        from components import main_win
 
         self.control = controller.Controller(self)
-        self.main_window = main_window.MainWindow()
-        self.main_window.register_screens(controller.all_screens())
+        self.main_window = main_win.MainWin()
         self.main_window.register_controller(self.control)
-        self.main_window.select_screen(screen_id='startup_screen', verify_state=False)
+        # self.main_window.register_screens(controller.all_screens())
+        # self.main_window.register_controller(self.control)
+        # self.main_window.select_screen(screen_id='my_id_screen', verify_state=False)
         # Window.bind(on_keyboard=self.on_key_input)
         return self.main_window
 
@@ -208,6 +192,10 @@ class BitDustApp(styles.AppStyle, MDApp):
                             return False
             if _Debug:
                 print('BitDustApp.do_start   is okay to start now, storage path is %r' % primary_external_storage_path())
+
+        self.main_window.register_screens(controller.all_screens())
+        # self.main_window.register_controller(self.control)
+        # self.main_window.select_screen(screen_id='my_id_screen', verify_state=False)
 
         self.control.start()
 

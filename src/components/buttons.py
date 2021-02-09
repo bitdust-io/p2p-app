@@ -8,18 +8,15 @@ from kivy.properties import (
     ColorProperty,  # @UnresolvedImport
     ListProperty,  # @UnresolvedImport
 )
-# from kivy.uix.button import Button
 from kivy.uix.behaviors import ButtonBehavior
 
 from kivymd.theming import ThemableBehavior
-# from kivymd.uix.label import MDLabel
 from kivymd.uix.button import (
     BaseButton,
     BaseElevationButton,
     BasePressedButton,
     MDFloatingActionButton,
     MDFlatButton,
-    # MDIconButton,
 )
 from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
 from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
@@ -119,9 +116,6 @@ class CustomIconButton(ButtonBehavior, MarkupLabel):
     background_disabled_down = StringProperty('')
     border = ListProperty([0, 0, 0, 0])
     selected = BooleanProperty(False)
-
-    # def __init__(self, **kwargs):
-    #     super().__init__(**kwargs)
 
 
 class TransparentIconButton(CustomIconButton):
