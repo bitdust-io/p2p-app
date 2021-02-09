@@ -8,6 +8,27 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
+def my_app():
+    return App.get_running_app()
+
+
+def main_window():
+    return my_app().main_window
+
+
+def toolbar():
+    return main_window().ids.toolbar
+
+
+def manager():
+    return main_window().ids.screen_manager
+
+
+def control():
+    return my_app().control
+
+#------------------------------------------------------------------------------
+
 class AppScreen(ThemableBehavior, Screen):
 
     def __init__(self, **kw):
@@ -30,16 +51,16 @@ class AppScreen(ThemableBehavior, Screen):
         return True
 
     def app(self):
-        return App.get_running_app()
+        return my_app()
 
     def main_win(self):
-        return self.app().main_window
+        return main_window()
 
     def scr_manager(self):
-        return self.main_win().ids.screen_manager
+        return manager()
 
     def control(self):
-        return self.app().control
+        return control()
 
     def on_opened(self):
         pass
