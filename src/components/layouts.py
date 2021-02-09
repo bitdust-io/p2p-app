@@ -8,6 +8,14 @@ from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
 
+class ScreenContainerLayout(BoxLayout):
+    pass
+
+
+class TopEmptyScreenSpace(Widget):
+    pass
+
+
 class HorizontalLayout(BoxLayout):
     pass
 

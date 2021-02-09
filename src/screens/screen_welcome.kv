@@ -1,22 +1,26 @@
 <WelcomeScreen>:
 
-    VLayout:
-        size_hint: 1, 1
+    ScreenContainerLayout:
 
-        VEmptySpace:
-            size_hint_y: 0.5
+        TopEmptyScreenSpace:
 
-        HLayout:
-            size_hint: 1, .01
+        VLayout:
+            size_hint: 1, 1
 
-            HEmptySpace:
-                size_hint_x: 0.5
+            VEmptySpace:
+                size_hint_y: 0.5
 
-            NormalLabel:
-                text: '[size=26sp]Welcome to BitDust[/size]'
+            HLayout:
+                size_hint: 1, .01
 
-            HEmptySpace:
-                size_hint_x: 0.5
+                HEmptySpace:
+                    size_hint_x: 0.5
 
-        VEmptySpace:
-            size_hint_y: 0.5
+                NormalLabel:
+                    text: '[size=26sp]Welcome to BitDust[/size]'
+
+                HEmptySpace:
+                    size_hint_x: 0.5
+
+            VEmptySpace:
+                size_hint_y: 0.5

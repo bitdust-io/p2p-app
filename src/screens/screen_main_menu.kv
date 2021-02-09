@@ -9,38 +9,42 @@
 
 <MainMenuScreen>:
 
-    VerticalScrollView:
+    ScreenContainerLayout:
 
-        StackLayout:
-            orientation: 'lr-tb'
-            padding: dp(20)
-            spacing: dp(25)
-            size_hint: None, None
-            width: root.width - app.scroll_bar_width
-            height: self.minimum_height
-            pos_hint: {'top': 1}
+        TopEmptyScreenSpace:
 
-            MainMenuButton:
-            	icon: 'passport'
-                label_text: 'my identity'
-                on_press: root.main_win().select_screen('my_id_screen', verify_state=True)
-
-            MainMenuButton:
-            	icon: 'account-search'
-                label_text: 'search people'
-                on_press: root.main_win().select_screen('search_people_screen', verify_state=True)
-
-            MainMenuButton:
-            	icon: 'comment-multiple'
-                label_text: 'conversations'
-                on_press: root.main_win().select_screen('conversations_screen', verify_state=True)
-
-            MainMenuButton:
-            	icon: 'notebook'
-                label_text: 'contacts'
-                on_press: root.main_win().select_screen('friends_screen', verify_state=True)
-
-            MainMenuButton:
-            	icon: 'cogs'
-                label_text: 'settings'
-                on_press: root.main_win().select_screen('settings_screen', verify_state=True)
+        VerticalScrollView:
+    
+            StackLayout:
+                orientation: 'lr-tb'
+                padding: dp(20)
+                spacing: dp(25)
+                size_hint: None, None
+                width: root.width - app.scroll_bar_width
+                height: self.minimum_height
+                pos_hint: {'top': 1}
+    
+                MainMenuButton:
+                	icon: 'passport'
+                    label_text: 'my identity'
+                    on_press: root.main_win().select_screen('my_id_screen', verify_state=True)
+    
+                MainMenuButton:
+                	icon: 'account-search'
+                    label_text: 'search people'
+                    on_press: root.main_win().select_screen('search_people_screen', verify_state=True)
+    
+                MainMenuButton:
+                	icon: 'comment-multiple'
+                    label_text: 'conversations'
+                    on_press: root.main_win().select_screen('conversations_screen', verify_state=True)
+    
+                MainMenuButton:
+                	icon: 'notebook'
+                    label_text: 'contacts'
+                    on_press: root.main_win().select_screen('friends_screen', verify_state=True)
+    
+                MainMenuButton:
+                	icon: 'cogs'
+                    label_text: 'settings'
+                    on_press: root.main_win().select_screen('settings_screen', verify_state=True)

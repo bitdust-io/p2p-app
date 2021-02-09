@@ -1,64 +1,68 @@
 <NewIdentityScreen>:
 
-    BoxLayout:
-        orientation: 'horizontal'
-        spacing: 10
+    ScreenContainerLayout:
 
-        Widget:
-            size_hint: 0.5, 1
+        TopEmptyScreenSpace:
 
         BoxLayout:
-            orientation: 'vertical'
-            size_hint: 0.4, 1
+            orientation: 'horizontal'
             spacing: 10
 
             Widget:
-                size_hint: 1, 0.3
+                size_hint: 0.5, 1
 
-            MarkupLabel:
-                text_size: self.size
-                valign: "bottom"
-                halign: "center"
-                text: "username:"
-                height: dp(20)
-                size_hint: 1, None
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 0.4, 1
+                spacing: 10
 
-            TextInput:
-                id: username_input
-                hint_text: 'alice'
-                text: ''
-                multiline: False
-                pos_hint: {'center_x': .5}
-                size_hint: None, None
-                width: dp(160)
-                height: self.minimum_height
+                Widget:
+                    size_hint: 1, 0.3
 
-            RoundedFlexButton:
-                id: create_identity_button
-                text: "create"
-                pos_hint: {'center_x': .5}
-                on_release: root.on_create_identity_button_clicked()
+                MarkupLabel:
+                    text_size: self.size
+                    valign: "bottom"
+                    halign: "center"
+                    text: "username:"
+                    height: dp(20)
+                    size_hint: 1, None
 
-            StatusLabel:
-                id: create_identity_result_message
-                valign: 'bottom'
-                halign: 'right'
-                height: dp(20)
-                size_hint: None, None
-                pos_hint: {'center_x': .5}
-                text: ""
+                TextInput:
+                    id: username_input
+                    hint_text: 'alice'
+                    text: ''
+                    multiline: False
+                    pos_hint: {'center_x': .5}
+                    size_hint: None, None
+                    width: dp(160)
+                    height: self.minimum_height
+
+                RoundedFlexButton:
+                    id: create_identity_button
+                    text: "create"
+                    pos_hint: {'center_x': .5}
+                    on_release: root.on_create_identity_button_clicked()
+
+                StatusLabel:
+                    id: create_identity_result_message
+                    valign: 'bottom'
+                    halign: 'right'
+                    height: dp(20)
+                    size_hint: None, None
+                    pos_hint: {'center_x': .5}
+                    text: ""
+
+                Widget:
+                    size_hint: 1, 0.3
+
+                RoundedFlexButton:
+                    id: recover_identity_button
+                    text: "recover"
+                    pos_hint: {'center_x': .5}
+                    on_release: root.on_recover_identity_button_clicked()
+
+                Widget:
+                    size_hint: 1, 0.1
 
             Widget:
-                size_hint: 1, 0.3
-
-            RoundedFlexButton:
-                id: recover_identity_button
-                text: "recover"
-                pos_hint: {'center_x': .5}
-                on_release: root.on_recover_identity_button_clicked()
-
-            Widget:
-                size_hint: 1, 0.1
-
-        Widget:
-            size_hint: 0.5, 1
+                size_hint: 0.5, 1

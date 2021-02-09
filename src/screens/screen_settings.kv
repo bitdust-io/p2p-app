@@ -293,27 +293,31 @@
 
 <SettingsScreen>:
 
-    AppScreenLayout:
+    ScreenContainerLayout:
 
-        HorizontalContainerLayout:
+        TopEmptyScreenSpace:
 
-            StatusLabel:
-                id: status_label
-                size_hint: 1, None
-                height: self.texture_size[1]
-                text: ''
+        AppScreenLayout:
 
-        VerticalScrollView:
-            id: scroll_view
+            HorizontalContainerLayout:
 
-            PageContainerWithLeftPaddingLayout:
-                size_hint: None, None
-                width: root.width - app.scroll_bar_width
-                height: self.minimum_height
-
-                SettingsTreeView:
-
-                    id: settings_tree
-                    pos_hint: {'top': 1}
+                StatusLabel:
+                    id: status_label
                     size_hint: 1, None
+                    height: self.texture_size[1]
+                    text: ''
+
+            VerticalScrollView:
+                id: scroll_view
+
+                PageContainerWithLeftPaddingLayout:
+                    size_hint: None, None
+                    width: root.width - app.scroll_bar_width
                     height: self.minimum_height
+
+                    SettingsTreeView:
+
+                        id: settings_tree
+                        pos_hint: {'top': 1}
+                        size_hint: 1, None
+                        height: self.minimum_height

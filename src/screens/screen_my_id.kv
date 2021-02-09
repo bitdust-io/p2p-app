@@ -1,22 +1,26 @@
 <MyIDScreen>:
 
-    AppScreenLayout:
+    ScreenContainerLayout:
 
-        VerticalScrollView:
+        TopEmptyScreenSpace:
 
-    	    VerticalWithPaddingLayout:
-    	        pos_hint: {'top': 1}
-    	        size_hint: None, None
-    	        height: self.minimum_height
-                width: root.width - app.scroll_bar_width
+        AppScreenLayout:
 
-    	        MarkupLabel:
-    	        	id: my_id_details
-    			    size_hint_y: None
-    			    text_size: self.width, None
-    			    height: self.texture_size[1]
-    			    color: app.color_black
-    			    text: ''
+            VerticalScrollView:
 
-    			RoundedFlexButton:
-    				text: 'key backup'
+        	    VerticalWithPaddingLayout:
+        	        pos_hint: {'top': 1}
+        	        size_hint: None, None
+        	        height: self.minimum_height
+                    width: root.width - app.scroll_bar_width
+
+        	        MarkupLabel:
+        	        	id: my_id_details
+        			    size_hint_y: None
+        			    text_size: self.width, None
+        			    height: self.texture_size[1]
+        			    color: app.color_black
+        			    text: ''
+
+        			RoundedFlexButton:
+        				text: 'key backup'

@@ -46,3 +46,8 @@ class AppScreen(ThemableBehavior, Screen):
 
     def on_closed(self):
         pass
+
+#------------------------------------------------------------------------------
+
+from kivy.lang.builder import Builder 
+Builder.load_file('./components/screen.kv')
