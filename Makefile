@@ -4,7 +4,7 @@
 
 REQUIREMENTS_TXT:=requirements.txt
 
-REQUIREMENTS_ANDROID:="kivy==2.0.0,git+https://github.com/kivymd/KivyMD.git@a51aa9faf1f9a70edecd4a993b9705d05baddaaf,sdl2_ttf==2.0.15,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python2"
+REQUIREMENTS_ANDROID:="kivy==2.0.0,https://github.com/kivymd/KivyMD/archive/master.zip,sdl2_ttf==2.0.15,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python2"
 
 
 OS=$(shell lsb_release -si 2>/dev/null || uname)
@@ -45,6 +45,9 @@ ifeq ($(OS), Ubuntu)
 endif
 
 install: system_dependencies clean venv
+
+download_support_lib:
+	@curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/27.0.0/support-compat-27.0.0.aar -o support-compat-27.0.0.aar
 
 install_buildozer:
 	@rm -rf buildozer/
