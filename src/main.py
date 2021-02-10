@@ -84,15 +84,6 @@ if is_android():
 
 #------------------------------------------------------------------------------
 
-Builder.load_string("""
-#:import fa_icon components.webfont.fa_icon
-#:import md_icon components.webfont.md_icon
-#:import icofont_icon components.webfont.icofont_icon
-#:import make_icon components.webfont.make_icon
-""")
-
-#------------------------------------------------------------------------------
-
 if is_android():
     PACKAGE_NAME = 'org.bitdust_io.bitdust1'
     SERVICE_NAME = '{packagename}.Service{servicename}'.format(
@@ -106,6 +97,17 @@ if is_android():
         'android.permission.FOREGROUND_SERVICE',
     ]
     PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
+    from kivy.resources import resource_add_path
+    resource_add_path('/data/user/0/{}/files/app/_python_bundle/site-packages/kivymd/fonts'.format(PACKAGE_NAME))
+
+#------------------------------------------------------------------------------
+
+Builder.load_string("""
+#:import fa_icon components.webfont.fa_icon
+#:import md_icon components.webfont.md_icon
+#:import icofont_icon components.webfont.icofont_icon
+#:import make_icon components.webfont.make_icon
+""")
 
 #------------------------------------------------------------------------------
 
@@ -154,17 +156,23 @@ class BitDustApp(styles.AppStyle, MDApp):
         if is_android():
             fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
 
+        from kivymd import icon_definitions
+        from fonts import materialdesignicons_map
+        icon_definitions.md_icons = materialdesignicons_map.materialdesignicons_codes.copy()
+        LabelBase.register(name="Icons", fn_regular=os.path.join(fonts_path, "md.ttf"))
+        self.theme_cls.font_styles["Icon"] = ["Icons", 24, False, 0, ]
+
         LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
         theme_font_styles.append('IconMD')
-        self.theme_cls.font_styles["IconMD"] = ["IconMD", 22, False, 0.15, ]
+        self.theme_cls.font_styles["IconMD"] = ["IconMD", 24, False, 0, ]
 
         LabelBase.register(name="IconFA", fn_regular=os.path.join(fonts_path, "fa-solid.ttf"))
         theme_font_styles.append('IconFA')
-        self.theme_cls.font_styles["IconFA"] = ["IconFA", 22, False, 0.15, ]
+        self.theme_cls.font_styles["IconFA"] = ["IconFA", 24, False, 0, ]
 
         LabelBase.register(name="IconICO", fn_regular=os.path.join(fonts_path, "icofont.ttf"))
         theme_font_styles.append('IconICO')
-        self.theme_cls.font_styles["IconICO"] = ["IconICO", 22, False, 0.15, ]
+        self.theme_cls.font_styles["IconICO"] = ["IconICO", 24, False, 0, ]
 
         from components import layouts
         from components import labels

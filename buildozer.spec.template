@@ -40,7 +40,7 @@ requirements = {requirements}
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
-# requirements.source.kivy = ../../kivy
+# requirements.source.kivy = ../kivymd
 
 # (list) Garden requirements
 #garden_requirements = 
@@ -223,7 +223,7 @@ android.arch = arm64-v8a
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-p4a.branch = master
+# p4a.branch = master
 # master
 # v2019.08.09
 

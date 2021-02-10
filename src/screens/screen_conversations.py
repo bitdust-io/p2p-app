@@ -18,10 +18,10 @@ class ConversationRecord(list_view.SelectableHorizontalRecord):
 
     def get_icon_color(self, state):
         if state in ['IN_SYNC!', 'CONNECTED', ]:
-            return styles.style.color_circle_online
+            return styles.app.color_circle_online
         if state in ['OFFLINE', 'DISCONNECTED', ]:
-            return styles.style.color_circle_offline
-        return styles.style.color_circle_connecting
+            return styles.app.color_circle_offline
+        return styles.app.color_circle_connecting
 
     def on_chat_button_clicked(self, *args):
         if _Debug:

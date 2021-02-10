@@ -4,8 +4,7 @@
 
 REQUIREMENTS_TXT:=requirements.txt
 
-# REQUIREMENTS_ANDROID:="kivy==2.0.0,https://github.com/vesellov/KivyMD/archive/master.zip,sdl2_ttf==2.0.15,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python2"
-REQUIREMENTS_ANDROID:="kivy==2.0.0rc3,git+https://github.com/HeaTTheatR/KivyMD.git,sdl2_ttf==2.0.15,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python3"
+REQUIREMENTS_ANDROID:="kivy==2.0.0rc3,https://github.com/vesellov/KivyMD/archive/master.zip,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python3"
 
 OS=$(shell lsb_release -si 2>/dev/null || uname)
 PIP:="venv/bin/pip"
@@ -92,7 +91,8 @@ clean_android_environment_full:
 
 system_dependencies_android:
 ifeq ($(OS), Ubuntu)
-	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends openjdk-8-jdk cython autoconf
+	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends openjdk-8-jdk cython3 autoconf
+	@$(PYTHON_VERSION) -m pip install Cython
 endif
 
 rewrite_android_dist_files:
@@ -102,20 +102,21 @@ rewrite_android_dist_files:
 refresh_android_environment: update_p4a rewrite_android_dist_files
 	$(MAKE) spec requirements=$(REQUIREMENTS_ANDROID)
 
-refresh_android_environment_full: update_p4a update_engine_repo rewrite_android_dist_files
+refresh_android_environment_full: update_p4a rewrite_android_dist_files update_engine_repo
 	$(MAKE) spec requirements=$(REQUIREMENTS_ANDROID)
 
 spec:
 	@P_requirements="$(requirements)" ./venv/bin/python3 -c "tpl=open('buildozer.spec.template').read();import os,sys;sys.stdout.write(tpl.format(requirements=os.environ['P_requirements']));" > buildozer.spec
 
 build_android: refresh_android_environment
-	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android debug
-
-release_android: refresh_android_environment
 	@rm -rfv ./bin/*.apk
 	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
-	# @VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
-	@mv ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
+	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
+
+release_android: refresh_android_environment_full
+	@rm -rfv ./bin/*.apk
+	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
+	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 test_apk:
 	@adb install -r bin/BitDustAndroid.apk
