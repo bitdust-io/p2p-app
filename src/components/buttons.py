@@ -24,9 +24,9 @@ from kivymd.uix.behaviors.backgroundcolor_behavior import SpecificBackgroundColo
 
 #------------------------------------------------------------------------------
 
-from components.layouts import VerticalLayout
-from components.labels import MarkupLabel
-from components.styles import style
+from components import styles
+from components import layouts  
+from components import labels 
 
 #------------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ class CustomRaisedButton(CustomRectangularButton, RectangularElevationBehavior, 
 
 class CustomFloatingActionButton(MDFloatingActionButton):
 
-    button_size = NumericProperty(style.btn_icon_normal_width)
+    button_size = NumericProperty(styles.app.btn_icon_normal_width)
     icon_pack = StringProperty('IconMD')
 
     def set_size(self, interval):
@@ -103,7 +103,7 @@ class RoundedFlexButton(RoundedButton):
     pass
 
 
-class CustomIconButton(ButtonBehavior, MarkupLabel):
+class CustomIconButton(ButtonBehavior, labels.MarkupLabel):
 
     icon = StringProperty("circle")
     icon_pack = StringProperty("IconMD")
@@ -126,7 +126,7 @@ class CloseIconButton(TransparentIconButton):
     pass
 
 
-class LabeledIconButton(ButtonBehavior, VerticalLayout, ThemableBehavior):
+class LabeledIconButton(ButtonBehavior, layouts.VerticalLayout, ThemableBehavior):
 
     label_text = StringProperty("")
     label_font_size = NumericProperty("14sp")
@@ -160,8 +160,8 @@ class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, 
     icon_pack = StringProperty("IconMD")
     selected = BooleanProperty(False)
     _radius = dp(4)
-    button_width = NumericProperty(style.btn_icon_normal_width)
-    button_height = NumericProperty(style.btn_icon_normal_height)
+    button_width = NumericProperty(styles.app.btn_icon_normal_width)
+    button_height = NumericProperty(styles.app.btn_icon_normal_height)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

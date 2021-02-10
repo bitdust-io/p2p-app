@@ -1,6 +1,6 @@
-from components.layouts import HorizontalLayout
-from components.screen import AppScreen
-from components.labels import NormalLabel
+from components import layouts
+from components import screen
+from components import labels
 
 from lib import api_client
 
@@ -10,7 +10,7 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-class SearchPeopleResult(HorizontalLayout):
+class SearchPeopleResult(layouts.HorizontalLayout):
 
     def __init__(self, **kwargs):
         label_text = kwargs.pop('label_text', '')
@@ -27,11 +27,11 @@ class SearchPeopleResult(HorizontalLayout):
         self.parent.parent.parent.parent.main_win().select_screen('friends_screen')
 
 
-class NoUsersFound(NormalLabel):
+class NoUsersFound(labels.NormalLabel):
     pass
 
 
-class SearchPeopleScreen(AppScreen):
+class SearchPeopleScreen(screen.AppScreen):
 
     search_started = False
 

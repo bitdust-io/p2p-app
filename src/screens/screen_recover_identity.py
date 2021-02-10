@@ -2,7 +2,7 @@ import time
 
 #------------------------------------------------------------------------------
 
-from components.screen import AppScreen
+from components import screen
 
 from lib import websock
 from lib import api_client
@@ -13,7 +13,7 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-class RecoverIdentityScreen(AppScreen):
+class RecoverIdentityScreen(screen.AppScreen):
 
     def get_icon(self):
         return 'account-key'

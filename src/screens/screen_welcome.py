@@ -2,11 +2,11 @@ from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
-from components.screen import AppScreen
+from components import screen
 
 #------------------------------------------------------------------------------
 
-class WelcomeScreen(AppScreen):
+class WelcomeScreen(screen.AppScreen):
 
     verify_network_connected_task = None
 

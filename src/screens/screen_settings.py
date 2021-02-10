@@ -7,10 +7,10 @@ from kivy.properties import BooleanProperty, ListProperty, StringProperty, Numer
 
 #------------------------------------------------------------------------------
 
-from components.screen import AppScreen
-from components.labels import NormalLabel
-from components.buttons import CustomFlatButton
-from components.layouts import VerticalLayout
+from components import screen
+from components import labels
+from components import buttons
+from components import layouts
 
 from lib import api_client
 from lib import websock
@@ -21,48 +21,13 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-class OptionNameLabel(CustomFlatButton):
+class OptionNameLabel(buttons.CustomFlatButton):
 
     _no_ripple_effect = True
 
 
-class OptionDescriptionLabel(NormalLabel):
+class OptionDescriptionLabel(labels.NormalLabel):
     pass
-
-
-# class OptionValueTextInput(SingleLineTextInput):
-#     pass
-
-
-# class OptionValueIntInput(SingleLineTextInput):
-#     def insert_text(self, substring, from_undo=False):
-#         min_value = self.parent.parent.option_value_min
-#         max_value = self.parent.parent.option_value_max
-#         t = self.text
-#         c = self.cursor[0]
-#         if c == len(t):
-#             new_text = self.text + substring
-#         else:
-#             new_text = t[:c] + substring + t[c:]
-#         if new_text != '':
-#             try:
-#                 new_value = int(new_text)
-#             except:
-#                 return
-#             if min_value is not None and min_value > new_value:
-#                 return
-#             if max_value is not None and max_value < new_value:
-#                 return
-#             return super(OptionValueIntInput, self).insert_text(substring, from_undo=from_undo)
-
-
-#  class OptionValueDiskSpaceInput(OptionValueTextInput):
-#     pass
-
-
-# class OptionValueSingleChoiceInput(OptionValueTextInput):
-#     pass
-
 
 #------------------------------------------------------------------------------
 
@@ -86,7 +51,7 @@ class TreeElement(TreeViewNode):
             print('TreeElement.del   erased element %r : %r' % (self.item_key, id(self), ))
 
 
-class ParentElement(TreeElement, CustomFlatButton):
+class ParentElement(TreeElement, buttons.CustomFlatButton):
 
     _no_ripple_effect = True
     text_halign = 'left'
@@ -96,7 +61,7 @@ class ParentElement(TreeElement, CustomFlatButton):
         super(ParentElement, self).__init__(**kwargs)
 
 
-class ServiceElement(TreeElement, VerticalLayout):
+class ServiceElement(TreeElement, layouts.VerticalLayout):
 
     service_name = StringProperty('')
     service_state = StringProperty('')
@@ -139,7 +104,7 @@ class OptionElement(TreeElement):
             self.value_modified_callback(self.item_key, self.ids.option_value_input.text)
 
 
-class BooleanElement(OptionElement, VerticalLayout):
+class BooleanElement(OptionElement, layouts.VerticalLayout):
 
     def __init__(self, **kwargs):
         super(BooleanElement, self).__init__(**kwargs)
@@ -149,7 +114,7 @@ class BooleanElement(OptionElement, VerticalLayout):
         self.ids.option_value_checkbox.active = bool(self.option_value)
 
 
-class IntegerElement(OptionElement, VerticalLayout):
+class IntegerElement(OptionElement, layouts.VerticalLayout):
 
     option_value_min = NumericProperty(None, allownone=True)
     option_value_max = NumericProperty(None, allownone=True)
@@ -174,7 +139,7 @@ class IntegerElement(OptionElement, VerticalLayout):
             self.option_value_recent = None
 
 
-class DiskSpaceElement(OptionElement, VerticalLayout):
+class DiskSpaceElement(OptionElement, layouts.VerticalLayout):
 
     def __init__(self, **kwargs):
         super(DiskSpaceElement, self).__init__(**kwargs)
@@ -203,7 +168,7 @@ class DiskSpaceElement(OptionElement, VerticalLayout):
             self.option_value_recent = None
 
 
-class SingleChoiceElement(OptionElement, VerticalLayout):
+class SingleChoiceElement(OptionElement, layouts.VerticalLayout):
 
     option_possible_values = ListProperty([])
 
@@ -228,7 +193,7 @@ class SingleChoiceElement(OptionElement, VerticalLayout):
             self.option_value_recent = None
 
 
-class TextElement(OptionElement, VerticalLayout):
+class TextElement(OptionElement, layouts.VerticalLayout):
 
     def __init__(self, **kwargs):
         super(TextElement, self).__init__(**kwargs)
@@ -262,7 +227,7 @@ class SettingsTreeView(TreeView):
 
 #------------------------------------------------------------------------------
 
-class SettingsScreen(AppScreen):
+class SettingsScreen(screen.AppScreen):
 
     recent_tree_index = {}
 

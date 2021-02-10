@@ -12,7 +12,6 @@ from kivymd.theming import ThemableBehavior
 
 from lib import system
 
-from components import buttons
 from components import webfont
 
 #------------------------------------------------------------------------------
@@ -26,8 +25,6 @@ def patch_kivy_core_window():
 
     def _get_android_kheight(self=Window):
         ret = system.get_android_keyboard_height()
-        # if _Debug:
-        #     print('main_window._get_android_kheight', ret)
         return ret
 
     def _get_size(self=Window):
@@ -44,9 +41,6 @@ def patch_kivy_core_window():
         return h, w
 
     def update_viewport(self=Window):
-        # if _Debug:
-        #     print('main_window.update_viewport', self.keyboard_height, Window.keyboard_height, get_android_keyboard_height())
-
         from kivy.graphics.opengl import glViewport  # @UnresolvedImport
         from kivy.graphics.transformation import Matrix  # @UnresolvedImport
         from math import radians
@@ -238,19 +232,11 @@ class MainWin(Screen, ThemableBehavior):
         else:
             self.active_screens[screen_id][0].init_kwargs(**kwargs)
             self.populate_toolbar_content(self.active_screens[screen_id][0])
-        # self.ids.main_nav_button.disabled = bool(screen_id in ['process_dead_screen', 'connecting_screen', 'startup_screen', ])
         if self.selected_screen:
             if self.selected_screen == screen_id:
                 if _Debug:
                     print('MainWindow.select_screen   skip, selected screen is already %r' % screen_id)
                 return True
-            # if self.selected_screen in self.active_screens:
-            #     _, selected_btn = self.active_screens[self.selected_screen]
-            #     if selected_btn:
-            #         selected_btn.selected = False
-        # _, another_btn = self.active_screens[screen_id]
-        # if another_btn:
-        #     another_btn.selected = True
         self.ids.screen_manager.current = screen_id
         self.selected_screen = screen_id
         if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:

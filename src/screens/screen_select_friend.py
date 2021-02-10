@@ -1,7 +1,9 @@
 from kivy.properties import StringProperty  # @UnresolvedImport
 
-from components.screen import AppScreen
-from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
+#------------------------------------------------------------------------------
+
+from components import screen
+from components import list_view
 
 from lib import api_client
 from lib import websock
@@ -12,14 +14,14 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-class SelectFriendRecord(SelectableHorizontalRecord):
+class SelectFriendRecord(list_view.SelectableHorizontalRecord):
 
     def __init__(self, **kwargs):
         super(SelectFriendRecord, self).__init__(**kwargs)
         self.visible_buttons = []
 
 
-class SelectFriendListView(SelectableRecycleView):
+class SelectFriendListView(list_view.SelectableRecycleView):
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
         if _Debug:
@@ -28,8 +30,9 @@ class SelectFriendListView(SelectableRecycleView):
             if self.parent.parent.parent.parent.result_callback:
                 self.parent.parent.parent.parent.result_callback(item.global_id)
 
+#------------------------------------------------------------------------------
 
-class SelectFriendScreen(AppScreen):
+class SelectFriendScreen(screen.AppScreen):
 
     screen_header = StringProperty('Select user')
 

@@ -1,11 +1,11 @@
-from components.screen import AppScreen
+from components import screen
 
 from lib import api_client
 from lib import websock
 
 #------------------------------------------------------------------------------
 
-class CreateGroupScreen(AppScreen):
+class CreateGroupScreen(screen.AppScreen):
 
     def get_icon(self):
         return 'chat-plus'

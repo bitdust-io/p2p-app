@@ -1,19 +1,12 @@
-'''
-Runnable
-========
-
-'''
-
 from jnius import PythonJavaClass, java_method, autoclass  # @UnresolvedImport
 
-# PythonActivity = autoclass('org.kivy.android.PythonActivity')
+#------------------------------------------------------------------------------
+
 PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
 
+#------------------------------------------------------------------------------
 
 class Runnable(PythonJavaClass):
-    '''Wrapper around Java Runnable class. This class can be used to schedule a
-    call of a Python function into the PythonActivity thread.
-    '''
 
     __javainterfaces__ = ['java/lang/Runnable']
     __runnables__ = []
@@ -40,9 +33,6 @@ class Runnable(PythonJavaClass):
 
 
 def run_on_ui_thread(f):
-    '''Decorator to create automatically a :class:`Runnable` object with the
-    function. The function will be delayed and call into the Activity thread.
-    '''
     def f2(*args, **kwargs):
         Runnable(f)(*args, **kwargs)
     return f2

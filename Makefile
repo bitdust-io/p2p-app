@@ -4,8 +4,8 @@
 
 REQUIREMENTS_TXT:=requirements.txt
 
-REQUIREMENTS_ANDROID:="kivy==2.0.0,https://github.com/vesellov/KivyMD/archive/master.zip,sdl2_ttf==2.0.15,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python2"
-
+# REQUIREMENTS_ANDROID:="kivy==2.0.0,https://github.com/vesellov/KivyMD/archive/master.zip,sdl2_ttf==2.0.15,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python2"
+REQUIREMENTS_ANDROID:="kivy==2.0.0rc3,git+https://github.com/HeaTTheatR/KivyMD.git,sdl2_ttf==2.0.15,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python3"
 
 OS=$(shell lsb_release -si 2>/dev/null || uname)
 PIP:="venv/bin/pip"
@@ -116,11 +116,6 @@ release_android: refresh_android_environment
 	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
 	# @VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
 	@mv ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
-
-download_apk:
-	@rm -rfv bin/*.apk
-	@scp android.build:p2p-app/bin/BitDustAndroid.apk bin/.
-	@ls -la bin/
 
 test_apk:
 	@adb install -r bin/BitDustAndroid.apk

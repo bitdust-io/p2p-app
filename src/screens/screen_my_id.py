@@ -1,4 +1,4 @@
-from components.screen import AppScreen
+from components import screen
 
 from lib import api_client
 from lib import websock
@@ -31,7 +31,7 @@ identity_details_temlate_text = """
 
 #------------------------------------------------------------------------------
 
-class MyIDScreen(AppScreen):
+class MyIDScreen(screen.AppScreen):
 
     def get_icon(self):
         return 'account-box'
