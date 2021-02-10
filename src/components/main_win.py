@@ -138,8 +138,6 @@ class MainWin(Screen, ThemableBehavior):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         patch_kivy_core_window()
-        if system.is_android():
-            self.ids.inner_container.padding = 1
 
     def on_height(self, instance, value):
         if _Debug:

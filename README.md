@@ -89,21 +89,22 @@ This way Google will be able to verify the .APK file you built before publish it
         java -jar pepk.jar --keystore=~/keystores/bitdust.keystore --alias=bitdust --encryptionkey=<Encryption Key> --include-cert --output=output.zip
 
 
-
-##### Make sure BitDust Engine is up to date before the build
-
-        make update_engine_repo
-
-
 ##### Build APK image with specific version
 
-        ./release_ubuntu.sh 1.0.5
+        ./release.sh <version number> <keystore password>
+
+
+
+### Build for Linux
+
+TODO:
 
 
 
 ### Build for MacOS
 
 TODO:
+
 
 
 ### Build for Windows

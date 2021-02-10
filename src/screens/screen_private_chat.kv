@@ -26,7 +26,7 @@
                 size_hint: 1, None
                 height: self.minimum_height
                 pos_hint: {'bottom': 1}
-                padding: dp(10), dp(0)
+                padding: dp(0), dp(0)
 
                 DynamicHeightTextInput:
                     id: chat_input
@@ -36,7 +36,7 @@
                 RaisedIconButton:
                     id: chat_send_button
                     icon: 'send'
-                    _radius: dp(2)
+                    _radius: dp(0)
                     button_width: dp(32)
                     button_height: root.ids.chat_input.height
                     height: root.ids.chat_input.height

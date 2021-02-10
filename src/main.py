@@ -47,6 +47,8 @@ from lib.system import is_android
 
 #------------------------------------------------------------------------------
 
+# Config.set('kivy', 'window_icon', 'bitdust.png')
+
 if _Debug:
     Config.set('kivy', 'log_level', 'debug')
 
@@ -140,6 +142,9 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
 
+        self.title = 'BitDust'
+        # self.icon = './bitdust.png'
+
         self.theme_cls.theme_style = 'Light'
         self.theme_cls.primary_palette = 'Blue'
         self.theme_cls.primary_hue = "400"
@@ -166,15 +171,11 @@ class BitDustApp(styles.AppStyle, MDApp):
         from components import buttons
         from components import text_input
         from components import list_view
-        # from components import navigation
         from components import main_win
 
         self.control = controller.Controller(self)
         self.main_window = main_win.MainWin()
         self.main_window.register_controller(self.control)
-        # self.main_window.register_screens(controller.all_screens())
-        # self.main_window.register_controller(self.control)
-        # self.main_window.select_screen(screen_id='my_id_screen', verify_state=False)
         # Window.bind(on_keyboard=self.on_key_input)
         return self.main_window
 
@@ -194,8 +195,6 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.do_start   is okay to start now, storage path is %r' % primary_external_storage_path())
 
         self.main_window.register_screens(controller.all_screens())
-        # self.main_window.register_controller(self.control)
-        # self.main_window.select_screen(screen_id='my_id_screen', verify_state=False)
 
         self.control.start()
 
@@ -294,7 +293,6 @@ class BitDustApp(styles.AppStyle, MDApp):
         return False
 
     def on_height(self, instance, value):
-        # instance.y += Window.keyboard_height
         if _Debug:
             print ('BitDustApp.on_height', instance, value, Window.keyboard_height)
 
