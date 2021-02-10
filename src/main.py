@@ -73,7 +73,7 @@ if is_android():
     import encodings.idna
 
     from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE  # @UnresolvedImport
-    from android.storage import app_storage_path, primary_external_storage_path  # @UnresolvedImport
+    from android.storage import primary_external_storage_path  # @UnresolvedImport
 
     from lib.permissions import check_permission, request_permissions  # @UnresolvedImport
 
@@ -97,8 +97,6 @@ if is_android():
         'android.permission.FOREGROUND_SERVICE',
     ]
     PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
-    from kivy.resources import resource_add_path
-    resource_add_path('/data/user/0/{}/files/app/_python_bundle/site-packages/kivymd/fonts'.format(PACKAGE_NAME))
 
 #------------------------------------------------------------------------------
 
@@ -155,12 +153,6 @@ class BitDustApp(styles.AppStyle, MDApp):
         fonts_path = './src/fonts'
         if is_android():
             fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
-
-        from kivymd import icon_definitions
-        from fonts import materialdesignicons_map
-        icon_definitions.md_icons = materialdesignicons_map.materialdesignicons_codes.copy()
-        LabelBase.register(name="Icons", fn_regular=os.path.join(fonts_path, "md.ttf"))
-        self.theme_cls.font_styles["Icon"] = ["Icons", 24, False, 0, ]
 
         LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
         theme_font_styles.append('IconMD')

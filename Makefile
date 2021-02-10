@@ -4,7 +4,7 @@
 
 REQUIREMENTS_TXT:=requirements.txt
 
-REQUIREMENTS_ANDROID:="kivy==2.0.0rc3,https://github.com/vesellov/KivyMD/archive/master.zip,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python3"
+REQUIREMENTS_ANDROID:="kivy==2.0.0rc3,https://github.com/kivymd/KivyMD/archive/master.zip,sdl2_ttf==2.0.15,pillow,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python3"
 
 OS=$(shell lsb_release -si 2>/dev/null || uname)
 PIP:="venv/bin/pip"
@@ -40,7 +40,7 @@ run:
 
 system_dependencies:
 ifeq ($(OS), Ubuntu)
-	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip python-virtualenv libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip
+	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends cmake python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip python-virtualenv libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip
 endif
 
 install: system_dependencies clean venv

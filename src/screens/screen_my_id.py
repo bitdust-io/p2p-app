@@ -5,6 +5,10 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
+_Debug = True
+
+#------------------------------------------------------------------------------
+
 identity_details_temlate_text = """
 [size={text_size}][color=#909090]name:[/color] [b]{name}[/b]
 
@@ -62,6 +66,14 @@ class MyIDScreen(screen.AppScreen):
             sources='\n'.join(result.get('sources', [])),
             contacts='\n'.join(result.get('contacts', [])),
         )
+
+    def on_backup_button_clicked(self):
+        if _Debug:
+            print('on_backup_button_clicked')
+
+    def on_erase_button_clicked(self):
+        if _Debug:
+            print('on_erase_button_clicked')
 
 
 from kivy.lang.builder import Builder 
