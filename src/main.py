@@ -43,7 +43,7 @@ if _Debug:
 from kivy.lang import Builder
 from kivy.config import Config
 
-from lib.system import is_android
+from lib.system import is_android, android_sdk_version
 
 #------------------------------------------------------------------------------
 
@@ -90,12 +90,6 @@ if is_android():
         packagename=PACKAGE_NAME,
         servicename='Bitdustnode'
     )    
-    APP_STARTUP_PERMISSIONS = [
-        'android.permission.INTERNET',
-        'android.permission.READ_EXTERNAL_STORAGE',
-        'android.permission.WRITE_EXTERNAL_STORAGE',
-        'android.permission.FOREGROUND_SERVICE',
-    ]
     PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
 
 #------------------------------------------------------------------------------
@@ -118,11 +112,9 @@ def check_app_permission(permission):
     return ret
 
 
-def request_app_permissions(permissions=[], callback=None):
+def request_app_permissions(permissions, callback=None):
     if not is_android():
         return True
-    if not permissions:
-        permissions = APP_STARTUP_PERMISSIONS
     if _Debug:
         print('BitDustApp.request_app_permissions', permissions, callback)
     request_permissions(permissions, callback)
@@ -139,6 +131,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.build')
             if is_android():
+                print('BitDustApp.build   android_sdk_version() : %r' % android_sdk_version())
                 print('BitDustApp.build   ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
 
@@ -247,21 +240,23 @@ class BitDustApp(styles.AppStyle, MDApp):
             if _Debug:
                 print('BitDustApp.on_start')
             return self.do_start()
-
-        global APP_STARTUP_PERMISSIONS
+        required_permissions = [
+            'android.permission.INTERNET',
+            'android.permission.READ_EXTERNAL_STORAGE',
+            'android.permission.WRITE_EXTERNAL_STORAGE',
+        ]
+        if android_sdk_version() >= 28:
+            required_permissions.append('android.permission.FOREGROUND_SERVICE')
         if _Debug:
-            print('BitDustApp.on_start APP_STARTUP_PERMISSIONS=%r' % APP_STARTUP_PERMISSIONS)
-
+            print('BitDustApp.on_start required_permissions=%r' % required_permissions)
         missed_permissions = []
-        for perm in APP_STARTUP_PERMISSIONS:
+        for perm in required_permissions:
             if not check_app_permission(perm):
                 missed_permissions.append(perm)
         if _Debug:
             print('BitDustApp.on_start missed_permissions=%r' % missed_permissions)
-
         if not missed_permissions:
             return self.do_start() 
-
         request_app_permissions(permissions=missed_permissions, callback=self.do_start)
         return True
 
