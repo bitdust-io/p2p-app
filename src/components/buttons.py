@@ -157,7 +157,7 @@ class LabeledIconButton(ButtonBehavior, layouts.VerticalLayout, ThemableBehavior
 class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, SpecificBackgroundColorBehavior, BaseElevationButton, BasePressedButton):
 
     icon = StringProperty("circle")
-    icon_pack = StringProperty("IconMD")
+    icon_pack = StringProperty("Icon")
     selected = BooleanProperty(False)
     _radius = dp(4)
     button_width = NumericProperty(styles.app.btn_icon_normal_width)
@@ -173,5 +173,5 @@ class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, 
 
 #------------------------------------------------------------------------------
 
-from kivy.lang.builder import Builder 
+from kivy.lang.builder import Builder
 Builder.load_file('./components/buttons.kv')

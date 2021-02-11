@@ -168,6 +168,14 @@ class MainWin(Screen, ThemableBehavior):
         else:
             self.ids.toolbar.title = 'BitDust'
 
+    def populate_dropdown_menu(self, new_items):
+        if _Debug:
+            print('MainWin.populate_dropdown_menu', new_items)
+        self.control.app.dropdown_menu.dismiss()
+        self.control.app.dropdown_menu.menu.ids.box.clear_widgets()
+        self.control.app.dropdown_menu.items = new_items
+        self.control.app.dropdown_menu.create_menu_items()
+
     def open_screen(self, screen_id, screen_type, **kwargs):
         if screen_id in self.active_screens:
             if _Debug:
@@ -178,7 +186,6 @@ class MainWin(Screen, ThemableBehavior):
         self.ids.screen_manager.add_widget(screen_inst)
         self.ids.screen_manager.current = screen_id
         self.active_screens[screen_id] = (screen_inst, None, )
-        self.populate_toolbar_content(screen_inst)
         screen_inst.on_opened()
         if _Debug:
             print('MainWin.open_screen   opened screen %r' % screen_id)
@@ -223,13 +230,15 @@ class MainWin(Screen, ThemableBehavior):
             self.open_screen(screen_id, screen_type, **kwargs)
         else:
             self.active_screens[screen_id][0].init_kwargs(**kwargs)
-            self.populate_toolbar_content(self.active_screens[screen_id][0])
         if self.selected_screen:
             if self.selected_screen == screen_id:
                 if _Debug:
                     print('MainWin.select_screen   skip, selected screen is already %r' % screen_id)
                 return True
+        self.populate_toolbar_content(self.active_screens[screen_id][0])
+        self.populate_dropdown_menu([])
         self.ids.screen_manager.current = screen_id
+        self.populate_dropdown_menu(self.active_screens[screen_id][0].get_dropdown_menu_items())
         self.selected_screen = screen_id
         if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
             self.latest_screen = self.selected_screen
@@ -242,7 +251,8 @@ class MainWin(Screen, ThemableBehavior):
             print('MainWin.on_right_menu_button_clicked', args)
         if self.control:
             if self.control.app.dropdown_menu:
-                self.control.app.dropdown_menu.open()
+                if self.control.app.dropdown_menu.items:
+                    self.control.app.dropdown_menu.open()
 
     def on_state_process_health(self, instance, value):
         self.control.on_state_process_health(instance, value)

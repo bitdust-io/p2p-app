@@ -54,12 +54,10 @@ if _Debug:
 
 #------------------------------------------------------------------------------
 
-from kivy.core.text import LabelBase
 from kivy.core.window import Window
 
 from kivymd.app import MDApp
 from kivymd.uix.menu import MDDropdownMenu
-from kivymd.font_definitions import theme_font_styles
 
 #------------------------------------------------------------------------------
 
@@ -95,15 +93,6 @@ if is_android():
 
 #------------------------------------------------------------------------------
 
-Builder.load_string("""
-#:import fa_icon components.webfont.fa_icon
-#:import md_icon components.webfont.md_icon
-#:import icofont_icon components.webfont.icofont_icon
-#:import make_icon components.webfont.make_icon
-""")
-
-#------------------------------------------------------------------------------
-
 def check_app_permission(permission):
     if not is_android():
         return True
@@ -129,6 +118,35 @@ class BitDustApp(styles.AppStyle, MDApp):
     main_window = None
     dropdown_menu = None
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def apply_styles(self):
+        from kivy.app import App
+        from kivy.core.text import LabelBase
+        from kivymd.font_definitions import theme_font_styles
+        if _Debug:
+            print('BitDustApp.apply_styles   App.get_running_app() : %r', App.get_running_app())
+            print('BitDustApp.apply_styles                    self : %r', self)
+        self.theme_cls.theme_style = 'Light'
+        self.theme_cls.primary_palette = 'Blue'
+        self.theme_cls.primary_hue = "400"
+        self.theme_cls.accent_palette = 'Green'
+        fonts_path = './src/fonts'
+        if is_android():
+            fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
+        LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
+        theme_font_styles.append('IconMD')
+        self.theme_cls.font_styles["IconMD"] = ["IconMD", 24, False, 0, ]
+        LabelBase.register(name="IconFA", fn_regular=os.path.join(fonts_path, "fa-solid.ttf"))
+        theme_font_styles.append('IconFA')
+        self.theme_cls.font_styles["IconFA"] = ["IconFA", 24, False, 0, ]
+        LabelBase.register(name="IconICO", fn_regular=os.path.join(fonts_path, "icofont.ttf"))
+        theme_font_styles.append('IconICO')
+        self.theme_cls.font_styles["IconICO"] = ["IconICO", 24, False, 0, ]
+        if _Debug:
+            print('BitDustApp.apply_styles', self.theme_cls)
+
     def build(self):
         if _Debug:
             print('BitDustApp.build')
@@ -139,45 +157,38 @@ class BitDustApp(styles.AppStyle, MDApp):
 
         self.title = 'BitDust'
         # self.icon = './bitdust.png'
+        self.apply_styles()
 
-        self.theme_cls.theme_style = 'Light'
-        self.theme_cls.primary_palette = 'Blue'
-        self.theme_cls.primary_hue = "400"
-        self.theme_cls.accent_palette = 'Green'
-
-        fonts_path = './src/fonts'
-        if is_android():
-            fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
-
-        LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
-        theme_font_styles.append('IconMD')
-        self.theme_cls.font_styles["IconMD"] = ["IconMD", 24, False, 0, ]
-
-        LabelBase.register(name="IconFA", fn_regular=os.path.join(fonts_path, "fa-solid.ttf"))
-        theme_font_styles.append('IconFA')
-        self.theme_cls.font_styles["IconFA"] = ["IconFA", 24, False, 0, ]
-
-        LabelBase.register(name="IconICO", fn_regular=os.path.join(fonts_path, "icofont.ttf"))
-        theme_font_styles.append('IconICO')
-        self.theme_cls.font_styles["IconICO"] = ["IconICO", 24, False, 0, ]
+        Builder.load_string("""
+#:import fa_icon components.webfont.fa_icon
+#:import md_icon components.webfont.md_icon
+#:import icofont_icon components.webfont.icofont_icon
+#:import make_icon components.webfont.make_icon
+        """)
 
         from components import layouts
         from components import labels
         from components import buttons
         from components import text_input
         from components import list_view
+        from components import screen
         from components import main_win
 
         self.control = controller.Controller(self)
+
         self.main_window = main_win.MainWin()
+
         self.dropdown_menu = MDDropdownMenu(
             caller=self.main_window.ids.dropdown_menu_placeholder,
             width_mult=4,
-            items=[{"icon": "git", 'text': 'abcd', }, {"icon": "git", 'text': 'xyz', }, ],
+            items=[],
             selected_color=self.theme_cls.bg_darkest,
         )
         self.dropdown_menu.bind(on_release=self.on_dropdown_menu_callback)
+
         self.main_window.register_controller(self.control)
+        self.main_window.register_screens(controller.all_screens())
+
         # Window.bind(on_keyboard=self.on_key_input)
         return self.main_window
 
@@ -195,8 +206,6 @@ class BitDustApp(styles.AppStyle, MDApp):
                             return False
             if _Debug:
                 print('BitDustApp.do_start   is okay to start now, storage path is %r' % primary_external_storage_path())
-
-        self.main_window.register_screens(controller.all_screens())
 
         self.control.start()
 

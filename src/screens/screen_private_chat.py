@@ -27,6 +27,9 @@ class PrivateChatScreen(screen.AppScreen):
     def get_title(self):
         return self.username
 
+    def get_dropdown_menu_items(self):
+        return [{"icon": "git", 'text': 'abcd', }, {"icon": "git", 'text': 'xyz', }, ] 
+
     def on_enter(self, *args):
         self.ids.chat_status_label.text = ''
         self.control().add_callback('on_private_message_received', self.on_private_message_received)
