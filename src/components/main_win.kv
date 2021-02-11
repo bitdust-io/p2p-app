@@ -35,6 +35,7 @@
         MDNavigationDrawer:
             id: nav_drawer
             type: "modal"
+            width: dp(200)
             opening_time: 0
             closing_time: 0
 
@@ -47,32 +48,69 @@
 
                     MDList:
                         id: menu_items
+                        padding: dp(10)
+
+                        MDActionTopAppBarButton:
+                            icon: 'arrow-left'
+                            md_bg_color: app.color_white99
+                            on_release: nav_drawer.set_state("close")
 
                         Widget:
                             size_hint: None, None
                             width: 1
-                            height: toolbar.height
+                            height: dp(50)
+                            # height: toolbar.height
+                            
 
-                        OneLineListItem:
+                        OneLineIconListItem:
                             text: "my identity"
-                            on_press:
+                            on_release:
                                 nav_drawer.set_state("close")
                                 main_win.select_screen('my_id_screen', verify_state=True)
 
-                        OneLineListItem:
+                            IconLeftWidget:
+                                icon: "passport"
+                                md_bg_color: app.color_white99
+                                on_release:
+                                    nav_drawer.set_state("close")
+                                    main_win.select_screen('my_id_screen', verify_state=True)
+
+
+                        OneLineIconListItem:
                             text: "contacts"
-                            on_press:
+                            on_release:
                                 nav_drawer.set_state("close")
                                 main_win.select_screen('friends_screen', verify_state=True)
 
-                        OneLineListItem:
+                            IconLeftWidget:
+                                icon: "account-multiple"
+                                md_bg_color: app.color_white99
+                                on_release:
+                                    nav_drawer.set_state("close")
+                                    main_win.select_screen('friends_screen', verify_state=True)
+
+                        OneLineIconListItem:
                             text: "chat"
-                            on_press:
+                            on_release:
                                 nav_drawer.set_state("close")
                                 main_win.select_screen('conversations_screen', verify_state=True)
 
-                        OneLineListItem:
+                            IconLeftWidget:
+                                icon: "chat-outline"
+                                md_bg_color: app.color_white99
+                                on_release:
+                                    nav_drawer.set_state("close")
+                                    main_win.select_screen('conversations_screen', verify_state=True)
+
+                        OneLineIconListItem:
                             text: "settings"
-                            on_press:
+                            on_release:
                                 nav_drawer.set_state("close")
                                 main_win.select_screen('settings_screen', verify_state=True)
+
+                            IconLeftWidget:
+                                icon: "cogs"
+                                md_bg_color: app.color_white99
+                                on_release:
+                                    nav_drawer.set_state("close")
+                                    main_win.select_screen('settings_screen', verify_state=True)

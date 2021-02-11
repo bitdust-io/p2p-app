@@ -1,10 +1,8 @@
-from kivy.metrics import dp
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.stacklayout import StackLayout
 
 from kivymd.uix.boxlayout import BoxLayout
-from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
 
@@ -94,6 +92,11 @@ class PageContainerWithLeftPaddingLayout(VerticalLayout):
 
 
 class ChatContainerLayout(VerticalLayout):
+    pass
+
+#------------------------------------------------------------------------------
+
+class StatusPanelLayout(HorizontalLayout):
     pass
 
 #------------------------------------------------------------------------------
