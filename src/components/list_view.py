@@ -6,7 +6,6 @@ from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
-# from kivy.input.providers.mouse import MouseMotionEvent
 
 #------------------------------------------------------------------------------
 

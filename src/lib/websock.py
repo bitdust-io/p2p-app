@@ -246,10 +246,6 @@ def requests_thread(active_queue):
         if not ws():
             on_fail(Exception('websocket is closed'), result_callback)
             continue
-#         result_callback = _CallbacksQueue.pop(call_id)
-#         if result_callback:
-#             result_callback(json_data)
-#         return True
         _CallbacksQueue[call_id] = result_callback
         data = json.dumps(json_data)
         if _Debug:

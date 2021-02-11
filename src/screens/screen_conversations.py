@@ -1,7 +1,6 @@
-from components.buttons import TransparentIconButton
-from components.screen import AppScreen
-from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
-from components.styles import style
+from components import screen
+from components import list_view
+from components import styles
 
 from lib import api_client
 from lib import websock
@@ -12,71 +11,17 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-class ConversationActionButton(TransparentIconButton):
-    pass
-
-
-class ConversationRecord(SelectableHorizontalRecord):
-
-    def __init__(self, **kwargs):
-        super(ConversationRecord, self).__init__(**kwargs)
-        self.visible_buttons = []
+class ConversationRecord(list_view.SelectableHorizontalRecord):
 
     def get_root(self):
         return self.parent.parent.parent.parent.parent.parent
 
     def get_icon_color(self, state):
         if state in ['IN_SYNC!', 'CONNECTED', ]:
-            return style.color_circle_online
+            return styles.app.color_circle_online
         if state in ['OFFLINE', 'DISCONNECTED', ]:
-            return style.color_circle_offline
-        return style.color_circle_connecting
-
-    def clear_selection(self):
-        self.hide_buttons()
-        self.selected = False
-        self.parent.clear_selection()
-
-    def show_buttons(self):
-        if _Debug:
-            print('ConversationRecord.show_buttons', self.key_id, self.state, len(self.visible_buttons))
-        if not self.visible_buttons:
-            chat_button = ConversationActionButton(
-                icon='comment-multiple',
-                on_release=self.on_chat_button_clicked,
-            )
-            self.visible_buttons.append(chat_button)
-            self.add_widget(chat_button)
-            if self.type in ['group_message', 'personal_message', ]:
-                join_button = ConversationActionButton(
-                    icon='access-point-network',
-                    disabled=self.state in ['IN_SYNC!', 'CONNECTED', ],
-                    on_release=self.on_join_button_clicked,
-                )
-                self.visible_buttons.append(join_button)
-                self.add_widget(join_button)
-                leave_button = ConversationActionButton(
-                    icon='lan-disconnect',
-                    disabled=self.state in ['OFFLINE', 'DISCONNECTED', ],
-                    on_release=self.on_leave_button_clicked,
-                )
-                self.visible_buttons.append(leave_button)
-                self.add_widget(leave_button)
-                delete_button = ConversationActionButton(
-                    icon='trash-can',
-                    on_release=self.on_group_delete_button_clicked,
-                )
-                self.visible_buttons.append(delete_button)
-                self.add_widget(delete_button)
-
-
-    def hide_buttons(self):
-        if _Debug:
-            print('ConversationRecord.hide_buttons', self.key_id, self.state, len(self.visible_buttons))
-        if self.visible_buttons:
-            for w in self.visible_buttons:
-                self.remove_widget(w)
-            self.visible_buttons.clear()
+            return styles.app.color_circle_offline
+        return styles.app.color_circle_connecting
 
     def on_chat_button_clicked(self, *args):
         if _Debug:
@@ -124,20 +69,27 @@ class ConversationRecord(SelectableHorizontalRecord):
         api_client.group_leave(group_key_id=self.key_id, erase_key=True, cb=self.on_group_leave_result)
 
 
-class ConversationsListView(SelectableRecycleView):
+class ConversationsListView(list_view.SelectableRecycleView):
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
-        if _Debug:
-            print('ConversationsListView.on_selection_applied',
-                  item, index, is_selected, prev_selected, item.selected if item else None, self.ids.selectable_layout.selected_nodes)
-        if is_selected != prev_selected:
-            if is_selected:
-                item.show_buttons()
-            else:
-                item.hide_buttons()
+        if self.selected_item:
+            if self.selected_item.type in ['group_message', 'personal_message', ]:
+                screen.main_window().select_screen(
+                    screen_id=self.selected_item.key_id,
+                    screen_type='group_chat_screen',
+                    global_id=self.selected_item.key_id,
+                    label=self.selected_item.label,
+                )
+            elif self.selected_item.type in ['private_message', ]:
+                screen.main_window().select_screen(
+                    screen_id='private_chat_{}'.format(self.selected_item.key_id.replace('master$', '')),
+                    screen_type='private_chat_screen',
+                    global_id=self.selected_item.key_id,
+                    username=self.selected_item.label,
+                )
 
 
-class ConversationsScreen(AppScreen):
+class ConversationsScreen(screen.AppScreen):
 
     def get_title(self):
         return 'conversations'
@@ -150,7 +102,6 @@ class ConversationsScreen(AppScreen):
 
     def clear_selected_item(self):
         if self.ids.conversations_list_view.selected_item:
-            self.ids.conversations_list_view.selected_item.hide_buttons()
             self.ids.conversations_list_view.selected_item.selected = False
         self.ids.conversations_list_view.clear_selection()
 

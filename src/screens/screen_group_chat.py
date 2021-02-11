@@ -1,5 +1,5 @@
-from components.screen import AppScreen
-from components.labels import ChatMessageLabel
+from components import screen
+from components import labels
 
 from lib import colorhash
 from lib import api_client
@@ -11,7 +11,7 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-class GroupChatScreen(AppScreen):
+class GroupChatScreen(screen.AppScreen):
 
     def __init__(self, **kwargs):
         self.global_id = ''
@@ -30,8 +30,8 @@ class GroupChatScreen(AppScreen):
 
     def get_title(self):
         l = self.label
-        if len(l) > 10:
-            l = l[:10] + '...'
+        if len(l) > 20:
+            l = l[:20] + '...'
         return l
 
     def on_enter(self, *args):
@@ -59,8 +59,6 @@ class GroupChatScreen(AppScreen):
         msg_list = list(websock.response_result(resp))
         if _Debug:
             print('on_message_history_result', len(msg_list))
-        # small hack to make sure content is pushed to the bottom
-        # self.ids.chat_messages.add_widget(ChatMessageLabel(text='\n' * 15))
         for item in msg_list:
             msg_id = item['doc']['payload']['message_id']
             msg = item['doc']['payload']['data']['message']
@@ -72,7 +70,7 @@ class GroupChatScreen(AppScreen):
                 current_messages.append(msg)
             else:
                 sender_clr = colorhash.ColorHash(sender_name).hex
-                self.ids.chat_messages.add_widget(ChatMessageLabel(
+                self.ids.chat_messages.add_widget(labels.ChatMessageLabel(
                     text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
                 ))
                 current_sender = sender
@@ -81,7 +79,7 @@ class GroupChatScreen(AppScreen):
                 current_messages.append(msg)
         if current_messages:
             sender_clr = colorhash.ColorHash(sender_name).hex
-            self.ids.chat_messages.add_widget(ChatMessageLabel(
+            self.ids.chat_messages.add_widget(labels.ChatMessageLabel(
                 text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
             ))
         self.ids.chat_messages_view.scroll_y = 0

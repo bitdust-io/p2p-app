@@ -50,6 +50,7 @@ class AppStyle(object):
     color_black = (0,0,0,1)
     color_gray = (btn_clr_rgb_mid,btn_clr_rgb_mid,btn_clr_rgb_mid,1)
     color_white = (1,1,1,1)
+    color_white99 = (.99,.99,.99,1)
     color_row_seleted = (.96, .96, 1, 1)
     color_circle_connecting = (btn_clr_rgb_top, btn_clr_rgb_top, btn_clr_rgb_low+.1, 1)
     color_circle_offline = (btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, 1)
@@ -117,5 +118,5 @@ class AppStyle(object):
 
 #------------------------------------------------------------------------------
 
-style = AppStyle()
+app = AppStyle()
 

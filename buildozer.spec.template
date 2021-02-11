@@ -40,7 +40,7 @@ requirements = {requirements}
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
-# requirements.source.kivy = ../../kivy
+# requirements.source.kivy = ../kivymd
 
 # (list) Garden requirements
 #garden_requirements = 
@@ -103,7 +103,8 @@ android.minapi = 21
 # (str) Android NDK version to use
 # android.ndk = 17c
 # android.ndk = 17b
-android.ndk = 19c
+# android.ndk = 19c
+android.ndk = 21d
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 android.ndk_api = 21
@@ -123,7 +124,7 @@ android.private_storage = True
 # (bool) If True, then skip trying to update the Android sdk
 # This can be useful to avoid excess Internet downloads or save time
 # when an update is due and you just want to test/build your package
-# android.skip_update = False
+android.skip_update = True
 
 # (bool) If True, then automatically accept SDK license
 # agreements. This is intended for automation only. If set to False,
@@ -223,7 +224,7 @@ android.arch = arm64-v8a
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-p4a.branch = master
+# p4a.branch = master
 # master
 # v2019.08.09
 
@@ -275,7 +276,7 @@ ios.ios_deploy_branch = 1.7.0
 log_level = 2
 
 # (int) Display warning if buildozer is run as root (0 = False, 1 = True)
-warn_on_root = 1
+warn_on_root = 0
 
 # (str) Path to build artifact storage, absolute or relative to spec file
 # build_dir = ./.buildozer

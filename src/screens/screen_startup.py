@@ -1,8 +1,8 @@
-from components.screen import AppScreen
+from components import screen
 
 #------------------------------------------------------------------------------
 
-class StartUpScreen(AppScreen):
+class StartUpScreen(screen.AppScreen):
 
     def get_icon(self):
         return 'progress-clock'

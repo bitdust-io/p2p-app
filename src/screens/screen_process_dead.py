@@ -2,7 +2,7 @@ from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
-from components.screen import AppScreen
+from components import screen
 
 #------------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-class ProcessDeadScreen(AppScreen):
+class ProcessDeadScreen(screen.AppScreen):
 
     verify_process_health_task = None
 

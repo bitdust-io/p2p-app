@@ -1,7 +1,11 @@
-from components.screen import AppScreen
+from components import screen
 
 from lib import api_client
 from lib import websock
+
+#------------------------------------------------------------------------------
+
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -31,7 +35,7 @@ identity_details_temlate_text = """
 
 #------------------------------------------------------------------------------
 
-class MyIDScreen(AppScreen):
+class MyIDScreen(screen.AppScreen):
 
     def get_icon(self):
         return 'account-box'
@@ -62,6 +66,14 @@ class MyIDScreen(AppScreen):
             sources='\n'.join(result.get('sources', [])),
             contacts='\n'.join(result.get('contacts', [])),
         )
+
+    def on_backup_button_clicked(self):
+        if _Debug:
+            print('on_backup_button_clicked')
+
+    def on_erase_button_clicked(self):
+        if _Debug:
+            print('on_erase_button_clicked')
 
 
 from kivy.lang.builder import Builder 

@@ -1,6 +1,6 @@
-from components.buttons import TransparentIconButton
-from components.screen import AppScreen
-from components.list_view import SelectableRecycleView, SelectableHorizontalRecord
+from components import buttons
+from components import screen
+from components import list_view
 
 from lib import api_client
 from lib import websock
@@ -11,71 +11,27 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-class FriendActionButton(TransparentIconButton):
+class FriendActionButton(buttons.TransparentIconButton):
     pass
 
 
-class FriendRecord(SelectableHorizontalRecord):
-
-    def __init__(self, **kwargs):
-        super(FriendRecord, self).__init__(**kwargs)
-        self.visible_buttons = []
-
-    def get_root(self):
-        return self.parent.parent.parent.parent.parent.parent
-
-    def show_buttons(self):
-        if not self.visible_buttons:
-            chat_button = FriendActionButton(
-                icon='comment-multiple',
-                on_release=self.on_chat_button_clicked,
-            )
-            self.visible_buttons.append(chat_button)
-            self.add_widget(chat_button)
-            delete_button = FriendActionButton(
-                icon='trash-can',
-                on_release=self.on_delete_button_clicked,
-            )
-            self.visible_buttons.append(delete_button)
-            self.add_widget(delete_button)
-
-    def hide_buttons(self):
-        if self.visible_buttons:
-            for w in self.visible_buttons:
-                self.remove_widget(w)
-            self.visible_buttons.clear()
-
-    def on_chat_button_clicked(self, *args):
-        self.get_root().main_win().select_screen(
-            screen_id='private_chat_{}'.format(self.global_id),
-            screen_type='private_chat_screen',
-            global_id=self.global_id,
-            username=self.username,
-        )
-
-    def on_delete_button_clicked(self, *args):
-        self.get_root().main_win().close_screen(
-            screen_id='private_chat_{}'.format(self.global_id),
-        )
-        self.parent.clear_selection()
-        api_client.friend_remove(global_user_id=self.global_id, cb=self.on_friend_remove_result)
-
-    def on_friend_remove_result(self, resp):
-        self.get_root().ids.status_label.from_api_response(resp)
-        self.get_root().populate()
+class FriendRecord(list_view.SelectableHorizontalRecord):
+    pass
 
 
-class FriendsListView(SelectableRecycleView):
+class FriendsListView(list_view.SelectableRecycleView):
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
-        if is_selected != prev_selected:
-            if is_selected:
-                item.show_buttons()
-            else:
-                item.hide_buttons()
+        if self.selected_item:
+            screen.main_window().select_screen(
+                screen_id='private_chat_{}'.format(self.selected_item.global_id),
+                screen_type='private_chat_screen',
+                global_id=self.selected_item.global_id,
+                username=self.selected_item.username,
+            )
 
 
-class FriendsScreen(AppScreen):
+class FriendsScreen(screen.AppScreen):
 
     def get_title(self):
         return 'contacts'
@@ -88,7 +44,6 @@ class FriendsScreen(AppScreen):
 
     def clear_selected_item(self):
         if self.ids.friends_list_view.selected_item:
-            self.ids.friends_list_view.selected_item.hide_buttons()
             self.ids.friends_list_view.selected_item.selected = False
         self.ids.friends_list_view.clear_selection()
 
@@ -161,5 +116,5 @@ class FriendsScreen(AppScreen):
 
 #------------------------------------------------------------------------------
 
-from kivy.lang.builder import Builder 
+from kivy.lang.builder import Builder
 Builder.load_file('./screens/screen_friends.kv')

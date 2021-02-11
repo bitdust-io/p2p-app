@@ -7,6 +7,7 @@ _Debug = True
 #------------------------------------------------------------------------------
 
 _LatestState = None
+_LatestAndroidSDKVersion = None
 _LatestAndroidBitDustActivity = None
 _LatestAndroidRectClass = None
 _LatestAndroidDisplayRealHeight = None
@@ -36,6 +37,18 @@ def is_android():
 
 def is_ios():
     return latest_state() == 'ios'
+
+#------------------------------------------------------------------------------
+
+def android_sdk_version():
+    global _LatestAndroidSDKVersion
+    if not is_android():
+        return None
+    if _LatestAndroidSDKVersion is not None:
+        return _LatestAndroidSDKVersion
+    from jnius import autoclass  # @UnresolvedImport
+    _LatestAndroidSDKVersion = autoclass('android.os.Build$VERSION').SDK_INT
+    return _LatestAndroidSDKVersion
 
 #------------------------------------------------------------------------------
 
@@ -70,8 +83,8 @@ def get_android_keyboard_height():
     _LatestAndroidTopBarSize = rctx.top
     bottom_size_latest = _LatestAndroidDisplayRealHeight - _LatestAndroidDisplayDefaultHeight - _LatestAndroidTopBarSize
     if bottom_size_latest < 0:
-        if _Debug:
-            print('system.get_android_keyboard_height         WARNING Bottom Bar Size  was going to be negative!', bottom_size_latest)
+        # if _Debug:
+        #     print('system.get_android_keyboard_height         WARNING Bottom Bar Size  was going to be negative!', bottom_size_latest)
         bottom_size_latest = 0
     if _LatestAndroidBottomBarSize is None:
         if _Debug:

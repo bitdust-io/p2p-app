@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2016 Felix Krull <f_krull@gmx.de>
-# Released under the terms of the MIT license; see README.rst.
+# Released under the terms of the MIT license;
 
 """
 Generate a color based on an object's hash value.

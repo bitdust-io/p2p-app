@@ -1,6 +1,5 @@
 from kivy.uix.textinput import TextInput
 from kivy.properties import NumericProperty  # @UnresolvedImport
-# from kivy.input.providers.mouse import MouseMotionEvent
 
 from kivymd.uix.textfield import MDTextFieldRect, MDTextFieldRound, MDTextField
 from kivymd.theming import ThemableBehavior
