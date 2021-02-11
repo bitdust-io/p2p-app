@@ -15,6 +15,12 @@
             pos: self.pos
             size: self.size
 
+    Widget:
+        id: dropdown_menu_placeholder
+        size_hint: None, None
+        size: 1,1
+        pos_hint: {"center_x": .98, "center_y": .89}
+
     MDToolbar:
         id: toolbar
         pos_hint: {"top": 1}
@@ -23,8 +29,9 @@
         title: "BitDust"
         anchor_title: 'center'
         specific_text_color: app.color_white
+        # md_bg_color: app.theme_cls.accent_color
         left_action_items: [["menu", lambda x: nav_drawer.set_state("open")], ]
-        right_action_items: [["search-web", lambda x: print('right menu 2')], ["dots-vertical", lambda x: print('right menu 1')], ]
+        right_action_items: [["search-web", lambda x: print('right menu 2')], ["dots-vertical", root.on_right_menu_button_clicked], ]
 
     MDNavigationLayout:
 
@@ -35,7 +42,7 @@
         MDNavigationDrawer:
             id: nav_drawer
             type: "modal"
-            width: dp(200)
+            width: dp(220)
             opening_time: 0
             closing_time: 0
 
@@ -52,7 +59,7 @@
 
                         MDActionTopAppBarButton:
                             icon: 'arrow-left'
-                            md_bg_color: app.color_white99
+                            md_bg_color: app.color_transparent
                             on_release: nav_drawer.set_state("close")
 
                         Widget:
@@ -70,7 +77,7 @@
 
                             IconLeftWidget:
                                 icon: "passport"
-                                md_bg_color: app.color_white99
+                                md_bg_color: app.color_transparent
                                 on_release:
                                     nav_drawer.set_state("close")
                                     main_win.select_screen('my_id_screen', verify_state=True)
@@ -84,7 +91,7 @@
 
                             IconLeftWidget:
                                 icon: "account-multiple"
-                                md_bg_color: app.color_white99
+                                md_bg_color: app.color_transparent
                                 on_release:
                                     nav_drawer.set_state("close")
                                     main_win.select_screen('friends_screen', verify_state=True)
@@ -97,7 +104,7 @@
 
                             IconLeftWidget:
                                 icon: "chat-outline"
-                                md_bg_color: app.color_white99
+                                md_bg_color: app.color_transparent
                                 on_release:
                                     nav_drawer.set_state("close")
                                     main_win.select_screen('conversations_screen', verify_state=True)
@@ -110,7 +117,7 @@
 
                             IconLeftWidget:
                                 icon: "cogs"
-                                md_bg_color: app.color_white99
+                                md_bg_color: app.color_transparent
                                 on_release:
                                     nav_drawer.set_state("close")
                                     main_win.select_screen('settings_screen', verify_state=True)

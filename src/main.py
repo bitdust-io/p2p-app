@@ -58,6 +58,7 @@ from kivy.core.text import LabelBase
 from kivy.core.window import Window
 
 from kivymd.app import MDApp
+from kivymd.uix.menu import MDDropdownMenu
 from kivymd.font_definitions import theme_font_styles
 
 #------------------------------------------------------------------------------
@@ -126,6 +127,7 @@ class BitDustApp(styles.AppStyle, MDApp):
 
     control = None
     main_window = None
+    dropdown_menu = None
 
     def build(self):
         if _Debug:
@@ -168,6 +170,13 @@ class BitDustApp(styles.AppStyle, MDApp):
 
         self.control = controller.Controller(self)
         self.main_window = main_win.MainWin()
+        self.dropdown_menu = MDDropdownMenu(
+            caller=self.main_window.ids.dropdown_menu_placeholder,
+            width_mult=4,
+            items=[{"icon": "git", 'text': 'abcd', }, {"icon": "git", 'text': 'xyz', }, ],
+            selected_color=self.theme_cls.bg_darkest,
+        )
+        self.dropdown_menu.bind(on_release=self.on_dropdown_menu_callback)
         self.main_window.register_controller(self.control)
         # Window.bind(on_keyboard=self.on_key_input)
         return self.main_window
@@ -276,6 +285,11 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_resume(self):
         if _Debug:
             print('BitDustApp.on_resume')
+
+    def on_dropdown_menu_callback(self, instance_menu, instance_menu_item):
+        if _Debug:
+            print('BitDustApp.on_dropdown_menu_callback', instance_menu, instance_menu_item.text)
+        instance_menu.dismiss()
 
     def on_key_input(self, window_obj, key_code, scancode, codepoint, modifier):
         if _Debug:
