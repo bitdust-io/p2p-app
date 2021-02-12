@@ -173,7 +173,15 @@ class MainWin(Screen, ThemableBehavior):
             print('MainWin.populate_dropdown_menu', new_items)
         self.control.app.dropdown_menu.dismiss()
         self.control.app.dropdown_menu.menu.ids.box.clear_widgets()
-        self.control.app.dropdown_menu.items = new_items
+        itms = []
+        for itm in new_items:
+            itm.update({
+                "height": "40dp",
+                "top_pad": "10dp",
+                "bot_pad": "10dp",
+            })
+            itms.append(itm)
+        self.control.app.dropdown_menu.items = itms
         self.control.app.dropdown_menu.create_menu_items()
 
     def open_screen(self, screen_id, screen_type, **kwargs):
@@ -237,11 +245,11 @@ class MainWin(Screen, ThemableBehavior):
                 return True
         self.populate_toolbar_content(self.active_screens[screen_id][0])
         self.populate_dropdown_menu([])
-        self.ids.screen_manager.current = screen_id
-        self.populate_dropdown_menu(self.active_screens[screen_id][0].get_dropdown_menu_items())
         self.selected_screen = screen_id
         if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
             self.latest_screen = self.selected_screen
+        self.ids.screen_manager.current = screen_id
+        self.populate_dropdown_menu(self.active_screens[screen_id][0].get_dropdown_menu_items())
         return True
 
     #------------------------------------------------------------------------------

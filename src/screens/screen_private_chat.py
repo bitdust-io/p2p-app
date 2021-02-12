@@ -28,7 +28,7 @@ class PrivateChatScreen(screen.AppScreen):
         return self.username
 
     def get_dropdown_menu_items(self):
-        return [{"icon": "git", 'text': 'abcd', }, {"icon": "git", 'text': 'xyz', }, ] 
+        return []  # [{"icon": "git", 'text': 'abcd', }, {"icon": "git", 'text': 'xyz', }, ] 
 
     def on_enter(self, *args):
         self.ids.chat_status_label.text = ''

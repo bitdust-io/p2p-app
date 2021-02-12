@@ -6,22 +6,20 @@
 
         AppScreenLayout:
 
-            HLayout:
-                size_hint_y: None
-                height: self.minimum_height
-                padding: dp(10)
-                spacing: dp(10)
-
-                MDFillRoundFlatButton:
-                    text_color: app.color_white99
-                    text: 'backup my key'
-                    on_release: root.on_backup_button_clicked()
-
-                MDFillRoundFlatButton:
-                    text_color: app.color_white99
-                    md_bg_color: app.theme_cls.error_color
-                    text: 'erase my identity'
-                    on_release: root.on_erase_button_clicked()
+#             HLayout:
+#                 size_hint_y: None
+#                 height: self.minimum_height
+#                 padding: dp(10)
+#                 spacing: dp(10)
+#                 MDFillRoundFlatButton:
+#                     text_color: app.color_white99
+#                     text: 'backup my key'
+#                     on_release: root.on_backup_button_clicked()
+#                 MDFillRoundFlatButton:
+#                     text_color: app.color_white99
+#                     md_bg_color: app.theme_cls.error_color
+#                     text: 'erase my identity'
+#                     on_release: root.on_erase_button_clicked()
 
             VerticalScrollView:
 

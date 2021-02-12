@@ -34,13 +34,7 @@ class AppScreen(ThemableBehavior, Screen):
     def __init__(self, **kw):
         kw = self.init_kwargs(**kw)
         kw.pop('id', None)
-        if _Debug:
-            print('AppScreen.init   BEFORE theme_cls:', self.theme_cls)
-            print('AppScreen.init   BEFORE App.get_running_app() : %r', App.get_running_app())
         super(AppScreen, self).__init__(**kw)
-        if _Debug:
-            print('AppScreen.init   App.get_running_app() : %r', App.get_running_app())
-            print('AppScreen.init   %r  theme_cls=%r  creating with kwargs=%r' % (kw.get('name'), self.theme_cls, kw))
 
     def init_kwargs(self, **kw):
         return kw
@@ -76,6 +70,9 @@ class AppScreen(ThemableBehavior, Screen):
         pass
 
     def on_closed(self):
+        pass
+
+    def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
         pass
 
 #------------------------------------------------------------------------------

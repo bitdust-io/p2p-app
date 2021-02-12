@@ -5,7 +5,7 @@
 
 import os
 import sys
-import time
+import threading
 
 #------------------------------------------------------------------------------
 
@@ -40,10 +40,9 @@ if _Debug:
 
 #------------------------------------------------------------------------------
 
-from kivy.lang import Builder
 from kivy.config import Config
 
-from lib.system import is_android, android_sdk_version
+from lib import system
 
 #------------------------------------------------------------------------------
 
@@ -54,7 +53,9 @@ if _Debug:
 
 #------------------------------------------------------------------------------
 
+from kivy.lang import Builder
 from kivy.core.window import Window
+from kivy.clock import Clock, mainthread
 
 from kivymd.app import MDApp
 from kivymd.uix.menu import MDDropdownMenu
@@ -67,7 +68,7 @@ from components import styles
 
 #------------------------------------------------------------------------------
 
-if is_android(): 
+if system.is_android(): 
     from jnius import autoclass  # @UnresolvedImport
     import encodings.idna
 
@@ -83,7 +84,7 @@ if is_android():
 
 #------------------------------------------------------------------------------
 
-if is_android():
+if system.is_android():
     PACKAGE_NAME = 'org.bitdust_io.bitdust1'
     SERVICE_NAME = '{packagename}.Service{servicename}'.format(
         packagename=PACKAGE_NAME,
@@ -94,7 +95,7 @@ if is_android():
 #------------------------------------------------------------------------------
 
 def check_app_permission(permission):
-    if not is_android():
+    if not system.is_android():
         return True
     ret = check_permission(permission)
     if _Debug:
@@ -103,7 +104,7 @@ def check_app_permission(permission):
 
 
 def request_app_permissions(permissions, callback=None):
-    if not is_android():
+    if not system.is_android():
         return True
     if _Debug:
         print('BitDustApp.request_app_permissions', permissions, callback)
@@ -117,6 +118,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     control = None
     main_window = None
     dropdown_menu = None
+    finishing = threading.Event()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -133,7 +135,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.theme_cls.primary_hue = "400"
         self.theme_cls.accent_palette = 'Green'
         fonts_path = './src/fonts'
-        if is_android():
+        if system.is_android():
             fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
         LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
         theme_font_styles.append('IconMD')
@@ -150,8 +152,8 @@ class BitDustApp(styles.AppStyle, MDApp):
     def build(self):
         if _Debug:
             print('BitDustApp.build')
-            if is_android():
-                print('BitDustApp.build   android_sdk_version() : %r' % android_sdk_version())
+            if system.is_android():
+                print('BitDustApp.build   android_sdk_version() : %r' % system.android_sdk_version())
                 print('BitDustApp.build   ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
 
@@ -180,9 +182,11 @@ class BitDustApp(styles.AppStyle, MDApp):
 
         self.dropdown_menu = MDDropdownMenu(
             caller=self.main_window.ids.dropdown_menu_placeholder,
-            width_mult=4,
+            width_mult=3,
             items=[],
             selected_color=self.theme_cls.bg_darkest,
+            opening_time=0,
+            radius=[0, ],
         )
         self.dropdown_menu.bind(on_release=self.on_dropdown_menu_callback)
 
@@ -196,7 +200,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.do_start', args, kwargs)
 
-        if is_android():
+        if system.is_android():
             if args:
                 if len(args) >= 2:
                     if args[1] and isinstance(args[1], list):
@@ -208,15 +212,17 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.do_start   is okay to start now, storage path is %r' % primary_external_storage_path())
 
         self.control.start()
+        self.start_engine()
 
-        if is_android():
+    def start_engine(self):
+        if system.is_android():
             self.start_android_service()
         else:
-            self.check_restart_bitdust_engine()
+            self.check_restart_bitdust_process()
         return True
 
     def start_android_service(self, finishing=False):
-        if not is_android():
+        if not system.is_android():
             return None
         if _Debug:
             print('BitDustApp.start_android_service finishing=%r' % finishing)
@@ -237,7 +243,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         return self.service
 
     def stop_android_service(self):
-        if not is_android():
+        if not system.is_android():
             return None
         if _Debug:
             print('BitDustApp.stop_service %r' % self.service)
@@ -248,13 +254,40 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.stop_service STOPPED')
         return self.service
 
-    def check_restart_bitdust_engine(self):
-        if is_android():
+    def check_restart_bitdust_process(self):
+        if system.is_android():
             return None
+        if system.is_linux():
+            Clock.schedule_once(self.do_start_deploy_process)
         # TODO: to be implemented ...
 
+    def do_start_deploy_process(self, *args):
+        if self.finishing.is_set():
+            return
+        system.BackgroundProcess(
+            cmd=['/bin/bash', './src/deploy/linux.sh', ],
+            stdout_callback=self.on_deploy_process_stdout,
+            stderr_callback=self.on_deploy_process_stderr,
+            finishing=self.finishing,
+        ).run()
+        if _Debug:
+            print('BitDustApp.do_start_deploy_process finished')
+
+    @mainthread
+    def on_deploy_process_stdout(self, line):
+        if _Debug:
+            print('DEPLOY:', line.decode().rstrip())
+        if line.decode().startswith('#####'):
+            if 'process_dead_screen' in self.main_window.active_screens:
+                self.main_window.active_screens['process_dead_screen'][0].ids.deploy_output_label.text += line.decode()[6:]
+
+    @mainthread
+    def on_deploy_process_stderr(self, line):
+        if _Debug:
+            print('DEPLOY ERR:', line.decode().rstrip())
+
     def on_start(self):
-        if not is_android():
+        if not system.is_android():
             if _Debug:
                 print('BitDustApp.on_start')
             return self.do_start()
@@ -263,7 +296,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             'android.permission.READ_EXTERNAL_STORAGE',
             'android.permission.WRITE_EXTERNAL_STORAGE',
         ]
-        if android_sdk_version() >= 28:
+        if system.android_sdk_version() >= 28:
             required_permissions.append('android.permission.FOREGROUND_SERVICE')
         if _Debug:
             print('BitDustApp.on_start required_permissions=%r' % required_permissions)
@@ -281,6 +314,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_stop(self):
         if _Debug:
             print('BitDustApp.on_stop')
+        self.finishing.set()
         self.control.stop()
         self.main_window.unregister_controller()
         self.main_window.unregister_screens()
@@ -299,11 +333,15 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.on_dropdown_menu_callback', instance_menu, instance_menu_item.text)
         instance_menu.dismiss()
+        if self.main_window.selected_screen:
+            self.main_window.active_screens[self.main_window.selected_screen][0].on_dropdown_menu_item_clicked(
+                instance_menu, instance_menu_item
+            )
 
     def on_key_input(self, window_obj, key_code, scancode, codepoint, modifier):
         if _Debug:
             print('BitDustApp.on_key_input', key_code, scancode, modifier)
-        if is_android():
+        if system.is_android():
             if key_code == 27:
                 return True
             else:
