@@ -62,7 +62,8 @@ if [ ! -d $SOURCE_DIR ]; then
     echo ''
     echo "##### Downloading BitDust source code from Git repository"
     mkdir -p $SOURCE_DIR
-    git clone --depth=1 https://github.com/bitdust-io/public.git $SOURCE_DIR
+    git clone --depth=1 https://github.com/bitdust-io/devel.git $SOURCE_DIR
+    # git clone --depth=1 https://github.com/bitdust-io/public.git $SOURCE_DIR
 else
     echo ''
     echo "##### BitDust source files already cloned locally"
@@ -77,7 +78,7 @@ else
 fi
 
 
-if [ ! -d $PIP_BIN ]; then
+if [ ! -f $PIP_BIN ]; then
     echo ''
     echo "##### Preparing Python virtual environment"
     python3 $BITDUST_PY install  1>$LOG_FILE 2>$LOG_FILE

@@ -58,7 +58,6 @@ from kivy.core.window import Window
 from kivy.clock import Clock, mainthread
 
 from kivymd.app import MDApp
-from kivymd.uix.menu import MDDropdownMenu
 
 #------------------------------------------------------------------------------
 
@@ -117,7 +116,6 @@ class BitDustApp(styles.AppStyle, MDApp):
 
     control = None
     main_window = None
-    dropdown_menu = None
     finishing = threading.Event()
 
     def __init__(self, **kwargs):
@@ -180,16 +178,6 @@ class BitDustApp(styles.AppStyle, MDApp):
 
         self.main_window = main_win.MainWin()
 
-        self.dropdown_menu = MDDropdownMenu(
-            caller=self.main_window.ids.dropdown_menu_placeholder,
-            width_mult=3,
-            items=[],
-            selected_color=self.theme_cls.bg_darkest,
-            opening_time=0,
-            radius=[0, ],
-        )
-        self.dropdown_menu.bind(on_release=self.on_dropdown_menu_callback)
-
         self.main_window.register_controller(self.control)
         self.main_window.register_screens(controller.all_screens())
 
@@ -213,6 +201,7 @@ class BitDustApp(styles.AppStyle, MDApp):
 
         self.control.start()
         self.start_engine()
+        return True
 
     def start_engine(self):
         if system.is_android():
@@ -329,14 +318,14 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.on_resume')
 
-    def on_dropdown_menu_callback(self, instance_menu, instance_menu_item):
-        if _Debug:
-            print('BitDustApp.on_dropdown_menu_callback', instance_menu, instance_menu_item.text)
-        instance_menu.dismiss()
-        if self.main_window.selected_screen:
-            self.main_window.active_screens[self.main_window.selected_screen][0].on_dropdown_menu_item_clicked(
-                instance_menu, instance_menu_item
-            )
+#     def on_dropdown_menu_callback(self, instance_menu, instance_menu_item):
+#         if _Debug:
+#             print('BitDustApp.on_dropdown_menu_callback', instance_menu, instance_menu_item.text)
+#         instance_menu.dismiss()
+#         if self.main_window.selected_screen:
+#             self.main_window.active_screens[self.main_window.selected_screen][0].on_dropdown_menu_item_clicked(
+#                 instance_menu, instance_menu_item
+#             )
 
     def on_key_input(self, window_obj, key_code, scancode, codepoint, modifier):
         if _Debug:
@@ -348,9 +337,9 @@ class BitDustApp(styles.AppStyle, MDApp):
                 return False
         return False
 
-    def on_height(self, instance, value):
-        if _Debug:
-            print ('BitDustApp.on_height', instance, value, Window.keyboard_height)
+    # def on_height(self, instance, value):
+    #     if _Debug:
+    #         print ('BitDustApp.on_height', instance, value, Window.keyboard_height)
 
 #------------------------------------------------------------------------------
 
