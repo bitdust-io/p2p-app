@@ -141,12 +141,16 @@ class GroupChatScreen(screen.AppScreen):
         api_client.group_share(
             group_key_id=self.global_id,
             trusted_user_id=user_global_id,
-            cb=self.on_group_share_result,
+            cb=lambda resp: self.on_group_share_result(resp, user_global_id),
         )
 
-    def on_group_share_result(self, resp):
+    def on_group_share_result(self, resp, user_global_id):
         if _Debug:
             print('on_group_share_result', resp)
+        if websock.is_ok(resp):
+            snackbar.success(text='group key shared with %s' % user_global_id)
+        else:
+            snackbar.error(text=websock.response_errors(resp))
 
     def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
         if item_inst.text == 'activate':

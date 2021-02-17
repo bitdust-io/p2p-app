@@ -6,6 +6,7 @@
 import os
 import sys
 import threading
+import cProfile
 
 #------------------------------------------------------------------------------
 
@@ -276,9 +277,11 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('DEPLOY ERR:', line.decode().rstrip())
 
     def on_start(self):
+        if _Debug:
+            print('BitDustApp.on_start')
+            self.profile = cProfile.Profile()
+            self.profile.enable()        
         if not system.is_android():
-            if _Debug:
-                print('BitDustApp.on_start')
             return self.do_start()
         required_permissions = [
             'android.permission.INTERNET',
@@ -303,6 +306,11 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_stop(self):
         if _Debug:
             print('BitDustApp.on_stop')
+            self.profile.disable()
+            if system.is_android():
+                self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
+            else:
+                self.profile.dump_stats('./debug.profile')
         self.finishing.set()
         self.control.stop()
         self.main_window.unregister_controller()

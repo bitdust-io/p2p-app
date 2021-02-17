@@ -1,3 +1,8 @@
+import time
+
+#------------------------------------------------------------------------------
+
+from kivy.clock import Clock
 from kivy.properties import StringProperty  # @UnresolvedImport
 from kivy.properties import NumericProperty  # @UnresolvedImport
 from kivy.properties import ObjectProperty  # @UnresolvedImport
@@ -15,7 +20,7 @@ from components import webfont
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -123,10 +128,11 @@ class ContentNavigationDrawer(BoxLayout):
 
 class MainWin(Screen, ThemableBehavior):
 
-    screens_map = {}
     control = None
+    screens_map = {}
     active_screens = {}
     dropdown_menus = {}
+    screen_closed_time = {}
     selected_screen = StringProperty('')
     latest_screen = ''
 
@@ -210,6 +216,7 @@ class MainWin(Screen, ThemableBehavior):
         self.ids.screen_manager.add_widget(screen_inst)
         self.ids.screen_manager.current = screen_id
         self.active_screens[screen_id] = (screen_inst, None, )
+        self.screen_closed_time[screen_id] = time.time()
         menu_items = screen_inst.get_dropdown_menu_items()
         if menu_items:
             self.populate_dropdown_menu(screen_id, menu_items)
@@ -222,8 +229,11 @@ class MainWin(Screen, ThemableBehavior):
             if _Debug:
                 print('MainWin.close_screen   screen %r has not been opened' % screen_id)
             return
-        self.dropdown_menu
         screen_inst, btn = self.active_screens.pop(screen_id)
+        self.screen_closed_time.pop(screen_id, None)
+        if screen_inst not in self.ids.screen_manager.children:
+            if _Debug:
+                print('MainWin.close_screen   WARNING   screen instance %r was not found among screen manager children')
         self.ids.screen_manager.remove_widget(screen_inst)
         screen_inst.on_closed()
         del screen_inst
@@ -239,6 +249,18 @@ class MainWin(Screen, ThemableBehavior):
         for screen_id in screen_ids:
             if screen_id not in exclude_screens:
                 self.close_screen(screen_id)
+
+    def cleanup_screens(self, *args):
+        screen_ids = list(self.active_screens.keys())
+        for screen_id in screen_ids:
+            if screen_id == self.selected_screen:
+                continue
+            closed_time = self.screen_closed_time.get(screen_id)
+            if closed_time:
+                if time.time() - closed_time > 5.0:
+                    if _Debug:
+                        print('closing inactive screen %r : %d ~ %d' % (screen_id, time.time(), closed_time, ))
+                    self.close_screen(screen_id)
 
     def select_screen(self, screen_id, verify_state=False, screen_type=None, **kwargs):
         if screen_type is None:
@@ -265,10 +287,13 @@ class MainWin(Screen, ThemableBehavior):
                 return True
         self.populate_toolbar_content(self.active_screens[screen_id][0])
         # self.populate_dropdown_menu([])
-        self.selected_screen = screen_id
+        if self.selected_screen:
+            self.screen_closed_time[self.selected_screen] = time.time()
         if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
             self.latest_screen = self.selected_screen
+        self.selected_screen = screen_id
         self.ids.screen_manager.current = screen_id
+        Clock.schedule_once(self.cleanup_screens)
         # self.populate_dropdown_menu(self.active_screens[screen_id][0].get_dropdown_menu_items())
         return True
 
