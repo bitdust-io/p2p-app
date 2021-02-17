@@ -5,7 +5,8 @@
 
 import os
 import sys
-import time
+import threading
+import cProfile
 
 #------------------------------------------------------------------------------
 
@@ -40,10 +41,9 @@ if _Debug:
 
 #------------------------------------------------------------------------------
 
-from kivy.lang import Builder
 from kivy.config import Config
 
-from lib.system import is_android, android_sdk_version
+from lib import system
 
 #------------------------------------------------------------------------------
 
@@ -54,11 +54,11 @@ if _Debug:
 
 #------------------------------------------------------------------------------
 
-from kivy.core.text import LabelBase
+from kivy.lang import Builder
 from kivy.core.window import Window
+from kivy.clock import Clock, mainthread
 
 from kivymd.app import MDApp
-from kivymd.font_definitions import theme_font_styles
 
 #------------------------------------------------------------------------------
 
@@ -68,7 +68,7 @@ from components import styles
 
 #------------------------------------------------------------------------------
 
-if is_android(): 
+if system.is_android(): 
     from jnius import autoclass  # @UnresolvedImport
     import encodings.idna
 
@@ -84,7 +84,7 @@ if is_android():
 
 #------------------------------------------------------------------------------
 
-if is_android():
+if system.is_android():
     PACKAGE_NAME = 'org.bitdust_io.bitdust1'
     SERVICE_NAME = '{packagename}.Service{servicename}'.format(
         packagename=PACKAGE_NAME,
@@ -94,17 +94,8 @@ if is_android():
 
 #------------------------------------------------------------------------------
 
-Builder.load_string("""
-#:import fa_icon components.webfont.fa_icon
-#:import md_icon components.webfont.md_icon
-#:import icofont_icon components.webfont.icofont_icon
-#:import make_icon components.webfont.make_icon
-""")
-
-#------------------------------------------------------------------------------
-
 def check_app_permission(permission):
-    if not is_android():
+    if not system.is_android():
         return True
     ret = check_permission(permission)
     if _Debug:
@@ -113,7 +104,7 @@ def check_app_permission(permission):
 
 
 def request_app_permissions(permissions, callback=None):
-    if not is_android():
+    if not system.is_android():
         return True
     if _Debug:
         print('BitDustApp.request_app_permissions', permissions, callback)
@@ -126,49 +117,71 @@ class BitDustApp(styles.AppStyle, MDApp):
 
     control = None
     main_window = None
+    finishing = threading.Event()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def apply_styles(self):
+        from kivy.app import App
+        from kivy.core.text import LabelBase
+        from kivymd.font_definitions import theme_font_styles
+        if _Debug:
+            print('BitDustApp.apply_styles   App.get_running_app() : %r', App.get_running_app())
+            print('BitDustApp.apply_styles                    self : %r', self)
+        self.theme_cls.theme_style = 'Light'
+        self.theme_cls.primary_palette = 'Blue'
+        self.theme_cls.primary_hue = "400"
+        self.theme_cls.accent_palette = 'Green'
+        fonts_path = './src/fonts'
+        if system.is_android():
+            fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
+        LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
+        theme_font_styles.append('IconMD')
+        self.theme_cls.font_styles["IconMD"] = ["IconMD", 24, False, 0, ]
+        LabelBase.register(name="IconFA", fn_regular=os.path.join(fonts_path, "fa-solid.ttf"))
+        theme_font_styles.append('IconFA')
+        self.theme_cls.font_styles["IconFA"] = ["IconFA", 24, False, 0, ]
+        LabelBase.register(name="IconICO", fn_regular=os.path.join(fonts_path, "icofont.ttf"))
+        theme_font_styles.append('IconICO')
+        self.theme_cls.font_styles["IconICO"] = ["IconICO", 24, False, 0, ]
+        if _Debug:
+            print('BitDustApp.apply_styles', self.theme_cls)
 
     def build(self):
         if _Debug:
             print('BitDustApp.build')
-            if is_android():
-                print('BitDustApp.build   android_sdk_version() : %r' % android_sdk_version())
+            if system.is_android():
+                print('BitDustApp.build   android_sdk_version() : %r' % system.android_sdk_version())
                 print('BitDustApp.build   ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
 
         self.title = 'BitDust'
         # self.icon = './bitdust.png'
+        self.apply_styles()
 
-        self.theme_cls.theme_style = 'Light'
-        self.theme_cls.primary_palette = 'Blue'
-        self.theme_cls.primary_hue = "400"
-        self.theme_cls.accent_palette = 'Green'
-
-        fonts_path = './src/fonts'
-        if is_android():
-            fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
-
-        LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
-        theme_font_styles.append('IconMD')
-        self.theme_cls.font_styles["IconMD"] = ["IconMD", 24, False, 0, ]
-
-        LabelBase.register(name="IconFA", fn_regular=os.path.join(fonts_path, "fa-solid.ttf"))
-        theme_font_styles.append('IconFA')
-        self.theme_cls.font_styles["IconFA"] = ["IconFA", 24, False, 0, ]
-
-        LabelBase.register(name="IconICO", fn_regular=os.path.join(fonts_path, "icofont.ttf"))
-        theme_font_styles.append('IconICO')
-        self.theme_cls.font_styles["IconICO"] = ["IconICO", 24, False, 0, ]
+        Builder.load_string("""
+#:import fa_icon components.webfont.fa_icon
+#:import md_icon components.webfont.md_icon
+#:import icofont_icon components.webfont.icofont_icon
+#:import make_icon components.webfont.make_icon
+        """)
 
         from components import layouts
         from components import labels
         from components import buttons
         from components import text_input
         from components import list_view
+        from components import screen
         from components import main_win
 
         self.control = controller.Controller(self)
+
         self.main_window = main_win.MainWin()
+
         self.main_window.register_controller(self.control)
+        self.main_window.register_screens(controller.all_screens())
+
         # Window.bind(on_keyboard=self.on_key_input)
         return self.main_window
 
@@ -176,7 +189,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.do_start', args, kwargs)
 
-        if is_android():
+        if system.is_android():
             if args:
                 if len(args) >= 2:
                     if args[1] and isinstance(args[1], list):
@@ -187,18 +200,19 @@ class BitDustApp(styles.AppStyle, MDApp):
             if _Debug:
                 print('BitDustApp.do_start   is okay to start now, storage path is %r' % primary_external_storage_path())
 
-        self.main_window.register_screens(controller.all_screens())
-
         self.control.start()
+        self.start_engine()
+        return True
 
-        if is_android():
+    def start_engine(self):
+        if system.is_android():
             self.start_android_service()
         else:
-            self.check_restart_bitdust_engine()
+            self.check_restart_bitdust_process()
         return True
 
     def start_android_service(self, finishing=False):
-        if not is_android():
+        if not system.is_android():
             return None
         if _Debug:
             print('BitDustApp.start_android_service finishing=%r' % finishing)
@@ -219,7 +233,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         return self.service
 
     def stop_android_service(self):
-        if not is_android():
+        if not system.is_android():
             return None
         if _Debug:
             print('BitDustApp.stop_service %r' % self.service)
@@ -230,22 +244,51 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.stop_service STOPPED')
         return self.service
 
-    def check_restart_bitdust_engine(self):
-        if is_android():
+    def check_restart_bitdust_process(self):
+        if system.is_android():
             return None
+        if system.is_linux():
+            Clock.schedule_once(self.do_start_deploy_process)
         # TODO: to be implemented ...
 
+    def do_start_deploy_process(self, *args):
+        if self.finishing.is_set():
+            return
+        system.BackgroundProcess(
+            cmd=['/bin/bash', './src/deploy/linux.sh', ],
+            stdout_callback=self.on_deploy_process_stdout,
+            stderr_callback=self.on_deploy_process_stderr,
+            finishing=self.finishing,
+        ).run()
+        if _Debug:
+            print('BitDustApp.do_start_deploy_process finished')
+
+    @mainthread
+    def on_deploy_process_stdout(self, line):
+        if _Debug:
+            print('DEPLOY:', line.decode().rstrip())
+        if line.decode().startswith('#####'):
+            if 'process_dead_screen' in self.main_window.active_screens:
+                self.main_window.active_screens['process_dead_screen'][0].ids.deploy_output_label.text += line.decode()[6:]
+
+    @mainthread
+    def on_deploy_process_stderr(self, line):
+        if _Debug:
+            print('DEPLOY ERR:', line.decode().rstrip())
+
     def on_start(self):
-        if not is_android():
-            if _Debug:
-                print('BitDustApp.on_start')
+        if _Debug:
+            print('BitDustApp.on_start')
+            self.profile = cProfile.Profile()
+            self.profile.enable()        
+        if not system.is_android():
             return self.do_start()
         required_permissions = [
             'android.permission.INTERNET',
             'android.permission.READ_EXTERNAL_STORAGE',
             'android.permission.WRITE_EXTERNAL_STORAGE',
         ]
-        if android_sdk_version() >= 28:
+        if system.android_sdk_version() >= 28:
             required_permissions.append('android.permission.FOREGROUND_SERVICE')
         if _Debug:
             print('BitDustApp.on_start required_permissions=%r' % required_permissions)
@@ -263,6 +306,12 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_stop(self):
         if _Debug:
             print('BitDustApp.on_stop')
+            self.profile.disable()
+            if system.is_android():
+                self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
+            else:
+                self.profile.dump_stats('./debug.profile')
+        self.finishing.set()
         self.control.stop()
         self.main_window.unregister_controller()
         self.main_window.unregister_screens()
@@ -277,19 +326,28 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.on_resume')
 
+#     def on_dropdown_menu_callback(self, instance_menu, instance_menu_item):
+#         if _Debug:
+#             print('BitDustApp.on_dropdown_menu_callback', instance_menu, instance_menu_item.text)
+#         instance_menu.dismiss()
+#         if self.main_window.selected_screen:
+#             self.main_window.active_screens[self.main_window.selected_screen][0].on_dropdown_menu_item_clicked(
+#                 instance_menu, instance_menu_item
+#             )
+
     def on_key_input(self, window_obj, key_code, scancode, codepoint, modifier):
         if _Debug:
             print('BitDustApp.on_key_input', key_code, scancode, modifier)
-        if is_android():
+        if system.is_android():
             if key_code == 27:
                 return True
             else:
                 return False
         return False
 
-    def on_height(self, instance, value):
-        if _Debug:
-            print ('BitDustApp.on_height', instance, value, Window.keyboard_height)
+    # def on_height(self, instance, value):
+    #     if _Debug:
+    #         print ('BitDustApp.on_height', instance, value, Window.keyboard_height)
 
 #------------------------------------------------------------------------------
 

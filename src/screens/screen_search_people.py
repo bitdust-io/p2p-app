@@ -6,7 +6,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ class SearchPeopleResult(layouts.HorizontalLayout):
         )
 
     def on_friend_added(self, resp):
-        self.parent.parent.parent.parent.main_win().select_screen('friends_screen')
+        screen.main_window().select_screen('friends_screen')
 
 
 class NoUsersFound(labels.NormalLabel):

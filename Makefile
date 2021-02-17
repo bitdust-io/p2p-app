@@ -4,7 +4,8 @@
 
 REQUIREMENTS_TXT:=requirements.txt
 
-REQUIREMENTS_ANDROID:="kivy==2.0.0rc3,https://github.com/kivymd/KivyMD/archive/master.zip,sdl2_ttf==2.0.15,pillow,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python3"
+REQUIREMENTS_ANDROID:="kivy==2.0.0,https://github.com/vesellov/KivyMD/archive/master.zip,sdl2_ttf==2.0.15,PIL,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted==20.3.0,python3"
+# pillow
 
 OS=$(shell lsb_release -si 2>/dev/null || uname)
 PIP:="venv/bin/pip"
@@ -110,7 +111,7 @@ spec:
 
 build_android: refresh_android_environment
 	@rm -rfv ./bin/*.apk
-	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
+	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
 	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 release_android: refresh_android_environment_full

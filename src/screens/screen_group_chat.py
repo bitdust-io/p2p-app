@@ -1,5 +1,6 @@
 from components import screen
 from components import labels
+from components import snackbar
 
 from lib import colorhash
 from lib import api_client
@@ -33,6 +34,14 @@ class GroupChatScreen(screen.AppScreen):
         if len(l) > 20:
             l = l[:20] + '...'
         return l
+
+    def get_dropdown_menu_items(self):
+        return [
+            {'text': 'activate', },
+            {'text': 'deactivate', },
+            {'text': 'reconnect', },
+            {'text': 'close', },
+        ]
 
     def on_enter(self, *args):
         self.ids.chat_status_label.text = ''
@@ -132,12 +141,53 @@ class GroupChatScreen(screen.AppScreen):
         api_client.group_share(
             group_key_id=self.global_id,
             trusted_user_id=user_global_id,
-            cb=self.on_group_share_result,
+            cb=lambda resp: self.on_group_share_result(resp, user_global_id),
         )
 
-    def on_group_share_result(self, resp):
+    def on_group_share_result(self, resp, user_global_id):
         if _Debug:
             print('on_group_share_result', resp)
+        if websock.is_ok(resp):
+            snackbar.success(text='group key shared with %s' % user_global_id)
+        else:
+            snackbar.error(text=websock.response_errors(resp))
+
+    def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
+        if item_inst.text == 'activate':
+            api_client.group_join(
+                group_key_id=self.global_id,
+                cb=self.on_group_join_result,
+            )
+        elif item_inst.text == 'deactivate':
+            api_client.group_leave(
+                group_key_id=self.global_id,
+                erase_key=False,
+                cb=self.on_group_leave_result,
+            )
+        elif item_inst.text == 'close':
+            api_client.group_leave(
+                group_key_id=self.global_id,
+                erase_key=True,
+                cb=self.on_group_close_result,
+            )
+
+    def on_group_join_result(self, resp):
+        if not websock.is_ok(resp):
+            snackbar.error(text='failed to join the group: %s' % websock.response_errors(resp))
+        else:
+            snackbar.success(text='group activated')
+
+    def on_group_leave_result(self, resp):
+        if not websock.is_ok(resp):
+            snackbar.error(text='failed to deactivate the group: %s' % websock.response_errors(resp))
+        else:
+            snackbar.success(text='group deactivated')
+
+    def on_group_close_result(self, resp):
+        if not websock.is_ok(resp):
+            snackbar.error(text='failed to close the group: %s' % websock.response_errors(resp))
+        else:
+            snackbar.success(text='group closed')
 
 #------------------------------------------------------------------------------
 

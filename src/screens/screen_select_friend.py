@@ -10,7 +10,7 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -25,10 +25,10 @@ class SelectFriendListView(list_view.SelectableRecycleView):
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
         if _Debug:
-            print('on_selection_applied', item.global_id, self.selected_item, self.parent.parent.parent.parent)
+            print('on_selection_applied', item.global_id, self.selected_item)
         if self.selected_item:
-            if self.parent.parent.parent.parent.result_callback:
-                self.parent.parent.parent.parent.result_callback(item.global_id)
+            if self.parent.parent.parent.parent.parent.result_callback:
+                self.parent.parent.parent.parent.parent.result_callback(item.global_id)
 
 #------------------------------------------------------------------------------
 

@@ -7,14 +7,11 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
 class ConversationRecord(list_view.SelectableHorizontalRecord):
-
-    def get_root(self):
-        return self.parent.parent.parent.parent.parent.parent
 
     def get_icon_color(self, state):
         if state in ['IN_SYNC!', 'CONNECTED', ]:
@@ -28,14 +25,14 @@ class ConversationRecord(list_view.SelectableHorizontalRecord):
             print('ConversationRecord.on_chat_button_clicked', self.key_id)
         self.clear_selection()
         if self.type in ['group_message', 'personal_message', ]:
-            self.get_root().main_win().select_screen(
+            screen.main_window().select_screen(
                 screen_id=self.key_id,
                 screen_type='group_chat_screen',
                 global_id=self.key_id,
                 label=self.label,
             )
         elif self.type in ['private_message', ]:
-            self.get_root().main_win().select_screen(
+            screen.main_window().select_screen(
                 screen_id='private_chat_{}'.format(self.key_id.replace('master$', '')),
                 screen_type='private_chat_screen',
                 global_id=self.key_id,

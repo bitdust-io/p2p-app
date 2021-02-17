@@ -6,7 +6,7 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -20,6 +20,10 @@ def run(method, kwargs={}, cb=None, ):
 
 def process_health(cb=None):
     return run('process_health', cb=cb)
+
+
+def process_stop(cb=None):
+    return run('process_stop', cb=cb)
 
 
 def identity_get(cb=None):
@@ -42,8 +46,16 @@ def identity_recover(private_key_source, known_idurl=None, join_network=False, c
     }, cb=cb)
 
 
+def identity_backup(destination_filepath, cb=None):
+    return run('identity_backup', kwargs={'destination_filepath': destination_filepath, }, cb=cb)
+
+
 def network_connected(wait_timeout=0, cb=None):
     return run('network_connected', kwargs={'wait_timeout': wait_timeout, }, cb=cb)
+
+
+def network_reconnect(cb=None):
+    return run('network_reconnect', cb=cb)
 
 
 def configs_list(sort=True, include_info=False, cb=None):

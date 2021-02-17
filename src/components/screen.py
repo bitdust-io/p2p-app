@@ -4,7 +4,7 @@ from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -34,8 +34,6 @@ class AppScreen(ThemableBehavior, Screen):
     def __init__(self, **kw):
         kw = self.init_kwargs(**kw)
         kw.pop('id', None)
-        if _Debug:
-            print('AppScreen.init   %r creating with kwargs=%r' % (kw.get('name'), kw))
         super(AppScreen, self).__init__(**kw)
 
     def init_kwargs(self, **kw):
@@ -49,6 +47,9 @@ class AppScreen(ThemableBehavior, Screen):
 
     def get_title(self):
         return ''
+
+    def get_dropdown_menu_items(self):
+        return []
 
     def is_closable(self):
         return True
@@ -69,6 +70,9 @@ class AppScreen(ThemableBehavior, Screen):
         pass
 
     def on_closed(self):
+        pass
+
+    def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
         pass
 
 #------------------------------------------------------------------------------

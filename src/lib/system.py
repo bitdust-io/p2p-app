@@ -1,8 +1,16 @@
+import os
+import subprocess
+import time
+import threading
+from queue import Queue
+
+#------------------------------------------------------------------------------
+
 from kivy.utils import platform
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -26,6 +34,10 @@ def latest_state():
     return _LatestState
 
 #------------------------------------------------------------------------------
+
+def is_linux():
+    return latest_state() == 'linux'
+
 
 def is_windows():
     return latest_state() == 'win'
@@ -122,3 +134,139 @@ def set_android_system_ui_visibility():
     decorView.setSystemUiVisibility(flags)
     if _Debug:
         print('system.set_android_system_ui_visibility', decorView, flags)
+
+#------------------------------------------------------------------------------
+
+def rmdir_recursive(dirpath, ignore_errors=False, pre_callback=None):
+    """
+    Remove a directory, and all its contents if it is not already empty.
+
+    http://mail.python.org/pipermail/python-
+    list/2000-December/060960.html If ``ignore_errors`` is True process
+    will continue even if some errors happens. Method ``pre_callback``
+    can be used to decide before remove the file.
+    """
+    counter = 0
+    for name in os.listdir(dirpath):
+        full_name = os.path.join(dirpath, name)
+        # on Windows, if we don't have write permission we can't remove
+        # the file/directory either, so turn that on
+        if not os.access(full_name, os.W_OK):
+            try:
+                os.chmod(full_name, 0o600)
+            except:
+                continue
+        if os.path.isdir(full_name):
+            counter += rmdir_recursive(full_name, ignore_errors, pre_callback)
+        else:
+            if pre_callback:
+                if not pre_callback(full_name):
+                    continue
+            if os.path.isfile(full_name):
+                if not ignore_errors:
+                    os.remove(full_name)
+                    counter += 1
+                else:
+                    try:
+                        os.remove(full_name)
+                        counter += 1
+                    except Exception as exc:
+                        if _Debug:
+                            print('rmdir_recursive', exc)
+                        continue
+    if pre_callback:
+        if not pre_callback(dirpath):
+            return counter
+    if not ignore_errors:
+        os.rmdir(dirpath)
+    else:
+        try:
+            os.rmdir(dirpath)
+        except Exception as exc:
+            if _Debug:
+                print('rmdir_recursive', exc)
+    return counter
+
+#------------------------------------------------------------------------------
+
+class AsynchronousFileReader(threading.Thread):
+
+    def __init__(self, fd, queue, finishing):
+        assert isinstance(queue, Queue)
+        assert callable(fd.readline)
+        threading.Thread.__init__(self)
+        self._fd = fd
+        self._queue = queue
+        self._finishing = finishing
+
+    def run(self):
+        for line in iter(self._fd.readline, ''):
+            if self._finishing and self._finishing.is_set():
+                break
+            self._queue.put(line)
+            if not line:
+                break
+
+    def eof(self):
+        return not self.is_alive() and self._queue.empty()
+
+
+class BackgroundProcess(object):
+
+    def __init__(self, cmd, stdout_callback=None, stderr_callback=None, finishing=None):
+        self.cmd = cmd
+        self.process = None
+        self.stdout_callback = stdout_callback
+        self.stderr_callback = stderr_callback
+        self.finishing = finishing
+
+    def run(self, **kwargs):
+
+        def target(**kwargs):
+            self.process = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout_queue = Queue()
+            stdout_reader = AsynchronousFileReader(self.process.stdout, stdout_queue, self.finishing)
+            stdout_reader.start()
+            stderr_queue = Queue()
+            stderr_reader = AsynchronousFileReader(self.process.stderr, stderr_queue, self.finishing)
+            stderr_reader.start()
+            empty_line = False
+            if _Debug:
+                print('BackgroundProcess.run.target start')
+            while not stdout_reader.eof() or not stderr_reader.eof():
+                if self.finishing and self.finishing.is_set():
+                    break
+                while not stdout_queue.empty():
+                    line = stdout_queue.get()
+                    if not line:
+                        empty_line = True
+                        break
+                    if self.stdout_callback:
+                        self.stdout_callback(line)
+                while not stderr_queue.empty():
+                    line = stderr_queue.get()
+                    if not line:
+                        empty_line = True
+                        break
+                    if self.stderr_callback:
+                        self.stderr_callback(line)
+                if empty_line:
+                    break
+                time.sleep(.2)
+            if _Debug:
+                print('BackgroundProcess.run.target EOF reached')
+            if self.finishing and self.finishing.is_set():
+                if _Debug:
+                    print('BackgroundProcess.run.target terminating the process because finishing flag is set')
+                self.process.terminate()
+            else:
+                stdout_reader.join()
+                stderr_reader.join()
+                self.process.stdout.close()
+                self.process.stderr.close()
+            if _Debug:
+                print('BackgroundProcess.run.target finished')
+
+        thread = threading.Thread(target=target, kwargs=kwargs)
+        thread.start()
+
