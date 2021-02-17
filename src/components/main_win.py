@@ -1,7 +1,10 @@
+import os
 import time
 
 #------------------------------------------------------------------------------
 
+from kivy.lang import Builder
+from kivy.factory import Factory
 from kivy.clock import Clock
 from kivy.properties import StringProperty  # @UnresolvedImport
 from kivy.properties import NumericProperty  # @UnresolvedImport
@@ -20,7 +23,7 @@ from components import webfont
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -120,9 +123,10 @@ def patch_kivy_core_window():
 #------------------------------------------------------------------------------
 
 class ContentNavigationDrawer(BoxLayout):
-    screen_manager = ObjectProperty()
-    nav_drawer = ObjectProperty()
-    main_win = ObjectProperty()
+    pass
+    # screen_manager = ObjectProperty()
+    # nav_drawer = ObjectProperty()
+    # main_win = ObjectProperty()
 
 #------------------------------------------------------------------------------
 
@@ -146,12 +150,24 @@ class MainWin(Screen, ThemableBehavior):
         super().__init__(**kwargs)
         patch_kivy_core_window()
 
+    def nav(self):
+        return self.ids.nav_drawer
+
+    def tbar(self):
+        return self.ids.toolbar
+
     def register_screens(self, screens_dict):
-        for screen_type, screen_class in screens_dict.items():
-            self.screens_map[screen_type] = screen_class
+        for screen_type, screen_module_class in screens_dict.items():
+            screen_kv_file, screen_module, screen_classname = screen_module_class
+            Factory.register(screen_classname, module=screen_module)
+            self.screens_map[screen_type] = (screen_classname, screen_kv_file, )
+        if _Debug:
+            print('MainWin.register_screens  done with %d registered items' % len(self.screens_map))
 
     def unregister_screens(self):
         self.screens_map.clear()
+        if _Debug:
+            print('MainWin.unregister_screens done')
 
     def register_controller(self, cont): 
         self.control = cont
@@ -166,6 +182,8 @@ class MainWin(Screen, ThemableBehavior):
 
     def get_active_screen(self, screen_id):
         return self.active_screens.get(screen_id, [None, ])[0]
+
+    #------------------------------------------------------------------------------
 
     def populate_toolbar_content(self, screen_inst=None):
         if not screen_inst:
@@ -206,20 +224,40 @@ class MainWin(Screen, ThemableBehavior):
         )
         self.dropdown_menus[screen_id].bind(on_release=self.on_dropdown_menu_callback)
 
+    #------------------------------------------------------------------------------
+
     def open_screen(self, screen_id, screen_type, **kwargs):
+        manager = self.ids.screen_manager
+        if manager.has_screen(screen_id):
+            if _Debug:
+                print('MainWin.open_screen   screen %r already registered in the screen manager' % screen_id)
+            return
         if screen_id in self.active_screens:
             if _Debug:
                 print('MainWin.open_screen   screen %r already opened' % screen_id)
             return
-        screen_class = self.screens_map[screen_type]
+        screen_class_name, screen_kv_file = self.screens_map[screen_type]
+        if screen_kv_file:
+            if system.is_android():
+                screen_kv_file = os.path.join(os.environ['ANDROID_ARGUMENT'], screen_kv_file)
+            else:
+                screen_kv_file = os.path.join('src', screen_kv_file)
+            if _Debug:
+                print('MainWin.open_screen   is about to load KV file : %r' % screen_kv_file)
+            Builder.load_file(screen_kv_file)
+        screen_class = Factory.get(screen_class_name)
+        if not screen_class:
+            raise Exception('screen class %r was not registered' % screen_class_name)
+        if _Debug:
+            print('MainWin.open_screen   is about to create a new instance of %r with id %r' % (screen_class, screen_id, ))
         screen_inst = screen_class(name=screen_id, **kwargs)
-        self.ids.screen_manager.add_widget(screen_inst)
-        self.ids.screen_manager.current = screen_id
+        # manager.current = screen_id
         self.active_screens[screen_id] = (screen_inst, None, )
-        self.screen_closed_time[screen_id] = time.time()
-        menu_items = screen_inst.get_dropdown_menu_items()
-        if menu_items:
-            self.populate_dropdown_menu(screen_id, menu_items)
+        # self.screen_closed_time[screen_id] = time.time()
+        # menu_items = screen_inst.get_dropdown_menu_items()
+        # if menu_items:
+        #     self.populate_dropdown_menu(screen_id, menu_items)
+        manager.add_widget(screen_inst)
         screen_inst.on_opened()
         if _Debug:
             print('MainWin.open_screen   opened screen %r' % screen_id)
@@ -235,7 +273,7 @@ class MainWin(Screen, ThemableBehavior):
             if _Debug:
                 print('MainWin.close_screen   WARNING   screen instance %r was not found among screen manager children')
         self.ids.screen_manager.remove_widget(screen_inst)
-        screen_inst.on_closed()
+        # screen_inst.on_closed()
         del screen_inst
         if _Debug:
             print('MainWin.close_screen  closed screen %r' % screen_id)
@@ -275,25 +313,30 @@ class MainWin(Screen, ThemableBehavior):
                     print('MainWin.select_screen   selecting screen %r not possible, state verify failed' % screen_id)
                 return False
         if _Debug:
-            print('MainWin.select_screen  %r' % screen_id)
+            print('MainWin.select_screen  starting transition to %r' % screen_id)
         if screen_id not in self.active_screens:
             self.open_screen(screen_id, screen_type, **kwargs)
         else:
             self.active_screens[screen_id][0].init_kwargs(**kwargs)
-        if self.selected_screen:
-            if self.selected_screen == screen_id:
-                if _Debug:
-                    print('MainWin.select_screen   skip, selected screen is already %r' % screen_id)
-                return True
+        if self.selected_screen and self.selected_screen == screen_id:
+            if _Debug:
+                print('MainWin.select_screen   skip, selected screen is already %r' % screen_id)
+            return True
         self.populate_toolbar_content(self.active_screens[screen_id][0])
         # self.populate_dropdown_menu([])
         if self.selected_screen:
+            if _Debug:
+                print('MainWin.select_screen   is about to switch away screen manger from currently selected screen %r' % self.selected_screen)
             self.screen_closed_time[self.selected_screen] = time.time()
+            self.active_screens[self.selected_screen][0].on_closed()
         if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
             self.latest_screen = self.selected_screen
         self.selected_screen = screen_id
+        if _Debug:
+            print('MainWin.select_screen   is going to switch screen manager to %r' % screen_id)
         self.ids.screen_manager.current = screen_id
-        Clock.schedule_once(self.cleanup_screens)
+        self.active_screens[screen_id][0].on_opened()
+        # Clock.schedule_once(self.cleanup_screens)
         # self.populate_dropdown_menu(self.active_screens[screen_id][0].get_dropdown_menu_items())
         return True
 
@@ -330,8 +373,3 @@ class MainWin(Screen, ThemableBehavior):
     # def on_size(self, instance, value):
     #     if _Debug:
     #         print ('MainWin.on_size', instance, value)
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./components/main_win.kv')

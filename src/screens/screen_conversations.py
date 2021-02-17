@@ -201,8 +201,3 @@ class ConversationsScreen(screen.AppScreen):
             self.populate()
         else:
             self.ids.conversations_list_view.refresh_from_data()
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_conversations.kv')

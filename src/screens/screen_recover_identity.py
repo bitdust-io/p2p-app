@@ -45,8 +45,3 @@ class RecoverIdentityScreen(screen.AppScreen):
         self.main_win().select_screen('connecting_screen')
         self.control().identity_get_latest = time.time()
         self.main_win().state_identity_get = 1
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_recover_identity.kv')

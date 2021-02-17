@@ -169,7 +169,3 @@ class MyIDScreen(screen.AppScreen):
             ) / Window.width
         ).open()
         self.app().start_engine()
-
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_my_id.kv')

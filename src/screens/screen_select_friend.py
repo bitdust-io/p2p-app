@@ -70,8 +70,3 @@ class SelectFriendScreen(screen.AppScreen):
             screen_id='search_people_screen',
             return_screen_id='select_friend_screen',
         )
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_select_friend.kv')

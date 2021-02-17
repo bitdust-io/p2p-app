@@ -24,8 +24,3 @@ class WelcomeScreen(screen.AppScreen):
         if self.verify_network_connected_task:
             Clock.unschedule(self.verify_network_connected_task)
             self.verify_network_connected_task = None
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_welcome.kv')

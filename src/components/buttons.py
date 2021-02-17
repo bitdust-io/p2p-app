@@ -170,8 +170,3 @@ class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, 
     def set_size(self, interval):
         self.width = self.button_width
         self.height = self.button_height
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder
-Builder.load_file('./components/buttons.kv')

@@ -73,8 +73,3 @@ class SelectableRecycleView(RecycleView):
     # def on_selection_applied(self, item, index, is_selected, prev_selected):
     #     if _Debug:
     #         print('SelectableRecycleView.on_selection_applied', item, index, is_selected, prev_selected, item.selected)
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./components/list_view.kv')

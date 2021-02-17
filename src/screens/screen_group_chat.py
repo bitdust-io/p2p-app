@@ -188,8 +188,3 @@ class GroupChatScreen(screen.AppScreen):
             snackbar.error(text='failed to close the group: %s' % websock.response_errors(resp))
         else:
             snackbar.success(text='group closed')
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder
-Builder.load_file('./screens/screen_group_chat.kv')

@@ -122,8 +122,3 @@ class PrivateChatScreen(screen.AppScreen):
         if _Debug:
             print('chat.on_private_message_received', json_data)
         self.populate()
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder
-Builder.load_file('./screens/screen_private_chat.kv')

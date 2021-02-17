@@ -512,8 +512,3 @@ class SettingsScreen(screen.AppScreen):
         if _Debug:
             print('SettingsScreen.on_option_value_modified', option_key, new_value)
         api_client.config_set(key=option_key, value=new_value)
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_settings.kv')

@@ -101,8 +101,3 @@ class SearchPeopleScreen(screen.AppScreen):
             self.ids.search_results.add_widget(SearchPeopleResult(
                 label_text=str(r['global_id']),
             ))
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_search_people.kv')

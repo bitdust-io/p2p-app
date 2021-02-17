@@ -138,9 +138,3 @@ class MultiLineTextInput(MDTextFieldRect):
 #         if _Debug:
 #             print('MultiLineTextInput.on_focus', instance, value)
 #         update_app_screen_soft_keyboard_area(value)
-
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./components/text_input.kv')

@@ -137,6 +137,10 @@ android.entrypoint = org.bitdust_io.bitdust1.BitDustActivity
 android.activity_class_name = org.bitdust_io.bitdust1.BitDustActivity
 android.service_class_name = org.bitdust_io.bitdust1.BitDustService
 
+# (str) Extra xml to write directly inside the <manifest><application> tag of AndroidManifest.xml
+# use that parameter to provide a filename from where to load your custom XML arguments
+android.extra_manifest_application_arguments = ./etc/extra_manifest_application_arguments.xml
+
 # (list) Pattern to whitelist for the whole project
 #android.whitelist =
 
@@ -181,8 +185,6 @@ android.add_activites = org.bitdust_io.bitdust1.BitDustActivity
 
 # (str) launchMode to set for the main activity
 android.manifest.launch_mode = singleTask
-android.manifest.network_security_config = "@xml/network_security_config"
-android.manifest.uses_cleartext_traffic = True
 
 # (list) Android additional libraries to copy into libs/armeabi
 #android.add_libs_armeabi = libs/android/*.so
@@ -279,10 +281,10 @@ log_level = 2
 warn_on_root = 0
 
 # (str) Path to build artifact storage, absolute or relative to spec file
-build_dir = ./.buildozer
+# build_dir = ./.buildozer
 
 # (str) Path to build output (i.e. .apk, .ipa) storage
-bin_dir = ./bin
+# bin_dir = ./bin
 
 #    -----------------------------------------------------------------------------
 #    List as sections

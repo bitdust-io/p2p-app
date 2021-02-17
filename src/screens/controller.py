@@ -12,37 +12,37 @@ _Debug = False
 #------------------------------------------------------------------------------
 
 def all_screens():
-    from screens import screen_startup
-    from screens import screen_welcome
-    from screens import screen_process_dead
-    from screens import screen_new_identity
-    from screens import screen_recover_identity
-    from screens import screen_connecting
-    from screens import screen_settings
-    from screens import screen_my_id
-    from screens import screen_search_people
-    from screens import screen_friends
-    from screens import screen_select_friend
-    from screens import screen_conversations
-    from screens import screen_create_group
-    from screens import screen_private_chat
-    from screens import screen_group_chat
     return {
-        'startup_screen': screen_startup.StartUpScreen,
-        'process_dead_screen': screen_process_dead.ProcessDeadScreen,
-        'connecting_screen': screen_connecting.ConnectingScreen,
-        'new_identity_screen': screen_new_identity.NewIdentityScreen,
-        'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
-        'welcome_screen': screen_welcome.WelcomeScreen,
-        'settings_screen': screen_settings.SettingsScreen,
-        'my_id_screen': screen_my_id.MyIDScreen,
-        'search_people_screen': screen_search_people.SearchPeopleScreen,
-        'friends_screen': screen_friends.FriendsScreen,
-        'select_friend_screen': screen_select_friend.SelectFriendScreen,
-        'conversations_screen': screen_conversations.ConversationsScreen,
-        'create_group_screen': screen_create_group.CreateGroupScreen,
-        'private_chat_screen': screen_private_chat.PrivateChatScreen,
-        'group_chat_screen': screen_group_chat.GroupChatScreen,
+        'startup_screen': (
+            'screens/screen_startup.kv', 'screens.screen_startup', 'StartUpScreen', ),
+        'process_dead_screen': (
+            'screens/screen_process_dead.kv', 'screens.screen_process_dead', 'ProcessDeadScreen', ),
+        'connecting_screen': (
+            'screens/screen_connecting.kv', 'screens.screen_connecting', 'ConnectingScreen', ),
+        'new_identity_screen': (
+            'screens/screen_new_identity.kv', 'screens.screen_new_identity', 'NewIdentityScreen', ),
+        'recover_identity_screen': (
+            'screens/screen_recover_identity.kv', 'screens.screen_recover_identity', 'RecoverIdentityScreen', ),
+        'welcome_screen': (
+            'screens/screen_welcome.kv', 'screens.screen_welcome', 'WelcomeScreen', ),
+        'settings_screen': (
+            'screens/screen_settings.kv', 'screens.screen_settings', 'SettingsScreen', ),
+        'my_id_screen': (
+            'screens/screen_my_id.kv', 'screens.screen_my_id', 'MyIDScreen', ),
+        'search_people_screen': (
+            'screens/screen_search_people.kv', 'screens.screen_search_people', 'SearchPeopleScreen', ),
+        'friends_screen': (
+            'screens/screen_friends.kv', 'screens.screen_friends', 'FriendsScreen', ),
+        'select_friend_screen': (
+            'screens/screen_select_friend.kv', 'screens.screen_select_friend', 'SelectFriendScreen', ),
+        'conversations_screen': (
+            'screens/screen_conversations.kv', 'screens.screen_conversations', 'ConversationsScreen', ),
+        'create_group_screen': (
+            'screens/screen_create_group.kv', 'screens.screen_create_group', 'CreateGroupScreen', ),
+        'private_chat_screen': (
+            'screens/screen_private_chat.kv', 'screens.screen_private_chat', 'PrivateChatScreen', ),
+        'group_chat_screen': (
+            'screens/screen_group_chat.kv', 'screens.screen_group_chat', 'GroupChatScreen', ),
     }
 
 #------------------------------------------------------------------------------

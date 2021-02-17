@@ -58,15 +58,16 @@ install_buildozer:
 
 install_p4a:
 	@rm -rf python-for-android/
+	@git clone --single-branch --branch develop https://github.com/kivy/python-for-android.git
 	# @git clone --single-branch --branch master https://github.com/vesellov/python-for-android.git
 	# @git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
-	@git clone --single-branch --branch develop_more https://github.com/vesellov/python-for-android.git
+	# @git clone --single-branch --branch develop_more https://github.com/vesellov/python-for-android.git
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 
 update_p4a:
-	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop; cd ..;
-	@cd ./python-for-android; git fetch --all; git reset --hard origin/develop_more; cd ..;
+	@cd ./python-for-android; git fetch --all; git reset --hard origin/develop; cd ..;
+	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop_more; cd ..;
 
 update_kivymd_icons:
 	@./venv/bin/python ./venv/lib/python3.6/site-packages/kivymd/tools/update_icons.py
@@ -111,12 +112,12 @@ spec:
 
 build_android: refresh_android_environment
 	@rm -rfv ./bin/*.apk
-	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
+	@PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
 	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 release_android: refresh_android_environment_full
 	@rm -rfv ./bin/*.apk
-	@VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
+	@PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
 	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 test_apk:

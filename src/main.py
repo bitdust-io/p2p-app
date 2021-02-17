@@ -55,7 +55,6 @@ if _Debug:
 #------------------------------------------------------------------------------
 
 from kivy.lang import Builder
-from kivy.core.window import Window
 from kivy.clock import Clock, mainthread
 
 from kivymd.app import MDApp
@@ -167,12 +166,13 @@ class BitDustApp(styles.AppStyle, MDApp):
 #:import make_icon components.webfont.make_icon
         """)
 
-        from components import layouts
-        from components import labels
-        from components import buttons
-        from components import text_input
-        from components import list_view
-        from components import screen
+        Builder.load_file('./components/layouts.kv')
+        Builder.load_file('./components/labels.kv')
+        Builder.load_file('./components/buttons.kv')
+        Builder.load_file('./components/text_input.kv')
+        Builder.load_file('./components/list_view.kv')
+        Builder.load_file('./components/main_win.kv')
+
         from components import main_win
 
         self.control = controller.Controller(self)
@@ -306,11 +306,6 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_stop(self):
         if _Debug:
             print('BitDustApp.on_stop')
-            self.profile.disable()
-            if system.is_android():
-                self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
-            else:
-                self.profile.dump_stats('./debug.profile')
         self.finishing.set()
         self.control.stop()
         self.main_window.unregister_controller()
@@ -320,6 +315,11 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_pause(self):
         if _Debug:
             print('BitDustApp.on_pause')
+            self.profile.disable()
+            if system.is_android():
+                self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
+            else:
+                self.profile.dump_stats('./debug.profile')
         return True
 
     def on_resume(self):

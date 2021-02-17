@@ -74,8 +74,3 @@ class AppScreen(ThemableBehavior, Screen):
 
     def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
         pass
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./components/screen.kv')

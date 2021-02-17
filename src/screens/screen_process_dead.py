@@ -35,8 +35,3 @@ class ProcessDeadScreen(screen.AppScreen):
         if self.verify_process_health_task:
             Clock.unschedule(self.verify_process_health_task)
             self.verify_process_health_task = None
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_process_dead.kv')

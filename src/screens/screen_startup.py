@@ -12,8 +12,3 @@ class StartUpScreen(screen.AppScreen):
 
     def is_closable(self):
         return False
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_startup.kv')
