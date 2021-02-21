@@ -10,10 +10,10 @@ import encodings.idna
 
 #------------------------------------------------------------------------------
 
-PACKAGE_NAME = 'org.bitdust_io.bitdust1'
-SERVICE_NAME = 'org.bitdust_io.bitdust1.BitDustService'
+from android.config import ACTIVITY_CLASS_NAME, SERVICE_CLASS_NAME  # @UnresolvedImport
 
-PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
+PACKAGE_NAME = 'org.bitdust_io.bitdust1'
+PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 #------------------------------------------------------------------------------ 
 
@@ -51,7 +51,7 @@ def set_foreground():
     notification_channel = NotificationChannel(channel_id, AndroidString('BitDust Channel'.encode('utf-8')), NotificationManager.IMPORTANCE_LOW)
 
     Notification = autoclass(u'android.app.Notification')
-    service = autoclass(SERVICE_NAME).mService
+    service = autoclass(SERVICE_CLASS_NAME).mService
     notification_service = service.getSystemService(Context.NOTIFICATION_SERVICE)
 
     notification_service.createNotificationChannel(notification_channel)
@@ -92,7 +92,7 @@ def set_foreground_api_lower_26():
     NotificationBuilder = autoclass('android.app.Notification$Builder')
 
     Notification = autoclass('android.app.Notification')
-    service = autoclass(SERVICE_NAME).mService
+    service = autoclass(SERVICE_CLASS_NAME).mService
 
     app_context = service.getApplication().getApplicationContext()
     notification_builder = NotificationBuilder(app_context)

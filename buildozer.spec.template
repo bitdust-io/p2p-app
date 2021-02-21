@@ -133,9 +133,9 @@ android.skip_update = True
 android.accept_sdk_license = True
 
 # (str) Android entry point, default is ok for Kivy-based app
-android.entrypoint = org.bitdust_io.bitdust1.BitDustActivity
-android.activity_class_name = org.bitdust_io.bitdust1.BitDustActivity
-android.service_class_name = org.bitdust_io.bitdust1.BitDustService
+# android.entrypoint = org.bitdust_io.bitdust1.BitDustActivity
+# android.activity_class_name = org.bitdust_io.bitdust1.BitDustActivity
+# android.service_class_name = org.bitdust_io.bitdust1.BitDustService
 
 # (str) Extra xml to write directly inside the <manifest><application> tag of AndroidManifest.xml
 # use that parameter to provide a filename from where to load your custom XML arguments
@@ -171,7 +171,8 @@ android.add_aars = support-compat-27.0.0.aar
 #android.gradle_dependencies =
 
 # (list) Java classes to add as activities to the manifest.
-android.add_activites = org.bitdust_io.bitdust1.BitDustActivity
+# android.add_activites = org.bitdust_io.bitdust1.BitDustActivity
+android.add_activites = org.kivy.android.PythonActivity
 
 # (str) OUYA Console category. Should be one of GAME or APP
 # If you leave this blank, OUYA support will not be enabled
@@ -240,7 +241,7 @@ p4a.local_recipes = ./recipes/
 #p4a.hook =
 
 # (str) Bootstrap to use for android builds
-# p4a.bootstrap = sdl2
+p4a.bootstrap = sdl2
 # p4a.bootstrap = webview
 
 # (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)
@@ -281,10 +282,10 @@ log_level = 2
 warn_on_root = 0
 
 # (str) Path to build artifact storage, absolute or relative to spec file
-# build_dir = ./.buildozer
+build_dir = ./.buildozer
 
 # (str) Path to build output (i.e. .apk, .ipa) storage
-# bin_dir = ./bin
+bin_dir = ./bin
 
 #    -----------------------------------------------------------------------------
 #    List as sections

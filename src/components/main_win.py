@@ -110,7 +110,7 @@ def patch_kivy_core_window():
 
     if system.is_android():
         Window.update_viewport = update_viewport
-        # Window._get_size = _get_size
+        Window._get_size = _get_size
         Window._get_android_kheight = _get_android_kheight
         Window.keyboard_anim_args = {"d": 0.1,"t": "linear", }
         softinput_mode = 'resize'
@@ -134,6 +134,7 @@ class MainWin(Screen, ThemableBehavior):
 
     control = None
     screens_map = {}
+    screens_loaded = set()
     active_screens = {}
     dropdown_menus = {}
     screen_closed_time = {}
@@ -238,25 +239,25 @@ class MainWin(Screen, ThemableBehavior):
             return
         screen_class_name, screen_kv_file = self.screens_map[screen_type]
         if screen_kv_file:
-            if system.is_android():
-                screen_kv_file = os.path.join(os.environ['ANDROID_ARGUMENT'], screen_kv_file)
-            else:
-                screen_kv_file = os.path.join('src', screen_kv_file)
-            if _Debug:
-                print('MainWin.open_screen   is about to load KV file : %r' % screen_kv_file)
-            Builder.load_file(screen_kv_file)
+            if screen_kv_file not in self.screens_loaded:
+                if system.is_android():
+                    screen_kv_file = os.path.join(os.environ['ANDROID_ARGUMENT'], screen_kv_file)
+                else:
+                    screen_kv_file = os.path.join('src', screen_kv_file)
+                if _Debug:
+                    print('MainWin.open_screen   is about to load KV file : %r' % screen_kv_file)
+                Builder.load_file(screen_kv_file)
+                self.screens_loaded.add(screen_kv_file)
         screen_class = Factory.get(screen_class_name)
         if not screen_class:
             raise Exception('screen class %r was not registered' % screen_class_name)
         if _Debug:
             print('MainWin.open_screen   is about to create a new instance of %r with id %r' % (screen_class, screen_id, ))
         screen_inst = screen_class(name=screen_id, **kwargs)
-        # manager.current = screen_id
         self.active_screens[screen_id] = (screen_inst, None, )
-        # self.screen_closed_time[screen_id] = time.time()
-        # menu_items = screen_inst.get_dropdown_menu_items()
-        # if menu_items:
-        #     self.populate_dropdown_menu(screen_id, menu_items)
+        menu_items = screen_inst.get_dropdown_menu_items()
+        if menu_items:
+            self.populate_dropdown_menu(screen_id, menu_items)
         manager.add_widget(screen_inst)
         screen_inst.on_opened()
         if _Debug:
@@ -323,12 +324,12 @@ class MainWin(Screen, ThemableBehavior):
                 print('MainWin.select_screen   skip, selected screen is already %r' % screen_id)
             return True
         self.populate_toolbar_content(self.active_screens[screen_id][0])
-        # self.populate_dropdown_menu([])
         if self.selected_screen:
             if _Debug:
                 print('MainWin.select_screen   is about to switch away screen manger from currently selected screen %r' % self.selected_screen)
             self.screen_closed_time[self.selected_screen] = time.time()
-            self.active_screens[self.selected_screen][0].on_closed()
+            if self.selected_screen in self.active_screens:
+                self.active_screens[self.selected_screen][0].on_closed()
         if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
             self.latest_screen = self.selected_screen
         self.selected_screen = screen_id
@@ -336,8 +337,6 @@ class MainWin(Screen, ThemableBehavior):
             print('MainWin.select_screen   is going to switch screen manager to %r' % screen_id)
         self.ids.screen_manager.current = screen_id
         self.active_screens[screen_id][0].on_opened()
-        # Clock.schedule_once(self.cleanup_screens)
-        # self.populate_dropdown_menu(self.active_screens[screen_id][0].get_dropdown_menu_items())
         return True
 
     #------------------------------------------------------------------------------

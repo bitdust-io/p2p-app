@@ -72,7 +72,7 @@ class MyIDScreen(screen.AppScreen):
             return
         result = websock.response_result(resp)
         if not result:
-            self.ids.my_id_details.text = websock.response_errors(resp)
+            self.ids.my_id_details.text = websock.response_err(resp)
             return
         self.ids.my_id_details.text = identity_details_temlate_text.format(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
@@ -108,7 +108,7 @@ class MyIDScreen(screen.AppScreen):
         if not websock.is_ok(resp):
             self.ids.my_id_details.text = str(resp)
             Snackbar(
-                text='identity backup failed: %s' % websock.response_errors(resp),
+                text='identity backup failed: %s' % websock.response_err(resp),
                 bg_color=self.theme_cls.error_color,
                 duration=5,
                 snackbar_x="10dp",

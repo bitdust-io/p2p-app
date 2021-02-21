@@ -89,7 +89,7 @@ if system.is_android():
         packagename=PACKAGE_NAME,
         servicename='Bitdustnode'
     )    
-    PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
+    PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 #------------------------------------------------------------------------------
 
@@ -164,6 +164,8 @@ class BitDustApp(styles.AppStyle, MDApp):
 #:import md_icon components.webfont.md_icon
 #:import icofont_icon components.webfont.icofont_icon
 #:import make_icon components.webfont.make_icon
+#:import DynamicHeightTextInput components.text_input.DynamicHeightTextInput
+#:import RaisedIconButton components.buttons.RaisedIconButton
         """)
 
         Builder.load_file('./components/layouts.kv')
@@ -279,8 +281,8 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_start(self):
         if _Debug:
             print('BitDustApp.on_start')
-            self.profile = cProfile.Profile()
-            self.profile.enable()        
+            # self.profile = cProfile.Profile()
+            # self.profile.enable()        
         if not system.is_android():
             return self.do_start()
         required_permissions = [
@@ -315,11 +317,11 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_pause(self):
         if _Debug:
             print('BitDustApp.on_pause')
-            self.profile.disable()
-            if system.is_android():
-                self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
-            else:
-                self.profile.dump_stats('./debug.profile')
+            # self.profile.disable()
+            # if system.is_android():
+            #     self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
+            # else:
+            #     self.profile.dump_stats('./debug.profile')
         return True
 
     def on_resume(self):

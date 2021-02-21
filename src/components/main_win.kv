@@ -1,4 +1,5 @@
 #:import NoTransition kivy.uix.screenmanager.NoTransition
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
 
 
 <ContentNavigationDrawer>:
@@ -94,7 +95,7 @@
     MDToolbar:
         id: toolbar
         pos_hint: {"top": 1}
-        elevation: 5
+        elevation: 0
         icon: "search-web"
         title: "BitDust"
         anchor_title: 'center'
@@ -113,8 +114,9 @@
             id: nav_drawer
             type: "modal"
             width: dp(220)
-            opening_time: 0
-            closing_time: 0
+            opening_time: 0.3
+            closing_time: 0.3
+            elevation: 0
 
             ContentNavigationDrawer:
                 id: nav_drawer_content

@@ -356,6 +356,10 @@ def response_errors(response):
     return response_payload(response).get('response', {}).get('errors', [])
 
 
+def response_err(response):
+    return ', '.join(response_errors(response))
+
+
 def response_status(response):
     if not isinstance(response, dict):
         return ''
