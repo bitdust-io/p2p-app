@@ -7,7 +7,7 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -70,20 +70,25 @@ class ConversationsListView(list_view.SelectableRecycleView):
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
         if self.selected_item:
-            if self.selected_item.type in ['group_message', 'personal_message', ]:
+            key_id = self.selected_item.key_id
+            label = self.selected_item.label
+            typ = self.selected_item.type
+            if typ in ['group_message', 'personal_message', ]:
                 screen.main_window().select_screen(
-                    screen_id=self.selected_item.key_id,
+                    screen_id=key_id,
                     screen_type='group_chat_screen',
-                    global_id=self.selected_item.key_id,
-                    label=self.selected_item.label,
+                    global_id=key_id,
+                    label=label,
                 )
-            elif self.selected_item.type in ['private_message', ]:
+            elif typ in ['private_message', ]:
                 screen.main_window().select_screen(
-                    screen_id='private_chat_{}'.format(self.selected_item.key_id.replace('master$', '')),
+                    screen_id='private_chat_{}'.format(key_id.replace('master$', '')),
                     screen_type='private_chat_screen',
-                    global_id=self.selected_item.key_id,
-                    username=self.selected_item.label,
+                    global_id=key_id,
+                    username=label,
                 )
+        self.clear_selection()
+        self.ids.selectable_layout.clear_selection()
 
 
 class ConversationsScreen(screen.AppScreen):
@@ -98,9 +103,8 @@ class ConversationsScreen(screen.AppScreen):
         api_client.message_conversations_list(cb=self.on_message_conversations_list_result)
 
     def clear_selected_item(self):
-        if self.ids.conversations_list_view.selected_item:
-            self.ids.conversations_list_view.selected_item.selected = False
         self.ids.conversations_list_view.clear_selection()
+        self.ids.conversations_list_view.ids.selectable_layout.clear_selection()
 
     def on_enter(self, *args):
         self.clear_selected_item()

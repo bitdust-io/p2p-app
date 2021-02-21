@@ -1,4 +1,3 @@
-from components import buttons
 from components import screen
 from components import list_view
 
@@ -11,10 +10,6 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-class FriendActionButton(buttons.TransparentIconButton):
-    pass
-
-
 class FriendRecord(list_view.SelectableHorizontalRecord):
     pass
 
@@ -23,12 +18,16 @@ class FriendsListView(list_view.SelectableRecycleView):
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
         if self.selected_item:
+            global_id = self.selected_item.global_id
+            username = self.selected_item.username
             screen.main_window().select_screen(
-                screen_id='private_chat_{}'.format(self.selected_item.global_id),
+                screen_id='private_chat_{}'.format(global_id),
                 screen_type='private_chat_screen',
-                global_id=self.selected_item.global_id,
-                username=self.selected_item.username,
+                global_id=global_id,
+                username=username,
             )
+        self.clear_selection()
+        self.ids.selectable_layout.clear_selection()
 
 
 class FriendsScreen(screen.AppScreen):
@@ -43,9 +42,8 @@ class FriendsScreen(screen.AppScreen):
         api_client.friends_list(cb=self.on_friends_list_result)
 
     def clear_selected_item(self):
-        if self.ids.friends_list_view.selected_item:
-            self.ids.friends_list_view.selected_item.selected = False
         self.ids.friends_list_view.clear_selection()
+        self.ids.friends_list_view.ids.selectable_layout.clear_selection()
 
     def on_enter(self, *args):
         self.clear_selected_item()

@@ -9,13 +9,13 @@ from kivy.uix.recycleboxlayout import RecycleBoxLayout
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
 class SelectableRecycleBoxLayout(RecycleBoxLayout, LayoutSelectionBehavior, FocusBehavior):
-
-    touch_deselect_last = BooleanProperty(True)
+    pass
+    # touch_deselect_last = BooleanProperty(True)
 
 
 class BaseSelectableRecord(RecycleDataViewBehavior):
@@ -31,9 +31,7 @@ class BaseSelectableRecord(RecycleDataViewBehavior):
     def on_touch_down(self, touch):
         if super(BaseSelectableRecord, self).on_touch_down(touch):
             return True
-        # if not isinstance(touch, MouseMotionEvent):
-        #     return False
-        if self.collide_point(*touch.pos) and self.selectable:
+        if self.selectable and self.collide_point(*touch.pos):
             if _Debug:
                 print('BaseSelectableRecord.on_touch_down  after collide_point', self.index)
             return self.parent.select_with_touch(self.index, touch)
@@ -68,8 +66,8 @@ class SelectableRecycleView(RecycleView):
             print('SelectableRecycleView.clear_selection', self.selected_item, self.selected_item.selected if self.selected_item else None)
         if self.selected_item:
             self.selected_item.selected = False
-            self.selected_item = None
+        self.selected_item = None
 
-    # def on_selection_applied(self, item, index, is_selected, prev_selected):
-    #     if _Debug:
-    #         print('SelectableRecycleView.on_selection_applied', item, index, is_selected, prev_selected, item.selected)
+    def on_selection_applied(self, item, index, is_selected, prev_selected):
+        if _Debug:
+            print('SelectableRecycleView.on_selection_applied', item, index, is_selected, prev_selected, item.selected)

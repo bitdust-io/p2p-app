@@ -3,7 +3,7 @@
     height: app.friend_record_height
     padding: 0
     spacing: 1
-
+    selectable: True
     global_id: 'global_id'
 	username: 'username'
 	idhost: 'idhost'
@@ -31,6 +31,7 @@
     viewclass: 'FriendRecord'
 
     SelectableRecycleBoxLayout:
+        id: selectable_layout
         default_size: None, app.friend_record_height
         default_size_hint: 1, None
         size_hint_y: None
