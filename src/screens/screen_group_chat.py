@@ -17,6 +17,7 @@ class GroupChatScreen(screen.AppScreen):
     def __init__(self, **kwargs):
         self.global_id = ''
         self.label = ''
+        self.automat_index = None
         super(GroupChatScreen, self).__init__(**kwargs)
 
     def init_kwargs(self, **kw):
@@ -24,6 +25,8 @@ class GroupChatScreen(screen.AppScreen):
             self.global_id = kw.pop('global_id', '')
         if not self.label and kw.get('label'):
             self.label = kw.pop('label', '')
+        if not self.automat_index and kw.get('automat_index'):
+            self.automat_index = kw.pop('automat_index', None)
         return kw
 
     def get_icon(self):

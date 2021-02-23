@@ -166,6 +166,7 @@ class BitDustApp(styles.AppStyle, MDApp):
 #:import make_icon components.webfont.make_icon
 #:import DynamicHeightTextInput components.text_input.DynamicHeightTextInput
 #:import RaisedIconButton components.buttons.RaisedIconButton
+#:import AutomatStatusPanel components.status_panel.AutomatStatusPanel
         """)
 
         Builder.load_file('./components/layouts.kv')
@@ -173,6 +174,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         Builder.load_file('./components/buttons.kv')
         Builder.load_file('./components/text_input.kv')
         Builder.load_file('./components/list_view.kv')
+        Builder.load_file('./components/status_panel.kv')
         Builder.load_file('./components/main_win.kv')
 
         from components import main_win

@@ -14,12 +14,23 @@ _Debug = False
 class PrivateChatScreen(screen.AppScreen):
 
     def __init__(self, **kwargs):
-        self.global_id = kwargs.pop('global_id', '')
+        self.global_id = ''
+        self.recipient_id = ''
+        self.username = ''
+        self.automat_index = None
+        super(PrivateChatScreen, self).__init__(**kwargs)
+
+    def init_kwargs(self, **kw):
+        if not self.global_id and kw.get('global_id'):
+            self.global_id = kw.pop('global_id', '')
         self.recipient_id = self.global_id
         if not self.recipient_id.count('$'):
             self.recipient_id = 'master${}'.format(self.recipient_id)
-        self.username = kwargs.pop('username', '')
-        super(PrivateChatScreen, self).__init__(**kwargs)
+        if not self.username and kw.get('username'):
+            self.username = kw.pop('username', '')
+        if not self.automat_index and kw.get('automat_index'):
+            self.automat_index = kw.pop('automat_index', None)
+        return kw
 
     def get_icon(self):
         return 'comment'
@@ -28,14 +39,16 @@ class PrivateChatScreen(screen.AppScreen):
         return self.username
 
     def get_dropdown_menu_items(self):
-        return []  # [{"icon": "git", 'text': 'abcd', }, {"icon": "git", 'text': 'xyz', }, ] 
+        return []
 
     def on_enter(self, *args):
         self.ids.chat_status_label.text = ''
+        self.ids.state_panel.init(self.automat_index)
         self.control().add_callback('on_private_message_received', self.on_private_message_received)
         self.populate()
 
     def on_leave(self, *args):
+        self.ids.state_panel.shutdown()
         self.control().remove_callback('on_private_message_received', self.on_private_message_received)
 
     def populate(self, **kwargs):

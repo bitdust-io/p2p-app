@@ -20,25 +20,6 @@ class ConversationRecord(list_view.SelectableHorizontalRecord):
             return styles.app.color_circle_offline
         return styles.app.color_circle_connecting
 
-    def on_chat_button_clicked(self, *args):
-        if _Debug:
-            print('ConversationRecord.on_chat_button_clicked', self.key_id)
-        self.clear_selection()
-        if self.type in ['group_message', 'personal_message', ]:
-            screen.main_window().select_screen(
-                screen_id=self.key_id,
-                screen_type='group_chat_screen',
-                global_id=self.key_id,
-                label=self.label,
-            )
-        elif self.type in ['private_message', ]:
-            screen.main_window().select_screen(
-                screen_id='private_chat_{}'.format(self.key_id.replace('master$', '')),
-                screen_type='private_chat_screen',
-                global_id=self.key_id,
-                username=self.label,
-            )
-
     def on_join_button_clicked(self, *args):
         if _Debug:
             print('ConversationRecord.on_join_button_clicked', self.key_id, )
@@ -70,15 +51,19 @@ class ConversationsListView(list_view.SelectableRecycleView):
 
     def on_selection_applied(self, item, index, is_selected, prev_selected):
         if self.selected_item:
+            typ = self.selected_item.type
             key_id = self.selected_item.key_id
             label = self.selected_item.label
-            typ = self.selected_item.type
+            automat_index = self.selected_item.automat_index or None
+            if automat_index is not None:
+                automat_index = int(automat_index)
             if typ in ['group_message', 'personal_message', ]:
                 screen.main_window().select_screen(
                     screen_id=key_id,
                     screen_type='group_chat_screen',
                     global_id=key_id,
                     label=label,
+                    automat_index=automat_index,
                 )
             elif typ in ['private_message', ]:
                 screen.main_window().select_screen(
@@ -86,6 +71,7 @@ class ConversationsListView(list_view.SelectableRecycleView):
                     screen_type='private_chat_screen',
                     global_id=key_id,
                     username=label,
+                    automat_index=automat_index,
                 )
         self.clear_selection()
         self.ids.selectable_layout.clear_selection()
@@ -114,6 +100,8 @@ class ConversationsScreen(screen.AppScreen):
         self.clear_selected_item()
 
     def on_message_conversations_list_result(self, resp):
+        if _Debug:
+            print('ConversationsScreen.on_message_conversations_list_result  %s...' % str(resp)[:100])
         self.ids.status_label.from_api_response(resp)
         if not websock.is_ok(resp):
             self.clear_selected_item()
@@ -121,7 +109,7 @@ class ConversationsScreen(screen.AppScreen):
             return
         conversations_list = websock.response_result(resp)
         for one_conversation in conversations_list:
-            one_conversation.pop('index', None)
+            one_conversation['automat_index'] = str(one_conversation.pop('index', ''))
             item_found = False
             for i in range(len(self.ids.conversations_list_view.data)):
                 item = self.ids.conversations_list_view.data[i]
