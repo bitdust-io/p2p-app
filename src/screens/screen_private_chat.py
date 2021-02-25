@@ -21,14 +21,14 @@ class PrivateChatScreen(screen.AppScreen):
         super(PrivateChatScreen, self).__init__(**kwargs)
 
     def init_kwargs(self, **kw):
-        if not self.global_id and kw.get('global_id'):
+        if 'global_id' in kw:
             self.global_id = kw.pop('global_id', '')
         self.recipient_id = self.global_id
         if not self.recipient_id.count('$'):
             self.recipient_id = 'master${}'.format(self.recipient_id)
-        if not self.username and kw.get('username'):
+        if 'username' in kw:
             self.username = kw.pop('username', '')
-        if not self.automat_index and kw.get('automat_index'):
+        if 'automat_index' in kw:
             self.automat_index = kw.pop('automat_index', None)
         return kw
 
@@ -42,13 +42,13 @@ class PrivateChatScreen(screen.AppScreen):
         return []
 
     def on_enter(self, *args):
-        self.ids.chat_status_label.text = ''
-        self.ids.state_panel.init(self.automat_index)
+        # self.ids.chat_status_label.text = ''
+        self.ids.state_panel.attach(self.automat_index)
         self.control().add_callback('on_private_message_received', self.on_private_message_received)
         self.populate()
 
     def on_leave(self, *args):
-        self.ids.state_panel.shutdown()
+        self.ids.state_panel.release()
         self.control().remove_callback('on_private_message_received', self.on_private_message_received)
 
     def populate(self, **kwargs):
@@ -59,10 +59,10 @@ class PrivateChatScreen(screen.AppScreen):
         )
 
     def on_message_history_result(self, resp):
-        self.ids.chat_status_label.from_api_response(resp)
+#         self.ids.chat_status_label.from_api_response(resp)
         if not websock.is_ok(resp):
             return
-        self.ids.chat_status_label.text = ''
+#         self.ids.chat_status_label.text = ''
         self.ids.chat_messages.clear_widgets()
         current_direction = None
         current_sender = None
@@ -119,7 +119,7 @@ class PrivateChatScreen(screen.AppScreen):
             data={'message': msg, },
             cb=self.on_message_sent,
         )
-        self.ids.chat_status_label.text = ''
+#         self.ids.chat_status_label.text = ''
         self.ids.chat_input.text = ''
         self.ids.chat_input.refresh_height()
 
@@ -127,7 +127,7 @@ class PrivateChatScreen(screen.AppScreen):
         if _Debug:
             print('on_message_sent', resp)
         if not websock.is_ok(resp):
-            self.ids.chat_status_label.text = '[color=#f00]%s[/color]' % websock.response_err(resp)
+#             self.ids.chat_status_label.text = '[color=#f00]%s[/color]' % websock.response_err(resp)
             return
         self.populate()
 

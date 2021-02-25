@@ -56,6 +56,8 @@ class Controller(object):
     def __init__(self, app):
         self.app = app
         self.callbacks = {}
+        self.state_changed_callbacks = {}
+        self.state_changed_callbacks_by_id = {}
 
     def mw(self):
         return self.app.main_window
@@ -132,6 +134,44 @@ class Controller(object):
 
     #------------------------------------------------------------------------------
 
+    def add_state_changed_callback(self, automat_index, cb, cb_id=None):
+        if automat_index not in self.state_changed_callbacks:
+            self.state_changed_callbacks[automat_index] = []
+        self.state_changed_callbacks[automat_index].append((cb, cb_id, ))
+
+    def remove_state_changed_callback(self, automat_index, cb=None, cb_id=None):
+        if automat_index not in self.state_changed_callbacks:
+            return False
+        for pos in range(len(self.state_changed_callbacks[automat_index])):
+            cur_cb, cur_cb_id = self.state_changed_callbacks[automat_index][pos]
+            if cb is not None and cur_cb == cb:
+                self.state_changed_callbacks[automat_index].pop(pos)
+                return True
+            if cb_id is not None and cur_cb_id == cb_id:
+                self.state_changed_callbacks[automat_index].pop(pos)
+                return True
+        return False
+
+    def add_state_changed_callback_by_id(self, automat_id, cb, cb_id=None):
+        if automat_id not in self.state_changed_callbacks_by_id:
+            self.state_changed_callbacks_by_id[automat_id] = []
+        self.state_changed_callbacks_by_id[automat_id].append((cb, cb_id, ))
+
+    def remove_state_changed_callback_by_id(self, automat_id, cb=None, cb_id=None):
+        if automat_id not in self.state_changed_callbacks_by_id:
+            return False
+        for pos in range(len(self.state_changed_callbacks_by_id[automat_id])):
+            cur_cb, cur_cb_id = self.state_changed_callbacks_by_id[automat_id][pos]
+            if cb is not None and cur_cb == cb:
+                self.state_changed_callbacks_by_id[automat_id].pop(pos)
+                return True
+            if cb_id is not None and cur_cb_id == cb_id:
+                self.state_changed_callbacks_by_id[automat_id].pop(pos)
+                return True
+        return False
+
+    #------------------------------------------------------------------------------
+
     def on_process_health_result(self, resp):
         if not isinstance(resp, dict):
             if _Debug:
@@ -202,6 +242,14 @@ class Controller(object):
                     service_name=event_data.get('name', ''),
                 )
         elif event_id == 'state-changed':
+            automat_index = event_data.get('index')
+            automat_id = event_data.get('id')
+            if automat_index is not None and automat_index in self.state_changed_callbacks:
+                for cb_info in self.state_changed_callbacks[automat_index]:
+                    cb_info[0](event_data)
+            if automat_id is not None and automat_id in self.state_changed_callbacks_by_id:
+                for cb_info in self.state_changed_callbacks_by_id[automat_id]:
+                    cb_info[0](event_data)
             if event_data.get('name', '') in ['GroupMember', 'OnlineStatus', ]:
                 if self.mw().is_screen_active('conversations_screen'):
                     self.mw().get_active_screen('conversations_screen').on_state_changed(event_data)

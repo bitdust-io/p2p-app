@@ -20,11 +20,14 @@ class FriendsListView(list_view.SelectableRecycleView):
         if self.selected_item:
             global_id = self.selected_item.global_id
             username = self.selected_item.username
+            automat_index = self.selected_item.automat_index or None
+            automat_index = int(automat_index) if automat_index not in ['None', None, '', ] else None
             screen.main_window().select_screen(
                 screen_id='private_chat_{}'.format(global_id),
                 screen_type='private_chat_screen',
                 global_id=global_id,
                 username=username,
+                automat_index=automat_index,
             )
         self.clear_selection()
         self.ids.selectable_layout.clear_selection()
@@ -60,6 +63,7 @@ class FriendsScreen(screen.AppScreen):
             return
         friends_list = websock.response_result(resp)
         for one_friend in friends_list:
+            one_friend['automat_index'] = str(one_friend.pop('index', ''))
             item_found = False
             for i in range(len(self.ids.friends_list_view.data)):
                 item = self.ids.friends_list_view.data[i]
@@ -100,9 +104,9 @@ class FriendsScreen(screen.AppScreen):
             if item['idurl'] == idurl:
                 item_found = True
                 prev_state = self.ids.friends_list_view.data[i]['contact_state']
-                if old_state != prev_state:
-                    if _Debug:
-                        print('FriendsScreen.on_friend_state_changed WARNING prev_state was %r, but expected %r' % (prev_state, old_state, ))
+                # if old_state != prev_state:
+                #     if _Debug:
+                #         print('FriendsScreen.on_friend_state_changed WARNING prev_state was %r, but expected %r' % (prev_state, old_state, ))
                 self.ids.friends_list_view.data[i]['contact_state'] = new_state
                 if _Debug:
                     print('FriendsScreen.on_friend_state_changed %r updated : %r -> %r' % (idurl, prev_state, new_state, ))

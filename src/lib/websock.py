@@ -19,7 +19,7 @@ from lib import websocket
 #------------------------------------------------------------------------------
 
 _Debug = False
-_DebugAPIResponses = True
+_DebugAPIResponses = False
 
 #------------------------------------------------------------------------------
 
@@ -391,7 +391,7 @@ def message(response):
 
 
 def result(response):
-    return response_result(response)
+    return response_result(response) or {}
 
 
 def red_err(response):

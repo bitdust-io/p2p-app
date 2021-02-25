@@ -1,22 +1,46 @@
 <AutomatStatusPanel>:
     orientation: "vertical"
-    size_hint: 1, None
-    height: dp(60)
+    size_hint_y: None
+    height: self.minimum_height
     padding: "8dp"
     elevation: 0
+    md_bg_color: self.theme_cls.bg_normal
 
-    HLayout:
-        size_hint: 1, None
-        height: dp(30)
+    HorizontalMinimumHeightLayout:
 
-        MDLabel:
+        SingleLineLabel:
             id: label_name
 
-        MDLabel:
+        SingleLineLabel:
             id: label_state
 
     MDSeparator:
         height: "1dp"
 
-    MDLabel:
+    SingleLineLabel:
+        id: label_status
+
+
+
+<AutomatShortStatusPanel>:
+    orientation: "vertical"
+    size_hint_y: None
+    height: self.minimum_height
+    padding: "8dp"
+    elevation: 0
+    md_bg_color: self.theme_cls.bg_normal
+
+    SingleLineLabel:
+        id: label_status
+
+
+<AutomatShortStatusPanelByIndex>:
+    orientation: "vertical"
+    size_hint_y: None
+    height: self.minimum_height
+    padding: "8dp"
+    elevation: 0
+    md_bg_color: self.theme_cls.bg_normal
+
+    SingleLineLabel:
         id: label_status

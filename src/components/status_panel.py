@@ -1,17 +1,13 @@
-from kivy.metrics import dp
-from kivy.clock import Clock
-from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
+from kivy.properties import DictProperty  # @UnresolvedImport
 
 from kivymd.uix.card import MDCard
-from kivymd.uix.label import MDLabel
  
 #------------------------------------------------------------------------------
 
 from lib import api_client
 from lib import websock
 
-from components import labels
-from components import layouts
+from components import screen
 
 #------------------------------------------------------------------------------
 
@@ -19,48 +15,169 @@ _Debug = True
 
 #------------------------------------------------------------------------------
 
-class AutomatStatusPanel(MDCard):
+class AutomatPanel(object):
 
-    automat_index = None
+    statuses = DictProperty({})
 
-#     def __init__(self, **kwargs):
-#         super().__init__(**kwargs)
-
-#     def build(self):
-#         self.label_name = labels.NormalLabel()
-#         self.label_state = labels.NormalLabel()
-#         self.label_status = labels.NormalLabel()
-#         hl = layouts.HorizontalLayout()
-#         self.add_widget(hl)
-#         self.add_widget(self.label_status)
-#         hl.add_widget(self.label_name)
-#         hl.add_widget(self.label_state)
-
-    def state_to_label(self):
-        return 'something here'
-
-    def init(self, automat_index):
-        if _Debug:
-            print('AutomatStatusPanel.init', automat_index)
-        self.automat_index = automat_index
-        if self.automat_index is not None:
-            api_client.automat_events_start(index=int(self.automat_index), cb=self.on_automat_events_start_result)
-
-    def shutdown(self):
-        if _Debug:
-            print('AutomatStatusPanel.shutdown', self.automat_index)
-        if self.automat_index is not None:
-            api_client.automat_events_stop(index=int(self.automat_index))
+    def update_fields(self, **kwargs):
+        raise NotImplementedError()
 
     def on_automat_events_start_result(self, resp):
         if _Debug:
-            print('AutomatStatusPanel.on_automat_events_start_result', resp)
+            print('AutomatPanel.on_automat_events_start_result', resp)
         if not websock.is_ok(resp):
+            self.update_fields(error=websock.red_err(resp))
+            return
+        self.update_fields(response=resp)
+
+    def on_automat_state_changed(self, event_data):
+        if _Debug:
+            print('AutomatPanel.on_automat_state_changed', event_data)
+        self.update_fields(state=event_data['newstate'])
+
+
+class AutomatPanelByIndex(AutomatPanel):
+
+    automat_index = None
+
+    def attach(self, automat_index):
+        if self.automat_index is not None:
+            if _Debug:
+                print('AutomatPanelByIndex.attach SKIP, already attached with automat_index=%r' % self.automat_index)
+            return
+        if _Debug:
+            print('AutomatPanelByIndex.attach with automat_index:', automat_index)
+        self.automat_index = automat_index
+        if self.automat_index is None:
+            self.update_fields(state=None)
+            return
+        self.automat_index = int(self.automat_index)
+        screen.control().add_state_changed_callback(self.automat_index, self.on_automat_state_changed)
+        api_client.automat_events_start(
+            index=int(self.automat_index),
+            cb=self.on_automat_events_start_result,
+        )
+
+    def release(self):
+        if self.automat_index is None:
+            if _Debug:
+                print('AutomatPanelByIndex.release SKIP, already released')
+            return
+        if _Debug:
+            print('AutomatPanelByIndex.release automat_index was:', self.automat_index)
+        _i = self.automat_index
+        self.automat_index = None
+        if _i is None:
+            self.update_fields(error='unexpected error, automat index was not set')
+            return
+        screen.control().remove_state_changed_callback(_i, self.on_automat_state_changed)
+        api_client.automat_events_stop(index=_i)
+        self.update_fields(state=None)
+
+    def on_automat_state_changed(self, event_data):
+        AutomatPanel.on_automat_state_changed(self, event_data)
+        if event_data['newstate'] in ['CLOSED', ]:
+            if _Debug:
+                print('AutomatPanelByIndex.on_automat_state_changed   will call release() now, newstate=%r' % event_data['newstate'])
+            self.release()
+
+
+class AutomatPanelByID(AutomatPanel):
+
+    automat_id = None
+
+    def attach(self, automat_id):
+        if self.automat_id is not None:
+            if _Debug:
+                print('AutomatPanelByID.attach SKIP, already attached with automat_id=%r' % self.automat_id)
+            return
+        if _Debug:
+            print('AutomatPanelByID.attach with automat_id:', automat_id)
+        self.automat_id = automat_id
+        if self.automat_id is None:
+            self.update_fields(state=None)
+            return
+        screen.control().add_state_changed_callback_by_id(self.automat_id, self.on_automat_state_changed)
+        api_client.automat_events_start(
+            automat_id=self.automat_id,
+            cb=self.on_automat_events_start_result,
+        )
+
+    def release(self):
+        if self.automat_id is None:
+            if _Debug:
+                print('AutomatPanelByID.release SKIP, already released')
+            return
+        if _Debug:
+            print('AutomatPanelByID.release automat_id was:', self.automat_id)
+        _id = self.automat_id
+        self.automat_id = None
+        if _id is None:
+            self.update_fields(error='unexpected error, automat id was not set')
+            return
+        screen.control().remove_state_changed_callback_by_id(_id, self.on_automat_state_changed)
+        api_client.automat_events_stop(automat_id=_id)
+        self.update_fields(state=None)
+
+#------------------------------------------------------------------------------
+
+class AutomatStatusPanel(AutomatPanelByID, MDCard):
+
+    def update_fields(self, **kwargs):
+        if _Debug:
+            print('AutomatStatusPanel.update_fields', kwargs)
+        if 'error' in kwargs:
             self.ids.label_name.text = ''
             self.ids.label_state.text = ''
-            self.ids.label_status.text = websock.red_err(resp)
+            self.ids.label_status.text = kwargs['error']
             return
-        r = websock.result(resp)
-        self.ids.label_name.text = '#{} {} {}'.format(self.automat_index, r['name'], r['id'])
-        self.ids.label_state.text = r['state']
-        self.ids.label_status.text = self.state_to_label()
+        if 'response' in kwargs:
+            r = websock.result(kwargs['response'])
+            self.ids.label_name.text = '#{} {}'.format(r['index'], r['id'])
+            self.ids.label_state.text = r['state']
+            self.ids.label_status.text = self.statuses.get(r['state'], 'status unknown')
+            return
+        if 'state' in kwargs:
+            # self.ids.label_name.text = ''
+            self.ids.label_state.text = kwargs['state']
+            self.ids.label_status.text = self.statuses.get(kwargs['state'], 'current status is unknown')
+            return
+        self.ids.label_name.text = kwargs.get('name', '')
+        self.ids.label_state.text = kwargs.get('state', '')
+        self.ids.label_status.text = kwargs.get('status', '')
+
+
+class AutomatShortStatusPanel(AutomatPanelByID, MDCard):
+
+    def update_fields(self, **kwargs):
+        if _Debug:
+            print('AutomatShortStatusPanel.update_fields', kwargs)
+        if 'error' in kwargs:
+            self.ids.label_status.text = kwargs['error']
+            return
+        if 'response' in kwargs:
+            r = websock.result(kwargs['response'])
+            self.ids.label_status.text = self.statuses.get(r['state'], 'current status is unknown')
+            return
+        if 'state' in kwargs:
+            self.ids.label_status.text = self.statuses.get(kwargs['state'], 'current status is unknown')
+            return
+        self.ids.label_status.text = kwargs.get('status', '')
+
+
+class AutomatShortStatusPanelByIndex(AutomatPanelByIndex, MDCard):
+
+    def update_fields(self, **kwargs):
+        if _Debug:
+            print('AutomatShortStatusPanel.update_fields', kwargs)
+        if 'error' in kwargs:
+            self.ids.label_status.text = kwargs['error']
+            return
+        if 'response' in kwargs:
+            r = websock.result(kwargs['response'])
+            self.ids.label_status.text = self.statuses.get(r['state'], 'current status is unknown')
+            return
+        if 'state' in kwargs:
+            self.ids.label_status.text = self.statuses.get(kwargs['state'], 'current status is unknown')
+            return
+        self.ids.label_status.text = kwargs.get('status', '')

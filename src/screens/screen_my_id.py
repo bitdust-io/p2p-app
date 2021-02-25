@@ -101,8 +101,18 @@ class MyIDScreen(screen.AppScreen):
         elif item_inst.text == 'reconnect':
             api_client.network_reconnect()
         elif item_inst.text == 'restart engine':
-            api_client.process_stop(cb=self.on_process_stop_result_start_engine)
-        
+            self.app().restart_engine()
+            Snackbar(
+                text='BitDust node is restarting',
+                bg_color=self.theme_cls.accent_color,
+                duration=5,
+                snackbar_x="10dp",
+                snackbar_y="10dp",
+                size_hint_x=(
+                    Window.width - (dp(10) * 2)
+                ) / Window.width
+            ).open()
+            # api_client.process_stop(cb=self.on_process_stop_result_start_engine)
 
     def on_identity_backup_result(self, resp, destination_filepath):
         if not websock.is_ok(resp):

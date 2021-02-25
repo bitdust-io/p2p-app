@@ -44,6 +44,7 @@ if _Debug:
 from kivy.config import Config
 
 from lib import system
+from lib import api_client
 
 #------------------------------------------------------------------------------
 
@@ -167,6 +168,8 @@ class BitDustApp(styles.AppStyle, MDApp):
 #:import DynamicHeightTextInput components.text_input.DynamicHeightTextInput
 #:import RaisedIconButton components.buttons.RaisedIconButton
 #:import AutomatStatusPanel components.status_panel.AutomatStatusPanel
+#:import AutomatShortStatusPanel components.status_panel.AutomatShortStatusPanel
+#:import AutomatShortStatusPanelByIndex components.status_panel.AutomatShortStatusPanelByIndex
         """)
 
         Builder.load_file('./components/layouts.kv')
@@ -209,11 +212,22 @@ class BitDustApp(styles.AppStyle, MDApp):
         return True
 
     def start_engine(self):
+        if _Debug:
+            print('BitDustApp.start_engine')
         if system.is_android():
             self.start_android_service()
         else:
             self.check_restart_bitdust_process()
         return True
+
+    def restart_engine(self):
+        if _Debug:
+            print('BitDustApp.restart_engine')
+        if system.is_android():
+            self.stop_android_service()
+            Clock.schedule_once(lambda x: self.start_android_service(), .5)
+        else:
+            api_client.process_stop(cb=lambda resp: self.check_restart_bitdust_process())
 
     def start_android_service(self, finishing=False):
         if not system.is_android():
@@ -249,13 +263,17 @@ class BitDustApp(styles.AppStyle, MDApp):
         return self.service
 
     def check_restart_bitdust_process(self):
-        if system.is_android():
+        if not system.is_linux():
+            if _Debug:
+                print('BitDustApp.check_restart_bitdust_process NOT IMPLEMENTED')
             return None
-        if system.is_linux():
-            Clock.schedule_once(self.do_start_deploy_process)
-        # TODO: to be implemented ...
+        if _Debug:
+            print('BitDustApp.check_restart_bitdust_process')
+        Clock.schedule_once(self.do_start_deploy_process)
 
     def do_start_deploy_process(self, *args):
+        if _Debug:
+            print('BitDustApp.do_start_deploy_process finishing=%r' % self.finishing.is_set())
         if self.finishing.is_set():
             return
         system.BackgroundProcess(
@@ -264,13 +282,11 @@ class BitDustApp(styles.AppStyle, MDApp):
             stderr_callback=self.on_deploy_process_stderr,
             finishing=self.finishing,
         ).run()
-        if _Debug:
-            print('BitDustApp.do_start_deploy_process finished')
 
     @mainthread
     def on_deploy_process_stdout(self, line):
         if _Debug:
-            print('DEPLOY:', line.decode().rstrip())
+            print('DEPLOY OUT:', line.decode().rstrip())
         if line.decode().startswith('#####'):
             if 'process_dead_screen' in self.main_window.active_screens:
                 self.main_window.active_screens['process_dead_screen'][0].ids.deploy_output_label.text += line.decode()[6:]

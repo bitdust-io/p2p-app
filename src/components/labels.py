@@ -34,6 +34,10 @@ class NormalLabel(MarkupLabel):
     pass
 
 
+class SingleLineLabel(NormalLabel):
+    pass
+
+
 class HFlexMarkupLabel(ThemableBehavior, Label):
     label_height = NumericProperty('32dp')
 

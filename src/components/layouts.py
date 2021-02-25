@@ -42,6 +42,14 @@ class VLayout(BoxLayout):
     pass
 
 
+class HorizontalMinimumHeightLayout(HorizontalLayout):
+    pass
+
+
+class VerticalMinimumWidthLayout(VerticalLayout):
+    pass
+
+
 class HorizontalStackLayout(StackLayout):
     pass
 
