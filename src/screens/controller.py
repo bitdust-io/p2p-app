@@ -306,9 +306,10 @@ class Controller(object):
         if _Debug:
             print('Controller.on_state_process_health', value)
         if value == -1:
-            if self.mw().selected_screen:
-                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
-                    self.mw().latest_screen = self.mw().selected_screen
+            # if self.mw().selected_screen:
+                # if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
+                #     self.mw().latest_screen = self.mw().selected_screen
+            self.mw().latest_screen = 'welcome_screen'
             self.mw().state_identity_get = 0
             self.mw().state_network_connected = 0
             self.mw().select_screen('process_dead_screen')
@@ -328,9 +329,10 @@ class Controller(object):
         if self.mw().state_process_health != 1:
             return
         if value == -1:
-            if self.mw().selected_screen:
-                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
-                    self.mw().latest_screen = self.mw().selected_screen
+            # if self.mw().selected_screen:
+                # if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
+                #     self.mw().latest_screen = self.mw().selected_screen
+            self.mw().latest_screen = 'welcome_screen'
             self.mw().state_network_connected = 0
             self.mw().select_screen('new_identity_screen')
             self.mw().close_screens(['process_dead_screen', 'connecting_screen', 'startup_screen', ])
@@ -377,17 +379,19 @@ class Controller(object):
             self.mw().close_screens(['process_dead_screen', 'connecting_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ])
             return
         if self.mw().state_process_health == 1 and self.mw().state_identity_get == 1 and self.mw().state_network_connected in [-1, 0, ]:
-            if self.mw().selected_screen:
-                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
-                    self.mw().latest_screen = self.mw().selected_screen
+            # if self.mw().selected_screen:
+            #     if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
+            #         self.mw().latest_screen = self.mw().selected_screen
+            self.mw().latest_screen = 'welcome_screen'
             if self.mw().selected_screen != 'welcome_screen':
                 self.mw().select_screen('connecting_screen')
             self.mw().close_screens(['process_dead_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ])
             return
         if self.mw().state_process_health == 1 and self.mw().state_identity_get == -1:
-            if self.mw().selected_screen:
-                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
-                    self.mw().latest_screen = self.mw().selected_screen
+            # if self.mw().selected_screen:
+            #     if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
+            #         self.mw().latest_screen = self.mw().selected_screen
+            self.mw().latest_screen = 'welcome_screen'
             self.mw().select_screen('new_identity_screen')
             self.mw().close_screens(['process_dead_screen', 'connecting_screen', 'recover_identity_screen', 'startup_screen', ])
             return

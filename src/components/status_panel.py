@@ -22,9 +22,22 @@ class AutomatPanel(object):
     def update_fields(self, **kwargs):
         raise NotImplementedError()
 
+    def start_automat_events(self, index=None, automat_id=None):
+        api_client.automat_events_start(
+            index=None if index is None else int(index),
+            automat_id=automat_id,
+            cb=self.on_automat_events_start_result,
+        )
+
+    def stop_automat_events(self, index=None, automat_id=None):
+        api_client.automat_events_stop(
+            index=None if index is None else int(index),
+            automat_id=automat_id,
+        )
+
     def on_automat_events_start_result(self, resp):
         if _Debug:
-            print('AutomatPanel.on_automat_events_start_result', resp)
+            print('AutomatPanel.on_automat_events_start_result', websock.is_ok(resp), websock.red_err(resp))
         if not websock.is_ok(resp):
             self.update_fields(error=websock.red_err(resp))
             return
@@ -53,10 +66,7 @@ class AutomatPanelByIndex(AutomatPanel):
             return
         self.automat_index = int(self.automat_index)
         screen.control().add_state_changed_callback(self.automat_index, self.on_automat_state_changed)
-        api_client.automat_events_start(
-            index=int(self.automat_index),
-            cb=self.on_automat_events_start_result,
-        )
+        self.start_automat_events(index=int(self.automat_index))
 
     def release(self):
         if self.automat_index is None:
@@ -71,7 +81,7 @@ class AutomatPanelByIndex(AutomatPanel):
             self.update_fields(error='unexpected error, automat index was not set')
             return
         screen.control().remove_state_changed_callback(_i, self.on_automat_state_changed)
-        api_client.automat_events_stop(index=_i)
+        self.stop_automat_events(index=_i)
         self.update_fields(state=None)
 
     def on_automat_state_changed(self, event_data):
@@ -98,10 +108,7 @@ class AutomatPanelByID(AutomatPanel):
             self.update_fields(state=None)
             return
         screen.control().add_state_changed_callback_by_id(self.automat_id, self.on_automat_state_changed)
-        api_client.automat_events_start(
-            automat_id=self.automat_id,
-            cb=self.on_automat_events_start_result,
-        )
+        self.start_automat_events(automat_id=self.automat_id)
 
     def release(self):
         if self.automat_id is None:
@@ -116,7 +123,7 @@ class AutomatPanelByID(AutomatPanel):
             self.update_fields(error='unexpected error, automat id was not set')
             return
         screen.control().remove_state_changed_callback_by_id(_id, self.on_automat_state_changed)
-        api_client.automat_events_stop(automat_id=_id)
+        self.stop_automat_events(automat_id=_id)
         self.update_fields(state=None)
 
 #------------------------------------------------------------------------------
@@ -125,7 +132,7 @@ class AutomatStatusPanel(AutomatPanelByID, MDCard):
 
     def update_fields(self, **kwargs):
         if _Debug:
-            print('AutomatStatusPanel.update_fields', kwargs)
+            print('AutomatStatusPanel.update_fields', 'response' in kwargs, kwargs.get('state'), kwargs.get('error'))
         if 'error' in kwargs:
             self.ids.label_name.text = ''
             self.ids.label_state.text = ''
@@ -151,7 +158,7 @@ class AutomatShortStatusPanel(AutomatPanelByID, MDCard):
 
     def update_fields(self, **kwargs):
         if _Debug:
-            print('AutomatShortStatusPanel.update_fields', kwargs)
+            print('AutomatShortStatusPanel.update_fields', 'response' in kwargs, kwargs.get('state'), kwargs.get('error'))
         if 'error' in kwargs:
             self.ids.label_status.text = kwargs['error']
             return
@@ -169,7 +176,7 @@ class AutomatShortStatusPanelByIndex(AutomatPanelByIndex, MDCard):
 
     def update_fields(self, **kwargs):
         if _Debug:
-            print('AutomatShortStatusPanel.update_fields', kwargs)
+            print('AutomatShortStatusPanelByIndex.update_fields', 'response' in kwargs, kwargs.get('state'), kwargs.get('error'))
         if 'error' in kwargs:
             self.ids.label_status.text = kwargs['error']
             return

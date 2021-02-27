@@ -239,14 +239,21 @@ class MainWin(Screen, ThemableBehavior):
             return
         screen_class_name, screen_kv_file = self.screens_map[screen_type]
         if screen_kv_file:
-            if screen_kv_file not in self.screens_loaded:
-                if system.is_android():
-                    screen_kv_file = os.path.join(os.environ['ANDROID_ARGUMENT'], screen_kv_file)
-                else:
-                    screen_kv_file = os.path.join('src', screen_kv_file)
+            if system.is_android():
+                screen_kv_file = os.path.abspath(os.path.join(os.environ['ANDROID_ARGUMENT'], screen_kv_file))
+            else:
+                screen_kv_file = os.path.abspath(os.path.join('src', screen_kv_file))
+            if screen_kv_file in self.screens_loaded:
                 if _Debug:
-                    print('MainWin.open_screen   is about to load KV file : %r' % screen_kv_file)
-                Builder.load_file(screen_kv_file)
+                    print('MainWin.open_screen   KV file already loaded: %r' % screen_kv_file)
+            else:
+                if screen_kv_file in Builder.files:
+                    if _Debug:
+                        print('MainWin.open_screen   KV file already loaded, but not marked: %r' % screen_kv_file)
+                else:
+                    if _Debug:
+                        print('MainWin.open_screen   is about to load KV file : %r' % screen_kv_file)
+                    Builder.load_file(screen_kv_file)
                 self.screens_loaded.add(screen_kv_file)
         screen_class = Factory.get(screen_class_name)
         if not screen_class:
@@ -272,7 +279,7 @@ class MainWin(Screen, ThemableBehavior):
         self.screen_closed_time.pop(screen_id, None)
         if screen_inst not in self.ids.screen_manager.children:
             if _Debug:
-                print('MainWin.close_screen   WARNING   screen instance %r was not found among screen manager children')
+                print('MainWin.close_screen   WARNING   screen instance %r was not found among screen manager children' % screen_inst)
         self.ids.screen_manager.remove_widget(screen_inst)
         # screen_inst.on_closed()
         del screen_inst
@@ -343,13 +350,13 @@ class MainWin(Screen, ThemableBehavior):
 
     def on_right_menu_button_clicked(self, *args):
         if _Debug:
-            print('MainWin.on_right_menu_button_clicked', args)
+            print('MainWin.on_right_menu_button_clicked', self.selected_screen, len(self.dropdown_menus))
         if self.selected_screen and self.selected_screen in self.dropdown_menus:
             self.dropdown_menus[self.selected_screen].open()
 
     def on_dropdown_menu_callback(self, instance_menu, instance_menu_item):
         if _Debug:
-            print('MainWin.on_dropdown_menu_callback', instance_menu, instance_menu_item.text)
+            print('MainWin.on_dropdown_menu_callback', self.selected_screen, instance_menu_item.text)
         instance_menu.dismiss()
         if self.selected_screen:
             self.active_screens[self.selected_screen][0].on_dropdown_menu_item_clicked(

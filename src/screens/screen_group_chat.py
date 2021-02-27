@@ -158,7 +158,7 @@ class GroupChatScreen(screen.AppScreen):
 
     def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
         if item_inst.text == 'activate':
-            self.ids.state_panel.release()
+            # self.ids.state_panel.release()
             api_client.group_join(
                 group_key_id=self.global_id,
                 wait_result=False,
@@ -170,6 +170,7 @@ class GroupChatScreen(screen.AppScreen):
                 erase_key=False,
                 cb=self.on_group_leave_result,
             )
+            # self.ids.state_panel.release()
         elif item_inst.text == 'reconnect':
             api_client.group_reconnect(
                 group_key_id=self.global_id,
@@ -187,6 +188,7 @@ class GroupChatScreen(screen.AppScreen):
             snackbar.error(text='failed to join the group: %s' % websock.response_err(resp))
         else:
             # snackbar.success(text='group activated')
+            self.ids.state_panel.release()
             self.ids.state_panel.attach(automat_id=websock.result(resp).get('id'))
 
     def on_group_leave_result(self, resp):
@@ -206,5 +208,7 @@ class GroupChatScreen(screen.AppScreen):
     def on_group_reconnect_result(self, resp):
         if not websock.is_ok(resp):
             snackbar.error(text='failed connect to the group: %s' % websock.response_err(resp))
-        # else:
+        else:
             # snackbar.success(text='network connection restarted')
+            self.ids.state_panel.release()
+            self.ids.state_panel.attach(automat_id=websock.result(resp).get('id'))
