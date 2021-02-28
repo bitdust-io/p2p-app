@@ -105,9 +105,6 @@ class FriendsScreen(screen.AppScreen):
             if item['idurl'] == idurl:
                 item_found = True
                 prev_state = self.ids.friends_list_view.data[i]['contact_state']
-                # if old_state != prev_state:
-                #     if _Debug:
-                #         print('FriendsScreen.on_friend_state_changed WARNING prev_state was %r, but expected %r' % (prev_state, old_state, ))
                 self.ids.friends_list_view.data[i]['contact_state'] = new_state
                 if _Debug:
                     print('FriendsScreen.on_friend_state_changed %r updated : %r -> %r' % (idurl, prev_state, new_state, ))

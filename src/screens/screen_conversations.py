@@ -94,16 +94,20 @@ class ConversationsScreen(screen.AppScreen):
         self.ids.conversations_list_view.ids.selectable_layout.clear_selection()
 
     def on_enter(self, *args):
+        self.ids.action_button.close_stack()
+        self.ids.state_panel.attach(automat_id='service_message_history')
         self.clear_selected_item()
         self.populate()
 
     def on_leave(self, *args):
+        self.ids.action_button.close_stack()
+        self.ids.state_panel.release()
         self.clear_selected_item()
 
     def on_message_conversations_list_result(self, resp):
         if _Debug:
             print('ConversationsScreen.on_message_conversations_list_result  %s...' % str(resp)[:100])
-        self.ids.status_label.from_api_response(resp)
+        # self.ids.status_label.from_api_response(resp)
         if not websock.is_ok(resp):
             self.clear_selected_item()
             self.ids.conversations_list_view.data = []
@@ -143,8 +147,14 @@ class ConversationsScreen(screen.AppScreen):
                 print('ConversationsScreen.on_message_conversations_list_result erased existing item', item['key_id'])
         self.ids.conversations_list_view.refresh_from_data()
 
-    def on_create_new_group_button_clicked(self, *args):
-        self.main_win().select_screen('create_group_screen')
+    def on_action_button_clicked(self, btn):
+        if _Debug:
+            print('ConversationsScreen.on_action_button_clicked', btn.icon)
+        self.ids.action_button.close_stack()
+        if btn.icon == 'chat-plus-outline':
+            self.main_win().select_screen('create_group_screen')
+        elif btn.icon == 'account-key-outline':
+            pass
 
     def on_state_changed(self, event_data):
         if _Debug:

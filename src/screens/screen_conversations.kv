@@ -51,6 +51,20 @@
 
         AppScreenLayout:
 
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'message history is not available at the moment',
+                    'ON': 'message history is synchronized, ready to chat',
+                    'OFF': 'message history service is not started',
+                    'NOT_INSTALLED': 'message history service was not installed',
+                    'INFLUENCE': 'verifying related network services',
+                    'DEPENDS_OFF': 'required network services are not started yet',
+                    'STARTING': 'turning on message history service',
+                    'STOPPING': 'turning off message history service',
+                    'CLOSED': 'message history service is stopped', }
+
             HorizontalContainerLayout:
 
                 StatusLabel:
@@ -58,15 +72,6 @@
                     size_hint: 1, None
                     height: self.texture_size[1]
                     text: ''
-
-                MDFloatingActionButton:
-                    id: create_new_group_button
-                    icon: 'plus'
-                    elevation: 5
-                    theme_text_color: "Custom"
-                    text_color: app.color_white99
-                    md_bg_color: app.theme_cls.accent_color
-                    on_release: root.on_create_new_group_button_clicked()
 
             VerticalScrollView:
                 id: scroll_view
@@ -79,3 +84,18 @@
                     ConversationsListView:
                         id: conversations_list_view
                         size_hint: 1, 1
+
+    CustomFloatingActionButtonSpeedDial:
+        id: action_button
+        data: {'chat-plus-outline': 'Create new group', 'account-key-outline': 'Start private chat', }
+        opening_time: 0.2
+        hint_animation: True
+        rotation_root_button: True
+        root_button_anim: True
+        label_text_color: app.color_white99
+        color_icon_stack_button: app.color_white99
+        color_icon_root_button: app.color_white99
+        bg_color_root_button: app.theme_cls.accent_color
+        bg_color_stack_button: app.theme_cls.accent_color
+        bg_hint_color: app.theme_cls.accent_light
+        callback: root.on_action_button_clicked

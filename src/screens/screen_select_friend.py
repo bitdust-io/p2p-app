@@ -17,10 +17,6 @@ _Debug = False
 class SelectFriendRecord(list_view.SelectableHorizontalRecord):
     pass
 
-#     def __init__(self, **kwargs):
-#         super(SelectFriendRecord, self).__init__(**kwargs)
-#         self.visible_buttons = []
-
 
 class SelectFriendListView(list_view.SelectableRecycleView):
 

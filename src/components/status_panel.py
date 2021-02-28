@@ -37,7 +37,7 @@ class AutomatPanel(object):
 
     def on_automat_events_start_result(self, resp):
         if _Debug:
-            print('AutomatPanel.on_automat_events_start_result', websock.is_ok(resp), websock.red_err(resp))
+            print('AutomatPanel.on_automat_events_start_result', websock.is_ok(resp))
         if not websock.is_ok(resp):
             self.update_fields(error=websock.red_err(resp))
             return
