@@ -64,6 +64,7 @@ class FriendsScreen(screen.AppScreen):
         friends_list = websock.response_result(resp)
         for one_friend in friends_list:
             one_friend['automat_index'] = str(one_friend.pop('index', ''))
+            one_friend['automat_id'] = str(one_friend.pop('id', ''))
             item_found = False
             for i in range(len(self.ids.friends_list_view.data)):
                 item = self.ids.friends_list_view.data[i]

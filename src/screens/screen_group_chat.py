@@ -50,11 +50,13 @@ class GroupChatScreen(screen.AppScreen):
         ]
 
     def on_enter(self, *args):
+        self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id=self.automat_id)
         self.control().add_callback('on_group_message_received', self.on_group_message_received)
         self.populate()
 
     def on_leave(self, *args):
+        self.ids.action_button.close_stack()
         self.ids.state_panel.release()
         self.control().remove_callback('on_group_message_received', self.on_group_message_received)
 
@@ -181,6 +183,17 @@ class GroupChatScreen(screen.AppScreen):
                 group_key_id=self.global_id,
                 erase_key=True,
                 cb=self.on_group_close_result,
+            )
+
+    def on_action_button_clicked(self, btn):
+        if _Debug:
+            print('GroupChatScreen.on_action_button_clicked', btn.icon)
+        self.ids.action_button.close_stack()
+        if btn.icon == 'account-plus':
+            self.main_win().select_screen(
+                screen_id='select_friend_screen',
+                result_callback=self.on_user_selected,
+                screen_header='Invite user to the group'
             )
 
     def on_group_join_result(self, resp):

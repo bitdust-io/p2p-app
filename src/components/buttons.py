@@ -10,6 +10,7 @@ from kivy.properties import (
 )
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.animation import Animation
 
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.button import (
@@ -19,6 +20,9 @@ from kivymd.uix.button import (
     MDFloatingActionButton,
     MDFlatButton,
     MDFloatingActionButtonSpeedDial,
+    MDFloatingLabel,
+    MDFloatingBottomButton,
+    MDFloatingRootButton,
 )
 from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
 from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
@@ -173,49 +177,38 @@ class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, 
         self.height = self.button_height
 
 
-from kivymd.uix.button import MDFloatingLabel, MDFloatingBottomButton, MDFloatingRootButton
-from kivy.animation import Animation
-
-
 class CustomFloatingActionButtonSpeedDial(MDFloatingActionButtonSpeedDial):
-#     pass
+    
+    top_offset = dp(180)
 
     def set_pos_root_button(self, instance):
         if self.anchor == "right":
-            instance.y = Window.height - dp(180)
+            instance.y = Window.height - self.top_offset
             instance.x = Window.width - (dp(56) + dp(20))
-        print('set_pos_root_button', instance, instance.icon, instance.x, instance.y, instance.width, instance.height, )
 
-#     def set_pos_bottom_buttons(self, instance):
-#         print(instance.height)
-#         if self.anchor == "right":
-#             # if self.state != "open":
-#             instance.y = Window.height - dp(180) - instance.height / 2
-#             instance.x = Window.width - (instance.height + instance.width / 2)
-#         print('set_pos_bottom_buttons', instance, instance.icon, instance.x, instance.y, instance.width, instance.height, )
+    def set_pos_labels(self, widget):
+        if self.anchor == "right":
+            widget.x = Window.width - widget.width - dp(86)
 
     def set_pos_bottom_buttons(self, instance):
         if self.anchor == "right":
             if self.state != "open":
-                instance.y = instance.height / 2
+                instance.y = Window.height - self.top_offset
             instance.x = Window.width - (instance.height + instance.width / 2)
-        print('set_pos_bottom_buttons', instance, instance.icon, instance.x, instance.y, instance.width, instance.height, )
 
     def open_stack(self, instance):
         for widget in self.children:
             if isinstance(widget, MDFloatingLabel):
                 Animation.cancel_all(widget)
         if self.state != "open":
-            y = Window.height - dp(180) - dp(56)
-            label_position = Window.height - dp(180) - dp(56) - dp(56)
+            y = Window.height - self.top_offset
+            label_position = Window.height - self.top_offset + dp(10)
             anim_buttons_data = {}
             anim_labels_data = {}
-
             for widget in self.children:
                 if isinstance(widget, MDFloatingBottomButton):
-                    # Sets new button positions.
                     y -= dp(56)
-                    widget.y = widget.y * 2 + y
+                    widget.y = y
                     if not self._anim_buttons_data:
                         anim_buttons_data[widget] = Animation(
                             opacity=1,
@@ -223,11 +216,9 @@ class CustomFloatingActionButtonSpeedDial(MDFloatingActionButtonSpeedDial):
                             t=self.opening_transition,
                         )
                 elif isinstance(widget, MDFloatingLabel):
-                    # Sets new labels positions.
                     label_position -= dp(56)
-                    # Sets the position of signatures only once.
                     if not self._label_pos_y_set:
-                        widget.y = widget.y * 2 + label_position
+                        widget.y = label_position
                         widget.x = Window.width - widget.width - dp(86)
                     if not self._anim_labels_data:
                         anim_labels_data[widget] = Animation(
@@ -237,7 +228,6 @@ class CustomFloatingActionButtonSpeedDial(MDFloatingActionButtonSpeedDial):
                     isinstance(widget, MDFloatingRootButton)
                     and self.root_button_anim
                 ):
-                    # Rotates the root button 45 degrees.
                     Animation(
                         _angle=-45,
                         d=self.opening_time_button_rotation,
@@ -248,7 +238,6 @@ class CustomFloatingActionButtonSpeedDial(MDFloatingActionButtonSpeedDial):
                 self._anim_buttons_data = anim_buttons_data
             if anim_labels_data and not self.hint_animation:
                 self._anim_labels_data = anim_labels_data
-
             self.state = "open"
             self.dispatch("on_open")
             self.do_animation_open_stack(self._anim_buttons_data)
@@ -258,3 +247,27 @@ class CustomFloatingActionButtonSpeedDial(MDFloatingActionButtonSpeedDial):
         else:
             self.close_stack()
 
+    def close_stack(self):
+        for widget in self.children:
+            if isinstance(widget, MDFloatingBottomButton):
+                Animation(
+                    y=Window.height - self.top_offset,
+                    d=self.closing_time,
+                    t=self.closing_transition,
+                    opacity=0,
+                ).start(widget)
+                widget._canvas_width = 0
+                widget._padding_right = 0
+            elif isinstance(widget, MDFloatingLabel):
+                Animation(opacity=0, d=0.1).start(widget)
+            elif (
+                isinstance(widget, MDFloatingRootButton)
+                and self.root_button_anim
+            ):
+                Animation(
+                    _angle=0,
+                    d=self.closing_time_button_rotation,
+                    t=self.closing_transition_button_rotation,
+                ).start(widget)
+        self.state = "close"
+        self.dispatch("on_close")
