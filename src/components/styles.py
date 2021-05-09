@@ -56,6 +56,8 @@ class AppStyle(object):
     color_circle_offline = (btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, 1)
     color_circle_online = (btn_clr_rgb_mid, btn_clr_rgb_top+.1, btn_clr_rgb_mid, 1)
 
+    color_root_button =  (btn_clr_rgb_low+.1,btn_clr_rgb_mid+.1,btn_clr_rgb_top+.1,1)
+
     color_btn_text_light = (1,1,1,1)
     color_btn_text_dark = (btn_clr_rgb_low+.1,btn_clr_rgb_top-.1,btn_clr_rgb_top+.1,1)
     color_btn_normal = (btn_clr_rgb_low,btn_clr_rgb_mid,btn_clr_rgb_top,1)

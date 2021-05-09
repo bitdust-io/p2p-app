@@ -24,3 +24,9 @@
 
             VEmptySpace:
                 size_hint_y: 0.5
+
+    RootActionButton:
+        id: action_button
+        data: {'chat-plus-outline': 'Create new group', 'account-key-outline': 'Start private chat', }
+        buttons_colors: {'chat-plus-outline': root.theme_cls.error_color, }
+        callback: root.on_action_button_clicked

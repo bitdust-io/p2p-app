@@ -167,6 +167,7 @@ class BitDustApp(styles.AppStyle, MDApp):
 #:import make_icon components.webfont.make_icon
 #:import DynamicHeightTextInput components.text_input.DynamicHeightTextInput
 #:import RaisedIconButton components.buttons.RaisedIconButton
+#:import RootActionButton components.buttons.RootActionButton
 #:import AutomatStatusPanel components.status_panel.AutomatStatusPanel
 #:import AutomatShortStatusPanel components.status_panel.AutomatShortStatusPanel
 #:import AutomatShortStatusPanelByIndex components.status_panel.AutomatShortStatusPanelByIndex

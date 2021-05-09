@@ -79,6 +79,8 @@
     CustomFloatingActionButtonSpeedDial:
         id: action_button
         data: {'account-search-outline': 'Search people', }
+        callback: root.on_action_button_clicked
+
         opening_time: 0.2
         hint_animation: True
         rotation_root_button: True
@@ -89,4 +91,4 @@
         bg_color_root_button: app.theme_cls.accent_color
         bg_color_stack_button: app.theme_cls.accent_color
         bg_hint_color: app.theme_cls.accent_light
-        callback: root.on_action_button_clicked
+

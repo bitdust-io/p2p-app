@@ -7,6 +7,7 @@ from kivy.properties import (
     BoundedNumericProperty,  # @UnresolvedImport
     ColorProperty,  # @UnresolvedImport
     ListProperty,  # @UnresolvedImport
+    DictProperty,  # @UnresolvedImport
 )
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
@@ -31,8 +32,8 @@ from kivymd.uix.behaviors.backgroundcolor_behavior import SpecificBackgroundColo
 #------------------------------------------------------------------------------
 
 from components import styles
-from components import layouts  
-from components import labels 
+from components import layouts
+from components import labels
 
 #------------------------------------------------------------------------------
 
@@ -177,24 +178,54 @@ class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, 
         self.height = self.button_height
 
 
-class CustomFloatingActionButtonSpeedDial(MDFloatingActionButtonSpeedDial):
-    
-    top_offset = dp(180)
+class RootActionButton(MDFloatingActionButtonSpeedDial):
+
+    top_offset = dp(80)
+    buttons_colors = DictProperty()
+
+    def on_data(self, instance, value):
+        ret = super().on_data(instance, value)
+        self.config_style()
+        return ret
+
+    def on_buttons_colors(self, instance, value):
+        for widget in self.children:
+            if isinstance(widget, MDFloatingBottomButton):
+                if widget.icon in value:
+                    widget.md_bg_color = value[widget.icon]
+                    widget._bg_color = value[widget.icon][0:3] + [.6]
+            if isinstance(widget, MDFloatingLabel):
+                widget.bg_color = styles.app.color_transparent
+
+    def config_style(self):
+        self.opening_time = 0.2
+        self.hint_animation = True
+        self.rotation_root_button = True
+        self.root_button_anim = True
+        self.label_text_color = styles.app.color_white99
+        self.color_icon_stack_button = styles.app.color_white99
+        self.color_icon_root_button = styles.app.color_white99
+        self.bg_color_root_button = self.theme_cls.primary_dark
+        self.bg_color_stack_button = self.theme_cls.accent_color
+        self.bg_hint_color = self.theme_cls.accent_light
 
     def set_pos_root_button(self, instance):
         if self.anchor == "right":
             instance.y = Window.height - self.top_offset
             instance.x = Window.width - (dp(56) + dp(20))
+        instance.elevation = 0
 
     def set_pos_labels(self, widget):
         if self.anchor == "right":
             widget.x = Window.width - widget.width - dp(86)
+        widget.elevation = 0
 
     def set_pos_bottom_buttons(self, instance):
         if self.anchor == "right":
             if self.state != "open":
                 instance.y = Window.height - self.top_offset
             instance.x = Window.width - (instance.height + instance.width / 2)
+        instance.elevation = 0
 
     def open_stack(self, instance):
         for widget in self.children:
