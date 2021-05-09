@@ -37,3 +37,6 @@ class WelcomeScreen(screen.AppScreen):
             self.main_win().select_screen('')
         elif btn.icon == '':
             pass
+
+    def on_nav_button_clicked(self):
+        self.ids.action_button.close_stack()

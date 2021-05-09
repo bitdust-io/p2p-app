@@ -5,7 +5,7 @@ import time
 
 from kivy.lang import Builder
 from kivy.factory import Factory
-from kivy.clock import Clock
+# from kivy.clock import Clock
 from kivy.properties import StringProperty  # @UnresolvedImport
 from kivy.properties import NumericProperty  # @UnresolvedImport
 from kivy.properties import ObjectProperty  # @UnresolvedImport
@@ -124,9 +124,6 @@ def patch_kivy_core_window():
 
 class ContentNavigationDrawer(BoxLayout):
     pass
-    # screen_manager = ObjectProperty()
-    # nav_drawer = ObjectProperty()
-    # main_win = ObjectProperty()
 
 #------------------------------------------------------------------------------
 
@@ -140,6 +137,7 @@ class MainWin(Screen, ThemableBehavior):
     screen_closed_time = {}
     selected_screen = StringProperty('')
     latest_screen = ''
+    screens_stack = []
 
     state_process_health = NumericProperty(0)
     state_identity_get = NumericProperty(0)
@@ -337,9 +335,24 @@ class MainWin(Screen, ThemableBehavior):
             self.screen_closed_time[self.selected_screen] = time.time()
             if self.selected_screen in self.active_screens:
                 self.active_screens[self.selected_screen][0].on_closed()
-        if self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
+        if self.selected_screen and self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'startup_screen', ]:
             self.latest_screen = self.selected_screen
+            if _Debug:
+                print('MainWin.select_screen   current screens stack: %r' % self.screens_stack)
+            if self.selected_screen not in self.screens_stack:
+                if screen_id not in self.screens_stack:
+                    self.screens_stack.append(self.selected_screen)
+                else:
+                    self.screens_stack.remove(screen_id)
+            else:
+                self.screens_stack.remove(self.selected_screen)
+            if _Debug:
+                print('MainWin.select_screen   new screens stack: %r' % self.screens_stack)
         self.selected_screen = screen_id
+        if self.screens_stack:
+            self.tbar().left_action_items = [["arrow-left", self.on_nav_back_button_clicked, ], ]
+        else:
+            self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
         if _Debug:
             print('MainWin.select_screen   is going to switch screen manager to %r' % screen_id)
         self.ids.screen_manager.current = screen_id
@@ -347,6 +360,22 @@ class MainWin(Screen, ThemableBehavior):
         return True
 
     #------------------------------------------------------------------------------
+
+    def on_nav_back_button_clicked(self, *args):
+        if _Debug:
+            print('MainWin.on_nav_back_button_clicked', self.screens_stack)
+        back_to_screen = None
+        if self.screens_stack:
+            back_to_screen = self.screens_stack[-1]
+        if back_to_screen:
+            self.select_screen(back_to_screen)
+
+    def on_left_menu_button_clicked(self, *args):
+        if _Debug:
+            print('MainWin.on_left_menu_button_clicked', self.selected_screen)
+        if self.selected_screen:
+            self.active_screens[self.selected_screen][0].on_nav_button_clicked()
+        self.nav().set_state("open")
 
     def on_right_menu_button_clicked(self, *args):
         if _Debug:

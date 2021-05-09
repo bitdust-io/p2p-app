@@ -19,7 +19,6 @@
                 size_hint: None, None
                 width: 1
                 height: dp(50)
-                # height: toolbar.height
 
             OneLineIconListItem:
                 text: "my identity"
@@ -99,8 +98,7 @@
         title: "BitDust"
         anchor_title: 'center'
         specific_text_color: app.color_white
-        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")], ]
-        # right_action_items: [["dots-vertical", root.on_right_menu_button_clicked], ]
+        left_action_items: [["menu", root.on_left_menu_button_clicked, ], ]
         right_action_items: []
 
     MDNavigationLayout:

@@ -72,5 +72,8 @@ class AppScreen(ThemableBehavior, Screen):
     def on_closed(self):
         pass
 
+    def on_nav_button_clicked(self):
+        pass
+
     def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
         pass
