@@ -179,6 +179,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         Builder.load_file('./components/text_input.kv')
         Builder.load_file('./components/list_view.kv')
         Builder.load_file('./components/status_panel.kv')
+        Builder.load_file('./components/dialogs.kv')
         Builder.load_file('./components/main_win.kv')
 
         from components import main_win
@@ -301,7 +302,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.on_start')
             # self.profile = cProfile.Profile()
-            # self.profile.enable()        
+            # self.profile.enable()
         if not system.is_android():
             return self.do_start()
         required_permissions = [

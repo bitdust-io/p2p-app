@@ -32,14 +32,14 @@
                     size_hint: 1, 1
                     pos_hint: {'center_x': .5}
 
-    	            TextInput:
-    	                id: private_key_input
-    	                multiline: True
-    	                text: ''
-    	                halign: 'left'
-    	                text_size: self.size
-    	                height: self.minimum_height
-    	                size_hint: 1, 1
+                    TextInput:
+                        id: private_key_input
+                        multiline: True
+                        text: ''
+                        halign: 'left'
+                        text_size: self.size
+                        height: self.minimum_height
+                        size_hint: 1, 1
 
                 RoundedFlexButton:
                     id: recover_identity_button
@@ -48,7 +48,7 @@
                     on_release: root.on_start_recover_identity_button_clicked()
 
                 StatusLabel:
-                	id: recover_identity_result_message
+                    id: recover_identity_result_message
                     valign: 'bottom'
                     halign: 'right'
                     text: ""

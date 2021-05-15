@@ -12,3 +12,9 @@ class StartUpScreen(screen.AppScreen):
 
     def is_closable(self):
         return False
+
+    def on_enter(self, *args):
+        self.ids.state_panel.attach(automat_id='initializer')
+
+    def on_leave(self, *args):
+        self.ids.state_panel.release()

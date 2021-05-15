@@ -49,14 +49,17 @@ class FriendsScreen(screen.AppScreen):
         self.ids.friends_list_view.ids.selectable_layout.clear_selection()
 
     def on_enter(self, *args):
+        self.ids.action_button.close_stack()
+        self.ids.state_panel.attach(automat_id='service_identity_propagate')
         self.clear_selected_item()
         self.populate()
 
     def on_leave(self, *args):
+        self.ids.action_button.close_stack()
+        self.ids.state_panel.release()
         self.clear_selected_item()
 
     def on_friends_list_result(self, resp):
-        self.ids.status_label.from_api_response(resp)
         if not websock.is_ok(resp):
             self.clear_selected_item()
             self.ids.friends_list_view.data = []
@@ -89,9 +92,6 @@ class FriendsScreen(screen.AppScreen):
             self.ids.friends_list_view.data.remove(item)
         self.ids.friends_list_view.refresh_from_data()
 
-    def on_search_people_button_clicked(self, *args):
-        self.main_win().select_screen('search_people_screen')
-
     def on_state_changed(self, event_data):
         if _Debug:
             print('FriendsScreen.on_state_changed', event_data)
@@ -113,3 +113,10 @@ class FriendsScreen(screen.AppScreen):
             self.populate()
         else:
             self.ids.friends_list_view.refresh_from_data()
+
+    def on_action_button_clicked(self, btn):
+        if _Debug:
+            print('FriendsScreen.on_action_button_clicked', btn.icon)
+        self.ids.action_button.close_stack()
+        if btn.icon == 'account-plus':
+            self.main_win().select_screen('search_people_screen')

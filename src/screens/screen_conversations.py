@@ -20,32 +20,6 @@ class ConversationRecord(list_view.SelectableHorizontalRecord):
             return styles.app.color_circle_offline
         return styles.app.color_circle_connecting
 
-#     def on_join_button_clicked(self, *args):
-#         if _Debug:
-#             print('ConversationRecord.on_join_button_clicked', self.key_id, )
-#         self.clear_selection()
-#         api_client.group_join(group_key_id=self.key_id, publish_events=True, cb=self.on_group_join_result)
-
-#     def on_group_join_result(self, resp):
-#         self.get_root().ids.status_label.from_api_response(resp)
-#         self.get_root().populate()
-
-#     def on_leave_button_clicked(self, *args):
-#         if _Debug:
-#             print('ConversationRecord.on_leave_button_clicked', self.key_id)
-#         self.clear_selection()
-#         api_client.group_leave(group_key_id=self.key_id, erase_key=False, cb=self.on_group_leave_result)
-
-#     def on_group_leave_result(self, resp):
-#         self.get_root().ids.status_label.from_api_response(resp)
-#         self.get_root().populate()
-
-#     def on_group_delete_button_clicked(self, *args):
-#         if _Debug:
-#             print('ConversationRecord.on_group_delete_button_clicked', self.key_id)
-#         self.clear_selection()
-#         api_client.group_leave(group_key_id=self.key_id, erase_key=True, cb=self.on_group_leave_result)
-
 
 class ConversationsListView(list_view.SelectableRecycleView):
 
@@ -107,7 +81,6 @@ class ConversationsScreen(screen.AppScreen):
     def on_message_conversations_list_result(self, resp):
         if _Debug:
             print('ConversationsScreen.on_message_conversations_list_result  %s...' % str(resp)[:100])
-        # self.ids.status_label.from_api_response(resp)
         if not websock.is_ok(resp):
             self.clear_selected_item()
             self.ids.conversations_list_view.data = []

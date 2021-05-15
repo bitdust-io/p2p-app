@@ -42,7 +42,6 @@ class PrivateChatScreen(screen.AppScreen):
         return []
 
     def on_enter(self, *args):
-        # self.ids.chat_status_label.text = ''
         self.ids.state_panel.attach(self.automat_index)
         self.control().add_callback('on_private_message_received', self.on_private_message_received)
         self.populate()
@@ -59,10 +58,8 @@ class PrivateChatScreen(screen.AppScreen):
         )
 
     def on_message_history_result(self, resp):
-#         self.ids.chat_status_label.from_api_response(resp)
         if not websock.is_ok(resp):
             return
-#         self.ids.chat_status_label.text = ''
         self.ids.chat_messages.clear_widgets()
         current_direction = None
         current_sender = None
@@ -119,7 +116,6 @@ class PrivateChatScreen(screen.AppScreen):
             data={'message': msg, },
             cb=self.on_message_sent,
         )
-#         self.ids.chat_status_label.text = ''
         self.ids.chat_input.text = ''
         self.ids.chat_input.refresh_height()
 
@@ -127,7 +123,6 @@ class PrivateChatScreen(screen.AppScreen):
         if _Debug:
             print('on_message_sent', resp)
         if not websock.is_ok(resp):
-#             self.ids.chat_status_label.text = '[color=#f00]%s[/color]' % websock.response_err(resp)
             return
         self.populate()
 

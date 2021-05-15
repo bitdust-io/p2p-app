@@ -6,6 +6,19 @@
 
         AppScreenLayout:
 
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'main process is not started',
+                    'AT_STARTUP': 'starting the application',
+                    'NETWORK?': 'checking connection to the Internet',
+                    'INCOMMING?': 'waiting initial reply from other nodes',
+                    'CONNECTED': 'establishing peer-to-peer connections',
+                    'DISCONNECTED': 'disconnected',
+                    'MY_IDENTITY': 'verifying my identity in the network',
+                    'PROPAGATE': 'propagating my identity to other nodes', }
+
             VEmptySpace:
                 size_hint_y: 0.5
 
@@ -15,8 +28,9 @@
                 HEmptySpace:
                     size_hint_x: 0.5
 
-                NormalLabel:
-                    text: '[size=26sp]connecting to\nother nodes ...[/size]'
+                HFlexMarkupLabel:
+                    halign: 'center'
+                    text: '[size=26sp]connecting...[/size]'
 
                 HEmptySpace:
                     size_hint_x: 0.5

@@ -57,21 +57,13 @@
                 statuses:
                     { None: 'message history is not available at the moment',
                     'ON': 'message history is synchronized, you are on-line',
-                    'OFF': 'message history service is not started, you are off-line',
-                    'NOT_INSTALLED': 'message history service was not installed',
+                    'OFF': 'message-history service is not started, you are off-line',
+                    'NOT_INSTALLED': 'message-history service was not installed',
                     'INFLUENCE': 'verifying related network services',
-                    'DEPENDS_OFF': 'required network services are not started yet',
-                    'STARTING': 'turning on message history service',
-                    'STOPPING': 'turning off message history service',
-                    'CLOSED': 'message history service is stopped', }
-
-            HorizontalContainerLayout:
-
-                StatusLabel:
-                    id: status_label
-                    size_hint: 1, None
-                    height: self.texture_size[1]
-                    text: ''
+                    'DEPENDS_OFF': 'related network services were not started yet',
+                    'STARTING': 'turning on message-history service',
+                    'STOPPING': 'turning off message-history service',
+                    'CLOSED': 'message-history service is stopped', }
 
             VerticalScrollView:
                 id: scroll_view

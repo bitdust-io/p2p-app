@@ -349,6 +349,8 @@ class MainWin(Screen, ThemableBehavior):
             if _Debug:
                 print('MainWin.select_screen   new screens stack: %r' % self.screens_stack)
         self.selected_screen = screen_id
+        if self.selected_screen in ['process_dead_screen', 'connecting_screen', 'startup_screen', ]:
+            self.screens_stack = []
         if self.screens_stack:
             self.tbar().left_action_items = [["arrow-left", self.on_nav_back_button_clicked, ], ]
         else:
@@ -369,6 +371,8 @@ class MainWin(Screen, ThemableBehavior):
             back_to_screen = self.screens_stack[-1]
         if back_to_screen:
             self.select_screen(back_to_screen)
+        else:
+            self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
 
     def on_left_menu_button_clicked(self, *args):
         if _Debug:

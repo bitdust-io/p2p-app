@@ -39,7 +39,7 @@ class AutomatPanel(object):
         if _Debug:
             print('AutomatPanel.on_automat_events_start_result', websock.is_ok(resp))
         if not websock.is_ok(resp):
-            self.update_fields(error=websock.red_err(resp))
+            self.update_fields(error=self.statuses.get(None, websock.red_err(resp)))
             return
         self.update_fields(response=resp)
 
@@ -145,7 +145,6 @@ class AutomatStatusPanel(AutomatPanelByID, MDCard):
             self.ids.label_status.text = self.statuses.get(r['state'], 'status unknown')
             return
         if 'state' in kwargs:
-            # self.ids.label_name.text = ''
             self.ids.label_state.text = kwargs['state']
             self.ids.label_status.text = self.statuses.get(kwargs['state'], 'current status is unknown')
             return
