@@ -44,3 +44,9 @@
                     height: root.ids.chat_input.height
                     font_size: '12sp'
                     on_release: root.on_chat_send_button_clicked()
+
+    RootActionButton:
+        id: action_button
+        data: {'account-minus': 'Delete conversation', }
+        icon: 'account'
+        callback: root.on_action_button_clicked

@@ -182,6 +182,8 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
 
     top_offset = dp(80)
     buttons_colors = DictProperty()
+    logo = BooleanProperty(False)
+    root_button_rotate_angle = NumericProperty(360)
 
     def on_data(self, instance, value):
         ret = super().on_data(instance, value)
@@ -208,6 +210,10 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
         self.bg_color_root_button = self.theme_cls.primary_dark
         self.bg_color_stack_button = self.theme_cls.accent_color
         self.bg_hint_color = self.theme_cls.accent_light
+        if self.logo:
+            root_btn = self._get_count_widget(MDFloatingRootButton)
+            root_btn.icon = ''
+            root_btn.ids.lbl_txt.source = './bitdust.png'
 
     def set_pos_root_button(self, instance):
         if self.anchor == "right":
@@ -260,7 +266,7 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
                     and self.root_button_anim
                 ):
                     Animation(
-                        _angle=-45,
+                        _angle=-self.root_button_rotate_angle,
                         d=self.opening_time_button_rotation,
                         t=self.opening_transition_button_rotation,
                     ).start(widget)

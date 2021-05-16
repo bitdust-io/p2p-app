@@ -33,7 +33,7 @@ class GroupChatScreen(screen.AppScreen):
         return kw
 
     def get_icon(self):
-        return 'comment'
+        return 'account-group'
 
     def get_title(self):
         l = self.label

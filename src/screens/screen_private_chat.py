@@ -33,7 +33,7 @@ class PrivateChatScreen(screen.AppScreen):
         return kw
 
     def get_icon(self):
-        return 'comment'
+        return 'account'
 
     def get_title(self):
         return self.username
@@ -110,7 +110,7 @@ class PrivateChatScreen(screen.AppScreen):
     def on_chat_send_button_clicked(self, *args):
         msg = self.ids.chat_input.text
         if _Debug:
-            print('on_chat_send_button_clicked', self.recipient_id, msg)
+            print('PrivateChatScreen.on_chat_send_button_clicked', self.recipient_id, msg)
         api_client.message_send(
             recipient_id=self.recipient_id,
             data={'message': msg, },
@@ -121,12 +121,23 @@ class PrivateChatScreen(screen.AppScreen):
 
     def on_message_sent(self, resp):
         if _Debug:
-            print('on_message_sent', resp)
+            print('PrivateChatScreen.on_message_sent', resp)
         if not websock.is_ok(resp):
             return
         self.populate()
 
     def on_private_message_received(self, json_data):
         if _Debug:
-            print('chat.on_private_message_received', json_data)
+            print('PrivateChatScreen.on_private_message_received', json_data)
         self.populate()
+
+    def on_action_button_clicked(self, btn):
+        if _Debug:
+            print('PrivateChatScreen.on_action_button_clicked', btn.icon)
+        self.ids.action_button.close_stack()
+#         if btn.icon == 'account-plus':
+#             self.main_win().select_screen(
+#                 screen_id='select_friend_screen',
+#                 result_callback=self.on_user_selected,
+#                 screen_header='Invite user to the group:'
+#             )

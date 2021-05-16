@@ -48,7 +48,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-# Config.set('kivy', 'window_icon', 'bitdust.png')
+Config.set('kivy', 'window_icon', 'bitdust.png')
 
 if _Debug:
     Config.set('kivy', 'log_level', 'debug')
@@ -157,7 +157,7 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
 
         self.title = 'BitDust'
-        # self.icon = './bitdust.png'
+        self.icon = './bitdust.png'
         self.apply_styles()
 
         Builder.load_string("""

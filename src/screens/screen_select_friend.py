@@ -56,11 +56,13 @@ class SelectFriendScreen(screen.AppScreen):
 
     def on_enter(self, *args):
         self.ids.action_button.close_stack()
+        self.ids.state_panel.attach(automat_id='service_identity_propagate')
         self.clear_selected_item()
         self.populate()
 
     def on_leave(self, *args):
         self.ids.action_button.close_stack()
+        self.ids.state_panel.release()
         self.clear_selected_item()
 
     def on_friends_list_result(self, resp):
