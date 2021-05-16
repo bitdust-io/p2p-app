@@ -2,15 +2,9 @@ import os
 
 #------------------------------------------------------------------------------
 
-from kivy.metrics import dp
-from kivy.core.window import Window
-
-from kivymd.uix.snackbar import Snackbar
-
-#------------------------------------------------------------------------------
-
 from components import screen
 from components import dialogs
+from components import snackbar
 
 from lib import system
 from lib import api_client
@@ -118,61 +112,31 @@ class MyIDScreen(screen.AppScreen):
                 cb=self.on_confirm_erase_my_id,
             )
         elif btn.icon == 'lan-pending':
-            api_client.network_reconnect()
+            api_client.network_reconnect(cb=self.on_network_reconnect_result)
         elif btn.icon == 'cog-refresh':
             self.app().restart_engine()
-            Snackbar(
-                text='BitDust node is restarting',
-                bg_color=self.theme_cls.accent_color,
-                duration=5,
-                snackbar_x="10dp",
-                snackbar_y="10dp",
-                size_hint_x=(
-                    Window.width - (dp(10) * 2)
-                ) / Window.width
-            ).open()
+            snackbar.info(text='BitDust node is restarting')
 
     def on_confirm_erase_my_id(self, answer):
         if answer == 'yes':
             api_client.process_stop(cb=self.on_process_stop_result_erase_my_id)
 
+    def on_network_reconnect_result(self, resp):
+        if not websock.is_ok(resp):
+            snackbar.error(text='disconnected: %s' % websock.response_err(resp))
+        else:
+            snackbar.info(text='network connection refreshed')
+
     def on_identity_backup_result(self, resp, destination_filepath):
         if not websock.is_ok(resp):
             self.ids.my_id_details.text = str(resp)
-            Snackbar(
-                text='identity backup failed: %s' % websock.response_err(resp),
-                bg_color=self.theme_cls.error_color,
-                duration=5,
-                snackbar_x="10dp",
-                snackbar_y="10dp",
-                size_hint_x=(
-                    Window.width - (dp(10) * 2)
-                ) / Window.width
-            ).open()
+            snackbar.error(text='identity backup failed: %s' % websock.response_err(resp))
         else:
-            Snackbar(
-                text='backup copy of the private key stored in: %s' % destination_filepath,
-                bg_color=self.theme_cls.accent_color,
-                duration=5,
-                snackbar_x="10dp",
-                snackbar_y="10dp",
-                size_hint_x=(
-                    Window.width - (dp(10) * 2)
-                ) / Window.width
-            ).open()
+            snackbar.success(text='key file created: %s' % destination_filepath)
 
     def on_process_stop_result_start_engine(self, resp):
         self.app().start_engine()
-        Snackbar(
-            text='BitDust node process restarted',
-            bg_color=self.theme_cls.accent_color,
-            duration=5,
-            snackbar_x="10dp",
-            snackbar_y="10dp",
-            size_hint_x=(
-                Window.width - (dp(10) * 2)
-            ) / Window.width
-        ).open()
+        snackbar.info(text='BitDust node process restarted')
 
     def on_process_stop_result_erase_my_id(self, resp):
         home_folder_path = os.path.join(os.path.expanduser('~'), '.bitdust')
@@ -189,14 +153,5 @@ class MyIDScreen(screen.AppScreen):
         system.rmdir_recursive(os.path.join(home_folder_path, 'suppliers'))
         system.rmdir_recursive(os.path.join(home_folder_path, 'customers'))
         system.rmdir_recursive(os.path.join(home_folder_path, 'temp'))
-        Snackbar(
-            text='your identity and private key were erased',
-            bg_color=self.theme_cls.accent_color,
-            duration=5,
-            snackbar_x="10dp",
-            snackbar_y="10dp",
-            size_hint_x=(
-                Window.width - (dp(10) * 2)
-            ) / Window.width
-        ).open()
+        snackbar.info(text='private key erased')
         self.app().start_engine()

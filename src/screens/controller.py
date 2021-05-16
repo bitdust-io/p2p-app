@@ -235,6 +235,9 @@ class Controller(object):
         event_data = json_data.get('payload', {}).get('data', {})
         if not event_id:
             return
+        if event_data.get('id', '').startswith('service_') and 'newstate' in event_data and 'oldstate' in event_data:
+            if self.mw().is_screen_active('connecting_screen'):
+                self.mw().get_active_screen('connecting_screen').on_service_state_changed(event_data)
         if event_id in ['service-started', 'service-stopped', ]:
             if self.mw().is_screen_active('settings_screen'):
                 self.mw().get_active_screen('settings_screen').on_service_started_stopped(
