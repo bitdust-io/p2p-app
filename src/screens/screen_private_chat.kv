@@ -47,6 +47,7 @@
 
     RootActionButton:
         id: action_button
-        data: {'account-minus': 'Delete conversation', }
+        data: {'trash-can-outline': 'Delete contact', }
+        buttons_colors: {'trash-can-outline': root.theme_cls.error_color, }
         icon: 'account'
         callback: root.on_action_button_clicked

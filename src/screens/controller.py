@@ -7,7 +7,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -236,8 +236,9 @@ class Controller(object):
         if not event_id:
             return
         if event_data.get('id', '').startswith('service_') and 'newstate' in event_data and 'oldstate' in event_data:
-            if self.mw().is_screen_active('connecting_screen'):
-                self.mw().get_active_screen('connecting_screen').on_service_state_changed(event_data)
+            pass
+            # if self.mw().is_screen_active('connecting_screen'):
+            #     self.mw().get_active_screen('connecting_screen').on_service_state_changed(event_data)
         if event_id in ['service-started', 'service-stopped', ]:
             if self.mw().is_screen_active('settings_screen'):
                 self.mw().get_active_screen('settings_screen').on_service_started_stopped(
@@ -378,8 +379,11 @@ class Controller(object):
             if self.mw().latest_screen in ['process_dead_screen', 'connecting_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ]:
                 self.mw().latest_screen = 'welcome_screen'
             if self.mw().selected_screen != 'welcome_screen':
-                self.mw().select_screen(self.mw().latest_screen or 'welcome_screen')
-            self.mw().close_screens(['process_dead_screen', 'connecting_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ])
+                if self.mw().selected_screen == 'connecting_screen':
+                    self.mw().get_active_screen('connecting_screen').on_state_verify_success(self.mw().latest_screen or 'welcome_screen')
+                else:
+                    self.mw().select_screen(self.mw().latest_screen or 'welcome_screen')
+            self.mw().close_screens(['process_dead_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ])
             return
         if self.mw().state_process_health == 1 and self.mw().state_identity_get == 1 and self.mw().state_network_connected in [-1, 0, ]:
             # if self.mw().selected_screen:

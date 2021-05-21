@@ -1,9 +1,10 @@
-from components import screen
-from components import labels
-
 from lib import colorhash
 from lib import api_client
 from lib import websock
+
+from components import screen
+from components import labels
+from components import snackbar
 
 #------------------------------------------------------------------------------
 
@@ -33,7 +34,7 @@ class PrivateChatScreen(screen.AppScreen):
         return kw
 
     def get_icon(self):
-        return 'account'
+        return ''
 
     def get_title(self):
         return self.username
@@ -59,6 +60,7 @@ class PrivateChatScreen(screen.AppScreen):
 
     def on_message_history_result(self, resp):
         if not websock.is_ok(resp):
+            snackbar.error(text='failed reading message history: %s' % websock.response_err(resp))
             return
         self.ids.chat_messages.clear_widgets()
         current_direction = None
@@ -123,6 +125,7 @@ class PrivateChatScreen(screen.AppScreen):
         if _Debug:
             print('PrivateChatScreen.on_message_sent', resp)
         if not websock.is_ok(resp):
+            snackbar.error(text='message was not sent: %s' % websock.response_err(resp))
             return
         self.populate()
 
@@ -135,9 +138,13 @@ class PrivateChatScreen(screen.AppScreen):
         if _Debug:
             print('PrivateChatScreen.on_action_button_clicked', btn.icon)
         self.ids.action_button.close_stack()
-#         if btn.icon == 'account-plus':
-#             self.main_win().select_screen(
-#                 screen_id='select_friend_screen',
-#                 result_callback=self.on_user_selected,
-#                 screen_header='Invite user to the group:'
-#             )
+        if btn.icon == 'trash-can-outline':
+            api_client.friend_remove(global_user_id=self.recipient_id, cb=self.on_friend_remove_result)
+
+    def on_friend_remove_result(self, resp):
+        if _Debug:
+            print('PrivateChatScreen.on_friend_remove_result', resp)
+        if not websock.is_ok(resp):
+            snackbar.error(text='contact was not deleted: %s' % websock.response_err(resp))
+            return
+        self.main_win().select_screen('friends_screen')
