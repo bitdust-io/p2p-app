@@ -76,7 +76,7 @@ make_link_engine_repo:
 	@rm -rf ./src/bitdust; ln -v -s ../../bitdust ./src/bitdust;
 
 update_engine_repo:
-	@cd ./src/bitdust; git fetch origin -v; git reset --hard origin/master; cd ../..;
+	@cd ./src/bitdust; git fetch origin -v; git pull origin master; cd ../..; #  git reset --hard origin/master; cd ../..;
 
 
 ### Android release & development
