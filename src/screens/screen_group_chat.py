@@ -41,14 +41,6 @@ class GroupChatScreen(screen.AppScreen):
             l = l[:20] + '...'
         return l
 
-    def get_dropdown_menu_items(self):
-        return [
-            {'text': 'activate', },
-            {'text': 'deactivate', },
-            {'text': 'reconnect', },
-            {'text': 'close', },
-        ]
-
     def on_enter(self, *args):
         self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id=self.automat_id)
@@ -77,12 +69,12 @@ class GroupChatScreen(screen.AppScreen):
         if _Debug:
             print('on_message_history_result', len(msg_list))
         for item in msg_list:
-            msg_id = item['doc']['payload']['message_id']
+            # msg_id = item['doc']['payload']['message_id']
             msg = item['doc']['payload']['data']['message']
             sender = item['doc']['sender']['glob_id']
             if current_sender is None:
                 current_sender = sender
-            sender_name, sender_host = current_sender.split('@')
+            sender_name, _ = current_sender.split('@')
             if current_sender == sender:
                 current_messages.append(msg)
             else:
@@ -91,7 +83,7 @@ class GroupChatScreen(screen.AppScreen):
                     text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
                 ))
                 current_sender = sender
-                sender_name, sender_host = current_sender.split('@')
+                sender_name, _ = current_sender.split('@')
                 current_messages = []
                 current_messages.append(msg)
         if current_messages:
@@ -125,6 +117,49 @@ class GroupChatScreen(screen.AppScreen):
             print('on_group_message_received', json_data)
         self.populate()
 
+    def on_action_button_clicked(self, btn):
+        if _Debug:
+            print('GroupChatScreen.on_action_button_clicked', btn.icon)
+        self.ids.action_button.close_stack()
+        if btn.icon == 'account-plus':
+            self.main_win().select_screen(
+                screen_id='select_friend_screen',
+                result_callback=self.on_user_selected,
+                screen_header='Invite user to the group:'
+            )
+        elif btn.icon == 'human-greeting-proximity':
+            api_client.group_join(
+                group_key_id=self.global_id,
+                wait_result=False,
+                cb=self.on_group_join_result,
+            )
+        elif btn.icon == 'exit-run':
+            api_client.group_leave(
+                group_key_id=self.global_id,
+                erase_key=False,
+                cb=self.on_group_leave_result,
+            )
+        elif btn.icon == 'lan-check':
+            api_client.group_reconnect(
+                group_key_id=self.global_id,
+                cb=self.on_group_reconnect_result,
+            )
+        elif btn.icon == 'trash-can-outline':
+            api_client.group_leave(
+                group_key_id=self.global_id,
+                erase_key=True,
+                cb=self.on_group_close_result,
+            )
+        elif btn.icon == 'information':
+            self.main_win().select_screen(
+                screen_id='info_'+self.global_id,
+                screen_type='group_info_screen',
+                global_id=self.global_id,
+                label=self.label,
+                automat_index=self.automat_index,
+                automat_id=self.automat_id,
+            )
+
     def on_user_selected(self, user_global_id):
         if _Debug:
             print('on_user_selected', user_global_id)
@@ -149,42 +184,6 @@ class GroupChatScreen(screen.AppScreen):
         else:
             snackbar.error(text=websock.response_err(resp))
 
-    def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
-        if item_inst.text == 'activate':
-            api_client.group_join(
-                group_key_id=self.global_id,
-                wait_result=False,
-                cb=self.on_group_join_result,
-            )
-        elif item_inst.text == 'deactivate':
-            api_client.group_leave(
-                group_key_id=self.global_id,
-                erase_key=False,
-                cb=self.on_group_leave_result,
-            )
-        elif item_inst.text == 'reconnect':
-            api_client.group_reconnect(
-                group_key_id=self.global_id,
-                cb=self.on_group_reconnect_result,
-            )
-        elif item_inst.text == 'close':
-            api_client.group_leave(
-                group_key_id=self.global_id,
-                erase_key=True,
-                cb=self.on_group_close_result,
-            )
-
-    def on_action_button_clicked(self, btn):
-        if _Debug:
-            print('GroupChatScreen.on_action_button_clicked', btn.icon)
-        self.ids.action_button.close_stack()
-        if btn.icon == 'account-plus':
-            self.main_win().select_screen(
-                screen_id='select_friend_screen',
-                result_callback=self.on_user_selected,
-                screen_header='Invite user to the group:'
-            )
-
     def on_group_join_result(self, resp):
         if not websock.is_ok(resp):
             snackbar.error(text='failed to join the group: %s' % websock.response_err(resp))
@@ -194,11 +193,14 @@ class GroupChatScreen(screen.AppScreen):
 
     def on_group_leave_result(self, resp):
         if not websock.is_ok(resp):
-            snackbar.error(text='failed to deactivate the group: %s' % websock.response_err(resp))
+            snackbar.error(text=websock.response_err(resp))
+        else:
+            self.main_win().select_screen('conversations_screen')
+            self.main_win().close_screen(screen_id=self.global_id)
 
     def on_group_close_result(self, resp):
         if not websock.is_ok(resp):
-            snackbar.error(text='failed to close the group: %s' % websock.response_err(resp))
+            snackbar.error(text=websock.response_err(resp))
         else:
             self.main_win().select_screen('conversations_screen')
             self.main_win().close_screen(screen_id=self.global_id)

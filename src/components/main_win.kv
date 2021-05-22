@@ -25,7 +25,6 @@
                 on_release:
                     app.root.nav().set_state("close")
                     app.root.select_screen('my_id_screen', verify_state=True)
-
                 IconLeftWidget:
                     icon: "passport"
                     md_bg_color: app.color_transparent
@@ -34,25 +33,23 @@
                         app.root.select_screen('my_id_screen', verify_state=True)
 
 
-            OneLineIconListItem:
-                text: "contacts"
-                on_release:
-                    app.root.nav().set_state("close")
-                    app.root.select_screen('friends_screen', verify_state=True)
-
-                IconLeftWidget:
-                    icon: "account-multiple"
-                    md_bg_color: app.color_transparent
-                    on_release:
-                        app.root.nav().set_state("close")
-                        app.root.select_screen('friends_screen', verify_state=True)
+#             OneLineIconListItem:
+#                 text: "contacts"
+#                 on_release:
+#                     app.root.nav().set_state("close")
+#                     app.root.select_screen('friends_screen', verify_state=True)
+#                 IconLeftWidget:
+#                     icon: "account-multiple"
+#                     md_bg_color: app.color_transparent
+#                     on_release:
+#                         app.root.nav().set_state("close")
+#                         app.root.select_screen('friends_screen', verify_state=True)
 
             OneLineIconListItem:
                 text: "chat"
                 on_release:
                     app.root.nav().set_state("close")
                     app.root.select_screen('conversations_screen', verify_state=True)
-
                 IconLeftWidget:
                     icon: "chat-outline"
                     md_bg_color: app.color_transparent
@@ -65,7 +62,6 @@
                 on_release:
                     app.root.nav().set_state("close")
                     app.root.select_screen('settings_screen', verify_state=True)
-
                 IconLeftWidget:
                     icon: "cogs"
                     md_bg_color: app.color_transparent

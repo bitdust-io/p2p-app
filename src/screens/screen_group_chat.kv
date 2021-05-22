@@ -49,6 +49,13 @@
 
     RootActionButton:
         id: action_button
-        data: {'account-plus': 'Invite people', }
+        data:
+            {'trash-can-outline': 'Delete',
+            'lan-check': 'Reconnect',
+            'information': 'Info',
+            'exit-run': 'Leave group',
+            'human-greeting-proximity': 'Join group',
+            'account-plus': 'Invite people', }
+        buttons_colors: {'trash-can-outline': root.theme_cls.error_color, 'account-plus': root.theme_cls.accent_light, }
         icon: 'account-group'
         callback: root.on_action_button_clicked

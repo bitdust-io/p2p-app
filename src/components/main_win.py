@@ -260,9 +260,9 @@ class MainWin(Screen, ThemableBehavior):
             print('MainWin.open_screen   is about to create a new instance of %r with id %r' % (screen_class, screen_id, ))
         screen_inst = screen_class(name=screen_id, **kwargs)
         self.active_screens[screen_id] = (screen_inst, None, )
-        menu_items = screen_inst.get_dropdown_menu_items()
-        if menu_items:
-            self.populate_dropdown_menu(screen_id, menu_items)
+        # menu_items = screen_inst.get_dropdown_menu_items()
+        # if menu_items:
+        #     self.populate_dropdown_menu(screen_id, menu_items)
         manager.add_widget(screen_inst)
         screen_inst.on_opened()
         if _Debug:
@@ -311,8 +311,10 @@ class MainWin(Screen, ThemableBehavior):
             screen_type = screen_id
             if screen_type.startswith('private_chat_'):
                 screen_type = 'private_chat_screen'
-            if screen_type.startswith('group_'):
+            elif screen_type.startswith('group_'):
                 screen_type = 'group_chat_screen'
+            elif screen_type.startswith('info_group_'):
+                screen_type = 'group_info_screen'
         if verify_state:
             if self.state_process_health != 1 or self.state_identity_get != 1:
                 if _Debug:

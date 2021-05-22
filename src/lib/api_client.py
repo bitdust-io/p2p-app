@@ -144,6 +144,10 @@ def group_leave(group_key_id, erase_key=False, cb=None):
     return run('group_leave', kwargs={'group_key_id': group_key_id, 'erase_key': erase_key, }, cb=cb)
 
 
+def group_info(group_key_id, cb=None):
+    return run('group_info', kwargs={'group_key_id': group_key_id, }, cb=cb)
+
+
 def group_share(group_key_id, trusted_user_id, publish_events=False, cb=None):
     return run('group_share', kwargs={'group_key_id': group_key_id, 'trusted_user_id': trusted_user_id, 'publish_events': publish_events, }, cb=cb)
 

@@ -10,6 +10,13 @@ from lib import api_client
 _Debug = True
 
 #------------------------------------------------------------------------------
+# create new screen step-by-step:
+# 1. add new item in screens.controller.all_screens()
+# 2. create new file screens/screen_xxx.kv
+# 3. create new file screens/screen_xxx.py
+# 4. make changes in components.main_win.MainWin.select_screen() if it is required for screen identification
+# 4. to open screen use: screen.main_window().select_screen(screen_id='xxx_screen')
+#------------------------------------------------------------------------------ 
 
 def all_screens():
     return {
@@ -43,6 +50,8 @@ def all_screens():
             'screens/screen_private_chat.kv', 'screens.screen_private_chat', 'PrivateChatScreen', ),
         'group_chat_screen': (
             'screens/screen_group_chat.kv', 'screens.screen_group_chat', 'GroupChatScreen', ),
+        'group_info_screen': (
+            'screens/screen_group_info.kv', 'screens.screen_group_info', 'GroupInfoScreen', ),
     }
 
 #------------------------------------------------------------------------------

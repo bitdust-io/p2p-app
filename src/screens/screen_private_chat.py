@@ -39,9 +39,6 @@ class PrivateChatScreen(screen.AppScreen):
     def get_title(self):
         return self.username
 
-    def get_dropdown_menu_items(self):
-        return []
-
     def on_enter(self, *args):
         self.ids.state_panel.attach(self.automat_index)
         self.control().add_callback('on_private_message_received', self.on_private_message_received)

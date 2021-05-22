@@ -48,9 +48,6 @@ class AppScreen(ThemableBehavior, Screen):
     def get_title(self):
         return ''
 
-    def get_dropdown_menu_items(self):
-        return []
-
     def is_closable(self):
         return True
 

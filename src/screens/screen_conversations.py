@@ -127,7 +127,9 @@ class ConversationsScreen(screen.AppScreen):
         if btn.icon == 'chat-plus-outline':
             self.main_win().select_screen('create_group_screen')
         elif btn.icon == 'account-key-outline':
-            pass
+            self.main_win().select_screen('select_friend_screen')
+        elif btn.icon == 'account-box-multiple':
+            self.main_win().select_screen('friends_screen')
 
     def on_state_changed(self, event_data):
         if _Debug:

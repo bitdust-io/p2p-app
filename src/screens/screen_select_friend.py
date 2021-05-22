@@ -38,11 +38,11 @@ class SelectFriendScreen(screen.AppScreen):
 
     def init_kwargs(self, **kw):
         self.result_callback = kw.pop('result_callback', None)
-        self.screen_header = kw.pop('screen_header', 'Select user')
+        self.screen_header = kw.pop('screen_header', '')
         return kw
 
     def get_title(self):
-        return 'select user'
+        return 'select contact'
 
     def get_icon(self):
         return 'target-account'

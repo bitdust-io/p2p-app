@@ -208,8 +208,8 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
         self.color_icon_stack_button = styles.app.color_white99
         self.color_icon_root_button = styles.app.color_white99
         self.bg_color_root_button = self.theme_cls.primary_dark
-        self.bg_color_stack_button = self.theme_cls.accent_color
-        self.bg_hint_color = self.theme_cls.accent_light
+        self.bg_color_stack_button = self.theme_cls.primary_color
+        self.bg_hint_color = self.theme_cls.primary_light
         if self.logo:
             root_btn = self._get_count_widget(MDFloatingRootButton)
             root_btn.icon = ''

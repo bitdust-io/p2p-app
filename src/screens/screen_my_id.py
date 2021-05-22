@@ -53,14 +53,6 @@ class MyIDScreen(screen.AppScreen):
     def get_title(self):
         return 'my identity'
 
-    def get_dropdown_menu_items(self):
-        return [
-            {'text': 'reconnect', },
-            {'text': 'restart engine', },
-            {'text': 'key backup', },
-            {'text': 'erase my ID', },
-        ]
-
     def on_enter(self, *args):
         self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id='service_identity_propagate')
