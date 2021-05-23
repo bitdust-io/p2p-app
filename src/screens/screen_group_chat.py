@@ -67,7 +67,7 @@ class GroupChatScreen(screen.AppScreen):
         current_messages = []
         msg_list = list(websock.response_result(resp))
         if _Debug:
-            print('on_message_history_result', len(msg_list))
+            print('GroupChatScreen.on_message_history_result', len(msg_list))
         for item in msg_list:
             # msg_id = item['doc']['payload']['message_id']
             msg = item['doc']['payload']['data']['message']

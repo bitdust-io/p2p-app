@@ -89,7 +89,7 @@ if system.is_android():
     SERVICE_NAME = '{packagename}.Service{servicename}'.format(
         packagename=PACKAGE_NAME,
         servicename='Bitdustnode'
-    )    
+    )
     PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 #------------------------------------------------------------------------------

@@ -1,8 +1,6 @@
 from components import screen
-from components import labels
 from components import snackbar
 
-from lib import colorhash
 from lib import api_client
 from lib import websock
 
@@ -63,7 +61,7 @@ class GroupInfoScreen(screen.AppScreen):
         return l
 
     def on_enter(self, *args):
-        self.ids.state_panel.attach(automat_id=self.automat_id)
+        self.ids.state_panel.attach(automat_id=self.automat_id, callback_automat_state_changed=self.on_automat_state_changed)
         self.populate()
 
     def on_leave(self, *args):
@@ -86,3 +84,8 @@ class GroupInfoScreen(screen.AppScreen):
             connected_brokers=('\n'.join(result.get('connected_brokers', {}).values())),
         )
         self.ids.group_info_details.text = group_info_temlate_text.format(**result)
+
+    def on_automat_state_changed(self, event_data):
+        if _Debug:
+            print('GroupInfoScreen.on_automat_state_changed', event_data)
+        self.populate()
