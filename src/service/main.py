@@ -2,6 +2,15 @@ import os
 import sys
 import json
 
+#------------------------------------------------------------------------------ 
+
+_Debug = True
+
+if _Debug:
+    print('BitDustService ENTRYPOINT')
+
+#------------------------------------------------------------------------------ 
+
 from twisted.internet import reactor
 
 from jnius import autoclass  # @UnresolvedImport
@@ -14,10 +23,6 @@ from android.config import ACTIVITY_CLASS_NAME, SERVICE_CLASS_NAME  # @Unresolve
 
 PACKAGE_NAME = 'org.bitdust_io.bitdust1'
 PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
-
-#------------------------------------------------------------------------------ 
-
-_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -75,7 +80,7 @@ def set_foreground():
     notification_builder.setPriority(NotificationManager.IMPORTANCE_MIN)
 
     Drawable = autoclass(u"{}.R$drawable".format(service.getPackageName()))
-    notification_builder.setSmallIcon(getattr(Drawable, 'icon'))
+    notification_builder.setSmallIcon(getattr(Drawable, 'notification_icon_background'))
     notification_builder.setAutoCancel(True)
     notification_builder.setCategory(Notification.CATEGORY_SERVICE)
 
@@ -184,8 +189,8 @@ def run_service():
             print('BitDustService.run_service() Twisted reactor stopped')
 
     except Exception as exc:
-        if _Debug:
-            print('BitDustService.run_service()  Exception : %r' % exc)
+        import traceback
+        traceback.print_exc()
 
 #------------------------------------------------------------------------------
 

@@ -66,6 +66,7 @@ install_p4a:
 	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 
 update_p4a:
+	# @cd ./python-for-android; git fetch --all; git reset --hard origin/master; cd ..;
 	@cd ./python-for-android; git fetch --all; git reset --hard origin/develop; cd ..;
 	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop_more; cd ..;
 
