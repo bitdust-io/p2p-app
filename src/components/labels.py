@@ -34,6 +34,10 @@ class NormalLabel(MarkupLabel):
     pass
 
 
+class SingleLineLabel(NormalLabel):
+    pass
+
+
 class HFlexMarkupLabel(ThemableBehavior, Label):
     label_height = NumericProperty('32dp')
 
@@ -57,8 +61,3 @@ class StatusLabel(NormalLabel):
             errors = [errors, ]
         txt = ', '.join(errors)
         self.text = '[color=#f00]%s[/color]' % txt
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./components/labels.kv')

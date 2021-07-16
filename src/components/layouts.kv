@@ -14,9 +14,9 @@
 
 
 <HorizontalLayout>:
-	orientation: 'horizontal'
-	padding: 0
-	spacing: 0
+    orientation: 'horizontal'
+    padding: 0
+    spacing: 0
 
 
 <HorizontalWithPaddingLayout>:
@@ -28,9 +28,9 @@
 
 
 <VerticalLayout>:
-	orientation: 'vertical'
-	padding: 0
-	spacing: 0
+    orientation: 'vertical'
+    padding: 0
+    spacing: 0
 
 
 <VerticalWithPaddingLayout>:
@@ -50,15 +50,25 @@
 
 
 <HLayout>:
-	orientation: 'horizontal'
-	padding: 0
-	spacing: 0
+    orientation: 'horizontal'
+    padding: 0
+    spacing: 0
 
 
 <VLayout>:
-	orientation: 'vertical'
-	padding: 0
-	spacing: 0
+    orientation: 'vertical'
+    padding: 0
+    spacing: 0
+
+
+<HorizontalMinimumHeightLayout>:
+    size_hint: 1, None
+    height: self.minimum_height
+
+
+<VerticalMinimumWidthLayout>:
+    size_hint: None, 1
+    width: self.minimum_width
 
 
 <HorizontalStackLayout>:

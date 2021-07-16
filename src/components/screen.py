@@ -48,9 +48,6 @@ class AppScreen(ThemableBehavior, Screen):
     def get_title(self):
         return ''
 
-    def get_dropdown_menu_items(self):
-        return []
-
     def is_closable(self):
         return True
 
@@ -72,10 +69,8 @@ class AppScreen(ThemableBehavior, Screen):
     def on_closed(self):
         pass
 
-    def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
+    def on_nav_button_clicked(self):
         pass
 
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./components/screen.kv')
+    def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
+        pass

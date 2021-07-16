@@ -2,14 +2,9 @@ import os
 
 #------------------------------------------------------------------------------
 
-from kivy.metrics import dp
-from kivy.core.window import Window
-
-from kivymd.uix.snackbar import Snackbar
-
-#------------------------------------------------------------------------------
-
 from components import screen
+from components import dialogs
+from components import snackbar
 
 from lib import system
 from lib import api_client
@@ -26,10 +21,10 @@ identity_details_temlate_text = """
 
 [color=#909090]global ID:[/color] [b]{global_id}[/b]
 
-[color=#909090]incoming channels:[/color]
+[color=#909090]network interfaces:[/color]
 {contacts}
 
-[color=#909090]sources:[/color]
+[color=#909090]identity servers:[/color]
 {sources}
 
 [color=#909090]created:[/color] {date}
@@ -41,6 +36,9 @@ identity_details_temlate_text = """
 
 [color=#909090]public key:[/color]
 [size={small_text_size}][font=RobotoMono-Regular]{publickey}[/font][/size]
+
+[color=#909090]digital signature:[/color]
+[size={small_text_size}][font=RobotoMono-Regular]{signature}[/font][/size]
 
 [/size]
 """
@@ -55,16 +53,14 @@ class MyIDScreen(screen.AppScreen):
     def get_title(self):
         return 'my identity'
 
-    def get_dropdown_menu_items(self):
-        return [
-            {'text': 'reconnect', },
-            {'text': 'restart engine', },
-            {'text': 'key backup', },
-            {'text': 'erase my ID', },
-        ]
-
     def on_enter(self, *args):
+        self.ids.action_button.close_stack()
+        self.ids.state_panel.attach(automat_id='service_identity_propagate')
         api_client.identity_get(cb=self.on_identity_get_result)
+
+    def on_leave(self, *args):
+        self.ids.action_button.close_stack()
+        self.ids.state_panel.release()
 
     def on_identity_get_result(self, resp):
         if not websock.is_ok(resp):
@@ -72,7 +68,7 @@ class MyIDScreen(screen.AppScreen):
             return
         result = websock.response_result(resp)
         if not result:
-            self.ids.my_id_details.text = websock.response_errors(resp)
+            self.ids.my_id_details.text = websock.response_err(resp)
             return
         self.ids.my_id_details.text = identity_details_temlate_text.format(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
@@ -80,6 +76,7 @@ class MyIDScreen(screen.AppScreen):
             name=result.get('name', ''),
             global_id=result.get('global_id', ''),
             publickey=result.get('publickey', ''),
+            signature=result.get('signature', ''),
             date=result.get('date', ''),
             version=result.get('version', ''),
             revision=result.get('revision', ''),
@@ -87,61 +84,51 @@ class MyIDScreen(screen.AppScreen):
             contacts='\n'.join(result.get('contacts', [])),
         )
 
-    def on_dropdown_menu_item_clicked(self, menu_inst, item_inst):
-        if item_inst.text == 'key backup':
-            destination_filepath = os.path.join(os.path.expanduser('~'), 'bitdust_key.txt')
+    def on_action_button_clicked(self, btn):
+        if _Debug:
+            print('ConversationsScreen.on_action_button_clicked', btn.icon)
+        self.ids.action_button.close_stack()
+        if btn.icon == 'shield-key':
             if system.is_android():
                 destination_filepath = os.path.join('/storage/emulated/0/', 'bitdust_key.txt')
+            else:
+                destination_filepath = os.path.join(os.path.expanduser('~'), 'bitdust_key.txt')
             api_client.identity_backup(
                 destination_filepath=destination_filepath,
                 cb=lambda resp: self.on_identity_backup_result(resp, destination_filepath),
             )
-        elif item_inst.text == 'erase my ID':
+        elif btn.icon == 'cellphone-erase':
+            dialogs.open_yes_no_dialog(
+                title='Delete my key and all data',
+                text='WARNING! All your data will be erased along with the private key.',
+                cb=self.on_confirm_erase_my_id,
+            )
+        elif btn.icon == 'lan-pending':
+            api_client.network_reconnect(cb=self.on_network_reconnect_result)
+        elif btn.icon == 'cog-refresh':
+            self.app().restart_engine()
+            snackbar.info(text='BitDust node is restarting')
+
+    def on_confirm_erase_my_id(self, answer):
+        if answer == 'yes':
             api_client.process_stop(cb=self.on_process_stop_result_erase_my_id)
-        elif item_inst.text == 'reconnect':
-            api_client.network_reconnect()
-        elif item_inst.text == 'restart engine':
-            api_client.process_stop(cb=self.on_process_stop_result_start_engine)
-        
+
+    def on_network_reconnect_result(self, resp):
+        if not websock.is_ok(resp):
+            snackbar.error(text='disconnected: %s' % websock.response_err(resp))
+        else:
+            snackbar.info(text='network connection refreshed')
 
     def on_identity_backup_result(self, resp, destination_filepath):
         if not websock.is_ok(resp):
             self.ids.my_id_details.text = str(resp)
-            Snackbar(
-                text='identity backup failed: %s' % websock.response_errors(resp),
-                bg_color=self.theme_cls.error_color,
-                duration=5,
-                snackbar_x="10dp",
-                snackbar_y="10dp",
-                size_hint_x=(
-                    Window.width - (dp(10) * 2)
-                ) / Window.width
-            ).open()
+            snackbar.error(text='identity backup failed: %s' % websock.response_err(resp))
         else:
-            Snackbar(
-                text='backup copy of the private key stored in: %s' % destination_filepath,
-                bg_color=self.theme_cls.accent_color,
-                duration=5,
-                snackbar_x="10dp",
-                snackbar_y="10dp",
-                size_hint_x=(
-                    Window.width - (dp(10) * 2)
-                ) / Window.width
-            ).open()
+            snackbar.success(text='key file created: %s' % destination_filepath)
 
     def on_process_stop_result_start_engine(self, resp):
         self.app().start_engine()
-        Snackbar(
-            text='BitDust node process restarted',
-            bg_color=self.theme_cls.accent_color,
-            duration=5,
-            snackbar_x="10dp",
-            snackbar_y="10dp",
-            size_hint_x=(
-                Window.width - (dp(10) * 2)
-            ) / Window.width
-        ).open()
-        
+        snackbar.info(text='BitDust node process restarted')
 
     def on_process_stop_result_erase_my_id(self, resp):
         home_folder_path = os.path.join(os.path.expanduser('~'), '.bitdust')
@@ -158,18 +145,5 @@ class MyIDScreen(screen.AppScreen):
         system.rmdir_recursive(os.path.join(home_folder_path, 'suppliers'))
         system.rmdir_recursive(os.path.join(home_folder_path, 'customers'))
         system.rmdir_recursive(os.path.join(home_folder_path, 'temp'))
-        Snackbar(
-            text='your identity and private key were erased',
-            bg_color=self.theme_cls.accent_color,
-            duration=5,
-            snackbar_x="10dp",
-            snackbar_y="10dp",
-            size_hint_x=(
-                Window.width - (dp(10) * 2)
-            ) / Window.width
-        ).open()
+        snackbar.info(text='private key erased')
         self.app().start_engine()
-
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_my_id.kv')

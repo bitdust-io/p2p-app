@@ -6,21 +6,17 @@
 
         AppScreenLayout:
 
-            HorizontalContainerLayout:
-
-                StatusLabel:
-                    id: chat_status_label
-                    size_hint: 1, None
-                    height: self.texture_size[1]
-                    text: ''
-
-                MDFloatingActionButton:
-                    id: invite_user_button
-                    icon: 'chat-plus'
-                    elevation: 5
-                    theme_text_color: "Custom"
-                    text_color: app.color_white99
-                    on_release: root.on_invite_user_button_clicked()
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'group is currently inactive',
+                    'DHT_READ?': 'fetching list of active message brokers',
+                    'BROKERS?': 'connecting with message brokers',
+                    'QUEUE?': 'group is connected, reading recent messages',
+                    'IN_SYNC!': 'group is connected and synchronized',
+                    'DISCONNECTED': 'group is disconnected',
+                    'CLOSED': 'group is deactivated', }
 
             VerticalScrollView:
                 id: chat_messages_view
@@ -50,3 +46,16 @@
                     height: root.ids.chat_input.height
                     font_size: '12sp'
                     on_release: root.on_chat_send_button_clicked()
+
+    RootActionButton:
+        id: action_button
+        data:
+            {'trash-can-outline': 'Delete',
+            'lan-check': 'Reconnect',
+            'information': 'Info',
+            'exit-run': 'Leave group',
+            'human-greeting-proximity': 'Join group',
+            'account-plus': 'Invite people', }
+        buttons_colors: {'trash-can-outline': root.theme_cls.error_color, 'account-plus': root.theme_cls.accent_light, }
+        icon: 'account-group'
+        callback: root.on_action_button_clicked

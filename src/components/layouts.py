@@ -42,6 +42,14 @@ class VLayout(BoxLayout):
     pass
 
 
+class HorizontalMinimumHeightLayout(HorizontalLayout):
+    pass
+
+
+class VerticalMinimumWidthLayout(VerticalLayout):
+    pass
+
+
 class HorizontalStackLayout(StackLayout):
     pass
 
@@ -103,16 +111,3 @@ class StatusPanelLayout(HorizontalLayout):
 
 class VerticalScrollView(ScrollView):
     pass
-
-#     def __init__(self, **kwargs):
-#         super().__init__(**kwargs)
-#         self.do_scroll_x = False
-#         self.always_overscroll = False
-#         self.bar_color = self.theme_cls.primary_light
-#         self.bar_inactive_color = (.8, .8, .8, 1)
-#         self.bar_width = dp(10)
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./components/layouts.kv')

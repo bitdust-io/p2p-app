@@ -26,17 +26,14 @@ class ProcessDeadScreen(screen.AppScreen):
     def on_enter(self, *args):
         if _Debug:
             print('screen_process_dead.on_enter')
+        self.ids.state_panel.attach(automat_id='initializer')
         if not self.verify_process_health_task:
             self.verify_process_health_task = Clock.schedule_interval(self.control().verify_process_health, 3)
 
     def on_leave(self, *args):
         if _Debug:
             print('screen_process_dead.on_leave')
+        self.ids.state_panel.release()
         if self.verify_process_health_task:
             Clock.unschedule(self.verify_process_health_task)
             self.verify_process_health_task = None
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_process_dead.kv')

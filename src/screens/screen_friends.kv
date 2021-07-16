@@ -3,12 +3,14 @@
     height: app.friend_record_height
     padding: 0
     spacing: 1
-
+    selectable: True
     global_id: 'global_id'
-	username: 'username'
-	idhost: 'idhost'
-	alias: 'alias'
+    username: 'username'
+    idhost: 'idhost'
+    alias: 'alias'
     contact_state: 'contact_state'
+    automat_index: 'automat_index'
+    automat_id: 'automat_id'
 
     CustomIcon:
         id: contact_state_field
@@ -21,16 +23,18 @@
     HFlexMarkupLabel:
         id: label_field
         label_height: root.height
-        text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
+        # text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
+        text: root.username
 
-	HFixedEmptySpace:
-		width: dp(5)
+    HFixedEmptySpace:
+        width: dp(5)
 
 
 <FriendsListView>:
     viewclass: 'FriendRecord'
 
     SelectableRecycleBoxLayout:
+        id: selectable_layout
         default_size: None, app.friend_record_height
         default_size_hint: 1, None
         size_hint_y: None
@@ -48,29 +52,34 @@
 
         AppScreenLayout:
 
-            HorizontalContainerLayout:
-
-                StatusLabel:
-                    id: status_label
-                    size_hint: 1, None
-                    height: self.texture_size[1]
-                    text: ''
-
-                MDFloatingActionButton:
-                    id: search_users_button
-                    icon: 'account-plus'
-                    elevation: 5
-                    theme_text_color: "Custom"
-                    text_color: app.color_white99
-                    on_release: root.on_search_people_button_clicked()
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'network service is not started',
+                    'ON': 'list of contacts is synchronized',
+                    'OFF': 'network service is switched off',
+                    'NOT_INSTALLED': 'network service is not installed',
+                    'INFLUENCE': 'turning off dependent network services',
+                    'STARTING': 'network service is starting',
+                    'DEPENDS_OFF': 'related network services were not started yet',
+                    'STOPPING': 'network service is stopping',
+                    'CLOSED': 'network service is closed', }
 
             VerticalScrollView:
 
                 PageContainerWithLeftPaddingLayout:
-    	    	    id: friends_list
+                    id: friends_list
                     size_hint_x: None
                     width: root.width - app.scroll_bar_width
 
-        			FriendsListView:
-        	            id: friends_list_view
-        	            size_hint: 1, 1
+                    FriendsListView:
+                        id: friends_list_view
+                        size_hint: 1, 1
+
+    RootActionButton:
+        id: action_button
+        data: {'account-plus': 'Search people on-line', }
+        icon: 'account-box-multiple'
+        buttons_colors: {}
+        callback: root.on_action_button_clicked

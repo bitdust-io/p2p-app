@@ -33,8 +33,7 @@ class CreateGroupScreen(screen.AppScreen):
 
     def on_group_create_result(self, resp):
         if not websock.is_ok(resp):
-            snackbar.error(str(websock.response_errors(resp)))
-            # self.ids.status_message_label.text = str(websock.response_errors(resp))
+            snackbar.error(text=websock.response_err(resp))
             self.ids.create_group_button.disabled = False
             self.ids.group_label_input.disabled = False
             return
@@ -44,8 +43,3 @@ class CreateGroupScreen(screen.AppScreen):
         self.ids.group_label_input.disabled = False
         self.main_win().select_screen('conversations_screen')
         self.main_win().close_screen('create_group_screen')
-
-#------------------------------------------------------------------------------
-
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_create_group.kv')

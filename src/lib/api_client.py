@@ -132,21 +132,33 @@ def group_create(label=None, cb=None):
     return run('group_create', kwargs={'label': label, }, cb=cb)
 
 
-def group_join(group_key_id, publish_events=False, cb=None):
-    return run('group_join', kwargs={'group_key_id': group_key_id, 'publish_events': publish_events, }, cb=cb)
+def group_join(group_key_id, publish_events=False, wait_result=True, cb=None):
+    return run('group_join', kwargs={
+        'group_key_id': group_key_id,
+        'publish_events': publish_events,
+        'wait_result': wait_result,
+    }, cb=cb)
 
 
 def group_leave(group_key_id, erase_key=False, cb=None):
     return run('group_leave', kwargs={'group_key_id': group_key_id, 'erase_key': erase_key, }, cb=cb)
 
 
+def group_info(group_key_id, cb=None):
+    return run('group_info', kwargs={'group_key_id': group_key_id, }, cb=cb)
+
+
 def group_share(group_key_id, trusted_user_id, publish_events=False, cb=None):
     return run('group_share', kwargs={'group_key_id': group_key_id, 'trusted_user_id': trusted_user_id, 'publish_events': publish_events, }, cb=cb)
 
 
-def automat_events_start(index, cb=None):
-    return run('automat_events_start', kwargs={'index': index, }, cb=cb)
+def group_reconnect(group_key_id, cb=None):
+    return run('group_reconnect', kwargs={'group_key_id': group_key_id, }, cb=cb)
 
 
-def automat_events_stop(index, cb=None):
-    return run('automat_events_stop', kwargs={'index': index, }, cb=cb)
+def automat_events_start(index=None, automat_id=None, cb=None):
+    return run('automat_events_start', kwargs={'index': index, 'automat_id': automat_id, }, cb=cb)
+
+
+def automat_events_stop(index=None, automat_id=None, cb=None):
+    return run('automat_events_stop', kwargs={'index': index, 'automat_id': automat_id, }, cb=cb)

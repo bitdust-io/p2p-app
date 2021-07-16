@@ -13,7 +13,8 @@ class StartUpScreen(screen.AppScreen):
     def is_closable(self):
         return False
 
-#------------------------------------------------------------------------------
+    def on_enter(self, *args):
+        self.ids.state_panel.attach(automat_id='initializer')
 
-from kivy.lang.builder import Builder 
-Builder.load_file('./screens/screen_startup.kv')
+    def on_leave(self, *args):
+        self.ids.state_panel.release()

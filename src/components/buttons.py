@@ -7,8 +7,11 @@ from kivy.properties import (
     BoundedNumericProperty,  # @UnresolvedImport
     ColorProperty,  # @UnresolvedImport
     ListProperty,  # @UnresolvedImport
+    DictProperty,  # @UnresolvedImport
 )
+from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.animation import Animation
 
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.button import (
@@ -17,6 +20,10 @@ from kivymd.uix.button import (
     BasePressedButton,
     MDFloatingActionButton,
     MDFlatButton,
+    MDFloatingActionButtonSpeedDial,
+    MDFloatingLabel,
+    MDFloatingBottomButton,
+    MDFloatingRootButton,
 )
 from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
 from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
@@ -25,8 +32,8 @@ from kivymd.uix.behaviors.backgroundcolor_behavior import SpecificBackgroundColo
 #------------------------------------------------------------------------------
 
 from components import styles
-from components import layouts  
-from components import labels 
+from components import layouts
+from components import labels
 
 #------------------------------------------------------------------------------
 
@@ -159,7 +166,6 @@ class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, 
     icon = StringProperty("circle")
     icon_pack = StringProperty("Icon")
     selected = BooleanProperty(False)
-    _radius = dp(4)
     button_width = NumericProperty(styles.app.btn_icon_normal_width)
     button_height = NumericProperty(styles.app.btn_icon_normal_height)
 
@@ -171,7 +177,134 @@ class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, 
         self.width = self.button_width
         self.height = self.button_height
 
-#------------------------------------------------------------------------------
 
-from kivy.lang.builder import Builder
-Builder.load_file('./components/buttons.kv')
+class RootActionButton(MDFloatingActionButtonSpeedDial):
+
+    top_offset = dp(80)
+    buttons_colors = DictProperty()
+    logo = BooleanProperty(False)
+    root_button_rotate_angle = NumericProperty(360)
+
+    def on_data(self, instance, value):
+        ret = super().on_data(instance, value)
+        self.config_style()
+        return ret
+
+    def on_buttons_colors(self, instance, value):
+        for widget in self.children:
+            if isinstance(widget, MDFloatingBottomButton):
+                if widget.icon in value:
+                    widget.md_bg_color = value[widget.icon]
+                    widget._bg_color = value[widget.icon][0:3] + [.6]
+            if isinstance(widget, MDFloatingLabel):
+                widget.bg_color = styles.app.color_transparent
+
+    def config_style(self):
+        self.opening_time = 0.2
+        self.hint_animation = True
+        self.rotation_root_button = True
+        self.root_button_anim = True
+        self.label_text_color = styles.app.color_white99
+        self.color_icon_stack_button = styles.app.color_white99
+        self.color_icon_root_button = styles.app.color_white99
+        self.bg_color_root_button = self.theme_cls.primary_dark
+        self.bg_color_stack_button = self.theme_cls.primary_color
+        self.bg_hint_color = self.theme_cls.primary_light
+        if self.logo:
+            root_btn = self._get_count_widget(MDFloatingRootButton)
+            root_btn.icon = ''
+            root_btn.ids.lbl_txt.source = './bitdust.png'
+
+    def set_pos_root_button(self, instance):
+        if self.anchor == "right":
+            instance.y = Window.height - self.top_offset
+            instance.x = Window.width - (dp(56) + dp(20))
+        instance.elevation = 0
+
+    def set_pos_labels(self, widget):
+        if self.anchor == "right":
+            widget.x = Window.width - widget.width - dp(86)
+        widget.elevation = 0
+
+    def set_pos_bottom_buttons(self, instance):
+        if self.anchor == "right":
+            if self.state != "open":
+                instance.y = Window.height - self.top_offset
+            instance.x = Window.width - (instance.height + instance.width / 2)
+        instance.elevation = 0
+
+    def open_stack(self, instance):
+        for widget in self.children:
+            if isinstance(widget, MDFloatingLabel):
+                Animation.cancel_all(widget)
+        if self.state != "open":
+            y = Window.height - self.top_offset
+            label_position = Window.height - self.top_offset + dp(10)
+            anim_buttons_data = {}
+            anim_labels_data = {}
+            for widget in self.children:
+                if isinstance(widget, MDFloatingBottomButton):
+                    y -= dp(56)
+                    widget.y = y
+                    if not self._anim_buttons_data:
+                        anim_buttons_data[widget] = Animation(
+                            opacity=1,
+                            d=self.opening_time,
+                            t=self.opening_transition,
+                        )
+                elif isinstance(widget, MDFloatingLabel):
+                    label_position -= dp(56)
+                    if not self._label_pos_y_set:
+                        widget.y = label_position
+                        widget.x = Window.width - widget.width - dp(86)
+                    if not self._anim_labels_data:
+                        anim_labels_data[widget] = Animation(
+                            opacity=1, d=self.opening_time
+                        )
+                elif (
+                    isinstance(widget, MDFloatingRootButton)
+                    and self.root_button_anim
+                ):
+                    Animation(
+                        _angle=-self.root_button_rotate_angle,
+                        d=self.opening_time_button_rotation,
+                        t=self.opening_transition_button_rotation,
+                    ).start(widget)
+
+            if anim_buttons_data:
+                self._anim_buttons_data = anim_buttons_data
+            if anim_labels_data and not self.hint_animation:
+                self._anim_labels_data = anim_labels_data
+            self.state = "open"
+            self.dispatch("on_open")
+            self.do_animation_open_stack(self._anim_buttons_data)
+            self.do_animation_open_stack(self._anim_labels_data)
+            if not self._label_pos_y_set:
+                self._label_pos_y_set = True
+        else:
+            self.close_stack()
+
+    def close_stack(self):
+        for widget in self.children:
+            if isinstance(widget, MDFloatingBottomButton):
+                Animation(
+                    y=Window.height - self.top_offset,
+                    d=self.closing_time,
+                    t=self.closing_transition,
+                    opacity=0,
+                ).start(widget)
+                widget._canvas_width = 0
+                widget._padding_right = 0
+            elif isinstance(widget, MDFloatingLabel):
+                Animation(opacity=0, d=0.1).start(widget)
+            elif (
+                isinstance(widget, MDFloatingRootButton)
+                and self.root_button_anim
+            ):
+                Animation(
+                    _angle=0,
+                    d=self.closing_time_button_rotation,
+                    t=self.closing_transition_button_rotation,
+                ).start(widget)
+        self.state = "close"
+        self.dispatch("on_close")

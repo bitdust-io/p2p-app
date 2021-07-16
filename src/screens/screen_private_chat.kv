@@ -6,13 +6,15 @@
 
         AppScreenLayout:
 
-            HorizontalContainerLayout:
-
-                StatusLabel:
-                    id: chat_status_label
-                    size_hint: 1, None
-                    height: self.texture_size[1]
-                    text: ''
+            AutomatShortStatusPanelByIndex:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'connection with remote peer is not active',
+                    'PING?': 'waiting acknowledgment from remote peer',
+                    'CONNECTED': 'user is connected',
+                    'OFFLINE': 'user is disconnected',
+                    'CLOSED': 'connection with remote peer was closed', }
 
             VerticalScrollView:
                 id: chat_messages_view
@@ -42,3 +44,10 @@
                     height: root.ids.chat_input.height
                     font_size: '12sp'
                     on_release: root.on_chat_send_button_clicked()
+
+    RootActionButton:
+        id: action_button
+        data: {'trash-can-outline': 'Delete contact', }
+        buttons_colors: {'trash-can-outline': root.theme_cls.error_color, }
+        icon: 'account'
+        callback: root.on_action_button_clicked

@@ -24,7 +24,7 @@ fi
 
 if [ "$1" = "restart" ]; then
     echo ''
-    echo '##### Restarting BitDust'
+    echo '##### Restarting application'
     $PYTHON_BIN $BITDUST_PY restart
     echo ''
     echo 'DONE'
@@ -34,7 +34,7 @@ fi
 
 if [ "$1" = "redeploy" ]; then
     echo ''
-    echo '##### Re-deploying BitDust'
+    echo '##### Re-deploying application'
     rm -rf $ROOT_DIR/venv
     rm -rf $ROOT_DIR/src
     rm -rf $ROOT_DIR/identitycache
@@ -47,11 +47,11 @@ fi
 
 if [ ! -d $ROOT_DIR ]; then
     echo ''
-    echo "##### Create BitDust Home folder"
+    echo "##### Create Home folder"
     mkdir -p $ROOT_DIR
 else
     echo ''
-    echo "##### BitDust Home folder found locally"
+    echo "##### Home folder found locally"
 fi
 
 
@@ -60,19 +60,19 @@ cd "$ROOT_DIR"
 
 if [ ! -d $SOURCE_DIR ]; then
     echo ''
-    echo "##### Downloading BitDust source code from Git repository"
+    echo "##### Downloading source code from Git repository"
     mkdir -p $SOURCE_DIR
     git clone --depth=1 https://github.com/bitdust-io/devel.git $SOURCE_DIR
     # git clone --depth=1 https://github.com/bitdust-io/public.git $SOURCE_DIR
 else
     echo ''
-    echo "##### BitDust source files already cloned locally"
+    echo "##### Source files already cloned locally"
     cd "$SOURCE_DIR"
     echo ''
-    echo "##### Updating BitDust source files from Git repository"
+    echo "##### Updating source files from Git repository"
     git fetch --all
     echo ''
-    echo "##### Refreshing BitDust source files"
+    echo "##### Refreshing source files"
     git reset --hard origin/master
     cd ..
 fi
@@ -106,7 +106,7 @@ fi
 
 
 echo ''
-echo '##### Starting BitDust as a daemon process'
+echo '##### Starting main process in background'
 if [ -f $GLOBAL_COMMAND_FILE ]; then
     $GLOBAL_COMMAND_FILE daemon
 else

@@ -1,0 +1,48 @@
+<AutomatStatusPanel>:
+    orientation: "vertical"
+    size_hint_y: None
+    height: dp(32)
+    padding: "8dp"
+    elevation: 0
+    md_bg_color: self.theme_cls.bg_normal
+
+    HorizontalMinimumHeightLayout:
+
+        SingleLineLabel:
+            id: label_name
+
+        SingleLineLabel:
+            id: label_state
+
+    MDSeparator:
+        height: "1dp"
+
+    SingleLineLabel:
+        id: label_status
+        color: app.color_gray
+
+
+<AutomatShortStatusPanel>:
+    orientation: "vertical"
+    size_hint_y: None
+    height: dp(32)
+    padding: "8dp"
+    elevation: 0
+    md_bg_color: self.theme_cls.bg_normal
+
+    SingleLineLabel:
+        id: label_status
+        color: app.color_gray
+
+
+<AutomatShortStatusPanelByIndex>:
+    orientation: "vertical"
+    size_hint_y: None
+    height: dp(32)
+    padding: "8dp"
+    elevation: 0
+    md_bg_color: self.theme_cls.bg_normal
+
+    SingleLineLabel:
+        id: label_status
+        color: app.color_gray

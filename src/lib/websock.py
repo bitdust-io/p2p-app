@@ -19,6 +19,7 @@ from lib import websocket
 #------------------------------------------------------------------------------
 
 _Debug = False
+_DebugAPIResponses = False
 
 #------------------------------------------------------------------------------
 
@@ -192,6 +193,8 @@ def on_message(ws_inst, message):
                 print('        call_id found in the response, but no callbacks registered')
             return
         result_callback = _CallbacksQueue.pop(call_id)
+        if _DebugAPIResponses:
+            print('WS API Response {} : {}'.format(call_id, json_data['payload']['response'], ))
         if result_callback:
             result_callback(json_data)
         return True
@@ -356,13 +359,40 @@ def response_errors(response):
     return response_payload(response).get('response', {}).get('errors', [])
 
 
+def response_err(response):
+    return ', '.join(response_errors(response))
+
+
 def response_status(response):
     if not isinstance(response, dict):
         return ''
     return response_payload(response).get('response', {}).get('status', '')
 
 
+def response_message(response):
+    if not isinstance(response, dict):
+        return ''
+    return response_payload(response).get('response', {}).get('message', '')
+
+
 def response_result(response):
     if not isinstance(response, dict):
         return None
     return response_payload(response).get('response', {}).get('result', [])
+
+#------------------------------------------------------------------------------
+
+def status(response):
+    return response_status(response)
+
+
+def message(response):
+    return response_message(response)
+
+
+def result(response):
+    return response_result(response) or {}
+
+
+def red_err(response):
+    return '[color=#f00]{}[/color]'.format(response_err(response))

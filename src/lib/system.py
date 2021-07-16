@@ -10,7 +10,7 @@ from kivy.utils import platform
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -74,14 +74,21 @@ def get_android_keyboard_height():
     global _LatestAndroidKeyboardHeightSnapshot
     if not is_android():
         return 0
+    from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
+    from jnius import autoclass  # @UnresolvedImport
     if _LatestAndroidBitDustActivity is None:
-        from jnius import autoclass  # @UnresolvedImport
-        _LatestAndroidBitDustActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity').mActivity
+        _LatestAndroidBitDustActivity = autoclass(ACTIVITY_CLASS_NAME).mActivity
         _LatestAndroidRectClass = autoclass(u'android.graphics.Rect')
     if _LatestAndroidDisplayRealHeight is None:
-        _LatestAndroidDisplayRealHeight = _LatestAndroidBitDustActivity.getDisplayRealHeight()
+        if android_sdk_version() >= 17:
+            DisplayMetricsClass = autoclass(u'android.util.DisplayMetrics')
+            metrics = DisplayMetricsClass()
+            _LatestAndroidBitDustActivity.getWindowManager().getDefaultDisplay().getRealMetrics(metrics)
+            _LatestAndroidDisplayRealHeight = metrics.heightPixels
         if _Debug:
             print('system.get_android_keyboard_height         Display Real Height', _LatestAndroidDisplayRealHeight)
+    if _LatestAndroidDisplayRealHeight is None:
+        return 0
     if _LatestAndroidDisplayDefaultHeight is None:
         _LatestAndroidDisplayDefaultHeight = _LatestAndroidBitDustActivity.getWindowManager().getDefaultDisplay().getHeight()
         if _Debug:
@@ -95,8 +102,6 @@ def get_android_keyboard_height():
     _LatestAndroidTopBarSize = rctx.top
     bottom_size_latest = _LatestAndroidDisplayRealHeight - _LatestAndroidDisplayDefaultHeight - _LatestAndroidTopBarSize
     if bottom_size_latest < 0:
-        # if _Debug:
-        #     print('system.get_android_keyboard_height         WARNING Bottom Bar Size  was going to be negative!', bottom_size_latest)
         bottom_size_latest = 0
     if _LatestAndroidBottomBarSize is None:
         if _Debug:
@@ -104,6 +109,9 @@ def get_android_keyboard_height():
     _LatestAndroidBottomBarSize = bottom_size_latest
     visible_height = rctx.bottom - rctx.top
     keyboard_height = _LatestAndroidDisplayDefaultHeight - rctx.bottom + _LatestAndroidBottomBarSize
+    if _LatestAndroidDisplayDefaultHeight > 2000:
+        if keyboard_height >= 32:
+            keyboard_height -= 32
     if _LatestAndroidKeyboardHeightSnapshot != keyboard_height:
         old_keyboard_height = _LatestAndroidKeyboardHeightSnapshot
         _LatestAndroidKeyboardHeightSnapshot = keyboard_height
@@ -121,8 +129,9 @@ def set_android_system_ui_visibility():
     if not is_android():
         return
     from jnius import autoclass  # @UnresolvedImport
+    from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
     if _LatestAndroidBitDustActivity is None:
-        _LatestAndroidBitDustActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity').mActivity
+        _LatestAndroidBitDustActivity = autoclass(ACTIVITY_CLASS_NAME).mActivity
     View = autoclass('android.view.View')
     decorView = _LatestAndroidBitDustActivity.getWindow().getDecorView()
     flags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY \

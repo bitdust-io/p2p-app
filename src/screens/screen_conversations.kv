@@ -3,12 +3,14 @@
     height: app.conversation_record_height
     padding: 0
     spacing: 1
-
+    selectable: True
     type: 'type'
     conversation_id: 'conversation_id'
     key_id: 'key_id'
     state: 'state'
     label: 'label'
+    automat_index: 'automat_index'
+    automat_id: 'automat_id'
 
     CustomIcon:
         id: conversation_state_field
@@ -49,22 +51,19 @@
 
         AppScreenLayout:
 
-            HorizontalContainerLayout:
-
-                StatusLabel:
-                    id: status_label
-                    size_hint: 1, None
-                    height: self.texture_size[1]
-                    text: ''
-
-                MDFloatingActionButton:
-                    id: create_new_group_button
-                    icon: 'plus'
-                    elevation: 5
-                    theme_text_color: "Custom"
-                    text_color: app.color_white99
-                    md_bg_color: app.theme_cls.accent_color
-                    on_release: root.on_create_new_group_button_clicked()
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'message history is not available at the moment',
+                    'ON': 'message history is synchronized, you are on-line',
+                    'OFF': 'message-history service is not started, you are off-line',
+                    'NOT_INSTALLED': 'message-history service was not installed',
+                    'INFLUENCE': 'verifying related network services',
+                    'DEPENDS_OFF': 'related network services were not started yet',
+                    'STARTING': 'turning on message-history service',
+                    'STOPPING': 'turning off message-history service',
+                    'CLOSED': 'message-history service is stopped', }
 
             VerticalScrollView:
                 id: scroll_view
@@ -77,3 +76,12 @@
                     ConversationsListView:
                         id: conversations_list_view
                         size_hint: 1, 1
+
+    RootActionButton:
+        id: action_button
+        data:
+            {'chat-plus-outline': 'Create new group',
+            'account-key-outline': 'Start private chat',
+            'account-box-multiple': 'My contacts', }
+        icon: 'comment-text-multiple'
+        callback: root.on_action_button_clicked

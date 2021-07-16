@@ -44,10 +44,11 @@ if _Debug:
 from kivy.config import Config
 
 from lib import system
+from lib import api_client
 
 #------------------------------------------------------------------------------
 
-# Config.set('kivy', 'window_icon', 'bitdust.png')
+Config.set('kivy', 'window_icon', 'bitdust.png')
 
 if _Debug:
     Config.set('kivy', 'log_level', 'debug')
@@ -55,7 +56,6 @@ if _Debug:
 #------------------------------------------------------------------------------
 
 from kivy.lang import Builder
-from kivy.core.window import Window
 from kivy.clock import Clock, mainthread
 
 from kivymd.app import MDApp
@@ -89,8 +89,8 @@ if system.is_android():
     SERVICE_NAME = '{packagename}.Service{servicename}'.format(
         packagename=PACKAGE_NAME,
         servicename='Bitdustnode'
-    )    
-    PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
+    )
+    PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 #------------------------------------------------------------------------------
 
@@ -157,7 +157,7 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
 
         self.title = 'BitDust'
-        # self.icon = './bitdust.png'
+        self.icon = './bitdust.png'
         self.apply_styles()
 
         Builder.load_string("""
@@ -165,14 +165,23 @@ class BitDustApp(styles.AppStyle, MDApp):
 #:import md_icon components.webfont.md_icon
 #:import icofont_icon components.webfont.icofont_icon
 #:import make_icon components.webfont.make_icon
+#:import DynamicHeightTextInput components.text_input.DynamicHeightTextInput
+#:import RaisedIconButton components.buttons.RaisedIconButton
+#:import RootActionButton components.buttons.RootActionButton
+#:import AutomatStatusPanel components.status_panel.AutomatStatusPanel
+#:import AutomatShortStatusPanel components.status_panel.AutomatShortStatusPanel
+#:import AutomatShortStatusPanelByIndex components.status_panel.AutomatShortStatusPanelByIndex
         """)
 
-        from components import layouts
-        from components import labels
-        from components import buttons
-        from components import text_input
-        from components import list_view
-        from components import screen
+        Builder.load_file('./components/layouts.kv')
+        Builder.load_file('./components/labels.kv')
+        Builder.load_file('./components/buttons.kv')
+        Builder.load_file('./components/text_input.kv')
+        Builder.load_file('./components/list_view.kv')
+        Builder.load_file('./components/status_panel.kv')
+        Builder.load_file('./components/dialogs.kv')
+        Builder.load_file('./components/main_win.kv')
+
         from components import main_win
 
         self.control = controller.Controller(self)
@@ -205,11 +214,22 @@ class BitDustApp(styles.AppStyle, MDApp):
         return True
 
     def start_engine(self):
+        if _Debug:
+            print('BitDustApp.start_engine')
         if system.is_android():
             self.start_android_service()
         else:
             self.check_restart_bitdust_process()
         return True
+
+    def restart_engine(self):
+        if _Debug:
+            print('BitDustApp.restart_engine')
+        if system.is_android():
+            self.stop_android_service()
+            Clock.schedule_once(lambda x: self.start_android_service(), .5)
+        else:
+            api_client.process_stop(cb=lambda resp: self.check_restart_bitdust_process())
 
     def start_android_service(self, finishing=False):
         if not system.is_android():
@@ -245,13 +265,17 @@ class BitDustApp(styles.AppStyle, MDApp):
         return self.service
 
     def check_restart_bitdust_process(self):
-        if system.is_android():
+        if not system.is_linux():
+            if _Debug:
+                print('BitDustApp.check_restart_bitdust_process NOT IMPLEMENTED')
             return None
-        if system.is_linux():
-            Clock.schedule_once(self.do_start_deploy_process)
-        # TODO: to be implemented ...
+        if _Debug:
+            print('BitDustApp.check_restart_bitdust_process')
+        Clock.schedule_once(self.do_start_deploy_process)
 
     def do_start_deploy_process(self, *args):
+        if _Debug:
+            print('BitDustApp.do_start_deploy_process finishing=%r' % self.finishing.is_set())
         if self.finishing.is_set():
             return
         system.BackgroundProcess(
@@ -260,13 +284,11 @@ class BitDustApp(styles.AppStyle, MDApp):
             stderr_callback=self.on_deploy_process_stderr,
             finishing=self.finishing,
         ).run()
-        if _Debug:
-            print('BitDustApp.do_start_deploy_process finished')
 
     @mainthread
     def on_deploy_process_stdout(self, line):
         if _Debug:
-            print('DEPLOY:', line.decode().rstrip())
+            print('DEPLOY OUT:', line.decode().rstrip())
         if line.decode().startswith('#####'):
             if 'process_dead_screen' in self.main_window.active_screens:
                 self.main_window.active_screens['process_dead_screen'][0].ids.deploy_output_label.text += line.decode()[6:]
@@ -279,8 +301,8 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_start(self):
         if _Debug:
             print('BitDustApp.on_start')
-            self.profile = cProfile.Profile()
-            self.profile.enable()        
+            # self.profile = cProfile.Profile()
+            # self.profile.enable()
         if not system.is_android():
             return self.do_start()
         required_permissions = [
@@ -306,11 +328,6 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_stop(self):
         if _Debug:
             print('BitDustApp.on_stop')
-            self.profile.disable()
-            if system.is_android():
-                self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
-            else:
-                self.profile.dump_stats('./debug.profile')
         self.finishing.set()
         self.control.stop()
         self.main_window.unregister_controller()
@@ -320,6 +337,11 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_pause(self):
         if _Debug:
             print('BitDustApp.on_pause')
+            # self.profile.disable()
+            # if system.is_android():
+            #     self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
+            # else:
+            #     self.profile.dump_stats('./debug.profile')
         return True
 
     def on_resume(self):

@@ -4,8 +4,22 @@
 
         TopEmptyScreenSpace:
 
-        VLayout:
-            size_hint: 1, 1
+        AppScreenLayout:
+
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: '',
+                    'AT_STARTUP': 'starting',
+                    'LOCAL': 'initializing local environment',
+                    'MODULES': 'starting sub-modules',
+                    'INSTALL': 'installing application',
+                    'READY': 'application is ready',
+                    'STOPPING': 'application is shutting down',
+                    'SERVICES': 'starting network services',
+                    'INTERFACES': 'starting application interfaces',
+                    'EXIT': 'application is closed', }
 
             VEmptySpace:
                 size_hint_y: 0.5
@@ -16,7 +30,8 @@
                 HEmptySpace:
                     size_hint_x: 0.5
 
-                NormalLabel:
+                HFlexMarkupLabel:
+                    halign: 'center'
                     text: '[size=26sp]Welcome to BitDust[/size]'
 
                 HEmptySpace:
@@ -24,3 +39,13 @@
 
             VEmptySpace:
                 size_hint_y: 0.5
+
+    RootActionButton:
+        id: action_button
+        logo: True
+        data:
+            {'upload-lock': 'Encrypt and upload files',
+            'chat-plus-outline': 'Create new group',
+            'account-key-outline': 'Start private chat', }
+        buttons_colors: {}
+        callback: root.on_action_button_clicked

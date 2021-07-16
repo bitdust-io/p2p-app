@@ -2,6 +2,15 @@ import os
 import sys
 import json
 
+#------------------------------------------------------------------------------ 
+
+_Debug = True
+
+if _Debug:
+    print('BitDustService ENTRYPOINT')
+
+#------------------------------------------------------------------------------ 
+
 from twisted.internet import reactor
 
 from jnius import autoclass  # @UnresolvedImport
@@ -10,14 +19,10 @@ import encodings.idna
 
 #------------------------------------------------------------------------------
 
+from android.config import ACTIVITY_CLASS_NAME, SERVICE_CLASS_NAME  # @UnresolvedImport
+
 PACKAGE_NAME = 'org.bitdust_io.bitdust1'
-SERVICE_NAME = 'org.bitdust_io.bitdust1.BitDustService'
-
-PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
-
-#------------------------------------------------------------------------------ 
-
-_Debug = False
+PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 #------------------------------------------------------------------------------
 
@@ -51,7 +56,7 @@ def set_foreground():
     notification_channel = NotificationChannel(channel_id, AndroidString('BitDust Channel'.encode('utf-8')), NotificationManager.IMPORTANCE_LOW)
 
     Notification = autoclass(u'android.app.Notification')
-    service = autoclass(SERVICE_NAME).mService
+    service = autoclass(SERVICE_CLASS_NAME).mService
     notification_service = service.getSystemService(Context.NOTIFICATION_SERVICE)
 
     notification_service.createNotificationChannel(notification_channel)
@@ -75,7 +80,7 @@ def set_foreground():
     notification_builder.setPriority(NotificationManager.IMPORTANCE_MIN)
 
     Drawable = autoclass(u"{}.R$drawable".format(service.getPackageName()))
-    notification_builder.setSmallIcon(getattr(Drawable, 'icon'))
+    notification_builder.setSmallIcon(getattr(Drawable, 'notification_icon_background'))
     notification_builder.setAutoCancel(True)
     notification_builder.setCategory(Notification.CATEGORY_SERVICE)
 
@@ -92,7 +97,7 @@ def set_foreground_api_lower_26():
     NotificationBuilder = autoclass('android.app.Notification$Builder')
 
     Notification = autoclass('android.app.Notification')
-    service = autoclass(SERVICE_NAME).mService
+    service = autoclass(SERVICE_CLASS_NAME).mService
 
     app_context = service.getApplication().getApplicationContext()
     notification_builder = NotificationBuilder(app_context)
@@ -184,8 +189,8 @@ def run_service():
             print('BitDustService.run_service() Twisted reactor stopped')
 
     except Exception as exc:
-        if _Debug:
-            print('BitDustService.run_service()  Exception : %r' % exc)
+        import traceback
+        traceback.print_exc()
 
 #------------------------------------------------------------------------------
 

@@ -7,42 +7,51 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
+# create new screen step-by-step:
+# 1. add new item in screens.controller.all_screens()
+# 2. create new file screens/screen_xxx.kv
+# 3. create new file screens/screen_xxx.py
+# 4. make changes in components.main_win.MainWin.select_screen() if it is required for screen identification
+# 4. to open screen use: screen.main_window().select_screen(screen_id='xxx_screen')
+#------------------------------------------------------------------------------ 
 
 def all_screens():
-    from screens import screen_startup
-    from screens import screen_welcome
-    from screens import screen_process_dead
-    from screens import screen_new_identity
-    from screens import screen_recover_identity
-    from screens import screen_connecting
-    from screens import screen_settings
-    from screens import screen_my_id
-    from screens import screen_search_people
-    from screens import screen_friends
-    from screens import screen_select_friend
-    from screens import screen_conversations
-    from screens import screen_create_group
-    from screens import screen_private_chat
-    from screens import screen_group_chat
     return {
-        'startup_screen': screen_startup.StartUpScreen,
-        'process_dead_screen': screen_process_dead.ProcessDeadScreen,
-        'connecting_screen': screen_connecting.ConnectingScreen,
-        'new_identity_screen': screen_new_identity.NewIdentityScreen,
-        'recover_identity_screen': screen_recover_identity.RecoverIdentityScreen,
-        'welcome_screen': screen_welcome.WelcomeScreen,
-        'settings_screen': screen_settings.SettingsScreen,
-        'my_id_screen': screen_my_id.MyIDScreen,
-        'search_people_screen': screen_search_people.SearchPeopleScreen,
-        'friends_screen': screen_friends.FriendsScreen,
-        'select_friend_screen': screen_select_friend.SelectFriendScreen,
-        'conversations_screen': screen_conversations.ConversationsScreen,
-        'create_group_screen': screen_create_group.CreateGroupScreen,
-        'private_chat_screen': screen_private_chat.PrivateChatScreen,
-        'group_chat_screen': screen_group_chat.GroupChatScreen,
+        'startup_screen': (
+            'screens/screen_startup.kv', 'screens.screen_startup', 'StartUpScreen', ),
+        'process_dead_screen': (
+            'screens/screen_process_dead.kv', 'screens.screen_process_dead', 'ProcessDeadScreen', ),
+        'connecting_screen': (
+            'screens/screen_connecting.kv', 'screens.screen_connecting', 'ConnectingScreen', ),
+        'new_identity_screen': (
+            'screens/screen_new_identity.kv', 'screens.screen_new_identity', 'NewIdentityScreen', ),
+        'recover_identity_screen': (
+            'screens/screen_recover_identity.kv', 'screens.screen_recover_identity', 'RecoverIdentityScreen', ),
+        'welcome_screen': (
+            'screens/screen_welcome.kv', 'screens.screen_welcome', 'WelcomeScreen', ),
+        'settings_screen': (
+            'screens/screen_settings.kv', 'screens.screen_settings', 'SettingsScreen', ),
+        'my_id_screen': (
+            'screens/screen_my_id.kv', 'screens.screen_my_id', 'MyIDScreen', ),
+        'search_people_screen': (
+            'screens/screen_search_people.kv', 'screens.screen_search_people', 'SearchPeopleScreen', ),
+        'friends_screen': (
+            'screens/screen_friends.kv', 'screens.screen_friends', 'FriendsScreen', ),
+        'select_friend_screen': (
+            'screens/screen_select_friend.kv', 'screens.screen_select_friend', 'SelectFriendScreen', ),
+        'conversations_screen': (
+            'screens/screen_conversations.kv', 'screens.screen_conversations', 'ConversationsScreen', ),
+        'create_group_screen': (
+            'screens/screen_create_group.kv', 'screens.screen_create_group', 'CreateGroupScreen', ),
+        'private_chat_screen': (
+            'screens/screen_private_chat.kv', 'screens.screen_private_chat', 'PrivateChatScreen', ),
+        'group_chat_screen': (
+            'screens/screen_group_chat.kv', 'screens.screen_group_chat', 'GroupChatScreen', ),
+        'group_info_screen': (
+            'screens/screen_group_info.kv', 'screens.screen_group_info', 'GroupInfoScreen', ),
     }
 
 #------------------------------------------------------------------------------
@@ -56,6 +65,8 @@ class Controller(object):
     def __init__(self, app):
         self.app = app
         self.callbacks = {}
+        self.state_changed_callbacks = {}
+        self.state_changed_callbacks_by_id = {}
 
     def mw(self):
         return self.app.main_window
@@ -132,6 +143,44 @@ class Controller(object):
 
     #------------------------------------------------------------------------------
 
+    def add_state_changed_callback(self, automat_index, cb, cb_id=None):
+        if automat_index not in self.state_changed_callbacks:
+            self.state_changed_callbacks[automat_index] = []
+        self.state_changed_callbacks[automat_index].append((cb, cb_id, ))
+
+    def remove_state_changed_callback(self, automat_index, cb=None, cb_id=None):
+        if automat_index not in self.state_changed_callbacks:
+            return False
+        for pos in range(len(self.state_changed_callbacks[automat_index])):
+            cur_cb, cur_cb_id = self.state_changed_callbacks[automat_index][pos]
+            if cb is not None and cur_cb == cb:
+                self.state_changed_callbacks[automat_index].pop(pos)
+                return True
+            if cb_id is not None and cur_cb_id == cb_id:
+                self.state_changed_callbacks[automat_index].pop(pos)
+                return True
+        return False
+
+    def add_state_changed_callback_by_id(self, automat_id, cb, cb_id=None):
+        if automat_id not in self.state_changed_callbacks_by_id:
+            self.state_changed_callbacks_by_id[automat_id] = []
+        self.state_changed_callbacks_by_id[automat_id].append((cb, cb_id, ))
+
+    def remove_state_changed_callback_by_id(self, automat_id, cb=None, cb_id=None):
+        if automat_id not in self.state_changed_callbacks_by_id:
+            return False
+        for pos in range(len(self.state_changed_callbacks_by_id[automat_id])):
+            cur_cb, cur_cb_id = self.state_changed_callbacks_by_id[automat_id][pos]
+            if cb is not None and cur_cb == cb:
+                self.state_changed_callbacks_by_id[automat_id].pop(pos)
+                return True
+            if cb_id is not None and cur_cb_id == cb_id:
+                self.state_changed_callbacks_by_id[automat_id].pop(pos)
+                return True
+        return False
+
+    #------------------------------------------------------------------------------
+
     def on_process_health_result(self, resp):
         if not isinstance(resp, dict):
             if _Debug:
@@ -195,6 +244,10 @@ class Controller(object):
         event_data = json_data.get('payload', {}).get('data', {})
         if not event_id:
             return
+        if event_data.get('id', '').startswith('service_') and 'newstate' in event_data and 'oldstate' in event_data:
+            pass
+            # if self.mw().is_screen_active('connecting_screen'):
+            #     self.mw().get_active_screen('connecting_screen').on_service_state_changed(event_data)
         if event_id in ['service-started', 'service-stopped', ]:
             if self.mw().is_screen_active('settings_screen'):
                 self.mw().get_active_screen('settings_screen').on_service_started_stopped(
@@ -202,6 +255,14 @@ class Controller(object):
                     service_name=event_data.get('name', ''),
                 )
         elif event_id == 'state-changed':
+            automat_index = event_data.get('index')
+            automat_id = event_data.get('id')
+            if automat_index is not None and automat_index in self.state_changed_callbacks:
+                for cb_info in self.state_changed_callbacks[automat_index]:
+                    cb_info[0](event_data)
+            if automat_id is not None and automat_id in self.state_changed_callbacks_by_id:
+                for cb_info in self.state_changed_callbacks_by_id[automat_id]:
+                    cb_info[0](event_data)
             if event_data.get('name', '') in ['GroupMember', 'OnlineStatus', ]:
                 if self.mw().is_screen_active('conversations_screen'):
                     self.mw().get_active_screen('conversations_screen').on_state_changed(event_data)
@@ -258,9 +319,10 @@ class Controller(object):
         if _Debug:
             print('Controller.on_state_process_health', value)
         if value == -1:
-            if self.mw().selected_screen:
-                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
-                    self.mw().latest_screen = self.mw().selected_screen
+            # if self.mw().selected_screen:
+                # if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
+                #     self.mw().latest_screen = self.mw().selected_screen
+            self.mw().latest_screen = 'welcome_screen'
             self.mw().state_identity_get = 0
             self.mw().state_network_connected = 0
             self.mw().select_screen('process_dead_screen')
@@ -280,9 +342,10 @@ class Controller(object):
         if self.mw().state_process_health != 1:
             return
         if value == -1:
-            if self.mw().selected_screen:
-                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
-                    self.mw().latest_screen = self.mw().selected_screen
+            # if self.mw().selected_screen:
+                # if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
+                #     self.mw().latest_screen = self.mw().selected_screen
+            self.mw().latest_screen = 'welcome_screen'
             self.mw().state_network_connected = 0
             self.mw().select_screen('new_identity_screen')
             self.mw().close_screens(['process_dead_screen', 'connecting_screen', 'startup_screen', ])
@@ -325,21 +388,26 @@ class Controller(object):
             if self.mw().latest_screen in ['process_dead_screen', 'connecting_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ]:
                 self.mw().latest_screen = 'welcome_screen'
             if self.mw().selected_screen != 'welcome_screen':
-                self.mw().select_screen(self.mw().latest_screen or 'welcome_screen')
-            self.mw().close_screens(['process_dead_screen', 'connecting_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ])
+                if self.mw().selected_screen == 'connecting_screen':
+                    self.mw().get_active_screen('connecting_screen').on_state_verify_success(self.mw().latest_screen or 'welcome_screen')
+                else:
+                    self.mw().select_screen(self.mw().latest_screen or 'welcome_screen')
+            self.mw().close_screens(['process_dead_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ])
             return
         if self.mw().state_process_health == 1 and self.mw().state_identity_get == 1 and self.mw().state_network_connected in [-1, 0, ]:
-            if self.mw().selected_screen:
-                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
-                    self.mw().latest_screen = self.mw().selected_screen
+            # if self.mw().selected_screen:
+            #     if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
+            #         self.mw().latest_screen = self.mw().selected_screen
+            self.mw().latest_screen = 'welcome_screen'
             if self.mw().selected_screen != 'welcome_screen':
                 self.mw().select_screen('connecting_screen')
             self.mw().close_screens(['process_dead_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ])
             return
         if self.mw().state_process_health == 1 and self.mw().state_identity_get == -1:
-            if self.mw().selected_screen:
-                if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
-                    self.mw().latest_screen = self.mw().selected_screen
+            # if self.mw().selected_screen:
+            #     if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
+            #         self.mw().latest_screen = self.mw().selected_screen
+            self.mw().latest_screen = 'welcome_screen'
             self.mw().select_screen('new_identity_screen')
             self.mw().close_screens(['process_dead_screen', 'connecting_screen', 'recover_identity_screen', 'startup_screen', ])
             return

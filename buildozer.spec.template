@@ -16,7 +16,7 @@ source.dir = ./src
 source.include_exts = py,png,svg,jpg,jpeg,ico,kv,atlas,otf,ttf,sh,json,html,js,map,css,mp3
 
 # (list) List of inclusions using pattern matching
-#source.include_patterns = assets/*,images/*.png
+#source.include_patterns = assets/*,images/*.png,*.png
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec
@@ -133,9 +133,13 @@ android.skip_update = True
 android.accept_sdk_license = True
 
 # (str) Android entry point, default is ok for Kivy-based app
-android.entrypoint = org.bitdust_io.bitdust1.BitDustActivity
-android.activity_class_name = org.bitdust_io.bitdust1.BitDustActivity
-android.service_class_name = org.bitdust_io.bitdust1.BitDustService
+# android.entrypoint = org.bitdust_io.bitdust1.BitDustActivity
+# android.activity_class_name = org.bitdust_io.bitdust1.BitDustActivity
+# android.service_class_name = org.bitdust_io.bitdust1.BitDustService
+
+# (str) Extra xml to write directly inside the <manifest><application> tag of AndroidManifest.xml
+# use that parameter to provide a filename from where to load your custom XML arguments
+android.extra_manifest_application_arguments = ./etc/extra_manifest_application_arguments.xml
 
 # (list) Pattern to whitelist for the whole project
 #android.whitelist =
@@ -167,7 +171,8 @@ android.add_aars = support-compat-27.0.0.aar
 #android.gradle_dependencies =
 
 # (list) Java classes to add as activities to the manifest.
-android.add_activites = org.bitdust_io.bitdust1.BitDustActivity
+# android.add_activites = org.bitdust_io.bitdust1.BitDustActivity
+android.add_activites = org.kivy.android.PythonActivity
 
 # (str) OUYA Console category. Should be one of GAME or APP
 # If you leave this blank, OUYA support will not be enabled
@@ -181,8 +186,6 @@ android.add_activites = org.bitdust_io.bitdust1.BitDustActivity
 
 # (str) launchMode to set for the main activity
 android.manifest.launch_mode = singleTask
-android.manifest.network_security_config = "@xml/network_security_config"
-android.manifest.uses_cleartext_traffic = True
 
 # (list) Android additional libraries to copy into libs/armeabi
 #android.add_libs_armeabi = libs/android/*.so
@@ -238,7 +241,7 @@ p4a.local_recipes = ./recipes/
 #p4a.hook =
 
 # (str) Bootstrap to use for android builds
-# p4a.bootstrap = sdl2
+p4a.bootstrap = sdl2
 # p4a.bootstrap = webview
 
 # (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)

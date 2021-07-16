@@ -4,7 +4,6 @@
 
 ROOT_DIR="$HOME/.bitdust"
 SOURCE_DIR="${ROOT_DIR}/src"
-SOURCE_UI_DIR="${ROOT_DIR}/ui"
 VENV_DIR="${ROOT_DIR}/venv"
 BITDUST_PY="${SOURCE_DIR}/bitdust.py"
 BITDUST_COMMAND_FILE="${ROOT_DIR}/bitdust"
@@ -45,7 +44,6 @@ if [[ "$1" == "redeploy" ]]; then
     echo '##### Re-deploying BitDust'
     rm -rf $ROOT_DIR/venv
     rm -rf $ROOT_DIR/src
-    rm -rf $ROOT_DIR/ui
     rm -rf $ROOT_DIR/identitycache
     rm -rf $ROOT_DIR/identityhistory
     rm -rf $ROOT_DIR/temp
@@ -84,27 +82,6 @@ else
     # echo ''
     # echo "##### Refreshing BitDust source files"
     # $GIT_BIN reset --hard origin/master
-    # cd ..
-fi
-
-
-if [[ ! -e $SOURCE_UI_DIR ]]; then
-    echo ''
-    echo "##### Downloading BitDust UI source files from Git repository"
-    mkdir -p $SOURCE_UI_DIR
-    $PYTHON_BIN -c "import pygit2; pygit2.clone_repository('https://github.com/bitdust-io/ui.git', '$SOURCE_UI_DIR', checkout_branch='gh-pages')"
-    # $GIT_BIN clone --single-branch --branch gh-pages --depth=1 "git://github.com/bitdust-io/ui.git" "$SOURCE_UI_DIR"
-else
-    # echo ''
-    # echo "##### BitDust UI source files already cloned locally"
-    # cd $SOURCE_UI_DIR
-    echo ''
-    echo "##### Updating BitDust UI source files from Git repository"
-    $PYTHON_BIN -c "import pygit2; repo=pygit2.init_repository('$SOURCE_UI_DIR'); repo.remotes[0].fetch(); top=repo.lookup_reference('refs/remotes/origin/gh-pages').target; repo.reset(top, pygit2.GIT_RESET_HARD);"
-    # $GIT_BIN fetch --all
-    # echo ''
-    # echo "##### Refreshing BitDust UI source files"
-    # $GIT_BIN reset --hard origin/gh-pages
     # cd ..
 fi
 

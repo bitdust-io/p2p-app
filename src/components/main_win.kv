@@ -1,10 +1,8 @@
 #:import NoTransition kivy.uix.screenmanager.NoTransition
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
 
 
 <ContentNavigationDrawer>:
-    screen_manager: screen_manager
-    nav_drawer: nav_drawer
-    main_win: main_win
 
     ScrollView:
 
@@ -15,67 +13,61 @@
             MDActionTopAppBarButton:
                 icon: 'arrow-left'
                 md_bg_color: app.color_transparent
-                on_release: nav_drawer.set_state("close")
+                on_release: app.root.nav().set_state("close")
 
             Widget:
                 size_hint: None, None
                 width: 1
                 height: dp(50)
-                # height: toolbar.height
-                
 
             OneLineIconListItem:
                 text: "my identity"
                 on_release:
-                    nav_drawer.set_state("close")
-                    main_win.select_screen('my_id_screen', verify_state=True)
-
+                    app.root.nav().set_state("close")
+                    app.root.select_screen('my_id_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "passport"
                     md_bg_color: app.color_transparent
                     on_release:
-                        nav_drawer.set_state("close")
-                        main_win.select_screen('my_id_screen', verify_state=True)
+                        app.root.nav().set_state("close")
+                        app.root.select_screen('my_id_screen', verify_state=True)
 
 
-            OneLineIconListItem:
-                text: "contacts"
-                on_release:
-                    nav_drawer.set_state("close")
-                    main_win.select_screen('friends_screen', verify_state=True)
-
-                IconLeftWidget:
-                    icon: "account-multiple"
-                    md_bg_color: app.color_transparent
-                    on_release:
-                        nav_drawer.set_state("close")
-                        main_win.select_screen('friends_screen', verify_state=True)
+#             OneLineIconListItem:
+#                 text: "contacts"
+#                 on_release:
+#                     app.root.nav().set_state("close")
+#                     app.root.select_screen('friends_screen', verify_state=True)
+#                 IconLeftWidget:
+#                     icon: "account-multiple"
+#                     md_bg_color: app.color_transparent
+#                     on_release:
+#                         app.root.nav().set_state("close")
+#                         app.root.select_screen('friends_screen', verify_state=True)
 
             OneLineIconListItem:
                 text: "chat"
                 on_release:
-                    nav_drawer.set_state("close")
-                    main_win.select_screen('conversations_screen', verify_state=True)
-
+                    app.root.nav().set_state("close")
+                    app.root.select_screen('conversations_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "chat-outline"
                     md_bg_color: app.color_transparent
                     on_release:
-                        nav_drawer.set_state("close")
-                        main_win.select_screen('conversations_screen', verify_state=True)
+                        app.root.nav().set_state("close")
+                        app.root.select_screen('conversations_screen', verify_state=True)
 
             OneLineIconListItem:
                 text: "settings"
                 on_release:
-                    nav_drawer.set_state("close")
-                    main_win.select_screen('settings_screen', verify_state=True)
-
+                    app.root.nav().set_state("close")
+                    app.root.select_screen('settings_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "cogs"
                     md_bg_color: app.color_transparent
                     on_release:
-                        nav_drawer.set_state("close")
-                        main_win.select_screen('settings_screen', verify_state=True)
+                        app.root.nav().set_state("close")
+                        app.root.select_screen('settings_screen', verify_state=True)
 
 
 <MainWin>:
@@ -97,14 +89,13 @@
     MDToolbar:
         id: toolbar
         pos_hint: {"top": 1}
-        elevation: 5
+        elevation: 0
         icon: "search-web"
         title: "BitDust"
         anchor_title: 'center'
         specific_text_color: app.color_white
-        # md_bg_color: app.theme_cls.accent_color
-        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")], ]
-        right_action_items: [["search-web", lambda x: print('right menu 2')], ["dots-vertical", root.on_right_menu_button_clicked], ]
+        left_action_items: [["menu", root.on_left_menu_button_clicked, ], ]
+        right_action_items: []
 
     MDNavigationLayout:
 
@@ -116,7 +107,9 @@
             id: nav_drawer
             type: "modal"
             width: dp(220)
-            opening_time: 0
-            closing_time: 0
+            opening_time: 0.2
+            closing_time: 0.2
+            elevation: 0
 
             ContentNavigationDrawer:
+                id: nav_drawer_content
