@@ -6,7 +6,6 @@
 import os
 import sys
 import threading
-import cProfile
 
 #------------------------------------------------------------------------------
 
@@ -85,12 +84,11 @@ if system.is_android():
 #------------------------------------------------------------------------------
 
 if system.is_android():
-    PACKAGE_NAME = 'org.bitdust_io.bitdust1'
-    SERVICE_NAME = '{packagename}.Service{servicename}'.format(
+    PACKAGE_NAME = u'org.bitdust_io.bitdust1'
+    SERVICE_NAME = u'{packagename}.Service{servicename}'.format(
         packagename=PACKAGE_NAME,
-        servicename='Bitdustnode'
+        servicename=u'Bitdustnode'
     )
-    PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 #------------------------------------------------------------------------------
 
@@ -127,8 +125,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         from kivy.core.text import LabelBase
         from kivymd.font_definitions import theme_font_styles
         if _Debug:
-            print('BitDustApp.apply_styles   App.get_running_app() : %r', App.get_running_app())
-            print('BitDustApp.apply_styles                    self : %r', self)
+            print('BitDustApp.apply_styles   App.get_running_app() : %r' % App.get_running_app())
+            print('BitDustApp.apply_styles                    self : %r' % self)
         self.theme_cls.theme_style = 'Light'
         self.theme_cls.primary_palette = 'Blue'
         self.theme_cls.primary_hue = "400"
@@ -231,18 +229,20 @@ class BitDustApp(styles.AppStyle, MDApp):
         else:
             api_client.process_stop(cb=lambda resp: self.check_restart_bitdust_process())
 
-    def start_android_service(self, finishing=False):
+    def start_android_service(self, shutdown=False):
         if not system.is_android():
             return None
         if _Debug:
-            print('BitDustApp.start_android_service finishing=%r' % finishing)
+            print('BitDustApp.start_android_service ACTIVITY_CLASS_NAME=%r SERVICE_NAME=%r shutdown=%r' % (
+                ACTIVITY_CLASS_NAME, SERVICE_NAME, shutdown, ))
         service = autoclass(SERVICE_NAME)
-        mActivity = PythonActivity.mActivity
+        # activity = autoclass(u'org.kivy.android.PythonActivity').mActivity
+        activity = autoclass(ACTIVITY_CLASS_NAME).mActivity
         argument = ''
-        if finishing:
+        if shutdown:
             argument = '{"stop_service": 1}'
-        service.start(mActivity, argument)
-        if finishing:
+        service.start(activity, argument)
+        if shutdown:
             self.service = None
             if _Debug:
                 print('BitDustApp.start_android_service service expect to be STOPPED now')
@@ -258,8 +258,10 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.stop_service %r' % self.service)
         service = autoclass(SERVICE_NAME)
-        service.stop(PythonActivity.mActivity)
-        self.start_android_service(finishing=True)
+        # activity = autoclass(u'org.kivy.android.PythonActivity').mActivity
+        activity = autoclass(ACTIVITY_CLASS_NAME).mActivity
+        service.stop(activity)
+        self.start_android_service(shutdown=True)
         if _Debug:
             print('BitDustApp.stop_service STOPPED')
         return self.service
@@ -301,6 +303,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_start(self):
         if _Debug:
             print('BitDustApp.on_start')
+            # import cProfile
             # self.profile = cProfile.Profile()
             # self.profile.enable()
         if not system.is_android():

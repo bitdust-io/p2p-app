@@ -5,6 +5,7 @@ buildozer.spec
 pepk.jar
 support-compat-27.0.0.aar
 
+.keystore_password
 venv
 buildozer
 .buildozer

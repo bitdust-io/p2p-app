@@ -22,16 +22,18 @@ import encodings.idna
 from android.config import ACTIVITY_CLASS_NAME, SERVICE_CLASS_NAME  # @UnresolvedImport
 
 PACKAGE_NAME = 'org.bitdust_io.bitdust1'
-PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 #------------------------------------------------------------------------------
 
+from twisted.internet.defer import setDebugging
+
 if _Debug:
     # logging.basicConfig(level=logging.DEBUG)
-    from twisted.internet.defer import setDebugging
     setDebugging(True)
-    from twisted.python.log import startLogging
-    startLogging(sys.stdout)
+    # from twisted.python.log import startLogging
+    # startLogging(sys.stdout)
+else:
+    setDebugging(False)
 
 #------------------------------------------------------------------------------
 
@@ -44,6 +46,8 @@ if _Debug:
 #------------------------------------------------------------------------------
 
 def set_foreground():
+    if _Debug:
+        print('BitDustService.set_foreground()')
     channel_id = f'{PACKAGE_NAME}.Bitdustnode'
     Context = autoclass(u'android.content.Context')
     Intent = autoclass(u'android.content.Intent')
@@ -67,6 +71,7 @@ def set_foreground():
     title = AndroidString("BitDust".encode('utf-8'))
     message = AndroidString("Application is running in background".encode('utf-8'))
 
+    PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
     notification_intent = Intent(app_context, PythonActivity)
     notification_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
     notification_intent.setAction(Intent.ACTION_MAIN)
@@ -87,10 +92,12 @@ def set_foreground():
     new_notification = notification_builder.getNotification()
     service.startForeground(1, new_notification)
     if _Debug:
-        print('BitDustService.set_foreground() : %r' % service)
+        print('BitDustService.set_foreground() OK : %r' % service)
 
 
 def set_foreground_api_lower_26():
+    if _Debug:
+        print('BitDustService.set_foreground_api_lower_26()')
     Intent = autoclass('android.content.Intent')
     PendingIntent = autoclass('android.app.PendingIntent')
     AndroidString = autoclass('java.lang.String')
@@ -105,6 +112,7 @@ def set_foreground_api_lower_26():
     title = AndroidString("BitDust".encode('utf-8'))
     message = AndroidString("Application is running in background".encode('utf-8'))
 
+    PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
     notification_intent = Intent(app_context, PythonActivity)
     notification_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
     notification_intent.setAction(Intent.ACTION_MAIN)
@@ -123,7 +131,7 @@ def set_foreground_api_lower_26():
 
     service.startForeground(1, notification_builder.getNotification())
     if _Debug:
-        print('BitDustService.set_foreground_api_lower_26() : %r' % service)
+        print('BitDustService.set_foreground_api_lower_26() OK : %r' % service)
 
 #------------------------------------------------------------------------------
 
@@ -139,7 +147,8 @@ def start_bitdust():
     if _Debug:
         print('BitDustService.start_bitdust() executing the entry point     os.getcwd() : %r' % os.getcwd())
     from main.bpmain import main
-    main(executable_path, start_reactor=False)
+    reactor.callLater(0, main, executable_path, start_reactor=False)  # @UndefinedVariable
+    # main(executable_path, start_reactor=False)
     if _Debug:
         print('BitDustService.start_bitdust() OK!')
     return True
