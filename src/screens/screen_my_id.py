@@ -99,15 +99,18 @@ class MyIDScreen(screen.AppScreen):
             )
         elif btn.icon == 'cellphone-erase':
             dialogs.open_yes_no_dialog(
-                title='Delete my key and all data',
-                text='WARNING! All your data will be erased along with the private key.',
+                title='This will erase your identity and the private key and all data will be lost',
+                text='WARNING! All your data will become completely inaccessible without private key',
                 cb=self.on_confirm_erase_my_id,
             )
         elif btn.icon == 'lan-pending':
             api_client.network_reconnect(cb=self.on_network_reconnect_result)
         elif btn.icon == 'cog-refresh':
             self.app().restart_engine()
-            snackbar.info(text='BitDust node is restarting')
+            snackbar.info(text='BitDust background process is restarting')
+        elif btn.icon == 'power':
+            self.app().stop_engine()
+            snackbar.info(text='BitDust background process will be stopped')
 
     def on_confirm_erase_my_id(self, answer):
         if answer == 'yes':

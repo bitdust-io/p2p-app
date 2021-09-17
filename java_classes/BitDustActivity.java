@@ -23,6 +23,7 @@ import java.util.TimerTask;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.net.HttpURLConnection;
+import java.net.SocketException;
 
 import android.app.Activity;
 import android.content.Context;
@@ -75,7 +76,7 @@ public class BitDustActivity extends PythonActivity {
 
     public static BitDustActivity mActivity = null;
     public static BitDustActivity mCustomActivity = null;
-    
+
     public static int status_bar_height = 0;
 
     @Override
@@ -86,26 +87,16 @@ public class BitDustActivity extends PythonActivity {
         Log.v(TAG, "onCreate() overwrote mActivity " + this.mActivity);
     }
 
-
     @Override
     protected void onDestroy() {
         Log.v(TAG, "onDestroy()");
         String process_stop_result = "";
         process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
-        Log.v(TAG, "onDestroy() process_stop_result from the Activity : " + process_stop_result);
-
-        String process_health_result = "ok";
-        int attempts = 0;
-        while (process_health_result != "") {
-            attempts = attempts + 1;
-            if (attempts >= 50) {
-            	Log.v(TAG, "onDestroy() process_health_result ATTEMPTS exceeded!");
-                break;
-            }
-            process_health_result = requestGetURL("http://localhost:8180/process/health/v1");
-            Log.v(TAG, "onDestroy() process_health_result : " + process_health_result);
+        Log.v(TAG, "onDestroy() process_stop_result first call from the Activity : " + process_stop_result);
+        while (process_stop_result.indexOf("Failed to connect") < 0) {
+            process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
+            Log.v(TAG, "onDestroy() process_stop_result retry from the Activity : " + process_stop_result);
         }
-
         Log.v(TAG, "onDestroy()   about to call super onDestroy");
         super.onDestroy();
     }
@@ -122,9 +113,10 @@ public class BitDustActivity extends PythonActivity {
         protected String doInBackground(String... urls) {
             Log.v(TAG, "HttpRequestGET.doInBackground() " + urls[0]);
             String result = "";
+            HttpURLConnection urlConnection;
             try {
                 URL url = new URL(urls[0]);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setUseCaches(false);
                 urlConnection.setAllowUserInteraction(false);
@@ -146,13 +138,44 @@ public class BitDustActivity extends PythonActivity {
                         br.close();
                         result = sb.toString();
                     }
+                } catch (java.net.SocketException exc) {
+                    Log.e(TAG, "HttpRequestGET.doInBackground() FAILED SocketException: " + exc.getMessage());
+                    result = exc.getMessage();
+                    try {
+                        urlConnection.disconnect();
+                    } catch (Exception e) {
+                        Log.e(TAG, "HttpRequestGET.doInBackground().disconnect : " + e);
+                    }
                 } catch (Exception exc) {
                     Log.e(TAG, "HttpRequestGET.doInBackground() FAILED reading: " + exc);
+                    result = exc.getMessage();
+                    try {
+                        urlConnection.disconnect();
+                    } catch (Exception e) {
+                        Log.e(TAG, "HttpRequestGET.doInBackground().disconnect : " + e);
+                    }
                 }
-                urlConnection.disconnect();
-            }
-            catch (Exception exc) {
+                try {
+                    urlConnection.disconnect();
+                } catch (Exception e) {
+                    Log.e(TAG, "HttpRequestGET.doInBackground().disconnect : " + e);
+                }
+            } catch (java.net.SocketException exc) {
+                Log.e(TAG, "HttpRequestGET.doInBackground() FAILED SocketException: " + exc.getMessage());
+                result = exc.getMessage();
+                try {
+                    urlConnection.disconnect();
+                } catch (Exception e) {
+                    Log.e(TAG, "HttpRequestGET.doInBackground().disconnect : " + e);
+                }
+            } catch (Exception exc) {
                 Log.e(TAG, "HttpRequestGET.doInBackground() FAILED connecting: " + exc);
+                result = exc.getMessage();
+                try {
+                    urlConnection.disconnect();
+                } catch (Exception e) {
+                    Log.e(TAG, "HttpRequestGET.doInBackground().disconnect : " + e);
+                }
             }
             return result;
         }

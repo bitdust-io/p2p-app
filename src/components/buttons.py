@@ -37,7 +37,7 @@ from components import labels
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -178,6 +178,21 @@ class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, 
         self.height = self.button_height
 
 
+def RootActionButton_set_size(self, interval):
+    self.width = "36dp"
+    self.height = "36dp"
+    if _Debug:
+        print('RootActionButton_set_size', self)
+
+def RootActionButton_on_touch_up(self, touch):
+    super(MDFloatingRootButton, self).on_touch_up(touch)
+    if self.collide_point(touch.x, touch.y):
+        return True
+    if _Debug:
+        print('RootActionButton_on_touch_up going to close the stack', self)
+    self.parent.close_stack()
+
+
 class RootActionButton(MDFloatingActionButtonSpeedDial):
 
     top_offset = dp(80)
@@ -185,23 +200,39 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
     logo = BooleanProperty(False)
     root_button_rotate_angle = NumericProperty(360)
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if _Debug:
+            print('RootActionButton.__init__', self, kwargs)
+
     def on_data(self, instance, value):
+        if _Debug:
+            print('RootActionButton.on_data', instance, value)
         ret = super().on_data(instance, value)
         self.config_style()
+        self._update_pos_buttons(instance, 0, 0)
         return ret
 
     def on_buttons_colors(self, instance, value):
+        if _Debug:
+            print('RootActionButton.on_buttons_colors', self, instance, value)
         for widget in self.children:
             if isinstance(widget, MDFloatingBottomButton):
                 if widget.icon in value:
                     widget.md_bg_color = value[widget.icon]
                     widget._bg_color = value[widget.icon][0:3] + [.6]
             if isinstance(widget, MDFloatingLabel):
-                widget.bg_color = styles.app.color_transparent
+                label_icon = None
+                for icn, txt in self.data.items():
+                    if widget.text == txt:
+                        label_icon = icn
+                        break
+                if label_icon and label_icon in value:
+                    widget.bg_color = value[label_icon][0:3] + [.6]
 
     def config_style(self):
         self.opening_time = 0.2
-        self.hint_animation = True
+        self.hint_animation = False
         self.rotation_root_button = True
         self.root_button_anim = True
         self.label_text_color = styles.app.color_white99
@@ -210,41 +241,68 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
         self.bg_color_root_button = self.theme_cls.primary_dark
         self.bg_color_stack_button = self.theme_cls.primary_color
         self.bg_hint_color = self.theme_cls.primary_light
-        if self.logo:
-            root_btn = self._get_count_widget(MDFloatingRootButton)
-            root_btn.icon = ''
-            root_btn.ids.lbl_txt.source = './bitdust.png'
+        if _Debug:
+            print('RootActionButton.config_style', self.children)
+        for widget in self.children:
+            if isinstance(widget, MDFloatingBottomButton):
+                widget.user_font_size = '17sp'
+                widget.padding = '0dp'
+            elif isinstance(widget, MDFloatingRootButton):
+                widget.on_touch_up = RootActionButton_on_touch_up.__get__(widget, MDFloatingRootButton)
+                widget.set_size = RootActionButton_set_size.__get__(widget, MDFloatingRootButton)
+                widget.set_size(0)
+                widget.user_font_size = '17sp'
+                widget.padding = '0dp'
+                if self.logo:
+                    widget.icon = ''
+                    widget.ids.lbl_txt.source = './bitdust.png'
+            elif isinstance(widget, MDFloatingLabel):
+                widget.elevation = 0
 
     def set_pos_root_button(self, instance):
+        if _Debug:
+            print('RootActionButton.set_pos_root_button', instance)
+        instance.set_size = RootActionButton_set_size.__get__(instance, MDFloatingRootButton)
+        instance.set_size(0)
+        instance.user_font_size = '17sp'
+        instance.padding = '0dp'
         if self.anchor == "right":
             instance.y = Window.height - self.top_offset
-            instance.x = Window.width - (dp(56) + dp(20))
+            instance.x = Window.width - (dp(36) + dp(20))
         instance.elevation = 0
 
     def set_pos_labels(self, widget):
+        if _Debug:
+            print('RootActionButton.set_pos_labels', widget)
         if self.anchor == "right":
             widget.x = Window.width - widget.width - dp(86)
         widget.elevation = 0
 
     def set_pos_bottom_buttons(self, instance):
+        if _Debug:
+            print('RootActionButton.set_pos_bottom_buttons', instance)
+        instance.set_size = RootActionButton_set_size.__get__(instance, MDFloatingBottomButton)
+        instance.set_size(0)
         if self.anchor == "right":
             if self.state != "open":
                 instance.y = Window.height - self.top_offset
-            instance.x = Window.width - (instance.height + instance.width / 2)
+            instance.x = Window.width - (instance.height + instance.width / 2) - dp(2)
         instance.elevation = 0
 
     def open_stack(self, instance):
+        if _Debug:
+            print('RootActionButton.open_stack', self, instance)
         for widget in self.children:
             if isinstance(widget, MDFloatingLabel):
                 Animation.cancel_all(widget)
         if self.state != "open":
             y = Window.height - self.top_offset
-            label_position = Window.height - self.top_offset + dp(10)
+            label_position = Window.height - self.top_offset + dp(2)
             anim_buttons_data = {}
             anim_labels_data = {}
             for widget in self.children:
                 if isinstance(widget, MDFloatingBottomButton):
-                    y -= dp(56)
+                    y -= dp(40)
                     widget.y = y
                     if not self._anim_buttons_data:
                         anim_buttons_data[widget] = Animation(
@@ -253,10 +311,10 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
                             t=self.opening_transition,
                         )
                 elif isinstance(widget, MDFloatingLabel):
-                    label_position -= dp(56)
+                    label_position -= dp(40)
                     if not self._label_pos_y_set:
-                        widget.y = label_position
-                        widget.x = Window.width - widget.width - dp(86)
+                        widget.y = label_position + dp(3)
+                        widget.x = Window.width - widget.width - dp(58)
                     if not self._anim_labels_data:
                         anim_labels_data[widget] = Animation(
                             opacity=1, d=self.opening_time
@@ -285,6 +343,8 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
             self.close_stack()
 
     def close_stack(self):
+        if _Debug:
+            print('RootActionButton.close_stack', self)
         for widget in self.children:
             if isinstance(widget, MDFloatingBottomButton):
                 Animation(

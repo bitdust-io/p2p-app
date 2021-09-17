@@ -27,6 +27,14 @@
             VEmptySpace:
                 size_hint_y: 0.5
 
+            RoundedFlexButton:
+                id: create_identity_button
+                size_hint: 1, .01
+                text: "[size=26sp]start[/size]"
+                enabled: False
+                pos_hint: {'center_x': .5}
+                on_press: root.on_start_engine_button_clicked()
+
             HLayout:
                 size_hint: 1, .01
 

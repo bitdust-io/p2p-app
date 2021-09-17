@@ -9,6 +9,7 @@ from kivy.factory import Factory
 from kivy.properties import StringProperty  # @UnresolvedImport
 from kivy.properties import NumericProperty  # @UnresolvedImport
 from kivy.properties import ObjectProperty  # @UnresolvedImport
+from kivy.properties import BooleanProperty  # @UnresolvedImport
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 
@@ -135,14 +136,15 @@ class MainWin(Screen, ThemableBehavior):
     active_screens = {}
     dropdown_menus = {}
     screen_closed_time = {}
-    selected_screen = StringProperty('')
     latest_screen = ''
     screens_stack = []
 
+    # kivy properties
+    engine_is_on = BooleanProperty(False)
     state_process_health = NumericProperty(0)
     state_identity_get = NumericProperty(0)
     state_network_connected = NumericProperty(0)
-
+    selected_screen = StringProperty('')
     dropdown_menu = ObjectProperty(None)
 
     def __init__(self, **kwargs):

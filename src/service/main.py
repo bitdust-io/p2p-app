@@ -69,7 +69,7 @@ def set_foreground():
     notification_builder = NotificationBuilder(app_context, channel_id)
 
     title = AndroidString("BitDust".encode('utf-8'))
-    message = AndroidString("Application is running in background".encode('utf-8'))
+    message = AndroidString("BitDust is running in background".encode('utf-8'))
 
     PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
     notification_intent = Intent(app_context, PythonActivity)
@@ -84,8 +84,8 @@ def set_foreground():
     notification_builder.setOngoing(True)
     notification_builder.setPriority(NotificationManager.IMPORTANCE_MIN)
 
-    Drawable = autoclass(u"{}.R$drawable".format(service.getPackageName()))
-    notification_builder.setSmallIcon(getattr(Drawable, 'notification_icon_background'))
+    # Drawable = autoclass(u"{}.R$drawable".format(service.getPackageName()))
+    # notification_builder.setSmallIcon(getattr(Drawable, 'notification_icon_background'))
     notification_builder.setAutoCancel(True)
     notification_builder.setCategory(Notification.CATEGORY_SERVICE)
 
@@ -110,7 +110,7 @@ def set_foreground_api_lower_26():
     notification_builder = NotificationBuilder(app_context)
 
     title = AndroidString("BitDust".encode('utf-8'))
-    message = AndroidString("Application is running in background".encode('utf-8'))
+    message = AndroidString("BitDust is running in background".encode('utf-8'))
 
     PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
     notification_intent = Intent(app_context, PythonActivity)
@@ -124,8 +124,8 @@ def set_foreground_api_lower_26():
     notification_builder.setContentIntent(intent)
     notification_builder.setOngoing(True)
 
-    Drawable = autoclass("{}.R$drawable".format(service.getPackageName()))
-    notification_builder.setSmallIcon(getattr(Drawable, 'icon'))
+    # Drawable = autoclass("{}.R$drawable".format(service.getPackageName()))
+    # notification_builder.setSmallIcon(getattr(Drawable, 'icon'))
     notification_builder.setAutoCancel(True)
     notification_builder.setCategory(Notification.CATEGORY_SERVICE)
 
@@ -147,8 +147,8 @@ def start_bitdust():
     if _Debug:
         print('BitDustService.start_bitdust() executing the entry point     os.getcwd() : %r' % os.getcwd())
     from main.bpmain import main
-    reactor.callLater(0, main, executable_path, start_reactor=False)  # @UndefinedVariable
-    # main(executable_path, start_reactor=False)
+    # reactor.callLater(0, main, executable_path, start_reactor=False)  # @UndefinedVariable
+    main(executable_path, start_reactor=False)
     if _Debug:
         print('BitDustService.start_bitdust() OK!')
     return True
@@ -209,6 +209,7 @@ def main():
     run_service()
     if _Debug:
         print('BitDustService.main() process is finishing')
+    os._exit(0)
 
 #------------------------------------------------------------------------------
 

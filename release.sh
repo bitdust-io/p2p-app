@@ -28,5 +28,11 @@ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/keystores/bit
 zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
 
 apktool d -o ./bin/apk/ -f ./bin/BitDustAndroid.apk
+rm -rf ./bin/apk/private_mp3/
+mkdir -p ./bin/apk/private_mp3/
+cp ./bin/apk/assets/private.mp3 ./bin/apk/private_mp3/private_mp3.tar.gz
+cd ./bin/apk/private_mp3/
+tar -xf /private_mp3.tar.gz
+cd ../../..
 
 echo "SUCCESS !!!"

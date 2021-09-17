@@ -14,11 +14,8 @@ class WelcomeScreen(screen.AppScreen):
 
     verify_network_connected_task = None
 
-    def get_icon(self):
-        return 'human-greeting'
-
     def get_title(self):
-        return 'welcome'
+        return 'BitDust'
 
     def on_enter(self, *args):
         self.ids.action_button.close_stack()

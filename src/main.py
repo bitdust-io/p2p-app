@@ -117,8 +117,8 @@ class BitDustApp(styles.AppStyle, MDApp):
     main_window = None
     finishing = threading.Event()
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    # def __init__(self, **kwargs):
+    #     super().__init__(**kwargs)
 
     def apply_styles(self):
         from kivy.app import App
@@ -211,9 +211,9 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.start_engine()
         return True
 
-    def start_engine(self):
+    def start_engine(self, after_restart=False):
         if _Debug:
-            print('BitDustApp.start_engine')
+            print('BitDustApp.start_engine, after_restart=%r' % after_restart)
         if system.is_android():
             self.start_android_service()
         else:
@@ -227,7 +227,15 @@ class BitDustApp(styles.AppStyle, MDApp):
             self.stop_android_service()
             Clock.schedule_once(lambda x: self.start_android_service(), .5)
         else:
-            api_client.process_stop(cb=lambda resp: self.check_restart_bitdust_process())
+            api_client.process_stop(cb=lambda resp: self.start_engine(after_restart=True))
+
+    def stop_engine(self):
+        if _Debug:
+            print('BitDustApp.stop_engine')
+        if system.is_android():
+            self.stop_android_service()
+        else:
+            api_client.process_stop()
 
     def start_android_service(self, shutdown=False):
         if not system.is_android():
@@ -324,7 +332,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.on_start missed_permissions=%r' % missed_permissions)
         if not missed_permissions:
-            return self.do_start() 
+            return self.do_start()
         request_app_permissions(permissions=missed_permissions, callback=self.do_start)
         return True
 

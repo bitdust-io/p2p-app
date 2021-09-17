@@ -63,6 +63,7 @@ class Controller(object):
     network_connected_latest = 0
 
     def __init__(self, app):
+        self.enabled = False
         self.app = app
         self.callbacks = {}
         self.state_changed_callbacks = {}
@@ -72,6 +73,9 @@ class Controller(object):
         return self.app.main_window
 
     def start(self):
+        if _Debug:
+            print('Controller.start')
+        self.enabled = True
         websock.start(callbacks={
             'on_open': self.on_websocket_open,
             'on_error': self.on_websocket_error,
@@ -81,6 +85,9 @@ class Controller(object):
         self.run()
 
     def stop(self):
+        if _Debug:
+            print('Controller.stop')
+        self.enabled = False
         websock.stop()
 
     def run(self):
