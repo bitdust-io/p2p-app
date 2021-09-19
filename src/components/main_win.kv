@@ -21,6 +21,21 @@
                 height: dp(50)
 
             OneLineIconListItem:
+                id: menu_item_status
+                text: "status"
+                on_release:
+                    app.root.nav().set_state("close")
+                    app.root.select_screen('engine_status_screen', verify_state=True)
+                IconLeftWidget:
+                    icon: "cellphone-information"
+                    md_bg_color: app.color_transparent
+                    md_bg_color_disabled: app.color_transparent
+                    on_release:
+                        app.root.nav().set_state("close")
+                        app.root.select_screen('engine_status_screen', verify_state=True)
+
+            OneLineIconListItem:
+                id: menu_item_my_identity
                 text: "my identity"
                 on_release:
                     app.root.nav().set_state("close")
@@ -28,24 +43,13 @@
                 IconLeftWidget:
                     icon: "passport"
                     md_bg_color: app.color_transparent
+                    md_bg_color_disabled: app.color_transparent
                     on_release:
                         app.root.nav().set_state("close")
                         app.root.select_screen('my_id_screen', verify_state=True)
 
-
-#             OneLineIconListItem:
-#                 text: "contacts"
-#                 on_release:
-#                     app.root.nav().set_state("close")
-#                     app.root.select_screen('friends_screen', verify_state=True)
-#                 IconLeftWidget:
-#                     icon: "account-multiple"
-#                     md_bg_color: app.color_transparent
-#                     on_release:
-#                         app.root.nav().set_state("close")
-#                         app.root.select_screen('friends_screen', verify_state=True)
-
             OneLineIconListItem:
+                id: menu_item_chat
                 text: "chat"
                 on_release:
                     app.root.nav().set_state("close")
@@ -53,11 +57,13 @@
                 IconLeftWidget:
                     icon: "chat-outline"
                     md_bg_color: app.color_transparent
+                    md_bg_color_disabled: app.color_transparent
                     on_release:
                         app.root.nav().set_state("close")
                         app.root.select_screen('conversations_screen', verify_state=True)
 
             OneLineIconListItem:
+                id: menu_item_settings
                 text: "settings"
                 on_release:
                     app.root.nav().set_state("close")
@@ -65,6 +71,7 @@
                 IconLeftWidget:
                     icon: "cogs"
                     md_bg_color: app.color_transparent
+                    md_bg_color_disabled: app.color_transparent
                     on_release:
                         app.root.nav().set_state("close")
                         app.root.select_screen('settings_screen', verify_state=True)
@@ -107,8 +114,8 @@
             id: nav_drawer
             type: "modal"
             width: dp(220)
-            opening_time: 0.2
-            closing_time: 0.2
+            opening_time: 0
+            closing_time: 0
             elevation: 0
 
             ContentNavigationDrawer:

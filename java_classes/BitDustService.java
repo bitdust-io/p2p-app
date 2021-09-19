@@ -97,19 +97,9 @@ public class BitDustService extends PythonService {
             } catch (java.net.SocketException exc) {
                 Log.e(TAG, "HttpRequestGET.doInBackground() FAILED SocketException: " + exc.getMessage());
                 result = exc.getMessage();
-                try {
-                    urlConnection.disconnect();
-                } catch (Exception e) {
-                    Log.e(TAG, "HttpRequestGET.doInBackground().disconnect : " + e);
-                }
             } catch (Exception exc) {
                 Log.e(TAG, "HttpRequestGET.doInBackground() FAILED connecting: " + exc);
                 result = exc.getMessage();
-                try {
-                    urlConnection.disconnect();
-                } catch (Exception e) {
-                    Log.e(TAG, "HttpRequestGET.doInBackground().disconnect : " + e);
-                }
             }
             return result;
         }

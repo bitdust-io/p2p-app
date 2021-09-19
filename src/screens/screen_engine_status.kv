@@ -1,0 +1,74 @@
+<EngineStatusScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'main process is not started',
+                    'AT_STARTUP': 'starting the application',
+                    'LOCAL': 'initializing local environment',
+                    'MODULES': 'starting sub-modules',
+                    'INSTALL': 'installing application',
+                    'READY': 'application is ready',
+                    'STOPPING': 'application is shutting down',
+                    'SERVICES': 'starting network services',
+                    'INTERFACES': 'starting application interfaces',
+                    'EXIT': 'application is closed', }
+
+            HorizontalContainerLayout:
+
+                NormalLabel:
+                    size_hint: 1, None
+                    height: self.texture_size[1]
+                    text: 'BitDust engine is a peer-to-peer application that powers independent online storage, secure private messaging and other p2p services available to everyone.\n\nThe process will run in the background and maintain peer-to-peer connections to other devices on the network.'
+
+            HorizontalContainerLayout:
+
+                HFlexMarkupLabel:
+                    text: 'BitDust engine started:   '
+
+                VLayout:
+
+                    HLayout:
+                        CustomToggleButton:
+                            id: button_engine_on
+                            text: 'ON'
+                            group: 'engine_state'
+                            # size_hint: None, None
+                            # width: dp(24)
+                            # height: dp(24)
+                            # padding: 0, 0, 0, dp(10)
+                            active: bool(root.main_win().engine_is_on)
+                            on_active: root.on_engine_on_button(self.active)
+
+                        CustomToggleButton:
+                            id: button_engine_off
+                            text: 'OFF'
+                            group: 'engine_state'
+                            active: not bool(root.main_win().engine_is_on)
+                            on_active: root.on_engine_off_button(self.active)
+                            # size_hint: None, None
+                            # width: dp(48)
+                            # height: dp(24)
+
+                    VFixedEmptySpace:
+                        height: dp(5)
+
+            HorizontalMinimumHeightLayout:
+                # size_hint_y: None
+                # height: self.texture_size[1]
+
+                MarkupLabel:
+                    id: deploy_output_label
+                    size_hint: 1, None
+                    height: self.texture_size[1]
+                    halign: 'left'
+                    text: ''
+
+            VEmptySpace:

@@ -214,6 +214,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     def start_engine(self, after_restart=False):
         if _Debug:
             print('BitDustApp.start_engine, after_restart=%r' % after_restart)
+        self.main_window.engine_is_on = True
         if system.is_android():
             self.start_android_service()
         else:
@@ -232,6 +233,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     def stop_engine(self):
         if _Debug:
             print('BitDustApp.stop_engine')
+        self.main_window.engine_is_on = False
         if system.is_android():
             self.stop_android_service()
         else:
@@ -288,11 +290,14 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.do_start_deploy_process finishing=%r' % self.finishing.is_set())
         if self.finishing.is_set():
             return
+        if 'engine_status_screen' in self.main_window.active_screens:
+            self.main_window.active_screens['engine_status_screen'][0].ids.deploy_output_label.text = ''
         system.BackgroundProcess(
             cmd=['/bin/bash', './src/deploy/linux.sh', ],
             stdout_callback=self.on_deploy_process_stdout,
             stderr_callback=self.on_deploy_process_stderr,
             finishing=self.finishing,
+            daemon=True,
         ).run()
 
     @mainthread
@@ -300,8 +305,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('DEPLOY OUT:', line.decode().rstrip())
         if line.decode().startswith('#####'):
-            if 'process_dead_screen' in self.main_window.active_screens:
-                self.main_window.active_screens['process_dead_screen'][0].ids.deploy_output_label.text += line.decode()[6:]
+            if 'engine_status_screen' in self.main_window.active_screens:
+                self.main_window.active_screens['engine_status_screen'][0].ids.deploy_output_label.text += line.decode()[6:]
 
     @mainthread
     def on_deploy_process_stderr(self, line):

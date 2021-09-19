@@ -147,12 +147,20 @@ class MainWin(Screen, ThemableBehavior):
     selected_screen = StringProperty('')
     dropdown_menu = ObjectProperty(None)
 
+    # menu_item_status = BooleanProperty(True)
+    # menu_item_my_identity = BooleanProperty(False)
+    # menu_item_chat = BooleanProperty(False)
+    # menu_item_settings = BooleanProperty(False)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         patch_kivy_core_window()
 
     def nav(self):
         return self.ids.nav_drawer
+
+    def menu(self):
+        return self.ids.nav_drawer_content
 
     def tbar(self):
         return self.ids.toolbar
@@ -183,6 +191,43 @@ class MainWin(Screen, ThemableBehavior):
 
     def get_active_screen(self, screen_id):
         return self.active_screens.get(screen_id, [None, ])[0]
+
+    def is_screen_selectable(self, screen_id):
+        if not self.control:
+            return False
+        if self.state_process_health != 1:
+            return screen_id in ['engine_status_screen', 'startup_screen', 'welcome_screen', ]
+        if self.state_identity_get != 1:
+            return screen_id in ['engine_status_screen', 'startup_screen', 'welcome_screen', 'settings_screen',
+                                 'my_id_screen', 'new_identity_screen', 'recover_identity_screen', ]
+        if self.state_network_connected != 1:
+            return screen_id in ['engine_status_screen', 'startup_screen', 'welcome_screen',
+                                 'connecting_screen', 'settings_screen',
+                                 'my_id_screen', 'new_identity_screen', 'recover_identity_screen', ]
+        return True
+
+    def update_menu_items(self):
+        if not self.control:
+            return
+        self.menu().ids.menu_item_status.disabled = False
+        if self.state_process_health != 1:
+            self.menu().ids.menu_item_my_identity.disabled = True
+            self.menu().ids.menu_item_chat.disabled = True
+            self.menu().ids.menu_item_settings.disabled = True
+            return
+        if self.state_identity_get != 1:
+            self.menu().ids.menu_item_my_identity.disabled = False
+            self.menu().ids.menu_item_chat.disabled = True
+            self.menu().ids.menu_item_settings.disabled = False
+            return
+        if self.state_network_connected != 1:
+            self.menu().ids.menu_item_my_identity.disabled = False
+            self.menu().ids.menu_item_chat.disabled = True
+            self.menu().ids.menu_item_settings.disabled = False
+            return
+        self.menu().ids.menu_item_my_identity.disabled = False
+        self.menu().ids.menu_item_chat.disabled = False
+        self.menu().ids.menu_item_settings.disabled = False
 
     #------------------------------------------------------------------------------
 
@@ -318,9 +363,9 @@ class MainWin(Screen, ThemableBehavior):
             elif screen_type.startswith('info_group_'):
                 screen_type = 'group_info_screen'
         if verify_state:
-            if self.state_process_health != 1 or self.state_identity_get != 1:
+            if not self.is_screen_selectable(screen_id):
                 if _Debug:
-                    print('MainWin.select_screen   selecting screen %r not possible, state verify failed' % screen_id)
+                    print('MainWin.select_screen   selecting screen %r not possible at the moment' % screen_id)
                 return False
         if _Debug:
             print('MainWin.select_screen  starting transition to %r' % screen_id)
@@ -339,7 +384,7 @@ class MainWin(Screen, ThemableBehavior):
             self.screen_closed_time[self.selected_screen] = time.time()
             if self.selected_screen in self.active_screens:
                 self.active_screens[self.selected_screen][0].on_closed()
-        if self.selected_screen and self.selected_screen not in ['process_dead_screen', 'connecting_screen', 'startup_screen', ]:
+        if self.selected_screen and self.selected_screen not in ['engine_status_screen', 'connecting_screen', 'startup_screen', ]:
             self.latest_screen = self.selected_screen
             if _Debug:
                 print('MainWin.select_screen   current screens stack: %r' % self.screens_stack)
@@ -353,7 +398,7 @@ class MainWin(Screen, ThemableBehavior):
             if _Debug:
                 print('MainWin.select_screen   new screens stack: %r' % self.screens_stack)
         self.selected_screen = screen_id
-        if self.selected_screen in ['process_dead_screen', 'connecting_screen', 'startup_screen', ]:
+        if self.selected_screen in ['engine_status_screen', 'connecting_screen', 'startup_screen', ]:
             self.screens_stack = []
         if self.screens_stack:
             self.tbar().left_action_items = [["arrow-left", self.on_nav_back_button_clicked, ], ]

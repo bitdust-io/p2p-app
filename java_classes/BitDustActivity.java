@@ -113,10 +113,9 @@ public class BitDustActivity extends PythonActivity {
         protected String doInBackground(String... urls) {
             Log.v(TAG, "HttpRequestGET.doInBackground() " + urls[0]);
             String result = "";
-            HttpURLConnection urlConnection;
             try {
                 URL url = new URL(urls[0]);
-                urlConnection = (HttpURLConnection) url.openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setUseCaches(false);
                 urlConnection.setAllowUserInteraction(false);
@@ -163,19 +162,9 @@ public class BitDustActivity extends PythonActivity {
             } catch (java.net.SocketException exc) {
                 Log.e(TAG, "HttpRequestGET.doInBackground() FAILED SocketException: " + exc.getMessage());
                 result = exc.getMessage();
-                try {
-                    urlConnection.disconnect();
-                } catch (Exception e) {
-                    Log.e(TAG, "HttpRequestGET.doInBackground().disconnect : " + e);
-                }
             } catch (Exception exc) {
                 Log.e(TAG, "HttpRequestGET.doInBackground() FAILED connecting: " + exc);
                 result = exc.getMessage();
-                try {
-                    urlConnection.disconnect();
-                } catch (Exception e) {
-                    Log.e(TAG, "HttpRequestGET.doInBackground().disconnect : " + e);
-                }
             }
             return result;
         }
