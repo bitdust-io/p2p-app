@@ -141,6 +141,7 @@ class MainWin(Screen, ThemableBehavior):
 
     # kivy properties
     engine_is_on = BooleanProperty(False)
+    engine_log = StringProperty('')
     state_process_health = NumericProperty(0)
     state_identity_get = NumericProperty(0)
     state_network_connected = NumericProperty(0)

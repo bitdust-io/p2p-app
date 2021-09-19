@@ -11,6 +11,7 @@ from kivy.properties import (
 )
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.switch import Switch
 from kivy.animation import Animation
 
 from kivymd.theming import ThemableBehavior
@@ -24,12 +25,10 @@ from kivymd.uix.button import (
     MDFloatingLabel,
     MDFloatingBottomButton,
     MDFloatingRootButton,
-    MDRectangleFlatButton,
 )
 from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
 from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
 from kivymd.uix.behaviors.backgroundcolor_behavior import SpecificBackgroundColorBehavior
-from kivymd.uix.behaviors.toggle_behavior import MDToggleButton
 
 #------------------------------------------------------------------------------
 
@@ -39,7 +38,7 @@ from components import labels
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -96,40 +95,8 @@ class CustomFloatingActionButton(MDFloatingActionButton):
         self.height = self.button_size
 
 
-class CustomToggleButton(MDRectangleFlatButton, MDToggleButton):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        Clock.schedule_once(self.update_style)
-        # self.update_style()
-
-    def update_style(self, *args):
-        lbl = self.ids.lbl_txt
-        if _Debug:
-            print('CustomToggleButton.update_style', self, lbl, lbl.text, lbl.size, self.size)
-        # lbl.padding = (0, 0)
-        lbl.line_height = 0.5
-        lbl.shorten = False
-        lbl.font_size = '12sp'
-        lbl.bold = True
-        lbl.padding_x = 0
-        lbl.padding_y = 0
-        lbl.adaptive_size = False
-        lbl.size_hint = (None, None)
-        lbl.size = (dp(34), dp(22))
-        lbl.texture_update()
-        lbl.halign = 'center'
-        lbl.valign = 'middle'
-        self.size_hint = (None, None)
-        self.size = (dp(34), dp(22))
-        self.padding = (0, 0, 0, 0)
-        self._trigger_layout()
-
-#     def set_size(self, interval):
-#         if _Debug:
-#             print('CustomToggleButton.set_size', self)
-#         self.width = dp(10)
-#         self.height = dp(10)
+class CustomSwitch(Switch):
+    pass
 
 
 class RoundedButton(CustomRaisedButton):

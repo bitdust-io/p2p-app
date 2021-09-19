@@ -26,29 +26,35 @@ _LatestAndroidKeyboardHeightSnapshot = 0
 
 #------------------------------------------------------------------------------
 
-def latest_state():
+def current_platform():
     global _LatestState
     if _LatestState:
         return _LatestState
     _LatestState = str('' + platform)
+    if _Debug:
+        print('system.current_platform', _LatestState)
     return _LatestState
 
 #------------------------------------------------------------------------------
 
 def is_linux():
-    return latest_state() == 'linux'
+    return current_platform() == 'linux'
 
 
 def is_windows():
-    return latest_state() == 'win'
+    return current_platform() == 'win'
 
 
 def is_android():
-    return latest_state() == 'android'
+    return current_platform() == 'android'
 
 
 def is_ios():
-    return latest_state() == 'ios'
+    return current_platform() == 'ios'
+
+
+def is_osx():
+    return current_platform() == 'macosx'
 
 #------------------------------------------------------------------------------
 

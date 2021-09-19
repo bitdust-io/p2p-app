@@ -3,6 +3,7 @@ from kivy.clock import Clock
 #------------------------------------------------------------------------------
 
 from components import screen
+# from components import snackbar
 
 #------------------------------------------------------------------------------
 
@@ -27,6 +28,7 @@ class EngineStatusScreen(screen.AppScreen):
         if _Debug:
             print('EngineStatusScreen.on_enter')
         self.ids.state_panel.attach(automat_id='initializer')
+        self.ids.deploy_output_label.text = self.main_win().engine_log
         Clock.schedule_once(self.control().verify_process_health)
         if not self.verify_process_health_task:
             self.verify_process_health_task = Clock.schedule_interval(self.control().verify_process_health, 5)
@@ -39,10 +41,13 @@ class EngineStatusScreen(screen.AppScreen):
             Clock.unschedule(self.verify_process_health_task)
             self.verify_process_health_task = None
 
-    def on_engine_on_checkbox(self, *args):
+    def on_engine_on_off(self, *args):
         if _Debug:
-            print('EngineStatusScreen.on_engine_on_checkbox', args)
-
-    def on_start_engine_button_clicked(self, *args):
-        if _Debug:
-            print('EngineStatusScreen.on_start_engine_button_clicked', args)
+            print('EngineStatusScreen.on_engine_on_off', args)
+        st = args[0]
+        if st:
+            self.app().start_engine()
+            # snackbar.info(text='BitDust engine is starting')
+        else:
+            self.app().stop_engine()
+            # snackbar.info(text='BitDust engine will be stopped')
