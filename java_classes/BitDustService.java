@@ -34,6 +34,7 @@ public class BitDustService extends PythonService {
         }
         Log.v(TAG, "onDestroy()   about to call super onDestroy");
         super.onDestroy();
+        Log.v(TAG, "onDestroy()   is finishing");
     }
 
     private class HttpRequestGET extends AsyncTask<String, Void, String> {

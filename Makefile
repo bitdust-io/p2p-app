@@ -129,7 +129,7 @@ log_adb:
 	@adb logcat | grep -vE "python  : extracting|pythonutil: Checking pattern" | grep -E "WebViewConsole|python|DEBUG|Bitdustnode|BitDustActivity|PythonActivity|BitDust|SDL|PythonService|crush|Exception|WebViewManager|WebViewFactory"
 
 log_adb_fast:
-	@adb logcat | grep -E "WebViewConsole|python|DEBUG|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust1|bitdust_io|Exception|WebViewManager|WebViewFactory"
+	@adb logcat | grep -E "python|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust|bitdust_io|Exception"
 
 log_adb_brief:
 	@adb logcat | grep -v "Notification.Badge:" | grep -v "GameManagerService:" | grep -v "GamePkgDataHelper:" | grep -v "Layer   :" | grep -v "SurfaceFlinger:" | grep -v "SurfaceControl:" | grep -v "RemoteAnimationController:" | grep -v "WindowManager:" | grep -v extracting | grep -v "Checking pattern" | grep -v "Library loading" | grep -v "Loading library" | grep -v "AppleWebKit/537.36 (KHTML, like Gecko)" | grep -v "I Bitdustnode:   " | grep -v "I Bitdustnode: DEBUG:jnius.reflect:" | grep -e python -e Bitdustnode -e "E AndroidRuntime" -e "F DEBUG" -e "PythonActivity:" -e "WebViewConsole:" -e "SDL     :" -e "PythonService:" -e "org.bitdust_io.bitdust1"

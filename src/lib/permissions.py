@@ -2,13 +2,15 @@ import threading
 
 from jnius import autoclass, PythonJavaClass, java_method  # @UnresolvedImport
 
+from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE  # @UnresolvedImport
+
 #------------------------------------------------------------------------------
 
 PERMISSION_GRANTED = 0
 PERMISSION_DENIED = -1
 
-ACTIVITY_CLASS_NAME = 'org.kivy.android.PythonActivity'
-ACTIVITY_CLASS_NAMESPACE = 'org/kivy/android/PythonActivity'
+# ACTIVITY_CLASS_NAME = 'org.kivy.android.PythonActivity'
+# ACTIVITY_CLASS_NAMESPACE = 'org/kivy/android/PythonActivity'
 # ACTIVITY_CLASS_NAME = 'org.bitdust_io.bitdust1.BitDustActivity'
 # ACTIVITY_CLASS_NAMESPACE = 'org/bitdust_io/bitdust1/BitDustActivity'
 

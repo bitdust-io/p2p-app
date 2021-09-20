@@ -271,35 +271,35 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.start_android_service ACTIVITY_CLASS_NAME=%r SERVICE_NAME=%r shutdown=%r' % (
                 ACTIVITY_CLASS_NAME, SERVICE_NAME, shutdown, ))
         service = autoclass(SERVICE_NAME)
-        # activity = autoclass(u'org.kivy.android.PythonActivity').mActivity
         activity = autoclass(ACTIVITY_CLASS_NAME).mActivity
         argument = ''
         if shutdown:
             argument = '{"stop_service": 1}'
         service.start(activity, argument)
         if shutdown:
-            self.service = None
+            # self.service = None
             if _Debug:
                 print('BitDustApp.start_android_service service expect to be STOPPED now')
         else:
-            self.service = service
+            # self.service = service
             if _Debug:
-                print('BitDustApp.start_android_service service STARTED : %r' % self.service)
-        return self.service
+                print('BitDustApp.start_android_service service STARTED : %r' % service)
+        return service
 
     def stop_android_service(self):
         if not system.is_android():
             return None
         if _Debug:
-            print('BitDustApp.stop_service %r' % self.service)
+            print('BitDustApp.stop_service')
         service = autoclass(SERVICE_NAME)
-        # activity = autoclass(u'org.kivy.android.PythonActivity').mActivity
         activity = autoclass(ACTIVITY_CLASS_NAME).mActivity
         service.stop(activity)
-        self.start_android_service(shutdown=True)
+        # self.start_android_service(shutdown=True)
+        # api_client.process_stop()
+        # self.service = None
         if _Debug:
             print('BitDustApp.stop_service STOPPED')
-        return self.service
+        return service
 
     def check_restart_bitdust_process(self, params=[]):
         if not system.is_linux() and not system.is_osx():
@@ -380,7 +380,6 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.control.stop()
         self.main_window.unregister_controller()
         self.main_window.unregister_screens()
-        # TODO: check if we need to stop BitDust engine after App closes
 
     def on_pause(self):
         if _Debug:

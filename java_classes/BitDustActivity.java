@@ -74,31 +74,39 @@ public class BitDustActivity extends PythonActivity {
 
     private static final String TAG = "BitDustActivity";
 
-    public static BitDustActivity mActivity = null;
-    public static BitDustActivity mCustomActivity = null;
+    //public static BitDustActivity mActivity = null;
 
     public static int status_bar_height = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.mActivity = this;
-        this.mCustomActivity = this;
-        Log.v(TAG, "onCreate() overwrote mActivity " + this.mActivity);
+        //this.mActivity = this;
+        Log.v(TAG, "onCreate()");
+    }
+
+    @Override
+    protected void onStop() {
+        Log.v(TAG, "onStop()   about to call super onStop");
+        super.onStop();
+        Log.v(TAG, "onStop()  super onStop finished");
     }
 
     @Override
     protected void onDestroy() {
-        Log.v(TAG, "onDestroy()");
-        String process_stop_result = "";
-        process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
-        Log.v(TAG, "onDestroy() process_stop_result first call from the Activity : " + process_stop_result);
-        while (process_stop_result.indexOf("Failed to connect") < 0) {
-            process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
-            Log.v(TAG, "onDestroy() process_stop_result retry from the Activity : " + process_stop_result);
-        }
+        //Log.v(TAG, "onDestroy() going to kill the process: " + Process.myPid());
+        //String process_stop_result = "";
+        //process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
+        //Log.v(TAG, "onDestroy() process_stop_result first call from the Activity : " + process_stop_result);
+        //while (process_stop_result.indexOf("Failed to connect") < 0) {
+        //    process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
+        //    Log.v(TAG, "onDestroy() process_stop_result retry from the Activity : " + process_stop_result);
+        //}
         Log.v(TAG, "onDestroy()   about to call super onDestroy");
         super.onDestroy();
+        Log.v(TAG, "onDestroy() going to kill the process: " + Process.myPid());
+        Process.killProcess(Process.myPid());
+        Log.v(TAG, "onDestroy()  is finishing");
     }
 
     private class HttpRequestGET extends AsyncTask<String, Void, String> {
@@ -119,8 +127,8 @@ public class BitDustActivity extends PythonActivity {
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setUseCaches(false);
                 urlConnection.setAllowUserInteraction(false);
-                urlConnection.setConnectTimeout(300);
-                urlConnection.setReadTimeout(300);
+                urlConnection.setConnectTimeout(50);
+                urlConnection.setReadTimeout(50);
                 urlConnection.setRequestProperty("Content-Type", "application/json; utf-8");
                 urlConnection.setRequestProperty("Content-length", "0");
                 urlConnection.setRequestProperty("Accept", "application/json");

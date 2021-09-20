@@ -179,8 +179,8 @@ def run_service():
 
     if argument.get('stop_service'):
         if _Debug:
-            print('BitDustService.run_service() service to be stopped now')
-        stop_bitdust()
+            print('BitDustService.run_service() service to be stopped now, SKIP and EXIT')
+        # stop_bitdust()
         return
 
     try:
@@ -206,7 +206,11 @@ def run_service():
 def main():
     if _Debug:
         print('BitDustService.main() process is starting')
+    # os.makedirs('/storage/emulated/0/.bitdust/', exist_ok=True)
+    # open('/storage/emulated/0/.bitdust/service.pid', 'wt').write(str(os.getpid()))
     run_service()
+    # if os.path.exists('/storage/emulated/0/.bitdust/service.pid'):
+    #     os.remove('/storage/emulated/0/.bitdust/service.pid')
     if _Debug:
         print('BitDustService.main() process is finishing')
     os._exit(0)
