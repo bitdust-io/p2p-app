@@ -94,18 +94,18 @@ public class BitDustActivity extends PythonActivity {
 
     @Override
     protected void onDestroy() {
-        //Log.v(TAG, "onDestroy() going to kill the process: " + Process.myPid());
-        //String process_stop_result = "";
-        //process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
-        //Log.v(TAG, "onDestroy() process_stop_result first call from the Activity : " + process_stop_result);
-        //while (process_stop_result.indexOf("Failed to connect") < 0) {
-        //    process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
-        //    Log.v(TAG, "onDestroy() process_stop_result retry from the Activity : " + process_stop_result);
-        //}
-        Log.v(TAG, "onDestroy()   about to call super onDestroy");
-        super.onDestroy();
+        Log.v(TAG, "onDestroy() going to call /process/stop/v1 API");
+        String process_stop_result = "";
+        process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
+        Log.v(TAG, "onDestroy() process_stop_result first call from the Activity : " + process_stop_result);
+        while (process_stop_result.indexOf("Failed to connect") < 0) {
+            process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
+            Log.v(TAG, "onDestroy() process_stop_result retry from the Activity : " + process_stop_result);
+        }
         Log.v(TAG, "onDestroy() going to kill the process: " + Process.myPid());
         Process.killProcess(Process.myPid());
+        Log.v(TAG, "onDestroy()   about to call super onDestroy");
+        super.onDestroy();
         Log.v(TAG, "onDestroy()  is finishing");
     }
 

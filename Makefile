@@ -114,28 +114,28 @@ spec:
 
 build_android: refresh_android_environment
 	@rm -rfv ./bin/*.apk
-	@PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
+	@(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release)
 	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 release_android: refresh_android_environment_full
 	@rm -rfv ./bin/*.apk
-	@PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -E "Listing |Compiling |\# Copy |\# Create directory |\- copy |running mv |FutureWarning\:"
+	@(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release) | grep -E "Listing |Compiling |\# Copy |\# Create directory |\- copy |running mv |FutureWarning\:"
 	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 test_apk:
 	@adb install -r bin/BitDustAndroid.apk
 
-log_adb:
-	@adb logcat | grep -vE "python  : extracting|pythonutil: Checking pattern" | grep -E "WebViewConsole|python|DEBUG|Bitdustnode|BitDustActivity|PythonActivity|BitDust|SDL|PythonService|crush|Exception|WebViewManager|WebViewFactory"
+shell:
+	@adb shell "cd /storage/emulated/0/.bitdust/; ls -la; sh;"
 
-log_adb_fast:
+log_adb:
 	@adb logcat | grep -E "python|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust|bitdust_io|Exception"
 
 log_adb_brief:
 	@adb logcat | grep -v "Notification.Badge:" | grep -v "GameManagerService:" | grep -v "GamePkgDataHelper:" | grep -v "Layer   :" | grep -v "SurfaceFlinger:" | grep -v "SurfaceControl:" | grep -v "RemoteAnimationController:" | grep -v "WindowManager:" | grep -v extracting | grep -v "Checking pattern" | grep -v "Library loading" | grep -v "Loading library" | grep -v "AppleWebKit/537.36 (KHTML, like Gecko)" | grep -v "I Bitdustnode:   " | grep -v "I Bitdustnode: DEBUG:jnius.reflect:" | grep -e python -e Bitdustnode -e "E AndroidRuntime" -e "F DEBUG" -e "PythonActivity:" -e "WebViewConsole:" -e "SDL     :" -e "PythonService:" -e "org.bitdust_io.bitdust1"
 
 log_adb_short:
-	@adb logcat | grep -v "python  : extracting" | grep -v "pythonutil: Checking pattern" | grep -e python -e Bitdustnode -e "E AndroidRuntime" -e "F DEBUG" -e "PythonActivity:" -e "WebViewConsole:" -e "SDL     :" -e "PythonService:"
+	@adb logcat | grep -E "python|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust|bitdust_io|Exception" | grep -v "python  : extracting" | grep -v "pythonutil: Checking pattern"
 
 log_adb_full:
 	@adb logcat
@@ -146,11 +146,8 @@ log_main:
 log_states:
 	@adb shell tail -f /storage/emulated/0/.bitdust/logs/automats.log
 
-shell:
-	@adb shell "cd /storage/emulated/0/.bitdust/; ls -la; sh;"
-
-cat_main_log:
+cat_log_main:
 	@adb shell cat /storage/emulated/0/.bitdust/logs/android.log
 
-cat_automat_log:
+cat_log_automat:
 	@adb shell cat /storage/emulated/0/.bitdust/logs/automats.log
