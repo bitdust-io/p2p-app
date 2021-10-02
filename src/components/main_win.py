@@ -385,7 +385,7 @@ class MainWin(Screen, ThemableBehavior):
             self.screen_closed_time[self.selected_screen] = time.time()
             if self.selected_screen in self.active_screens:
                 self.active_screens[self.selected_screen][0].on_closed()
-        if self.selected_screen and self.selected_screen not in ['engine_status_screen', 'connecting_screen', 'startup_screen', ]:
+        if self.selected_screen and self.selected_screen not in ['startup_screen', ]:
             self.latest_screen = self.selected_screen
             if _Debug:
                 print('MainWin.select_screen   current screens stack: %r' % self.screens_stack)
@@ -399,8 +399,8 @@ class MainWin(Screen, ThemableBehavior):
             if _Debug:
                 print('MainWin.select_screen   new screens stack: %r' % self.screens_stack)
         self.selected_screen = screen_id
-        if self.selected_screen in ['engine_status_screen', 'connecting_screen', 'startup_screen', ]:
-            self.screens_stack = []
+        # if self.selected_screen in ['engine_status_screen', 'connecting_screen', 'startup_screen', ]:
+        #     self.screens_stack = []
         if self.screens_stack:
             self.tbar().left_action_items = [["arrow-left", self.on_nav_back_button_clicked, ], ]
         else:

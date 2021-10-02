@@ -74,14 +74,11 @@ public class BitDustActivity extends PythonActivity {
 
     private static final String TAG = "BitDustActivity";
 
-    //public static BitDustActivity mActivity = null;
-
     public static int status_bar_height = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //this.mActivity = this;
         Log.v(TAG, "onCreate()");
     }
 

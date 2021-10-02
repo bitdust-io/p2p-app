@@ -1,3 +1,11 @@
+<NetworkServiceElement>:
+    markup: True
+    _radius: dp(8)
+    increment_width: dp(10)
+    increment_height: dp(10)
+    text_halign: 'left'
+
+
 <ConnectingScreen>:
 
     ScreenContainerLayout:
@@ -14,37 +22,22 @@
                     'AT_STARTUP': 'starting the application',
                     'NETWORK?': 'checking connection to the Internet',
                     'INCOMMING?': 'waiting initial reply from other nodes',
-                    'CONNECTED': 'starting peer-to-peer network services',
+                    'CONNECTED': 'peer-to-peer network services are started',
                     'DISCONNECTED': 'disconnected',
                     'MY_IDENTITY': 'verifying my identity in the network',
                     'PROPAGATE': 'propagating my identity to other nodes', }
 
-            VEmptySpace:
-                size_hint_y: 0.5
+            VerticalScrollView:
 
-            MarkupLabel:
-                id: progress_label
-                size_hint: 1, .01
-                halign: 'center'
-                text: '0 %'
-
-            HLayout:
-                size_hint: 1, .01
-
-                HEmptySpace:
-                    size_hint_x: 0.5
-
-                HorizontalStackLayout:
-                    id: services_list
-                    size_hint_x: None
-                    size_hint_y: None
-                    width: dp(140)
+                VerticalWithPaddingLayout:
+                    size_hint: None, None
+                    pos_hint: {'top': 1}
                     height: self.minimum_height
-                    spacing: dp(2)
-                    padding: dp(25)
+                    width: root.width - app.scroll_bar_width
 
-                HEmptySpace:
-                    size_hint_x: 0.5
-
-            VEmptySpace:
-                size_hint_y: 0.5
+                    StackLayout:
+                        id: services_list
+                        size_hint_y: None
+                        height: self.minimum_height
+                        spacing: dp(10)
+                        padding: dp(10)

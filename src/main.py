@@ -5,6 +5,7 @@
 
 import os
 import sys
+import time
 import threading
 
 #------------------------------------------------------------------------------
@@ -20,6 +21,7 @@ if 'ANDROID_ARGUMENT' not in os.environ:
 #------------------------------------------------------------------------------ 
 
 _Debug = True
+_DebugProfilingEnabled = False
 
 #------------------------------------------------------------------------------
 
@@ -43,11 +45,13 @@ if _Debug:
 from kivy.config import Config
 
 from lib import system
-from lib import api_client
 
 #------------------------------------------------------------------------------
 
 Config.set('kivy', 'window_icon', 'bitdust.png')
+
+if 'ANDROID_ARGUMENT' not in os.environ:
+    Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
 if _Debug:
     Config.set('kivy', 'log_level', 'debug')
@@ -69,7 +73,7 @@ from components import styles
 
 if system.is_android(): 
     from jnius import autoclass  # @UnresolvedImport
-    import encodings.idna
+    import encodings.idna  # @UnusedImport
 
     from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE  # @UnresolvedImport
     from android.storage import primary_external_storage_path  # @UnresolvedImport
@@ -116,9 +120,6 @@ class BitDustApp(styles.AppStyle, MDApp):
     control = None
     main_window = None
     finishing = threading.Event()
-
-    # def __init__(self, **kwargs):
-    #     super().__init__(**kwargs)
 
     def apply_styles(self):
         from kivy.app import App
@@ -238,7 +239,6 @@ class BitDustApp(styles.AppStyle, MDApp):
             Clock.schedule_once(lambda x: self.start_android_service(), .5)
         else:
             self.check_restart_bitdust_process(params=['restart', ])
-            # api_client.process_stop(cb=lambda resp: self.start_engine(after_restart=True))
 
     def redeploy_engine(self):
         if system.is_android():
@@ -262,7 +262,6 @@ class BitDustApp(styles.AppStyle, MDApp):
             self.stop_android_service()
         else:
             self.check_restart_bitdust_process(params=['stop', ])
-            # api_client.process_stop()
 
     def start_android_service(self, shutdown=False):
         if not system.is_android():
@@ -270,6 +269,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.start_android_service ACTIVITY_CLASS_NAME=%r SERVICE_NAME=%r shutdown=%r' % (
                 ACTIVITY_CLASS_NAME, SERVICE_NAME, shutdown, ))
+        self.main_window.engine_log = '\n'
         service = autoclass(SERVICE_NAME)
         activity = autoclass(ACTIVITY_CLASS_NAME).mActivity
         argument = ''
@@ -277,11 +277,9 @@ class BitDustApp(styles.AppStyle, MDApp):
             argument = '{"stop_service": 1}'
         service.start(activity, argument)
         if shutdown:
-            # self.service = None
             if _Debug:
                 print('BitDustApp.start_android_service service expect to be STOPPED now')
         else:
-            # self.service = service
             if _Debug:
                 print('BitDustApp.start_android_service service STARTED : %r' % service)
         return service
@@ -294,9 +292,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         service = autoclass(SERVICE_NAME)
         activity = autoclass(ACTIVITY_CLASS_NAME).mActivity
         service.stop(activity)
-        # self.start_android_service(shutdown=True)
-        # api_client.process_stop()
-        # self.service = None
+        self.main_window.engine_log = '\n'
         if _Debug:
             print('BitDustApp.stop_service STOPPED')
         return service
@@ -338,6 +334,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('DEPLOY OUT:', line.decode().rstrip())
         if line.decode().startswith('#####'):
+            # self.main_window.engine_log += '[%s] %s' % (time.strftime('%H:%M:%S'), line.decode()[6:])
             self.main_window.engine_log += line.decode()[6:]
 
     @mainthread
@@ -348,9 +345,10 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_start(self):
         if _Debug:
             print('BitDustApp.on_start')
-            # import cProfile
-            # self.profile = cProfile.Profile()
-            # self.profile.enable()
+            if _DebugProfilingEnabled:
+                import cProfile
+                self.profile = cProfile.Profile()
+                self.profile.enable()
         if not system.is_android():
             return self.do_start()
         required_permissions = [
@@ -384,11 +382,12 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_pause(self):
         if _Debug:
             print('BitDustApp.on_pause')
-            # self.profile.disable()
-            # if system.is_android():
-            #     self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
-            # else:
-            #     self.profile.dump_stats('./debug.profile')
+            if _DebugProfilingEnabled:
+                self.profile.disable()
+                if system.is_android():
+                    self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
+                else:
+                    self.profile.dump_stats('./debug.profile')
         return True
 
     def on_resume(self):

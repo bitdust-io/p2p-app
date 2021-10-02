@@ -15,7 +15,7 @@ from twisted.internet import reactor
 
 from jnius import autoclass  # @UnresolvedImport
 
-import encodings.idna
+import encodings.idna  # @UnusedImport
 
 #------------------------------------------------------------------------------
 
@@ -147,7 +147,6 @@ def start_bitdust():
     if _Debug:
         print('BitDustService.start_bitdust() executing the entry point     os.getcwd() : %r' % os.getcwd())
     from main.bpmain import main
-    # reactor.callLater(0, main, executable_path, start_reactor=False)  # @UndefinedVariable
     main(executable_path, start_reactor=False)
     if _Debug:
         print('BitDustService.start_bitdust() OK!')
@@ -180,7 +179,6 @@ def run_service():
     if argument.get('stop_service'):
         if _Debug:
             print('BitDustService.run_service() service to be stopped now, SKIP and EXIT')
-        # stop_bitdust()
         return
 
     try:
@@ -197,7 +195,7 @@ def run_service():
         if _Debug:
             print('BitDustService.run_service() Twisted reactor stopped')
 
-    except Exception as exc:
+    except:
         import traceback
         traceback.print_exc()
 
@@ -206,11 +204,7 @@ def run_service():
 def main():
     if _Debug:
         print('BitDustService.main() process is starting')
-    # os.makedirs('/storage/emulated/0/.bitdust/', exist_ok=True)
-    # open('/storage/emulated/0/.bitdust/service.pid', 'wt').write(str(os.getpid()))
     run_service()
-    # if os.path.exists('/storage/emulated/0/.bitdust/service.pid'):
-    #     os.remove('/storage/emulated/0/.bitdust/service.pid')
     if _Debug:
         print('BitDustService.main() process is finishing')
     os._exit(0)

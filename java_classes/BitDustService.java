@@ -25,7 +25,6 @@ public class BitDustService extends PythonService {
     @Override
     public void onDestroy() {
         Log.v(TAG, "onDestroy()");
-        /*
         String process_stop_result = "";
         process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
         Log.v(TAG, "onDestroy() process_stop_result first call from the Service : " + process_stop_result);
@@ -33,7 +32,6 @@ public class BitDustService extends PythonService {
             process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
             Log.v(TAG, "onDestroy() process_stop_result retry from the Service: " + process_stop_result);
         }
-        */
         Log.v(TAG, "onDestroy()   about to call super onDestroy");
         super.onDestroy();
         Log.v(TAG, "onDestroy()   is finishing");

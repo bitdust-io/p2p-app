@@ -36,6 +36,41 @@
         opposite_colors: root.opposite_colors
 
 
+<CustomRectangularFlexButton>:
+    canvas:
+        Clear
+        Color:
+            rgba: self.md_bg_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: (root._radius, )
+
+    lbl_txt: lbl_txt
+    width: lbl_txt.texture_size[0] + root.increment_width
+    height: lbl_txt.texture_size[1] + root.increment_height
+    padding: (dp(8), 0)
+    theme_text_color: 'Primary' if not root.text_color else 'Custom'
+    markup: False
+
+    BaseLabel:
+        id: lbl_txt
+        text: root.text if root.button_label else ''
+        font_size: root.font_size
+        can_capitalize: root.can_capitalize
+        size_hint: None, None
+        width: self.texture_size[0]
+        height: self.texture_size[1]
+        text_size: None, None
+        theme_text_color: root.theme_text_color
+        text_color: root.text_color
+        markup: root.markup
+        disabled: root.disabled
+        valign: 'middle'
+        halign: root.text_halign
+        opposite_colors: root.opposite_colors
+
+
 <CustomRoundButton>:
     canvas:
         Clear
@@ -99,6 +134,15 @@
 
 
 <CustomRaisedButton>:
+    md_bg_color: app.theme_cls.primary_color
+    theme_text_color: 'Custom'
+    text_color: root.specific_text_color
+    elevation_normal: 0
+    elevation_raised: 0
+    font_size: sp(16)
+
+
+<CustomRaisedFlexButton>:
     md_bg_color: app.theme_cls.primary_color
     theme_text_color: 'Custom'
     text_color: root.specific_text_color

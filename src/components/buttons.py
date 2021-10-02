@@ -52,7 +52,21 @@ class CustomRectangularButton(RectangularRippleBehavior, BaseButton):
     button_label = BooleanProperty(True)
     can_capitalize = BooleanProperty(True)
     _radius = NumericProperty("2dp")
-    _height = NumericProperty(0)
+    _height = NumericProperty(36)
+    text_halign = StringProperty('center')
+
+
+class CustomRectangularFlexButton(RectangularRippleBehavior, BaseButton):
+
+    width = BoundedNumericProperty(
+        10, min=10, max=None, errorhandler=lambda x: 10
+    )
+    text = StringProperty("")
+    increment_width = NumericProperty("0dp")
+    increment_height = NumericProperty("0dp")
+    button_label = BooleanProperty(True)
+    can_capitalize = BooleanProperty(True)
+    _radius = NumericProperty("2dp")
     text_halign = StringProperty('center')
 
 
@@ -77,11 +91,16 @@ class CustomFlatButton(MDFlatButton):
     fixed_height = NumericProperty(None, allownone=True)
 
     def __init__(self, **kwargs):
+        self.fixed_height = kwargs.pop('fixed_height', None)
         super().__init__(**kwargs)
         self.property('width').set_min(self, None)
 
 
 class CustomRaisedButton(CustomRectangularButton, RectangularElevationBehavior, SpecificBackgroundColorBehavior, BaseElevationButton, BasePressedButton):
+    pass
+
+
+class CustomRaisedFlexButton(CustomRectangularFlexButton, RectangularElevationBehavior, SpecificBackgroundColorBehavior, BaseElevationButton, BasePressedButton):
     pass
 
 

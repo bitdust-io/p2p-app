@@ -55,6 +55,8 @@ class AppStyle(object):
     color_circle_connecting = (btn_clr_rgb_top, btn_clr_rgb_top, btn_clr_rgb_low+.1, 1)
     color_circle_offline = (btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, 1)
     color_circle_online = (btn_clr_rgb_mid, btn_clr_rgb_top+.1, btn_clr_rgb_mid, 1)
+    color_hyperlink = (0, 0, 1, 1)
+    color_success_green = (btn_clr_rgb_low, btn_clr_rgb_top, btn_clr_rgb_low)
 
     color_root_button =  (btn_clr_rgb_low+.1,btn_clr_rgb_mid+.1,btn_clr_rgb_top+.1,1)
 
@@ -124,4 +126,3 @@ class AppStyle(object):
 #------------------------------------------------------------------------------
 
 app = AppStyle()
-

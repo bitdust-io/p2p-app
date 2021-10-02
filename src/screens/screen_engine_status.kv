@@ -31,23 +31,31 @@
                         height: self.texture_size[1]
                         text: 'BitDust engine is a peer-to-peer application that powers independent online storage, secure private messaging and other p2p services available to everyone.\nThe process will run in the background and maintain peer-to-peer connections to other devices on the network.'
 
-                HorizontalMinimumHeightLayout:
+                HorizontalLayout:
                     size_hint: 1, None
-                    height: dp(32)
+                    height: dp(48)
 
-                    MarkupLabel:
-                        size_hint: 1, None
-                        height: dp(32)
-                        halign: 'right'
-                        text: 'BitDust engine started:    '
-                        padding_x: dp(10)
+                    HFlexMarkupLabel:
+                        label_height: dp(48)
+                        text: 'BitDust engine is ON:  '
 
-                    Switch:
+                    MDSwitch:
                         id: button_engine_on
-                        size_hint_x: None
-                        width: sp(83)
                         active: root.main_win().engine_is_on
                         on_active: root.on_engine_on_off(self.active)
+
+                HorizontalMinimumHeightLayout:
+
+                    HFlexMarkupLabel:
+                        halign: 'left'
+                        text: 'Network connection [u][color=#0000ff][ref=link]status[/ref][/color][/u]:'
+                        on_ref_press: root.on_network_connection_status_pressed()
+
+                HorizontalMinimumHeightLayout:
+
+                    MDProgressBar:
+                        id: connection_progress
+                        halign: 'left'
 
                 HorizontalMinimumHeightLayout:
 
@@ -55,7 +63,7 @@
                         id: deploy_output_label
                         size_hint: 1, None
                         height: self.texture_size[1]
-                        halign: 'right'
+                        halign: 'left'
                         color: app.color_gray
                         text: root.main_win().engine_log
 
