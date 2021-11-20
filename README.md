@@ -3,6 +3,7 @@
 This is BitDust Application written in Python using Kivy framework.
 
 
+
 ### Install and run inside development environment
 
 At first clone the files locally and change to the repository folder:
@@ -31,26 +32,27 @@ Then you should be able to start the application inside development environment:
 
 ##### Prepare application folders
 
-First you must clone BitDust Engine and BitDust UI repositories to your local machine next to the current repository folder on the same level.
+First you must clone BitDust Engine repository to your local. BitDust p2p-app APK bundle will include files from both repositories:
 
-BitDust p2p-app APK bundle will include files from both repositories, so we need to create a sym-links to BitDust Engine repository:
+        make clone_engine_sources
 
-        cd ..
-        git clone https://github.com/bitdust-io/public.git bitdust
-        cd bitdust.p2p-app/src/
-        ln -s ../../bitdust bitdust
-        cd ..
 
 
 ##### Install dependencies (tested on Ubuntu 18.04 Desktop)
+
+Several system tools and libraries are required to be able to build and compile project files binaries. For Android there are also few additional requirements:
 
         make system_dependencies
         make system_dependencies_android
 
 
+
 ##### Create Python virtual environment
 
+Prepare Python virtual environment to isolate build files from your system Python:
+
         make venv
+
 
 
 ##### Install Buildozer into the virtual environment
@@ -58,14 +60,17 @@ BitDust p2p-app APK bundle will include files from both repositories, so we need
         make install_buildozer
 
 
-##### Install python-for-android (in a separate folder)
+
+##### Install python-for-android in a separate folder
 
         make install_p4a
+
 
 
 ##### Get some additional libraries and tools provided by Google as binaries
 
         make download_google_binaries
+
 
 
 ##### Prepare keystore to protect your .APK
@@ -89,9 +94,16 @@ This way Google will be able to verify the .APK file you built before publish it
         java -jar pepk.jar --keystore=~/keystores/bitdust.keystore --alias=bitdust --encryptionkey=<Encryption Key> --include-cert --output=output.zip
 
 
+
 ##### Build APK image with specific version
 
         ./release.sh <version number> <keystore password>
+
+
+
+##### Clean up and rebuild Android environment
+
+        make build_android_environment
 
 
 

@@ -15,7 +15,8 @@ PYTHON_VERSION=python3.7
 .PHONY: clean pyclean
 
 pyclean:
-	@find . -name *.pyc -delete
+	@find . -name '*.pyc' -exec rm -f {} +
+	@find . -name '*.pyo' -exec rm -f {} +
 	@rm -rf *.egg-info build
 	@rm -rf coverage.xml .coverage
 
@@ -52,16 +53,16 @@ download_google_binaries:
 
 install_buildozer:
 	@rm -rf buildozer/
-	# @git clone https://github.com/kivy/buildozer buildozer
-	@git clone https://github.com/vesellov/buildozer buildozer
+	@git clone https://github.com/kivy/buildozer buildozer
+	# @git clone https://github.com/vesellov/buildozer buildozer
 	@cd ./buildozer/; ../venv/bin/python setup.py build; ../venv/bin/pip install -e .; cd ..
 
 install_p4a:
 	@rm -rf python-for-android/
-	# @git clone --single-branch --branch master https://github.com/kivy/python-for-android.git
+	@git clone --single-branch --branch master https://github.com/kivy/python-for-android.git
 	# @git clone --single-branch --branch develop https://github.com/kivy/python-for-android.git
 	# @git clone --single-branch --branch master https://github.com/vesellov/python-for-android.git
-	@git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
+	# @git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
 	# @git clone --single-branch --branch develop_more https://github.com/vesellov/python-for-android.git
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
@@ -71,15 +72,9 @@ update_p4a:
 	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop; cd ..;
 	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop_more; cd ..;
 
-update_kivymd_icons:
-	@./venv/bin/python ./venv/lib/python3.6/site-packages/kivymd/tools/update_icons.py
-
-make_link_engine_repo:
-	@rm -rf ./src/bitdust; ln -v -s ../../bitdust ./src/bitdust;
-
-update_engine_repo:
-	@cd ./src/bitdust; git fetch origin -v; git pull origin master; cd ../..; #  git reset --hard origin/master; cd ../..;
-
+clone_engine_sources:
+	# @rm -rf ./src/bitdust; git clone https://github.com/bitdust-io/public.git ./src/bitdust;
+	@rm -rf ./src/bitdust; git clone https://github.com/bitdust-io/devel.git ./src/bitdust;
 
 ### Android release & development
 
@@ -106,20 +101,18 @@ rewrite_android_dist_files:
 refresh_android_environment: update_p4a rewrite_android_dist_files
 	$(MAKE) spec requirements=$(REQUIREMENTS_ANDROID)
 
-refresh_android_environment_full: update_p4a rewrite_android_dist_files update_engine_repo
+refresh_android_environment_full: update_p4a rewrite_android_dist_files clone_engine_sources
 	$(MAKE) spec requirements=$(REQUIREMENTS_ANDROID)
+
+build_android_environment: clean_android_environment_full clean venv install_buildozer install_p4a download_google_binaries clone_engine_sources
+	@echo 'Android environment is ready, to build APK file execute "./release.sh <version>"'
 
 spec:
 	@P_requirements="$(requirements)" ./venv/bin/python3 -c "tpl=open('buildozer.spec.template').read();import os,sys;sys.stdout.write(tpl.format(requirements=os.environ['P_requirements']));" > buildozer.spec
 
-build_android: refresh_android_environment
-	@rm -rfv ./bin/*.apk
-	@(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release)
-	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
-
 release_android: refresh_android_environment_full
 	@rm -rfv ./bin/*.apk
-	@(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release) | grep -E "Listing |Compiling |\# Copy |\# Create directory |\- copy |running mv |FutureWarning\:"
+	@(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release)
 	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 test_apk:

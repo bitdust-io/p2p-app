@@ -5,7 +5,6 @@
 
 import os
 import sys
-import time
 import threading
 
 #------------------------------------------------------------------------------
@@ -91,7 +90,7 @@ if system.is_android():
     PACKAGE_NAME = u'org.bitdust_io.bitdust1'
     SERVICE_NAME = u'{packagename}.Service{servicename}'.format(
         packagename=PACKAGE_NAME,
-        servicename=u'Bitdustnode'
+        servicename=u'Bitdustnode',
     )
 
 #------------------------------------------------------------------------------
@@ -271,7 +270,11 @@ class BitDustApp(styles.AppStyle, MDApp):
                 ACTIVITY_CLASS_NAME, SERVICE_NAME, shutdown, ))
         self.main_window.engine_log = '\n'
         service = autoclass(SERVICE_NAME)
+        if _Debug:
+            print('BitDustApp.start_android_service service=%r' % service)
         activity = autoclass(ACTIVITY_CLASS_NAME).mActivity
+        if _Debug:
+            print('BitDustApp.start_android_service activity=%r' % activity)
         argument = ''
         if shutdown:
             argument = '{"stop_service": 1}'

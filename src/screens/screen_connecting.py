@@ -97,8 +97,6 @@ class ConnectingScreen(screen.AppScreen):
                     self.known_services[svc['name']] = service_label
                 else:
                     service_label.md_bg_color = clr
-                    if _Debug:
-                        print('        new color', clr)
         services_by_name.clear()
         services_by_state.clear()
 
