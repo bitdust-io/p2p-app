@@ -18,7 +18,11 @@ btn_clr_rgb_low = .3
 class AppStyle(object):
 
     #--- FONT SIZE
-    font_size_extra_small_absolute = 10
+    font_size_extra_small_absolute = 9
+    font_size_extra_small = sp(9)
+
+    font_size_small_absolute = 10
+    font_size_small = sp(10)
 
     font_size_small_absolute = 12
     font_size_small = sp(12)
@@ -55,6 +59,8 @@ class AppStyle(object):
     color_circle_connecting = (btn_clr_rgb_top, btn_clr_rgb_top, btn_clr_rgb_low+.1, 1)
     color_circle_offline = (btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, 1)
     color_circle_online = (btn_clr_rgb_mid, btn_clr_rgb_top+.1, btn_clr_rgb_mid, 1)
+    color_hyperlink = (0, 0, 1, 1)
+    color_success_green = (btn_clr_rgb_low, btn_clr_rgb_top, btn_clr_rgb_low)
 
     color_root_button =  (btn_clr_rgb_low+.1,btn_clr_rgb_mid+.1,btn_clr_rgb_top+.1,1)
 
@@ -124,4 +130,3 @@ class AppStyle(object):
 #------------------------------------------------------------------------------
 
 app = AppStyle()
-

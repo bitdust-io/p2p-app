@@ -26,29 +26,35 @@ _LatestAndroidKeyboardHeightSnapshot = 0
 
 #------------------------------------------------------------------------------
 
-def latest_state():
+def current_platform():
     global _LatestState
     if _LatestState:
         return _LatestState
     _LatestState = str('' + platform)
+    if _Debug:
+        print('system.current_platform', _LatestState)
     return _LatestState
 
 #------------------------------------------------------------------------------
 
 def is_linux():
-    return latest_state() == 'linux'
+    return current_platform() == 'linux'
 
 
 def is_windows():
-    return latest_state() == 'win'
+    return current_platform() == 'win'
 
 
 def is_android():
-    return latest_state() == 'android'
+    return current_platform() == 'android'
 
 
 def is_ios():
-    return latest_state() == 'ios'
+    return current_platform() == 'ios'
+
+
+def is_osx():
+    return current_platform() == 'macosx'
 
 #------------------------------------------------------------------------------
 
@@ -222,12 +228,13 @@ class AsynchronousFileReader(threading.Thread):
 
 class BackgroundProcess(object):
 
-    def __init__(self, cmd, stdout_callback=None, stderr_callback=None, finishing=None):
+    def __init__(self, cmd, stdout_callback=None, stderr_callback=None, finishing=None, daemon=False):
         self.cmd = cmd
         self.process = None
         self.stdout_callback = stdout_callback
         self.stderr_callback = stderr_callback
         self.finishing = finishing
+        self.daemon = daemon
 
     def run(self, **kwargs):
 
@@ -276,6 +283,6 @@ class BackgroundProcess(object):
             if _Debug:
                 print('BackgroundProcess.run.target finished')
 
-        thread = threading.Thread(target=target, kwargs=kwargs)
+        thread = threading.Thread(target=target, kwargs=kwargs, daemon=self.daemon)
         thread.start()
 

@@ -48,7 +48,7 @@ def start(callbacks={}):
     _RegisteredCallbacks = callbacks or {}
     _WebSocketConnecting = True
     _WebSocketStarted = True
-    _WebSocketQueue = queue.Queue(maxsize=100)
+    _WebSocketQueue = queue.Queue(maxsize=1000)
     thread.start_new_thread(websocket_thread, ())
     thread.start_new_thread(requests_thread, (_WebSocketQueue, ))
 

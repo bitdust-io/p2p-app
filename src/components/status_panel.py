@@ -24,14 +24,14 @@ class AutomatPanel(object):
         raise NotImplementedError()
 
     def start_automat_events(self, index=None, automat_id=None):
-        api_client.automat_events_start(
+        return api_client.automat_events_start(
             index=None if index is None else int(index),
             automat_id=automat_id,
             cb=self.on_automat_events_start_result,
         )
 
     def stop_automat_events(self, index=None, automat_id=None):
-        api_client.automat_events_stop(
+        return api_client.automat_events_stop(
             index=None if index is None else int(index),
             automat_id=automat_id,
         )
@@ -60,23 +60,27 @@ class AutomatPanelByIndex(AutomatPanel):
         if self.automat_index is not None:
             if _Debug:
                 print('AutomatPanelByIndex.attach SKIP, already attached with automat_index=%r' % self.automat_index)
-            return
+            return None
         if _Debug:
             print('AutomatPanelByIndex.attach with automat_index:', automat_index)
         self.automat_index = automat_index
         if self.automat_index is None:
             self.update_fields(state=None)
-            return
+            return None
         self.automat_index = int(self.automat_index)
         self.callback_automat_state_changed = callback_automat_state_changed
         screen.control().add_state_changed_callback(self.automat_index, self.on_automat_state_changed)
-        self.start_automat_events(index=int(self.automat_index))
+        ret = self.start_automat_events(index=int(self.automat_index))
+        if not ret:
+            self.automat_index = None
+            self.update_fields(state=None)
+        return ret
 
     def release(self):
         if self.automat_index is None:
             if _Debug:
                 print('AutomatPanelByIndex.release SKIP, already released')
-            return
+            return None
         if _Debug:
             print('AutomatPanelByIndex.release automat_index was:', self.automat_index)
         _i = self.automat_index
@@ -84,10 +88,11 @@ class AutomatPanelByIndex(AutomatPanel):
         self.callback_automat_state_changed = None
         if _i is None:
             self.update_fields(error='unexpected error, automat index was not set')
-            return
+            return None
         screen.control().remove_state_changed_callback(_i, self.on_automat_state_changed)
-        self.stop_automat_events(index=_i)
+        ret = self.stop_automat_events(index=_i)
         self.update_fields(state=None)
+        return ret
 
     def on_automat_state_changed(self, event_data):
         if _Debug:
@@ -107,22 +112,26 @@ class AutomatPanelByID(AutomatPanel):
         if self.automat_id is not None:
             if _Debug:
                 print('AutomatPanelByID.attach SKIP, already attached with automat_id=%r' % self.automat_id)
-            return
+            return None
         if _Debug:
             print('AutomatPanelByID.attach with automat_id:', automat_id)
         self.automat_id = automat_id
         if self.automat_id is None:
             self.update_fields(state=None)
-            return
+            return None
         self.callback_automat_state_changed = callback_automat_state_changed
         screen.control().add_state_changed_callback_by_id(self.automat_id, self.on_automat_state_changed)
-        self.start_automat_events(automat_id=self.automat_id)
+        ret = self.start_automat_events(automat_id=self.automat_id)
+        if not ret:
+            self.automat_id = None
+            self.update_fields(state=None)
+        return ret
 
     def release(self):
         if self.automat_id is None:
             if _Debug:
                 print('AutomatPanelByID.release SKIP, already released')
-            return
+            return None
         if _Debug:
             print('AutomatPanelByID.release automat_id was:', self.automat_id)
         _id = self.automat_id
@@ -130,10 +139,11 @@ class AutomatPanelByID(AutomatPanel):
         self.callback_automat_state_changed = None
         if _id is None:
             self.update_fields(error='unexpected error, automat id was not set')
-            return
+            return None
         screen.control().remove_state_changed_callback_by_id(_id, self.on_automat_state_changed)
-        self.stop_automat_events(automat_id=_id)
+        ret = self.stop_automat_events(automat_id=_id)
         self.update_fields(state=None)
+        return ret
 
     def on_automat_state_changed(self, event_data):
         if _Debug:
@@ -146,7 +156,7 @@ class AutomatStatusPanel(AutomatPanelByID, MDCard):
 
     def update_fields(self, **kwargs):
         if _Debug:
-            print('AutomatStatusPanel.update_fields', 'response' in kwargs, kwargs.get('state'), kwargs.get('error'))
+            print('AutomatStatusPanel.update_fields', 'response' in kwargs, kwargs.get('state'), kwargs.get('error'), kwargs.get('response'))
         if 'error' in kwargs:
             self.ids.label_name.text = ''
             self.ids.label_state.text = ''
@@ -171,7 +181,7 @@ class AutomatShortStatusPanel(AutomatPanelByID, MDCard):
 
     def update_fields(self, **kwargs):
         if _Debug:
-            print('AutomatShortStatusPanel.update_fields', 'response' in kwargs, kwargs.get('state'), kwargs.get('error'))
+            print('AutomatShortStatusPanel.update_fields', 'response' in kwargs, kwargs.get('state'), kwargs.get('error'), kwargs.get('response'))
         if 'error' in kwargs:
             self.ids.label_status.text = kwargs['error']
             return
@@ -189,7 +199,7 @@ class AutomatShortStatusPanelByIndex(AutomatPanelByIndex, MDCard):
 
     def update_fields(self, **kwargs):
         if _Debug:
-            print('AutomatShortStatusPanelByIndex.update_fields', 'response' in kwargs, kwargs.get('state'), kwargs.get('error'))
+            print('AutomatShortStatusPanelByIndex.update_fields', 'response' in kwargs, kwargs.get('state'), kwargs.get('error'), kwargs.get('response'))
         if 'error' in kwargs:
             self.ids.label_status.text = kwargs['error']
             return

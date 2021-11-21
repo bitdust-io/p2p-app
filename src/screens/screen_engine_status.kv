@@ -1,0 +1,70 @@
+<EngineStatusScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'main process is not started',
+                    'AT_STARTUP': 'starting the application',
+                    'LOCAL': 'initializing local environment',
+                    'MODULES': 'starting sub-modules',
+                    'INSTALL': 'installing application',
+                    'READY': 'application is ready',
+                    'STOPPING': 'application is shutting down',
+                    'SERVICES': 'starting network services',
+                    'INTERFACES': 'starting application interfaces',
+                    'EXIT': 'application is closed', }
+
+            PageContainerWithPaddingLayout:
+
+                HorizontalMinimumHeightLayout:
+                    pos_hint: {'top': 1, 'left': 0}
+
+                    MarkupLabel:
+                        size_hint: 1, None
+                        height: self.texture_size[1]
+                        text: 'BitDust engine is a peer-to-peer application that powers independent online storage, secure private messaging and other p2p services available to everyone.\nThe process will run in the background and maintain peer-to-peer connections to other devices on the network.'
+
+                HorizontalLayout:
+                    size_hint: 1, None
+                    height: dp(48)
+
+                    HFlexMarkupLabel:
+                        label_height: dp(48)
+                        text: 'BitDust engine is ON:  '
+
+                    MDSwitch:
+                        id: button_engine_on
+                        active: root.main_win().engine_is_on
+                        on_active: root.on_engine_on_off(self.active)
+
+                HorizontalMinimumHeightLayout:
+
+                    HFlexMarkupLabel:
+                        halign: 'left'
+                        text: 'Network connection [u][color=#0000ff][ref=link]status[/ref][/color][/u]:'
+                        on_ref_press: root.on_network_connection_status_pressed()
+
+                HorizontalMinimumHeightLayout:
+
+                    MDProgressBar:
+                        id: connection_progress
+                        halign: 'left'
+
+                HorizontalMinimumHeightLayout:
+
+                    MarkupLabel:
+                        id: deploy_output_label
+                        size_hint: 1, None
+                        height: self.texture_size[1]
+                        halign: 'left'
+                        color: app.color_gray
+                        text: root.main_win().engine_log
+
+                VEmptySpace:

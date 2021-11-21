@@ -15,23 +15,25 @@ from twisted.internet import reactor
 
 from jnius import autoclass  # @UnresolvedImport
 
-import encodings.idna
+import encodings.idna  # @UnusedImport
 
 #------------------------------------------------------------------------------
 
 from android.config import ACTIVITY_CLASS_NAME, SERVICE_CLASS_NAME  # @UnresolvedImport
 
 PACKAGE_NAME = 'org.bitdust_io.bitdust1'
-PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 #------------------------------------------------------------------------------
 
+from twisted.internet.defer import setDebugging
+
 if _Debug:
     # logging.basicConfig(level=logging.DEBUG)
-    from twisted.internet.defer import setDebugging
     setDebugging(True)
-    from twisted.python.log import startLogging
-    startLogging(sys.stdout)
+    # from twisted.python.log import startLogging
+    # startLogging(sys.stdout)
+else:
+    setDebugging(False)
 
 #------------------------------------------------------------------------------
 
@@ -44,6 +46,8 @@ if _Debug:
 #------------------------------------------------------------------------------
 
 def set_foreground():
+    if _Debug:
+        print('BitDustService.set_foreground()')
     channel_id = f'{PACKAGE_NAME}.Bitdustnode'
     Context = autoclass(u'android.content.Context')
     Intent = autoclass(u'android.content.Intent')
@@ -65,8 +69,9 @@ def set_foreground():
     notification_builder = NotificationBuilder(app_context, channel_id)
 
     title = AndroidString("BitDust".encode('utf-8'))
-    message = AndroidString("Application is running in background".encode('utf-8'))
+    message = AndroidString("BitDust is running in background".encode('utf-8'))
 
+    PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
     notification_intent = Intent(app_context, PythonActivity)
     notification_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
     notification_intent.setAction(Intent.ACTION_MAIN)
@@ -79,18 +84,20 @@ def set_foreground():
     notification_builder.setOngoing(True)
     notification_builder.setPriority(NotificationManager.IMPORTANCE_MIN)
 
-    Drawable = autoclass(u"{}.R$drawable".format(service.getPackageName()))
-    notification_builder.setSmallIcon(getattr(Drawable, 'notification_icon_background'))
+    # Drawable = autoclass(u"{}.R$drawable".format(service.getPackageName()))
+    # notification_builder.setSmallIcon(getattr(Drawable, 'notification_icon_background'))
     notification_builder.setAutoCancel(True)
     notification_builder.setCategory(Notification.CATEGORY_SERVICE)
 
     new_notification = notification_builder.getNotification()
     service.startForeground(1, new_notification)
     if _Debug:
-        print('BitDustService.set_foreground() : %r' % service)
+        print('BitDustService.set_foreground() OK : %r' % service)
 
 
 def set_foreground_api_lower_26():
+    if _Debug:
+        print('BitDustService.set_foreground_api_lower_26()')
     Intent = autoclass('android.content.Intent')
     PendingIntent = autoclass('android.app.PendingIntent')
     AndroidString = autoclass('java.lang.String')
@@ -103,8 +110,9 @@ def set_foreground_api_lower_26():
     notification_builder = NotificationBuilder(app_context)
 
     title = AndroidString("BitDust".encode('utf-8'))
-    message = AndroidString("Application is running in background".encode('utf-8'))
+    message = AndroidString("BitDust is running in background".encode('utf-8'))
 
+    PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
     notification_intent = Intent(app_context, PythonActivity)
     notification_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
     notification_intent.setAction(Intent.ACTION_MAIN)
@@ -116,14 +124,14 @@ def set_foreground_api_lower_26():
     notification_builder.setContentIntent(intent)
     notification_builder.setOngoing(True)
 
-    Drawable = autoclass("{}.R$drawable".format(service.getPackageName()))
-    notification_builder.setSmallIcon(getattr(Drawable, 'icon'))
+    # Drawable = autoclass("{}.R$drawable".format(service.getPackageName()))
+    # notification_builder.setSmallIcon(getattr(Drawable, 'icon'))
     notification_builder.setAutoCancel(True)
     notification_builder.setCategory(Notification.CATEGORY_SERVICE)
 
     service.startForeground(1, notification_builder.getNotification())
     if _Debug:
-        print('BitDustService.set_foreground_api_lower_26() : %r' % service)
+        print('BitDustService.set_foreground_api_lower_26() OK : %r' % service)
 
 #------------------------------------------------------------------------------
 
@@ -170,8 +178,7 @@ def run_service():
 
     if argument.get('stop_service'):
         if _Debug:
-            print('BitDustService.run_service() service to be stopped now')
-        stop_bitdust()
+            print('BitDustService.run_service() service to be stopped now, SKIP and EXIT')
         return
 
     try:
@@ -188,7 +195,7 @@ def run_service():
         if _Debug:
             print('BitDustService.run_service() Twisted reactor stopped')
 
-    except Exception as exc:
+    except:
         import traceback
         traceback.print_exc()
 
@@ -200,6 +207,7 @@ def main():
     run_service()
     if _Debug:
         print('BitDustService.main() process is finishing')
+    os._exit(0)
 
 #------------------------------------------------------------------------------
 

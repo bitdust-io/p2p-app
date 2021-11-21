@@ -89,9 +89,9 @@
             text: root.option_name
             on_press: root.item_clicked_callback(root.item_key, root)
 
-		Widget:
-			size_hint: None, 1
-			width: dp(5)
+        Widget:
+            size_hint: None, 1
+            width: dp(5)
 
         CheckBox:
             canvas.before:
@@ -105,7 +105,7 @@
                 Rectangle:
                     pos: self.pos[0] + 7, self.pos[1] + 7
                     size: self.size[0] - 14, self.size[1] - 14
-			id: option_value_checkbox
+            id: option_value_checkbox
             size_hint: None, None
             pos_hint: {'right': 1, 'center_y': 0.5}
             width: dp(24)
@@ -116,9 +116,9 @@
     OptionDescriptionLabel:
         text: root.option_description
 
-	Widget:
-		size_hint: 1, None
-		height: dp(5)
+    Widget:
+        size_hint: 1, None
+        height: dp(5)
 
 
 <IntegerElement>:
@@ -141,9 +141,7 @@
         SingleLineTextInput:
             id: option_value_input
             size_hint_x: None
-            # size_hint_y: None
             width: dp(100)
-            # height: self.line_height + dp(8)
             pos_hint: {'right': 1, 'center_y': .5}
             padding: dp(10), dp(6)
             halign: 'left'

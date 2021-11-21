@@ -37,3 +37,7 @@ class ProcessDeadScreen(screen.AppScreen):
         if self.verify_process_health_task:
             Clock.unschedule(self.verify_process_health_task)
             self.verify_process_health_task = None
+
+    def on_start_engine_button_clicked(self, *args):
+        if _Debug:
+            print('screen_process_dead.on_start_engine_button_clicked')

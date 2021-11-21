@@ -52,10 +52,10 @@ presplash.filename = loading_logo.png
 icon.filename = bitdust.png
 
 # (str) Supported orientation (one of landscape, sensorLandscape, portrait or all)
-orientation = all
+orientation = portrait
 
 # (list) List of service to declare
-services = Bitdustnode:./service/main.py
+services = Bitdustnode:./service/main.py:foreground
 
 #
 # OSX Specific
@@ -89,13 +89,13 @@ fullscreen = 0
 android.presplash_color = #81A6FF
 
 # (list) Permissions
-android.permissions = INTERNET, READ_EXTERNAL_STORAGE, FOREGROUND_SERVICE
+android.permissions = INTERNET, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, FOREGROUND_SERVICE
 
 # (int) Target Android API, should be as high as possible.
-android.api = 29
+android.api = 31
 
 # (int) Minimum API your APK will support.
-android.minapi = 21
+# android.minapi = 21
 
 # (int) Android SDK version to use
 # android.sdk = 21
@@ -104,10 +104,10 @@ android.minapi = 21
 # android.ndk = 17c
 # android.ndk = 17b
 # android.ndk = 19c
-android.ndk = 21d
+# android.ndk = 21d
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
-android.ndk_api = 21
+# android.ndk_api = 21
 
 # (bool) Use --private data storage (True) or --dir public storage (False)
 android.private_storage = True
@@ -124,7 +124,7 @@ android.private_storage = True
 # (bool) If True, then skip trying to update the Android sdk
 # This can be useful to avoid excess Internet downloads or save time
 # when an update is due and you just want to test/build your package
-android.skip_update = True
+# android.skip_update = True
 
 # (bool) If True, then automatically accept SDK license
 # agreements. This is intended for automation only. If set to False,
@@ -133,9 +133,9 @@ android.skip_update = True
 android.accept_sdk_license = True
 
 # (str) Android entry point, default is ok for Kivy-based app
-# android.entrypoint = org.bitdust_io.bitdust1.BitDustActivity
-# android.activity_class_name = org.bitdust_io.bitdust1.BitDustActivity
-# android.service_class_name = org.bitdust_io.bitdust1.BitDustService
+android.entrypoint = org.bitdust_io.bitdust1.BitDustActivity
+android.activity_class_name = org.bitdust_io.bitdust1.BitDustActivity
+android.service_class_name = org.bitdust_io.bitdust1.BitDustService
 
 # (str) Extra xml to write directly inside the <manifest><application> tag of AndroidManifest.xml
 # use that parameter to provide a filename from where to load your custom XML arguments
@@ -172,7 +172,7 @@ android.add_aars = support-compat-27.0.0.aar
 
 # (list) Java classes to add as activities to the manifest.
 # android.add_activites = org.bitdust_io.bitdust1.BitDustActivity
-android.add_activites = org.kivy.android.PythonActivity
+# android.add_activites = org.kivy.android.PythonActivity
 
 # (str) OUYA Console category. Should be one of GAME or APP
 # If you leave this blank, OUYA support will not be enabled
@@ -276,10 +276,10 @@ ios.ios_deploy_branch = 1.7.0
 [buildozer]
 
 # (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
-log_level = 2
+log_level = 1
 
 # (int) Display warning if buildozer is run as root (0 = False, 1 = True)
-warn_on_root = 0
+warn_on_root = 1
 
 # (str) Path to build artifact storage, absolute or relative to spec file
 build_dir = ./.buildozer

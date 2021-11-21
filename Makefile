@@ -15,7 +15,8 @@ PYTHON_VERSION=python3.7
 .PHONY: clean pyclean
 
 pyclean:
-	@find . -name *.pyc -delete
+	@find . -name '*.pyc' -exec rm -f {} +
+	@find . -name '*.pyo' -exec rm -f {} +
 	@rm -rf *.egg-info build
 	@rm -rf coverage.xml .coverage
 
@@ -52,13 +53,14 @@ download_google_binaries:
 
 install_buildozer:
 	@rm -rf buildozer/
-	# @git clone https://github.com/kivy/buildozer buildozer
-	@git clone https://github.com/vesellov/buildozer buildozer
+	@git clone https://github.com/kivy/buildozer buildozer
+	# @git clone https://github.com/vesellov/buildozer buildozer
 	@cd ./buildozer/; ../venv/bin/python setup.py build; ../venv/bin/pip install -e .; cd ..
 
 install_p4a:
 	@rm -rf python-for-android/
-	@git clone --single-branch --branch develop https://github.com/kivy/python-for-android.git
+	@git clone --single-branch --branch master https://github.com/kivy/python-for-android.git
+	# @git clone --single-branch --branch develop https://github.com/kivy/python-for-android.git
 	# @git clone --single-branch --branch master https://github.com/vesellov/python-for-android.git
 	# @git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
 	# @git clone --single-branch --branch develop_more https://github.com/vesellov/python-for-android.git
@@ -67,18 +69,12 @@ install_p4a:
 
 update_p4a:
 	# @cd ./python-for-android; git fetch --all; git reset --hard origin/master; cd ..;
-	@cd ./python-for-android; git fetch --all; git reset --hard origin/develop; cd ..;
+	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop; cd ..;
 	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop_more; cd ..;
 
-update_kivymd_icons:
-	@./venv/bin/python ./venv/lib/python3.6/site-packages/kivymd/tools/update_icons.py
-
-make_link_engine_repo:
-	@rm -rf ./src/bitdust; ln -v -s ../../bitdust ./src/bitdust;
-
-update_engine_repo:
-	@cd ./src/bitdust; git fetch origin -v; git pull origin master; cd ../..; #  git reset --hard origin/master; cd ../..;
-
+clone_engine_sources:
+	@if [ ! -d "./src/bitdust" ]; then git clone https://github.com/bitdust-io/public.git; fi
+	@cd ./src/bitdust; git pull; cd ../..;
 
 ### Android release & development
 
@@ -105,36 +101,34 @@ rewrite_android_dist_files:
 refresh_android_environment: update_p4a rewrite_android_dist_files
 	$(MAKE) spec requirements=$(REQUIREMENTS_ANDROID)
 
-refresh_android_environment_full: update_p4a rewrite_android_dist_files update_engine_repo
+refresh_android_environment_full: update_p4a rewrite_android_dist_files clone_engine_sources
 	$(MAKE) spec requirements=$(REQUIREMENTS_ANDROID)
+
+build_android_environment: clean_android_environment_full clean venv install_buildozer install_p4a download_google_binaries clone_engine_sources
+	@echo 'Android environment is ready, to build APK file execute "./release.sh <version>"'
 
 spec:
 	@P_requirements="$(requirements)" ./venv/bin/python3 -c "tpl=open('buildozer.spec.template').read();import os,sys;sys.stdout.write(tpl.format(requirements=os.environ['P_requirements']));" > buildozer.spec
 
-build_android: refresh_android_environment
-	@rm -rfv ./bin/*.apk
-	@PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
-	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
-
 release_android: refresh_android_environment_full
 	@rm -rfv ./bin/*.apk
-	@PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release | grep -v "Listing " | grep -v "Compiling " | grep -v "\# Copy " | grep -v "\# Create directory " | grep -v "\- copy" | grep -v "running mv "
+	@(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release)
 	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 test_apk:
 	@adb install -r bin/BitDustAndroid.apk
 
-log_adb:
-	@adb logcat | grep -vE "python  : extracting|pythonutil: Checking pattern" | grep -E "WebViewConsole|python|DEBUG|Bitdustnode|BitDustActivity|PythonActivity|BitDust|SDL|PythonService|crush|Exception|WebViewManager|WebViewFactory"
+shell:
+	@adb shell "cd /storage/emulated/0/.bitdust/; ls -la; sh;"
 
-log_adb_fast:
-	@adb logcat | grep -E "WebViewConsole|python|DEBUG|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust1|bitdust_io|Exception|WebViewManager|WebViewFactory"
+log_adb:
+	@adb logcat | grep -E "python|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust|bitdust_io|Exception"
 
 log_adb_brief:
 	@adb logcat | grep -v "Notification.Badge:" | grep -v "GameManagerService:" | grep -v "GamePkgDataHelper:" | grep -v "Layer   :" | grep -v "SurfaceFlinger:" | grep -v "SurfaceControl:" | grep -v "RemoteAnimationController:" | grep -v "WindowManager:" | grep -v extracting | grep -v "Checking pattern" | grep -v "Library loading" | grep -v "Loading library" | grep -v "AppleWebKit/537.36 (KHTML, like Gecko)" | grep -v "I Bitdustnode:   " | grep -v "I Bitdustnode: DEBUG:jnius.reflect:" | grep -e python -e Bitdustnode -e "E AndroidRuntime" -e "F DEBUG" -e "PythonActivity:" -e "WebViewConsole:" -e "SDL     :" -e "PythonService:" -e "org.bitdust_io.bitdust1"
 
 log_adb_short:
-	@adb logcat | grep -v "python  : extracting" | grep -v "pythonutil: Checking pattern" | grep -e python -e Bitdustnode -e "E AndroidRuntime" -e "F DEBUG" -e "PythonActivity:" -e "WebViewConsole:" -e "SDL     :" -e "PythonService:"
+	@adb logcat | grep -E "python|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust|bitdust_io|Exception" | grep -v "python  : extracting" | grep -v "pythonutil: Checking pattern"
 
 log_adb_full:
 	@adb logcat
@@ -145,11 +139,8 @@ log_main:
 log_states:
 	@adb shell tail -f /storage/emulated/0/.bitdust/logs/automats.log
 
-shell:
-	@adb shell "cd /storage/emulated/0/.bitdust/; ls -la; sh;"
-
-cat_main_log:
+cat_log_main:
 	@adb shell cat /storage/emulated/0/.bitdust/logs/android.log
 
-cat_automat_log:
+cat_log_automat:
 	@adb shell cat /storage/emulated/0/.bitdust/logs/automats.log
