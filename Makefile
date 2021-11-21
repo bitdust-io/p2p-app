@@ -73,8 +73,8 @@ update_p4a:
 	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop_more; cd ..;
 
 clone_engine_sources:
-	# @rm -rf ./src/bitdust; git clone https://github.com/bitdust-io/public.git ./src/bitdust;
-	@rm -rf ./src/bitdust; git clone https://github.com/bitdust-io/devel.git ./src/bitdust;
+	@if [ ! -d "./src/bitdust" ]; then git clone https://github.com/bitdust-io/public.git; fi
+	@cd ./src/bitdust; git pull; cd ../..;
 
 ### Android release & development
 

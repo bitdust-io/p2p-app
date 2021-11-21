@@ -52,7 +52,7 @@ presplash.filename = loading_logo.png
 icon.filename = bitdust.png
 
 # (str) Supported orientation (one of landscape, sensorLandscape, portrait or all)
-orientation = all
+orientation = portrait
 
 # (list) List of service to declare
 services = Bitdustnode:./service/main.py:foreground
@@ -92,7 +92,7 @@ android.presplash_color = #81A6FF
 android.permissions = INTERNET, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, FOREGROUND_SERVICE
 
 # (int) Target Android API, should be as high as possible.
-android.api = 29
+android.api = 31
 
 # (int) Minimum API your APK will support.
 # android.minapi = 21
@@ -124,7 +124,7 @@ android.private_storage = True
 # (bool) If True, then skip trying to update the Android sdk
 # This can be useful to avoid excess Internet downloads or save time
 # when an update is due and you just want to test/build your package
-android.skip_update = True
+# android.skip_update = True
 
 # (bool) If True, then automatically accept SDK license
 # agreements. This is intended for automation only. If set to False,

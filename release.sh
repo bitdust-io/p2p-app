@@ -23,9 +23,9 @@ mv -v -f buildozer.spec.building buildozer.spec
 
 pw=$(cat ".keystore_password")
 
-jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/keystores/bitdust.keystore bin/BitDustAndroid_unsigned.apk -storepass "$pw" bitdust
-
 zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
+
+apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:.keystore_password --v1-signing-enabled true --v2-signing-enabled true bin/BitDustAndroid.apk
 
 apktool d -o ./bin/apk/ -f ./bin/BitDustAndroid.apk
 

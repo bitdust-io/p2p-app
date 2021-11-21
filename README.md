@@ -95,6 +95,20 @@ This way Google will be able to verify the .APK file you built before publish it
 
 
 
+##### Prepare Android command-line tools
+
+First we need to run buildozer one time and it will download Android SDK and NDK files:
+
+        PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release
+
+
+Then you will find `~/.buildozer` folder was created with downloaded and extracted Android files and be able to link those two command-line tools from there:
+
+        ln -s ~/.buildozer/android/platform/android-sdk/build-tools/32.0.0-rc1/zipalign
+        ln -s ~/.buildozer/android/platform/android-sdk/build-tools/32.0.0-rc1/apksigner
+
+
+
 ##### Build APK image with specific version
 
         ./release.sh <version number> <keystore password>
