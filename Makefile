@@ -10,7 +10,7 @@ REQUIREMENTS_ANDROID:="kivy==2.0.0,https://github.com/vesellov/KivyMD/archive/ma
 OS=$(shell lsb_release -si 2>/dev/null || uname)
 PIP:="venv/bin/pip"
 PYTHON="venv/bin/python"
-PYTHON_VERSION=python3.7
+PYTHON_VERSION=python3
 
 .PHONY: clean pyclean
 
@@ -42,7 +42,7 @@ run:
 
 system_dependencies:
 ifeq ($(OS), Ubuntu)
-	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends cmake python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip python-virtualenv libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip
+	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends cmake build-essential libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip python3-setuptools python3-pygame python3-opengl python3-enchant python3-dev python3-pip python3-virtualenv
 endif
 
 install: system_dependencies clean venv
