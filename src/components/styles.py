@@ -18,7 +18,11 @@ btn_clr_rgb_low = .3
 class AppStyle(object):
 
     #--- FONT SIZE
-    font_size_extra_small_absolute = 10
+    font_size_extra_small_absolute = 9
+    font_size_extra_small = sp(9)
+
+    font_size_small_absolute = 10
+    font_size_small = sp(10)
 
     font_size_small_absolute = 12
     font_size_small = sp(12)
