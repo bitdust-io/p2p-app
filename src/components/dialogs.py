@@ -26,7 +26,7 @@ def open_yes_no_dialog(title, text, cb=None):
         content=content,
         size_hint=(None, None),
         size=(480,400),
-        auto_dismiss= False,
+        auto_dismiss=False,
     )
 
     def on_answer(instance, answer):

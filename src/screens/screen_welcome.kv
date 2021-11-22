@@ -30,9 +30,19 @@
                 HEmptySpace:
                     size_hint_x: 0.5
 
-                HFlexMarkupLabel:
-                    halign: 'center'
-                    text: '[size=26sp]Welcome to BitDust[/size]'
+                VLayout:
+                    id: central_widget
+                    size_hint: None, .01
+                    width: self.minimum_width
+ 
+                    HFlexMarkupLabel:
+                        halign: 'center'
+                        text: '[size=26sp]Welcome to BitDust[/size]'
+                        pos_hint: {'center_x': .5}
+
+                    VEmptySpace:
+                        size_hint_y: None
+                        height: dp(20)
 
                 HEmptySpace:
                     size_hint_x: 0.5

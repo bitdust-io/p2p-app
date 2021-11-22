@@ -25,6 +25,7 @@ from kivymd.uix.button import (
     MDFloatingLabel,
     MDFloatingBottomButton,
     MDFloatingRootButton,
+    MDFillRoundFlatButton,
 )
 from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
 from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
@@ -112,6 +113,10 @@ class CustomFloatingActionButton(MDFloatingActionButton):
     def set_size(self, interval):
         self.width = self.button_size
         self.height = self.button_size
+
+
+class FillRoundFlatButton(MDFillRoundFlatButton):
+    pass
 
 
 class CustomSwitch(Switch):

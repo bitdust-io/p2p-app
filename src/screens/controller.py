@@ -15,7 +15,7 @@ _Debug = True
 # 2. create new file screens/screen_xxx.kv
 # 3. create new file screens/screen_xxx.py
 # 4. make changes in components.main_win.MainWin.select_screen() if it is required for screen identification
-# 4. to open screen use: screen.main_window().select_screen(screen_id='xxx_screen')
+# 5. to open screen use: screen.main_window().select_screen(screen_id='xxx_screen')
 #------------------------------------------------------------------------------ 
 
 def all_screens():

@@ -73,7 +73,7 @@ update_p4a:
 	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop_more; cd ..;
 
 clone_engine_sources:
-	@if [ ! -d "./src/bitdust" ]; then git clone https://github.com/bitdust-io/public.git; fi
+	@if [ ! -d "./src/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./src/bitdust; fi
 	@cd ./src/bitdust; git pull; cd ../..;
 
 ### Android release & development
@@ -90,7 +90,7 @@ clean_android_environment_full:
 
 system_dependencies_android:
 ifeq ($(OS), Ubuntu)
-	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends openjdk-8-jdk cython3 autoconf
+	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends openjdk-8-jdk cython3 autoconf automake libtool
 	@$(PYTHON_VERSION) -m pip install Cython
 endif
 

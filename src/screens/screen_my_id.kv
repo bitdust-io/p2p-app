@@ -13,7 +13,7 @@
                     { None: 'identity-propagate service is not started',
                     'ON': 'identity file is synchronized',
                     'OFF': 'identity-propagate service is switched off',
-                    'NOT_INSTALLED': 'identity-propagate service is not installed',
+                    'NOT_INSTALLED': 'identity not exist',
                     'INFLUENCE': 'turning off dependent network services',
                     'STARTING': 'identity-propagate service is starting',
                     'DEPENDS_OFF': 'related network services were not started yet',
@@ -35,6 +35,7 @@
                         height: self.texture_size[1]
                         color: app.color_black
                         text: ''
+                        on_ref_press: root.on_my_id_details_ref_pressed(*args)
 
     RootActionButton:
         id: action_button
