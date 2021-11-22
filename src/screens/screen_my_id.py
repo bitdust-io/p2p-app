@@ -2,6 +2,10 @@ import os
 
 #------------------------------------------------------------------------------
 
+from kivy.clock import Clock
+
+#------------------------------------------------------------------------------
+
 from components import screen
 from components import dialogs
 from components import snackbar
@@ -12,7 +16,7 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -43,6 +47,10 @@ identity_details_temlate_text = """
 [/size]
 """
 
+create_new_identity_text = """
+To be able to start using BitDust, please [u][color=#0000ff][ref=new_identity]create new identity[/ref][/color][/u] first
+"""
+
 #------------------------------------------------------------------------------
 
 class MyIDScreen(screen.AppScreen):
@@ -64,11 +72,11 @@ class MyIDScreen(screen.AppScreen):
 
     def on_identity_get_result(self, resp):
         if not websock.is_ok(resp):
-            self.ids.my_id_details.text = str(resp)
+            self.ids.my_id_details.text = create_new_identity_text
             return
         result = websock.response_result(resp)
         if not result:
-            self.ids.my_id_details.text = websock.response_err(resp)
+            self.ids.my_id_details.text = create_new_identity_text
             return
         self.ids.my_id_details.text = identity_details_temlate_text.format(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
@@ -84,9 +92,15 @@ class MyIDScreen(screen.AppScreen):
             contacts='\n'.join(result.get('contacts', [])),
         )
 
+    def on_my_id_details_ref_pressed(self, *args):
+        if _Debug:
+            print('MyIDScreen.on_my_id_details_ref_pressed', args)
+        if args[1] == 'new_identity':
+            self.main_win().select_screen('new_identity_screen')
+
     def on_action_button_clicked(self, btn):
         if _Debug:
-            print('ConversationsScreen.on_action_button_clicked', btn.icon)
+            print('MyIDScreen.on_action_button_clicked', btn.icon)
         self.ids.action_button.close_stack()
         if btn.icon == 'shield-key':
             if system.is_android():
@@ -100,7 +114,7 @@ class MyIDScreen(screen.AppScreen):
         elif btn.icon == 'cellphone-erase':
             dialogs.open_yes_no_dialog(
                 title='This will erase your identity and the private key and all data will be lost',
-                text='WARNING! All your data will become completely inaccessible without private key',
+                text='WARNING!\n\nAll your data will become\ncompletely inaccessible\nwithout a private key',
                 cb=self.on_confirm_erase_my_id,
             )
         elif btn.icon == 'lan-pending':
@@ -113,8 +127,12 @@ class MyIDScreen(screen.AppScreen):
             snackbar.info(text='BitDust background process will be stopped')
 
     def on_confirm_erase_my_id(self, answer):
+        if _Debug:
+            print('MyIDScreen.on_confirm_erase_my_id', answer)
         if answer == 'yes':
-            api_client.process_stop(cb=self.on_process_stop_result_erase_my_id)
+            api_client.process_stop()
+            self.main_win().engine_is_on = False
+            Clock.schedule_once(self.on_process_stop_result_erase_my_id, 1)
 
     def on_network_reconnect_result(self, resp):
         if not websock.is_ok(resp):
@@ -123,30 +141,35 @@ class MyIDScreen(screen.AppScreen):
             snackbar.info(text='network connection refreshed')
 
     def on_identity_backup_result(self, resp, destination_filepath):
+        if _Debug:
+            print('MyIDScreen.on_identity_backup_result', destination_filepath, resp)
         if not websock.is_ok(resp):
-            self.ids.my_id_details.text = str(resp)
             snackbar.error(text='identity backup failed: %s' % websock.response_err(resp))
         else:
             snackbar.success(text='key file created: %s' % destination_filepath)
 
     def on_process_stop_result_start_engine(self, resp):
+        if _Debug:
+            print('MyIDScreen.on_process_stop_result_start_engine', resp)
         self.app().start_engine()
         snackbar.info(text='BitDust node process restarted')
 
-    def on_process_stop_result_erase_my_id(self, resp):
+    def on_process_stop_result_erase_my_id(self, *args):
+        if _Debug:
+            print('MyIDScreen.on_process_stop_result_erase_my_id', args)
         home_folder_path = os.path.join(os.path.expanduser('~'), '.bitdust')
         if system.is_android():
             home_folder_path = os.path.join('/storage/emulated/0/', '.bitdust')
-        system.rmdir_recursive(os.path.join(home_folder_path, 'backups'))
-        system.rmdir_recursive(os.path.join(home_folder_path, 'config'))
-        system.rmdir_recursive(os.path.join(home_folder_path, 'identitycache'))
-        system.rmdir_recursive(os.path.join(home_folder_path, 'identityhistory'))
-        system.rmdir_recursive(os.path.join(home_folder_path, 'keys'))
-        system.rmdir_recursive(os.path.join(home_folder_path, 'metadata'))
-        system.rmdir_recursive(os.path.join(home_folder_path, 'messages'))
-        system.rmdir_recursive(os.path.join(home_folder_path, 'servicedata'))
-        system.rmdir_recursive(os.path.join(home_folder_path, 'suppliers'))
-        system.rmdir_recursive(os.path.join(home_folder_path, 'customers'))
-        system.rmdir_recursive(os.path.join(home_folder_path, 'temp'))
+        system.rmdir_recursive(os.path.join(home_folder_path, 'metadata'), ignore_errors=False)
+        system.rmdir_recursive(os.path.join(home_folder_path, 'backups'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, 'config'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, 'identitycache'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, 'identityhistory'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, 'keys'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, 'messages'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, 'servicedata'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, 'suppliers'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, 'customers'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, 'temp'), ignore_errors=True)
         snackbar.info(text='private key erased')
         self.app().start_engine()
