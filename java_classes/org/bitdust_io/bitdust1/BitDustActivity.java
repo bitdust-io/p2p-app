@@ -74,11 +74,14 @@ public class BitDustActivity extends PythonActivity {
 
     private static final String TAG = "BitDustActivity";
 
+    public static BitDustActivity mBitDustActivity = null;
+
     public static int status_bar_height = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.mBitDustActivity = this;
         Log.v(TAG, "onCreate()");
     }
 
@@ -95,9 +98,12 @@ public class BitDustActivity extends PythonActivity {
         String process_stop_result = "";
         process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
         Log.v(TAG, "onDestroy() process_stop_result first call from the Activity : " + process_stop_result);
-        while (process_stop_result.indexOf("Failed to connect") < 0) {
+        int attempts = 0;
+        while ((process_stop_result.indexOf("Failed to connect") < 0) && (process_stop_result.indexOf("Connection refused") < 0)) {
             process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
             Log.v(TAG, "onDestroy() process_stop_result retry from the Activity : " + process_stop_result);
+            attempts++;
+            if (attempts > 50) break;
         }
         Log.v(TAG, "onDestroy() going to kill the process: " + Process.myPid());
         Process.killProcess(Process.myPid());
@@ -190,6 +196,59 @@ public class BitDustActivity extends PythonActivity {
         }
         Log.v(TAG, "requestGetURL() result : " + str_result);
         return str_result;
+    }
+
+
+    public interface CustomPermissionsCallback {
+        void onRequestCustomPermissionsResult(int requestCode, String[] permissions, int[] grantResults);
+    }
+
+    private CustomPermissionsCallback permissionCallbackCustom;
+    private boolean haveCustomPermissionsCallback = false;
+
+    public void addCustomPermissionsCallback(CustomPermissionsCallback callback) {
+        permissionCallbackCustom = callback;
+        haveCustomPermissionsCallback = true;
+        Log.v(TAG, "addCustomPermissionsCallback(): Added callback for onRequestPermissionsResult");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.v(TAG, "onRequestPermissionsResult()");
+        if (haveCustomPermissionsCallback) {
+            Log.v(TAG, "onRequestPermissionsResult passed to callback");
+            permissionCallbackCustom.onRequestCustomPermissionsResult(requestCode, permissions, grantResults);
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    public boolean checkCurrentCustomPermission(String permission) {
+        if (android.os.Build.VERSION.SDK_INT < 23)
+            return true;
+
+        try {
+            java.lang.reflect.Method methodCheckPermission = Activity.class.getMethod("checkSelfPermission", String.class);
+            Object resultObj = methodCheckPermission.invoke(this, permission);
+            int result = Integer.parseInt(resultObj.toString());
+            if (result == PackageManager.PERMISSION_GRANTED)
+                return true;
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        }
+        return false;
+    }
+
+    public void requestCustomPermissionsWithRequestCode(String[] permissions, int requestCode) {
+        if (android.os.Build.VERSION.SDK_INT < 23)
+            return;
+        try {
+            java.lang.reflect.Method methodRequestPermission = Activity.class.getMethod("requestPermissions", String[].class, int.class);
+            methodRequestPermission.invoke(this, permissions, requestCode);
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        }
+    }
+
+    public void requestCustomPermissions(String[] permissions) {
+        requestCustomPermissionsWithRequestCode(permissions, 1);
     }
 
 }

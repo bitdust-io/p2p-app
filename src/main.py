@@ -78,6 +78,7 @@ if system.is_android():
     from android.storage import primary_external_storage_path  # @UnresolvedImport
 
     from lib.permissions import check_permission, request_permissions  # @UnresolvedImport
+    # from android.permissions import check_permission, request_permissions  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
@@ -272,7 +273,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         service = autoclass(SERVICE_NAME)
         if _Debug:
             print('BitDustApp.start_android_service service=%r' % service)
-        activity = autoclass(ACTIVITY_CLASS_NAME).mActivity
+        activity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
         if _Debug:
             print('BitDustApp.start_android_service activity=%r' % activity)
         argument = ''
@@ -293,7 +294,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.stop_service')
         service = autoclass(SERVICE_NAME)
-        activity = autoclass(ACTIVITY_CLASS_NAME).mActivity
+        activity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
         service.stop(activity)
         self.main_window.engine_log = '\n'
         if _Debug:

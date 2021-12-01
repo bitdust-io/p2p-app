@@ -83,7 +83,7 @@ def get_android_keyboard_height():
     from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
     from jnius import autoclass  # @UnresolvedImport
     if _LatestAndroidBitDustActivity is None:
-        _LatestAndroidBitDustActivity = autoclass(ACTIVITY_CLASS_NAME).mActivity
+        _LatestAndroidBitDustActivity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
         _LatestAndroidRectClass = autoclass(u'android.graphics.Rect')
     if _LatestAndroidDisplayRealHeight is None:
         if android_sdk_version() >= 17:
@@ -137,7 +137,7 @@ def set_android_system_ui_visibility():
     from jnius import autoclass  # @UnresolvedImport
     from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
     if _LatestAndroidBitDustActivity is None:
-        _LatestAndroidBitDustActivity = autoclass(ACTIVITY_CLASS_NAME).mActivity
+        _LatestAndroidBitDustActivity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
     View = autoclass('android.view.View')
     decorView = _LatestAndroidBitDustActivity.getWindow().getDecorView()
     flags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY \
