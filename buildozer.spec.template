@@ -216,7 +216,6 @@ android.logcat_filters = *:S python:D
 
 # (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
 # android.arch = armeabi-v7a
-# android.arch = x86
 # android.arch = x86_64
 android.arch = arm64-v8a
 
@@ -325,3 +324,12 @@ source.exclude_patterns = license,data/audio/*.wav,data/images/original/*,.git,s
 #    Then, invoke the command line with the "demo" profile:
 #
 #buildozer --profile demo android debug
+
+[app@armeabi_v7a]
+android.arch = armeabi-v7a
+
+[app@x86_64]
+android.arch = x86_64
+
+[app@arm64_v8a]
+android.arch = arm64-v8a
