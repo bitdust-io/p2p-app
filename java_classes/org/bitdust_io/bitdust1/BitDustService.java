@@ -28,9 +28,12 @@ public class BitDustService extends PythonService {
         String process_stop_result = "";
         process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
         Log.v(TAG, "onDestroy() process_stop_result first call from the Service : " + process_stop_result);
-        while (process_stop_result.indexOf("Failed to connect") < 0) {
+        int attempts = 0;
+        while ((process_stop_result.indexOf("Failed to connect") < 0) && (process_stop_result.indexOf("Connection refused") < 0)) {
             process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
             Log.v(TAG, "onDestroy() process_stop_result retry from the Service: " + process_stop_result);
+            attempts++;
+            if (attempts > 50) break;
         }
         Log.v(TAG, "onDestroy()   about to call super onDestroy");
         super.onDestroy();

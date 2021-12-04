@@ -116,7 +116,7 @@ release_android: refresh_android_environment_full
 	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 
 test_apk:
-	@adb install -r bin/BitDustAndroid.apk
+	@adb install -r bin/BitDustAndroid_arm64_v8a.apk
 
 shell:
 	@adb shell "cd /storage/emulated/0/.bitdust/; ls -la; sh;"

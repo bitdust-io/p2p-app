@@ -92,7 +92,7 @@ android.presplash_color = #81A6FF
 android.permissions = INTERNET, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, FOREGROUND_SERVICE
 
 # (int) Target Android API, should be as high as possible.
-android.api = 31
+android.api = 30
 
 # (int) Minimum API your APK will support.
 # android.minapi = 21
@@ -124,7 +124,7 @@ android.private_storage = True
 # (bool) If True, then skip trying to update the Android sdk
 # This can be useful to avoid excess Internet downloads or save time
 # when an update is due and you just want to test/build your package
-# android.skip_update = True
+android.skip_update = True
 
 # (bool) If True, then automatically accept SDK license
 # agreements. This is intended for automation only. If set to False,
@@ -216,7 +216,7 @@ android.logcat_filters = *:S python:D
 
 # (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
 # android.arch = armeabi-v7a
-# android.arch = x86
+# android.arch = x86_64
 android.arch = arm64-v8a
 
 #
@@ -324,3 +324,12 @@ source.exclude_patterns = license,data/audio/*.wav,data/images/original/*,.git,s
 #    Then, invoke the command line with the "demo" profile:
 #
 #buildozer --profile demo android debug
+
+[app@armeabi_v7a]
+android.arch = armeabi-v7a
+
+[app@x86_64]
+android.arch = x86_64
+
+[app@arm64_v8a]
+android.arch = arm64-v8a
