@@ -58,6 +58,7 @@ class EngineStatusScreen(screen.AppScreen):
             Clock.schedule_once(self.schedule_nw_task, 0.5)
             self.state_panel_attached = self.ids.state_panel.attach(automat_id='initializer')
         else:
+            self.set_nw_progress(0)
             self.ids.state_panel.release()
             self.state_panel_attached = False
             self.unschedule_nw_task()

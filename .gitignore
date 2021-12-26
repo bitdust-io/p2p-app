@@ -10,7 +10,7 @@ venv
 buildozer
 .buildozer
 python-for-android
-src/bitdust
+build/
 src/version.py
 bin/
 .release_android_incremental

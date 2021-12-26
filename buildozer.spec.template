@@ -10,7 +10,7 @@ package.name = bitdust1
 package.domain = org.bitdust_io
 
 # (str) Source code where the main.py live
-source.dir = ./src
+source.dir = ./build
 
 # (list) Source files to include (let empty to include all the files)
 source.include_exts = py,png,svg,jpg,jpeg,ico,kv,atlas,otf,ttf,sh,json,html,js,map,css,mp3
@@ -22,7 +22,7 @@ source.include_exts = py,png,svg,jpg,jpeg,ico,kv,atlas,otf,ttf,sh,json,html,js,m
 #source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-source.exclude_dirs = etc,src/bitdust/.git,src/bitdust/icons,src/bitdust/release,src/bitdust/deploy,src/bitdust/devops,src/bitdust/regress,src/bitdust/regression,src/bitdust/tests,src/bitdust/icons
+source.exclude_dirs = etc,build/bitdust/.git,build/bitdust/icons,build/bitdust/release,build/bitdust/deploy,build/bitdust/devops,build/bitdust/regress,build/bitdust/regression,build/bitdust/tests,build/bitdust/icons
 
 # (list) List of exclusions using pattern matching
 #source.exclude_patterns = license,images/*/*.jpg
@@ -296,7 +296,7 @@ bin_dir = ./bin
 #    Instead of doing:
 #
 #[app]
-source.exclude_patterns = license,data/audio/*.wav,data/images/original/*,.git,src/bitdust/.git
+source.exclude_patterns = license,data/audio/*.wav,data/images/original/*,.git,build/bitdust/.git
 #
 #    This can be translated into:
 #

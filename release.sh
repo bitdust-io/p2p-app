@@ -15,7 +15,7 @@ set -e
 # x86_64
 rm -rf buildozer.spec.building
 cp -v buildozer.spec buildozer.spec.building
-echo "__version__ = \"$1\"" > src/version.py
+echo "__version__ = \"$1\"" > ./src/version.py
 make refresh_android_environment_full
 rm -rfv ./bin/BitDustAndroid.apk
 rm -rfv ./bin/BitDustAndroid_unsigned.apk
@@ -32,7 +32,7 @@ mv -v ./bin/BitDustAndroid.apk ./bin/BitDustAndroid_x86_64.apk
 # armeabi_v7a
 rm -rf buildozer.spec.building
 cp -v buildozer.spec buildozer.spec.building
-echo "__version__ = \"$1\"" > src/version.py
+echo "__version__ = \"$1\"" > ./src/version.py
 make refresh_android_environment_full
 rm -rfv ./bin/BitDustAndroid.apk
 rm -rfv ./bin/BitDustAndroid_unsigned.apk
@@ -49,7 +49,7 @@ mv -v ./bin/BitDustAndroid.apk ./bin/BitDustAndroid_armeabi_v7a.apk
 # arm64_v8a
 rm -rf buildozer.spec.building
 cp -v buildozer.spec buildozer.spec.building
-echo "__version__ = \"$1\"" > src/version.py
+echo "__version__ = \"$1\"" > ./src/version.py
 make refresh_android_environment_full
 rm -rfv ./bin/BitDustAndroid.apk
 rm -rfv ./bin/BitDustAndroid_unsigned.apk
