@@ -427,6 +427,7 @@ class MainWin(Screen, ThemableBehavior):
     def on_left_menu_button_clicked(self, *args):
         if _Debug:
             print('MainWin.on_left_menu_button_clicked', self.selected_screen)
+        self.update_menu_items()
         if self.selected_screen:
             self.active_screens[self.selected_screen][0].on_nav_button_clicked()
         self.nav().set_state("open")
