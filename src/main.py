@@ -182,6 +182,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         Builder.load_file('./components/main_win.kv')
 
         from components import main_win
+        from components.layouts import DelayedResizeLayout
 
         self.control = controller.Controller(self)
 
@@ -192,7 +193,10 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.main_window.bind(engine_log=self.on_engine_log)
 
         # Window.bind(on_keyboard=self.on_key_input)
-        return self.main_window
+
+        dr_layout = DelayedResizeLayout()
+        dr_layout.add_root_widget(self.main_window)
+        return dr_layout
 
     def do_start(self, *args, **kwargs):
         if _Debug:

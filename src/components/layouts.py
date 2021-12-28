@@ -1,6 +1,11 @@
-from kivy.uix.widget import Widget
+from functools import partial
+
+from kivy.clock import Clock
+from kivy.properties import ObjectProperty, NumericProperty  # @UnresolvedImport
+from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.stacklayout import StackLayout
+from kivy.uix.widget import Widget
 
 from kivymd.uix.boxlayout import BoxLayout
 
@@ -111,3 +116,26 @@ class StatusPanelLayout(HorizontalLayout):
 
 class VerticalScrollView(ScrollView):
     pass
+
+#------------------------------------------------------------------------------
+
+class DelayedResizeLayout(AnchorLayout):
+
+    do_layout_event = ObjectProperty(None, allownone=True)
+    layout_delay_s = NumericProperty(0.5)
+    root_widget = None
+    initialized = False
+
+    def do_layout(self, *args, **kwargs):
+        if not self.initialized:
+            self.initialized = True
+            super().do_layout(*args, **kwargs)
+            return
+        if self.do_layout_event is not None:
+            self.do_layout_event.cancel()
+        real_do_layout = super().do_layout
+        self.do_layout_event = Clock.schedule_once(lambda dt: real_do_layout(*args, **kwargs), self.layout_delay_s)
+
+    def add_root_widget(self, w):
+        self.root_widget = w
+        self.add_widget(self.root_widget)

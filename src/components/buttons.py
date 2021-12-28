@@ -8,6 +8,7 @@ from kivy.properties import (
     ColorProperty,  # @UnresolvedImport
     ListProperty,  # @UnresolvedImport
     DictProperty,  # @UnresolvedImport
+    ObjectProperty,  # @UnresolvedImport
 )
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
@@ -211,14 +212,14 @@ def RootActionButton_set_size(self, interval):
     self.width = "36dp"
     self.height = "36dp"
     if _Debug:
-        print('RootActionButton_set_size', self)
+        print('    RootActionButton_set_size')
 
 def RootActionButton_on_touch_up(self, touch):
     super(MDFloatingRootButton, self).on_touch_up(touch)
     if self.collide_point(touch.x, touch.y):
         return True
     if _Debug:
-        print('RootActionButton_on_touch_up going to close the stack', self)
+        print('RootActionButton_on_touch_up going to close the stack')
     self.parent.close_stack()
 
 
@@ -228,6 +229,9 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
     buttons_colors = DictProperty()
     logo = BooleanProperty(False)
     root_button_rotate_angle = NumericProperty(360)
+    do_update_event = ObjectProperty(None, allownone=True)
+    update_delay_s = NumericProperty(0.5)
+    initialized = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -288,9 +292,22 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
             elif isinstance(widget, MDFloatingLabel):
                 widget.elevation = 0
 
+    def _update_pos_buttons(self, instance, width, height):
+        if not self.initialized:
+            self.initialized = True
+            super()._update_pos_buttons(instance, width, height)
+            return
+        if _Debug:
+            print('RootActionButton._update_pos_buttons', width, height)
+        self.drop_stack()
+        if self.do_update_event is not None:
+            self.do_update_event.cancel()
+        real_do_update = super()._update_pos_buttons
+        self.do_update_event = Clock.schedule_once(lambda dt: real_do_update(instance, width, height), self.update_delay_s)
+
     def set_pos_root_button(self, instance):
         if _Debug:
-            print('RootActionButton.set_pos_root_button', instance)
+            print('    RootActionButton.set_pos_root_button')
         instance.set_size = RootActionButton_set_size.__get__(instance, MDFloatingRootButton)
         instance.set_size(0)
         instance.user_font_size = '17sp'
@@ -302,14 +319,14 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
 
     def set_pos_labels(self, widget):
         if _Debug:
-            print('RootActionButton.set_pos_labels', widget)
+            print('    RootActionButton.set_pos_labels')
         if self.anchor == "right":
             widget.x = Window.width - widget.width - dp(86)
         widget.elevation = 0
 
     def set_pos_bottom_buttons(self, instance):
         if _Debug:
-            print('RootActionButton.set_pos_bottom_buttons', instance)
+            print('    RootActionButton.set_pos_bottom_buttons')
         instance.set_size = RootActionButton_set_size.__get__(instance, MDFloatingBottomButton)
         instance.set_size(0)
         if self.anchor == "right":
@@ -320,7 +337,7 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
 
     def open_stack(self, instance):
         if _Debug:
-            print('RootActionButton.open_stack', self, instance)
+            print('RootActionButton.open_stack')
         for widget in self.children:
             if isinstance(widget, MDFloatingLabel):
                 Animation.cancel_all(widget)
@@ -373,7 +390,7 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
 
     def close_stack(self):
         if _Debug:
-            print('RootActionButton.close_stack', self)
+            print('RootActionButton.close_stack')
         for widget in self.children:
             if isinstance(widget, MDFloatingBottomButton):
                 Animation(
@@ -395,5 +412,25 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
                     d=self.closing_time_button_rotation,
                     t=self.closing_transition_button_rotation,
                 ).start(widget)
+        self.state = "close"
+        self.dispatch("on_close")
+
+    def drop_stack(self):
+        if _Debug:
+            print('RootActionButton.drop_stack')
+        self._label_pos_y_set = False
+        for widget in self.children:
+            if isinstance(widget, MDFloatingBottomButton):
+                widget.opacity = 0
+                widget.y = Window.height - self.top_offset
+                widget._canvas_width = 0
+                widget._padding_right = 0
+            elif isinstance(widget, MDFloatingLabel):
+                widget.opacity = 0
+            elif (
+                isinstance(widget, MDFloatingRootButton)
+                and self.root_button_anim
+            ):
+                widget._angle = 0
         self.state = "close"
         self.dispatch("on_close")
