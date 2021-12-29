@@ -14,6 +14,10 @@ PYTHON_VERSION=python3
 
 .PHONY: clean pyclean
 
+
+
+### Local development
+
 pyclean:
 	@find . -name '*.pyc' -exec rm -f {} +
 	@find . -name '*.pyo' -exec rm -f {} +
@@ -38,6 +42,7 @@ run:
 	@$(PYTHON) -u src/main.py
 
 
+
 ### Requirements & Dependencies
 
 system_dependencies:
@@ -46,6 +51,10 @@ ifeq ($(OS), Ubuntu)
 endif
 
 install: system_dependencies clean venv
+
+
+
+### Android release & development
 
 download_google_binaries:
 	@curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/27.0.0/support-compat-27.0.0.aar -o support-compat-27.0.0.aar
@@ -74,10 +83,8 @@ update_p4a:
 
 clone_engine_sources:
 	@mkdir -p ./build
-	@if [ ! -d "./build/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./build/bitdust; fi
+	@if [ ! -d "./build/bitdust" ]; then git clone https://github.com/bitdust-io/devel.git ./build/bitdust; fi
 	@cd ./build/bitdust; git pull; cd ../..;
-
-### Android release & development
 
 clean_android_environment:
 	@rm -rf .build_incremental
@@ -106,7 +113,7 @@ rewrite_android_dist_files:
 refresh_android_environment: update_p4a rewrite_android_dist_files
 	$(MAKE) spec requirements=$(REQUIREMENTS_ANDROID)
 
-refresh_android_environment_full: update_p4a rewrite_android_dist_files prepare_build_location clone_engine_sources
+refresh_android_environment_full: update_p4a rewrite_android_dist_files
 	$(MAKE) spec requirements=$(REQUIREMENTS_ANDROID)
 
 prepare_build_location:
@@ -114,13 +121,13 @@ prepare_build_location:
 	@mkdir -p ./build
 	@cp -r src/* build/
 
-build_android_environment: clean_android_environment_full clean venv install_buildozer install_p4a download_google_binaries clone_engine_sources prepare_build_location
+build_android_environment: clean_android_environment_full clean venv install_buildozer install_p4a download_google_binaries
 	@echo 'Android environment is ready, to build APK file execute "./release.sh <version>"'
 
 spec:
 	@P_requirements="$(requirements)" ./venv/bin/python3 -c "tpl=open('buildozer.spec.template').read();import os,sys;sys.stdout.write(tpl.format(requirements=os.environ['P_requirements']));" > buildozer.spec
 
-release_android: refresh_android_environment_full prepare_build_location
+release_android: refresh_android_environment_full prepare_build_location clone_engine_sources
 	@rm -rfv ./bin/*.apk
 	@(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release)
 	@cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk

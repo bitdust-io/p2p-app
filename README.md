@@ -4,7 +4,7 @@ This is BitDust Application written in Python using Kivy framework.
 
 
 
-### Install and run inside development environment
+### Install and run inside development environment locally
 
 At first clone the files locally and change to the repository folder:
 
@@ -34,6 +34,7 @@ Then you should be able to start the application inside development environment:
 
 First you must clone BitDust Engine repository to your local. BitDust p2p-app APK bundle will include files from both repositories:
 
+        make prepare_build_location
         make clone_engine_sources
 
 

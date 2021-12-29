@@ -122,7 +122,7 @@ class VerticalScrollView(ScrollView):
 class DelayedResizeLayout(AnchorLayout):
 
     do_layout_event = ObjectProperty(None, allownone=True)
-    layout_delay_s = NumericProperty(0.5)
+    layout_delay_s = NumericProperty(0.1)
     root_widget = None
     initialized = False
 

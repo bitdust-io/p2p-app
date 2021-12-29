@@ -230,7 +230,7 @@ class RootActionButton(MDFloatingActionButtonSpeedDial):
     logo = BooleanProperty(False)
     root_button_rotate_angle = NumericProperty(360)
     do_update_event = ObjectProperty(None, allownone=True)
-    update_delay_s = NumericProperty(0.5)
+    update_delay_s = NumericProperty(0.1)
     initialized = False
 
     def __init__(self, **kwargs):
