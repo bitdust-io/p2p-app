@@ -12,6 +12,10 @@
 set -e
 
 
+make prepare_build_location
+make clone_engine_sources
+
+
 # x86_64
 rm -rf buildozer.spec.building
 cp -v buildozer.spec buildozer.spec.building

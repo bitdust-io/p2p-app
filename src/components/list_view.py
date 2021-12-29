@@ -9,13 +9,12 @@ from kivy.uix.recycleboxlayout import RecycleBoxLayout
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
 class SelectableRecycleBoxLayout(RecycleBoxLayout, LayoutSelectionBehavior, FocusBehavior):
     pass
-    # touch_deselect_last = BooleanProperty(True)
 
 
 class BaseSelectableRecord(RecycleDataViewBehavior):

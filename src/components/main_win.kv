@@ -13,7 +13,7 @@
             MDActionTopAppBarButton:
                 icon: 'arrow-left'
                 md_bg_color: app.color_transparent
-                on_release: app.root.nav().set_state("close")
+                on_release: app.root.root_widget.nav().set_state("close")
 
             Widget:
                 size_hint: None, None
@@ -24,57 +24,57 @@
                 id: menu_item_status
                 text: "status"
                 on_release:
-                    app.root.nav().set_state("close")
-                    app.root.select_screen('engine_status_screen', verify_state=True)
+                    app.root.root_widget.nav().set_state("close")
+                    app.root.root_widget.select_screen('engine_status_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "cellphone-information"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
-                        app.root.nav().set_state("close")
-                        app.root.select_screen('engine_status_screen', verify_state=True)
+                        app.root.root_widget.nav().set_state("close")
+                        app.root.root_widget.select_screen('engine_status_screen', verify_state=True)
 
             OneLineIconListItem:
                 id: menu_item_my_identity
                 text: "my identity"
                 on_release:
-                    app.root.nav().set_state("close")
-                    app.root.select_screen('my_id_screen', verify_state=True)
+                    app.root.root_widget.nav().set_state("close")
+                    app.root.root_widget.select_screen('my_id_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "passport"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
-                        app.root.nav().set_state("close")
-                        app.root.select_screen('my_id_screen', verify_state=True)
+                        app.root.root_widget.nav().set_state("close")
+                        app.root.root_widget.select_screen('my_id_screen', verify_state=True)
 
             OneLineIconListItem:
                 id: menu_item_chat
                 text: "chat"
                 on_release:
-                    app.root.nav().set_state("close")
-                    app.root.select_screen('conversations_screen', verify_state=True)
+                    app.root.root_widget.nav().set_state("close")
+                    app.root.root_widget.select_screen('conversations_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "chat-outline"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
-                        app.root.nav().set_state("close")
-                        app.root.select_screen('conversations_screen', verify_state=True)
+                        app.root.root_widget.nav().set_state("close")
+                        app.root.root_widget.select_screen('conversations_screen', verify_state=True)
 
             OneLineIconListItem:
                 id: menu_item_settings
                 text: "settings"
                 on_release:
-                    app.root.nav().set_state("close")
-                    app.root.select_screen('settings_screen', verify_state=True)
+                    app.root.root_widget.nav().set_state("close")
+                    app.root.root_widget.select_screen('settings_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "cogs"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
-                        app.root.nav().set_state("close")
-                        app.root.select_screen('settings_screen', verify_state=True)
+                        app.root.root_widget.nav().set_state("close")
+                        app.root.root_widget.select_screen('settings_screen', verify_state=True)
 
 
 <MainWin>:

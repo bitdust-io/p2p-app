@@ -82,6 +82,12 @@ class GroupInfoScreen(screen.AppScreen):
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             small_text_size='{}sp'.format(self.app().font_size_small_absolute),
             connected_brokers=('\n'.join(result.get('connected_brokers', {}).values())),
+            group_key_id=result.get('group_key_id', ''),
+            active_broker_id=result.get('active_broker_id', ''),
+            creator=result.get('creator', ''),
+            archive_folder_path=result.get('archive_folder_path', ''),
+            last_sequence_id=result.get('last_sequence_id', ''),
+            state=result.get('state', ''),
         )
         self.ids.group_info_details.text = group_info_temlate_text.format(**result)
 

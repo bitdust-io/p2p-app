@@ -1,10 +1,10 @@
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.popup import Popup
-from kivy.properties import StringProperty
+from kivy.properties import StringProperty  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
