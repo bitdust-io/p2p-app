@@ -58,6 +58,33 @@ def is_osx():
 
 #------------------------------------------------------------------------------
 
+def get_app_data_path():
+    """
+    A portable method to get the default data folder location, usually it is: "~/.bitdust/"
+    """
+    if is_windows():
+        # TODO: move somewhere on Win10 ...
+        return os.path.join(os.path.expanduser('~'), '.bitdust')
+
+    elif is_linux():
+        # This should be okay : /home/veselin/.bitdust/
+        return os.path.join(os.path.expanduser('~'), '.bitdust')
+
+    elif is_android():
+        # We are on Android, it must be in /storage/emulated/0/.bitdust/
+        # I also tried /data/user/0/org.kivy.bitdust/files/app/.bitdust/ but then I can't browse files from other apps
+        # return os.path.join(os.environ.get('ANDROID_APP_PATH'), '.bitdust')
+        return os.path.join('/storage/emulated/0', '.bitdust')
+
+    elif is_osx():
+        # This should be okay : /Users/veselin/.bitdust/
+        return os.path.join(os.path.expanduser('~'), '.bitdust')
+
+    # otherwise just default : ".bitdust/" in user root folder
+    return os.path.join(os.path.expanduser('~'), '.bitdust')
+
+#------------------------------------------------------------------------------
+
 def android_sdk_version():
     global _LatestAndroidSDKVersion
     if not is_android():
@@ -151,6 +178,25 @@ def set_android_system_ui_visibility():
         print('system.set_android_system_ui_visibility', decorView, flags)
 
 #------------------------------------------------------------------------------
+
+def ReadTextFile(filename):
+    """
+    Read text file and return its content.
+    """
+    if not os.path.isfile(filename):
+        return u''
+    if not os.access(filename, os.R_OK):
+        return u''
+    try:
+        infile = open(filename, 'rt', encoding="utf-8")
+        data = infile.read()
+        infile.close()
+        return data
+    except Exception as e:
+        if _Debug:
+            print('file %r read failed: %r' % (filename, e, ))
+    return u''
+
 
 def rmdir_recursive(dirpath, ignore_errors=False, pre_callback=None):
     """

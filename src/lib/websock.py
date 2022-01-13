@@ -1,3 +1,4 @@
+import os
 import time
 
 try:
@@ -15,6 +16,7 @@ from kivy.clock import mainthread
 #------------------------------------------------------------------------------
 
 from lib import websocket
+from lib import system
 
 #------------------------------------------------------------------------------
 
@@ -23,6 +25,7 @@ _DebugAPIResponses = False
 
 #------------------------------------------------------------------------------
 
+_APISecretFilePath = None
 _WebSocketApp = None
 _WebSocketQueue = None
 _WebSocketReady = False
@@ -36,7 +39,8 @@ _RegisteredCallbacks = {}
 
 #------------------------------------------------------------------------------
 
-def start(callbacks={}):
+def start(callbacks={}, api_secret_filepath=None):
+    global _APISecretFilePath
     global _WebSocketStarted
     global _WebSocketConnecting
     global _WebSocketQueue
@@ -44,7 +48,8 @@ def start(callbacks={}):
     if is_started():
         raise Exception('already started')
     if _Debug:
-        print('websock.start()')
+        print('websock.start() api_secret_filepath=%r' % api_secret_filepath)
+    _APISecretFilePath = api_secret_filepath
     _RegisteredCallbacks = callbacks or {}
     _WebSocketConnecting = True
     _WebSocketStarted = True
@@ -54,6 +59,7 @@ def start(callbacks={}):
 
 
 def stop():
+    global _APISecretFilePath
     global _WebSocketStarted
     global _WebSocketQueue
     global _WebSocketConnecting
@@ -62,6 +68,7 @@ def stop():
         raise Exception('has not been started')
     if _Debug:
         print('websock.stop()')
+    _APISecretFilePath = None
     _RegisteredCallbacks = {}
     _WebSocketStarted = False
     _WebSocketConnecting = False
@@ -259,17 +266,26 @@ def requests_thread(active_queue):
 
 
 def websocket_thread():
+    global _APISecretFilePath
     global _WebSocketApp
     global _WebSocketClosed
     websocket.enableTrace(False)
     if _Debug:
-        print('websocket_thread() beginning')
+        print('websocket_thread() beginning _APISecretFilePath=%r' % _APISecretFilePath)
     while is_started():
         if _Debug:
             print('websocket_thread() calling run_forever(ping_interval=10) %r' % time.asctime())
         _WebSocketClosed = False
+        ws_url = "ws://localhost:8280/"
+        if _APISecretFilePath:
+            if os.path.isfile(_APISecretFilePath):
+                api_secret = system.ReadTextFile(_APISecretFilePath)
+                if api_secret:
+                    ws_url += '?api_secret=' + api_secret
+        if _Debug:
+            print('websocket_thread() ws_url=%r' % ws_url)
         _WebSocketApp = websocket.WebSocketApp(
-            "ws://localhost:8280/",
+            ws_url,
             on_message = on_message,
             on_error = on_error,
             on_close = on_close,
@@ -281,14 +297,15 @@ def websocket_thread():
             _WebSocketApp = None
             if _Debug:
                 print('websocket_thread(): %r' % exc)
-            time.sleep(3)
+            time.sleep(1)
         if _Debug:
             print('websocket_thread().run_forever() returned: %r  is_started: %r' % (ret, is_started(), ))
-        del _WebSocketApp
-        _WebSocketApp = None
+        if _WebSocketApp:
+            del _WebSocketApp
+            _WebSocketApp = None
         if not is_started():
             break
-        time.sleep(3)
+        time.sleep(1)
     _WebSocketApp = None
     if _Debug:
         print('websocket_thread() finished')

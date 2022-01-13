@@ -1,7 +1,9 @@
+import os
 import time
 
 #------------------------------------------------------------------------------
 
+from lib import system
 from lib import websock
 from lib import api_client
 
@@ -78,12 +80,15 @@ class Controller(object):
         if _Debug:
             print('Controller.start')
         self.enabled = True
-        websock.start(callbacks={
-            'on_open': self.on_websocket_open,
-            'on_error': self.on_websocket_error,
-            'on_stream_message': self.on_websocket_stream_message,
-            'on_event': self.on_websocket_event,
-        })
+        websock.start(
+            callbacks={
+                'on_open': self.on_websocket_open,
+                'on_error': self.on_websocket_error,
+                'on_stream_message': self.on_websocket_stream_message,
+                'on_event': self.on_websocket_event,
+            },
+            api_secret_filepath=os.path.join(system.get_app_data_path(), 'metadata', 'apisecret'),
+        )
         self.mw().update_menu_items()
         self.mw().select_screen('welcome_screen')
         self.run()
