@@ -104,9 +104,9 @@ class MyIDScreen(screen.AppScreen):
         self.ids.action_button.close_stack()
         if btn.icon == 'shield-key':
             if system.is_android():
-                destination_filepath = os.path.join('/storage/emulated/0/', 'bitdust_key.txt')
+                destination_filepath = os.path.join('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents', 'BitDust_key.txt')
             else:
-                destination_filepath = os.path.join(os.path.expanduser('~'), 'bitdust_key.txt')
+                destination_filepath = os.path.join(os.path.expanduser('~'), 'BitDust_key.txt')
             api_client.identity_backup(
                 destination_filepath=destination_filepath,
                 cb=lambda resp: self.on_identity_backup_result(resp, destination_filepath),
@@ -159,7 +159,7 @@ class MyIDScreen(screen.AppScreen):
             print('MyIDScreen.on_process_stop_result_erase_my_id', args)
         home_folder_path = os.path.join(os.path.expanduser('~'), '.bitdust')
         if system.is_android():
-            home_folder_path = os.path.join('/storage/emulated/0/', '.bitdust')
+            home_folder_path = os.path.join('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents', '.bitdust')
         system.rmdir_recursive(os.path.join(home_folder_path, 'metadata'), ignore_errors=False)
         system.rmdir_recursive(os.path.join(home_folder_path, 'backups'), ignore_errors=True)
         system.rmdir_recursive(os.path.join(home_folder_path, 'config'), ignore_errors=True)

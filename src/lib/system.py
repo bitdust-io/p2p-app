@@ -71,10 +71,18 @@ def get_app_data_path():
         return os.path.join(os.path.expanduser('~'), '.bitdust')
 
     elif is_android():
-        # We are on Android, it must be in /storage/emulated/0/.bitdust/
-        # I also tried /data/user/0/org.kivy.bitdust/files/app/.bitdust/ but then I can't browse files from other apps
-        # return os.path.join(os.environ.get('ANDROID_APP_PATH'), '.bitdust')
-        return os.path.join('/storage/emulated/0', '.bitdust')
+        try:
+            from jnius import autoclass  # @UnresolvedImport
+            Context = autoclass("android.content.Context")
+            Environment = autoclass("android.os.Environment")
+            documents_dir = Context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()
+        except Exception as e:
+            if _Debug:
+                print('get_app_data_path() failed', e)
+            documents_dir = "/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents"
+        if _Debug:
+            print('get_app_data_path() documents_dir=%r' % documents_dir)
+        return os.path.join(documents_dir, '.bitdust')
 
     elif is_osx():
         # This should be okay : /Users/veselin/.bitdust/

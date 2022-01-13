@@ -75,7 +75,7 @@ if system.is_android():
     import encodings.idna  # @UnusedImport
 
     from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE  # @UnresolvedImport
-    from android.storage import primary_external_storage_path  # @UnresolvedImport
+    from android.storage import primary_external_storage_path, app_storage_path  # @UnresolvedImport
 
     from lib.permissions import check_permission, request_permissions  # @UnresolvedImport
     # from android.permissions import check_permission, request_permissions  # @UnresolvedImport
@@ -211,7 +211,9 @@ class BitDustApp(styles.AppStyle, MDApp):
                                 print('BitDustApp.do_start   FAILED : some of the requested permissions was not granted', args)
                             return False
             if _Debug:
-                print('BitDustApp.do_start   is okay to start now, storage path is %r' % primary_external_storage_path())
+                print('BitDustApp.do_start   is okay to start now')
+                print('    primary_external_storage_path is %r' % primary_external_storage_path())
+                print('    app_storage_path is %r' % primary_external_storage_path())
 
         self.control.start()
         self.start_engine()
@@ -273,6 +275,13 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.start_android_service ACTIVITY_CLASS_NAME=%r SERVICE_NAME=%r shutdown=%r' % (
                 ACTIVITY_CLASS_NAME, SERVICE_NAME, shutdown, ))
+        if _Debug:
+            print('BitDustApp.start_android_service app data path is %r' % system.get_app_data_path())
+        if os.path.isdir('/storage/emulated/0/.bitdust'):
+            try:
+                os.rename('/storage/emulated/0/.bitdust', '/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust')
+            except Exception as e:
+                print('Failed to move data folder from legacy location:', e)
         self.main_window.engine_log = '\n'
         service = autoclass(SERVICE_NAME)
         if _Debug:
@@ -393,7 +402,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             if _DebugProfilingEnabled:
                 self.profile.disable()
                 if system.is_android():
-                    self.profile.dump_stats('/storage/emulated/0/.bitdust/logs/debug.profile')
+                    self.profile.dump_stats('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/debug.profile')
                 else:
                     self.profile.dump_stats('./debug.profile')
         return True
