@@ -1,8 +1,7 @@
+from lib import api_client
+
 from components import screen
 from components import snackbar
-
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -32,12 +31,12 @@ class CreateGroupScreen(screen.AppScreen):
         )
 
     def on_group_create_result(self, resp):
-        if not websock.is_ok(resp):
-            snackbar.error(text=websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
             self.ids.create_group_button.disabled = False
             self.ids.group_label_input.disabled = False
             return
-        api_client.group_join(group_key_id=websock.response_result(resp).get('group_key_id'))
+        api_client.group_join(group_key_id=api_client.response_result(resp).get('group_key_id'))
         self.ids.status_message_label.text = ''
         self.ids.create_group_button.disabled = False
         self.ids.group_label_input.disabled = False

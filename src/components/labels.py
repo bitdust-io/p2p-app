@@ -6,7 +6,7 @@ from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
 
-from lib import websock
+from lib import api_client
 
 #------------------------------------------------------------------------------
 
@@ -53,10 +53,10 @@ class ChatMessageLabel(NormalLabel):
 class StatusLabel(NormalLabel):
 
     def from_api_response(self, response):
-        if websock.is_ok(response):
+        if api_client.is_ok(response):
             self.text = ''
             return
-        errors = websock.response_errors(response)
+        errors = api_client.response_errors(response)
         if not isinstance(errors, list):
             errors = [errors, ]
         txt = ', '.join(errors)

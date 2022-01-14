@@ -1,6 +1,5 @@
 from lib import colorhash
 from lib import api_client
-from lib import websock
 
 from components import screen
 from components import labels
@@ -56,14 +55,14 @@ class PrivateChatScreen(screen.AppScreen):
         )
 
     def on_message_history_result(self, resp):
-        if not websock.is_ok(resp):
-            snackbar.error(text='failed reading message history: %s' % websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text='failed reading message history: %s' % api_client.response_err(resp))
             return
         self.ids.chat_messages.clear_widgets()
         current_direction = None
         current_sender = None
         current_messages = []
-        msg_list = list(websock.response_result(resp))
+        msg_list = list(api_client.response_result(resp))
         if _Debug:
             print('PrivateChatScreen.on_message_history_result', len(msg_list))
         for item in msg_list:
@@ -121,8 +120,8 @@ class PrivateChatScreen(screen.AppScreen):
     def on_message_sent(self, resp):
         if _Debug:
             print('PrivateChatScreen.on_message_sent', resp)
-        if not websock.is_ok(resp):
-            snackbar.error(text='message was not sent: %s' % websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text='message was not sent: %s' % api_client.response_err(resp))
             return
         self.populate()
 
@@ -141,7 +140,7 @@ class PrivateChatScreen(screen.AppScreen):
     def on_friend_remove_result(self, resp):
         if _Debug:
             print('PrivateChatScreen.on_friend_remove_result', resp)
-        if not websock.is_ok(resp):
-            snackbar.error(text='contact was not deleted: %s' % websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text='contact was not deleted: %s' % api_client.response_err(resp))
             return
         self.main_win().select_screen('friends_screen')

@@ -2,11 +2,10 @@ from kivy.properties import StringProperty  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
+from lib import api_client
+
 from components import screen
 from components import list_view
-
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -70,7 +69,7 @@ class SelectFriendScreen(screen.AppScreen):
             self.clear_selected_item()
             self.ids.friends_list_view.data = []
             return
-        result = websock.response_result(resp)
+        result = api_client.response_result(resp)
         if not result:
             self.ids.friends_list_view.data = []
             return

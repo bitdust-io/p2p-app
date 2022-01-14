@@ -1,10 +1,9 @@
+from lib import colorhash
+from lib import api_client
+
 from components import screen
 from components import labels
 from components import snackbar
-
-from lib import colorhash
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -60,12 +59,12 @@ class GroupChatScreen(screen.AppScreen):
         )
 
     def on_message_history_result(self, resp):
-        if not websock.is_ok(resp):
+        if not api_client.is_ok(resp):
             return
         self.ids.chat_messages.clear_widgets()
         current_sender = None
         current_messages = []
-        msg_list = list(websock.response_result(resp))
+        msg_list = list(api_client.response_result(resp))
         if _Debug:
             print('GroupChatScreen.on_message_history_result', len(msg_list))
         for item in msg_list:
@@ -108,7 +107,7 @@ class GroupChatScreen(screen.AppScreen):
     def on_group_message_sent(self, resp):
         if _Debug:
             print('on_group_message_sent', resp)
-        if not websock.is_ok(resp):
+        if not api_client.is_ok(resp):
             return
         self.populate()
 
@@ -179,35 +178,35 @@ class GroupChatScreen(screen.AppScreen):
     def on_group_share_result(self, resp, user_global_id):
         if _Debug:
             print('on_group_share_result', resp)
-        if websock.is_ok(resp):
+        if api_client.is_ok(resp):
             snackbar.success(text='group key shared with %s' % user_global_id)
         else:
-            snackbar.error(text=websock.response_err(resp))
+            snackbar.error(text=api_client.response_err(resp))
 
     def on_group_join_result(self, resp):
-        if not websock.is_ok(resp):
-            snackbar.error(text='failed to join the group: %s' % websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text='failed to join the group: %s' % api_client.response_err(resp))
         else:
             self.ids.state_panel.release()
-            self.ids.state_panel.attach(automat_id=websock.result(resp).get('id'))
+            self.ids.state_panel.attach(automat_id=api_client.result(resp).get('id'))
 
     def on_group_leave_result(self, resp):
-        if not websock.is_ok(resp):
-            snackbar.error(text=websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
         else:
             self.main_win().select_screen('conversations_screen')
             self.main_win().close_screen(screen_id=self.global_id)
 
     def on_group_close_result(self, resp):
-        if not websock.is_ok(resp):
-            snackbar.error(text=websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
         else:
             self.main_win().select_screen('conversations_screen')
             self.main_win().close_screen(screen_id=self.global_id)
 
     def on_group_reconnect_result(self, resp):
-        if not websock.is_ok(resp):
-            snackbar.error(text='failed connect to the group: %s' % websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text='failed connect to the group: %s' % api_client.response_err(resp))
         else:
             self.ids.state_panel.release()
-            self.ids.state_panel.attach(automat_id=websock.result(resp).get('id'))
+            self.ids.state_panel.attach(automat_id=api_client.result(resp).get('id'))

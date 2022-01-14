@@ -2,7 +2,6 @@ from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
-from lib import websock
 from lib import api_client
 
 from components import screen
@@ -54,7 +53,7 @@ class WelcomeScreen(screen.AppScreen):
     def on_identity_get_result(self, resp):
         if _Debug:
             print('on_identity_get_result', self.main_win().state_process_health, self.main_win().state_identity_get, resp)
-        if self.main_win().state_process_health == 1 and self.main_win().state_identity_get != 1 and not websock.is_ok(resp):
+        if self.main_win().state_process_health == 1 and self.main_win().state_identity_get != 1 and not api_client.is_ok(resp):
             exists = False
             for w in self.ids.central_widget.children:
                 if isinstance(w, buttons.FillRoundFlatButton):

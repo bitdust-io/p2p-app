@@ -10,13 +10,106 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-def run(method, kwargs={}, cb=None, ):
+def run(method, kwargs={}, cb=None):
     if _Debug:
         print('api_client.run %r %r' % (method, time.asctime(), ))
     jd = {'command': 'api_call', 'method': method, 'kwargs': kwargs, }
     return websock.ws_call(json_data=jd, cb=cb)
 
 #------------------------------------------------------------------------------
+
+def is_ok(response):
+    if not isinstance(response, dict):
+        return False
+    return response_status(response) == 'OK'
+
+
+def response_payload(response):
+    return response.get('payload', {})
+
+
+def response_errors(response):
+    if not isinstance(response, dict):
+        return ['no response', ]
+    return response_payload(response).get('response', {}).get('errors', [])
+
+
+def response_err(response):
+    return ', '.join(response_errors(response))
+
+
+def response_status(response):
+    if not isinstance(response, dict):
+        return ''
+    return response_payload(response).get('response', {}).get('status', '')
+
+
+def response_message(response):
+    if not isinstance(response, dict):
+        return ''
+    return response_payload(response).get('response', {}).get('message', '')
+
+
+def response_result(response):
+    if not isinstance(response, dict):
+        return None
+    return response_payload(response).get('response', {}).get('result', [])
+
+#------------------------------------------------------------------------------
+
+def status(response):
+    return response_status(response)
+
+
+def message(response):
+    return response_message(response)
+
+
+def result(response):
+    return response_result(response) or {}
+
+
+def red_err(response):
+    return '[color=#f00]{}[/color]'.format(response_err(response))
+
+
+#------------------------------------------------------------------------------
+#--- API streaming
+
+def add_model_listener(model_name, listener_cb):
+    if model_name in websock.model_update_callbacks():
+        if listener_cb in websock.model_update_callbacks()[model_name]:
+            return False
+    if model_name not in websock.model_update_callbacks():
+        websock.model_update_callbacks()[model_name] = []
+    websock.model_update_callbacks()[model_name].append(listener_cb)
+    return True
+
+
+def remove_model_listener(model_name, listener_cb):
+    if model_name not in websock.model_update_callbacks():
+        return False
+    if listener_cb not in websock.model_update_callbacks()[model_name]:
+        return False
+    websock.model_update_callbacks()[model_name].remove(listener_cb)
+    if not websock.model_update_callbacks()[model_name]:
+        websock.model_update_callbacks().pop(model_name)
+    return True
+
+
+def start_model_streaming(model_name, request_all=False):
+    return run('enable_model_listener', kwargs={
+        'model_name': model_name,
+        'request_all': request_all,
+    })
+
+
+def stop_model_streaming(model_name):
+    return run('disable_model_listener', kwargs={'model_name': model_name, })
+
+
+#------------------------------------------------------------------------------
+#--- API methods
 
 def process_health(cb=None):
     return run('process_health', cb=cb)

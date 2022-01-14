@@ -2,11 +2,10 @@ from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
+from lib import api_client
+
 from components import screen
 from components import styles
-
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -75,13 +74,13 @@ class EngineStatusScreen(screen.AppScreen):
         if not self.main_win().engine_is_on:
             self.set_nw_progress(0)
             return
-        if not websock.is_ok(resp):
+        if not api_client.is_ok(resp):
             self.set_nw_progress(0)
             return
         services_by_state = {}
         count_total = 0.0
         count_on = 0.0
-        for svc in websock.response_result(resp):
+        for svc in api_client.response_result(resp):
             st = svc.get('state')
             if not svc.get('enabled'):
                 continue

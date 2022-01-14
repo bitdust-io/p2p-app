@@ -1,14 +1,12 @@
-from kivy.metrics import dp
 from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
+from lib import api_client
+
 from components import screen
 from components import styles
 from components import buttons
-
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -46,28 +44,23 @@ class ConnectingScreen(screen.AppScreen):
         self.state_panel_attached = False
         self.unschedule_nw_task()
 
-    def on_services_list_result(self, resp):
+    def on_service_result(self, payload):
         if _Debug:
             print('ConnectingScreen.on_services_list_result', len(self.known_services))
-        if not websock.is_ok(resp):
-            self.known_services.clear()
-            self.ids.services_list.clear_widgets()
-            return
+        # if not api_client.is_ok(resp):
+        #     self.known_services.clear()
+        #     self.ids.services_list.clear_widgets()
+        #     return
         services_by_state = {}
         services_by_name = {}
-        count_total = 0.0
-        count_on = 0.0
-        for svc in websock.response_result(resp):
-            st = svc.get('state')
-            if not svc.get('enabled'):
-                continue
-            if st not in services_by_state:
-                services_by_state[st] = {}
-            services_by_state[st][svc['name']] = svc
-            services_by_name[svc['name']] = svc
-            count_total += 1.0
-            if st == 'ON':
-                count_on += 1.0
+        svc = payload['data']
+        st = svc.get('state')
+        if not svc.get('enabled'):
+            continue
+        if st not in services_by_state:
+            services_by_state[st] = {}
+        services_by_state[st][svc['name']] = svc
+        services_by_name[svc['name']] = svc
         if not self.known_services:
             for st in ['ON', 'STARTING', 'DEPENDS_OFF', 'INFLUENCE', 'STOPPING', 'OFF', ]:
                 for svc_name in sorted(services_by_state.get(st, {}).keys()):
@@ -115,7 +108,9 @@ class ConnectingScreen(screen.AppScreen):
             print('ConnectingScreen.populate')
         if not self.state_panel_attached:
             self.state_panel_attached = self.ids.state_panel.attach(automat_id='p2p_connector')
-        api_client.services_list(cb=self.on_services_list_result)
+        api_client.add_model_listener('service', listener_cb=self.on_service_result)
+        api_client.
+        api_client.enable_model_listener(model_name='service', listener_cb=self.on_service_result, request_all=True)
 
     def get_service_label(self, svc):
         txt = '[size=14sp][b]{}[/b][/size]'.format(svc['name'].replace('service_', ''))

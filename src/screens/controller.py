@@ -72,6 +72,7 @@ class Controller(object):
         self.callbacks = {}
         self.state_changed_callbacks = {}
         self.state_changed_callbacks_by_id = {}
+        self.model_data = {}
 
     def mw(self):
         return self.app.main_window
@@ -86,6 +87,7 @@ class Controller(object):
                 'on_error': self.on_websocket_error,
                 'on_stream_message': self.on_websocket_stream_message,
                 'on_event': self.on_websocket_event,
+                'on_model_update': self.on_model_update,
             },
             api_secret_filepath=os.path.join(system.get_app_data_path(), 'metadata', 'apisecret'),
         )
@@ -206,8 +208,8 @@ class Controller(object):
             self.process_health_latest = 0
             self.mw().state_process_health = -1
             return
-        self.mw().state_process_health = 1 if websock.is_ok(resp) else -1
-        self.process_health_latest = time.time() if websock.is_ok(resp) else 0
+        self.mw().state_process_health = 1 if api_client.is_ok(resp) else -1
+        self.process_health_latest = time.time() if api_client.is_ok(resp) else 0
         self.run()
 
     def on_identity_get_result(self, resp):
@@ -218,7 +220,7 @@ class Controller(object):
             self.identity_get_latest = 0
             self.mw().state_identity_get = -1
             return
-        self.mw().state_identity_get = 1 if websock.is_ok(resp) else -1
+        self.mw().state_identity_get = 1 if api_client.is_ok(resp) else -1
         self.identity_get_latest = time.time()
         self.run()
 
@@ -230,7 +232,7 @@ class Controller(object):
             self.network_connected_latest = 0
             self.mw().state_network_connected = -1
             return
-        self.mw().state_network_connected = 1 if websock.is_ok(resp) else -1
+        self.mw().state_network_connected = 1 if api_client.is_ok(resp) else -1
         self.network_connected_latest = time.time()
         self.run()
 
@@ -244,6 +246,7 @@ class Controller(object):
             self.identity_get_latest = 0
             self.network_connected_latest = 0
             self.verify_process_health()
+        api_client.start_model_streaming('service', request_all=True)
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:
@@ -332,6 +335,16 @@ class Controller(object):
         cb_list = self.callbacks.get('on_group_message_received', [])
         for cb, _ in cb_list:
             cb(json_data)
+
+    def on_model_update(self, json_data):
+        model_name = json_data['payload']['name']
+        snap_id = json_data['payload']['id']
+        if model_name not in self.model_data:
+            self.model_data[model_name] = {}
+        if snap_id not in self.model_data[model_name]:
+            self.model_data[model_name][snap_id] = {}
+        self.model_data[model_name][snap_id]['data'] = json_data['payload']['data']
+        self.model_data[model_name][snap_id]['created'] = json_data['payload']['created']
 
     def on_state_process_health(self, instance, value):
         if _Debug:

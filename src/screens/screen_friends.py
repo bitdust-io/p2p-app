@@ -1,8 +1,7 @@
+from lib import api_client
+
 from components import screen
 from components import list_view
-
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -60,11 +59,11 @@ class FriendsScreen(screen.AppScreen):
         self.clear_selected_item()
 
     def on_friends_list_result(self, resp):
-        if not websock.is_ok(resp):
+        if not api_client.is_ok(resp):
             self.clear_selected_item()
             self.ids.friends_list_view.data = []
             return
-        friends_list = websock.response_result(resp)
+        friends_list = api_client.response_result(resp)
         for one_friend in friends_list:
             one_friend['automat_index'] = str(one_friend.pop('index', ''))
             one_friend['automat_id'] = str(one_friend.pop('id', ''))

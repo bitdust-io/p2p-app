@@ -6,13 +6,12 @@ from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
+from lib import system
+from lib import api_client
+
 from components import screen
 from components import dialogs
 from components import snackbar
-
-from lib import system
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -71,10 +70,10 @@ class MyIDScreen(screen.AppScreen):
         self.ids.state_panel.release()
 
     def on_identity_get_result(self, resp):
-        if not websock.is_ok(resp):
+        if not api_client.is_ok(resp):
             self.ids.my_id_details.text = create_new_identity_text
             return
-        result = websock.response_result(resp)
+        result = api_client.response_result(resp)
         if not result:
             self.ids.my_id_details.text = create_new_identity_text
             return
@@ -135,16 +134,16 @@ class MyIDScreen(screen.AppScreen):
             Clock.schedule_once(self.on_process_stop_result_erase_my_id, 1)
 
     def on_network_reconnect_result(self, resp):
-        if not websock.is_ok(resp):
-            snackbar.error(text='disconnected: %s' % websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text='disconnected: %s' % api_client.response_err(resp))
         else:
             snackbar.info(text='network connection refreshed')
 
     def on_identity_backup_result(self, resp, destination_filepath):
         if _Debug:
             print('MyIDScreen.on_identity_backup_result', destination_filepath, resp)
-        if not websock.is_ok(resp):
-            snackbar.error(text='identity backup failed: %s' % websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text='identity backup failed: %s' % api_client.response_err(resp))
         else:
             snackbar.success(text='key file created: %s' % destination_filepath)
 

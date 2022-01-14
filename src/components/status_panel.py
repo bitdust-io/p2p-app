@@ -5,7 +5,6 @@ from kivymd.uix.card import MDCard
 #------------------------------------------------------------------------------
 
 from lib import api_client
-from lib import websock
 
 from components import screen
 
@@ -38,9 +37,9 @@ class AutomatPanel(object):
 
     def on_automat_events_start_result(self, resp):
         if _Debug:
-            print('AutomatPanel.on_automat_events_start_result', websock.is_ok(resp))
-        if not websock.is_ok(resp):
-            self.update_fields(error=self.statuses.get(None, websock.red_err(resp)))
+            print('AutomatPanel.on_automat_events_start_result', api_client.is_ok(resp))
+        if not api_client.is_ok(resp):
+            self.update_fields(error=self.statuses.get(None, api_client.red_err(resp)))
             return
         self.update_fields(response=resp)
 
@@ -163,7 +162,7 @@ class AutomatStatusPanel(AutomatPanelByID, MDCard):
             self.ids.label_status.text = kwargs['error']
             return
         if 'response' in kwargs:
-            r = websock.result(kwargs['response'])
+            r = api_client.result(kwargs['response'])
             self.ids.label_name.text = '#{} {}'.format(r['index'], r['id'])
             self.ids.label_state.text = r['state']
             self.ids.label_status.text = self.statuses.get(r['state'], 'status unknown')
@@ -186,7 +185,7 @@ class AutomatShortStatusPanel(AutomatPanelByID, MDCard):
             self.ids.label_status.text = kwargs['error']
             return
         if 'response' in kwargs:
-            r = websock.result(kwargs['response'])
+            r = api_client.result(kwargs['response'])
             self.ids.label_status.text = self.statuses.get(r['state'], 'current status is unknown')
             return
         if 'state' in kwargs:
@@ -204,7 +203,7 @@ class AutomatShortStatusPanelByIndex(AutomatPanelByIndex, MDCard):
             self.ids.label_status.text = kwargs['error']
             return
         if 'response' in kwargs:
-            r = websock.result(kwargs['response'])
+            r = api_client.result(kwargs['response'])
             self.ids.label_status.text = self.statuses.get(r['state'], 'current status is unknown')
             return
         if 'state' in kwargs:

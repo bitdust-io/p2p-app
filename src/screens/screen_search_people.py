@@ -1,8 +1,8 @@
+from lib import api_client
+
 from components import layouts
 from components import screen
 from components import labels
-
-from lib import api_client
 
 #------------------------------------------------------------------------------
 

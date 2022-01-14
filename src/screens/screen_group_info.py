@@ -1,8 +1,7 @@
+from lib import api_client
+
 from components import screen
 from components import snackbar
-
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -74,10 +73,10 @@ class GroupInfoScreen(screen.AppScreen):
         )
 
     def on_group_info_result(self, resp):
-        if not websock.is_ok(resp):
-            snackbar.error(text=websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
             return
-        result = websock.response_result(resp)
+        result = api_client.response_result(resp)
         result.update(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             small_text_size='{}sp'.format(self.app().font_size_small_absolute),

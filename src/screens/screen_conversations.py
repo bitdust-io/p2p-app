@@ -1,9 +1,8 @@
+from lib import api_client
+
 from components import screen
 from components import list_view
 from components import styles
-
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -81,11 +80,11 @@ class ConversationsScreen(screen.AppScreen):
     def on_message_conversations_list_result(self, resp):
         if _Debug:
             print('ConversationsScreen.on_message_conversations_list_result  %s...' % str(resp)[:100])
-        if not websock.is_ok(resp):
+        if not api_client.is_ok(resp):
             self.clear_selected_item()
             self.ids.conversations_list_view.data = []
             return
-        conversations_list = websock.response_result(resp)
+        conversations_list = api_client.response_result(resp)
         for one_conversation in conversations_list:
             one_conversation['automat_index'] = str(one_conversation.pop('index') or '')
             one_conversation['automat_id'] = str(one_conversation.pop('id') or '')

@@ -213,7 +213,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             if _Debug:
                 print('BitDustApp.do_start   is okay to start now')
                 print('    primary_external_storage_path is %r' % primary_external_storage_path())
-                print('    app_storage_path is %r' % primary_external_storage_path())
+                print('    app_storage_path is %r' % app_storage_path())
 
         self.control.start()
         self.start_engine()
