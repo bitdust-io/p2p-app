@@ -1,3 +1,5 @@
+import time
+
 from lib import colorhash
 from lib import api_client
 
@@ -40,62 +42,99 @@ class GroupChatScreen(screen.AppScreen):
             l = l[:20] + '...'
         return l
 
+    def populate(self, **kwargs):
+        selected_messages = []
+        for snap_info in self.model('message').values():
+            if not snap_info:
+                continue
+            msg = snap_info['data']
+            if msg['payload']['msg_type'] != 'group_message':
+                continue
+            if msg['recipient']['glob_id'] != self.global_id:
+                continue
+            selected_messages.append(snap_info)
+        updated = False
+        for snap_info in sorted(selected_messages, key=lambda snap_info: snap_info['id']):
+            if self.on_message(snap_info):
+                updated = True
+        if updated:
+            self.ids.chat_messages_view.scroll_y = 0
+
     def on_enter(self, *args):
         self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id=self.automat_id)
-        self.control().add_callback('on_group_message_received', self.on_group_message_received)
+        api_client.add_model_listener('message', listener_cb=self.on_message)
         self.populate()
 
     def on_leave(self, *args):
+        api_client.remove_model_listener('message', listener_cb=self.on_message)
         self.ids.action_button.close_stack()
         self.ids.state_panel.release()
-        self.control().remove_callback('on_group_message_received', self.on_group_message_received)
 
-    def populate(self, **kwargs):
-        api_client.message_history(
-            recipient_id=self.global_id,
-            message_type='group_message',
-            cb=self.on_message_history_result,
-        )
-
-    def on_message_history_result(self, resp):
-        if not api_client.is_ok(resp):
-            return
-        self.ids.chat_messages.clear_widgets()
-        current_sender = None
-        current_messages = []
-        msg_list = list(api_client.response_result(resp))
+    def on_message(self, payload):
         if _Debug:
-            print('GroupChatScreen.on_message_history_result', len(msg_list))
-        for item in msg_list:
-            # msg_id = item['doc']['payload']['message_id']
-            msg = item['doc']['payload']['data']['message']
-            sender = item['doc']['sender']['glob_id']
-            if current_sender is None:
-                current_sender = sender
-            sender_name, _ = current_sender.split('@')
-            if current_sender == sender:
-                current_messages.append(msg)
-            else:
-                sender_clr = colorhash.ColorHash(sender_name).hex
-                self.ids.chat_messages.add_widget(labels.ChatMessageLabel(
-                    text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
-                ))
-                current_sender = sender
-                sender_name, _ = current_sender.split('@')
-                current_messages = []
-                current_messages.append(msg)
-        if current_messages:
-            sender_clr = colorhash.ColorHash(sender_name).hex
-            self.ids.chat_messages.add_widget(labels.ChatMessageLabel(
-                text='[color={}]{}[/color]\n{}'.format(sender_clr, sender_name, '\n'.join(current_messages)),
-            ))
-        self.ids.chat_messages_view.scroll_y = 0
+            print('GroupChatScreen.on_message', payload)
+        msg = payload['data']
+        msg_id = int(msg['payload']['message_id'])
+        if msg['payload']['msg_type'] != 'group_message':
+            return False
+        if msg['recipient']['glob_id'] != self.global_id:
+            return False
+        children_index = {}
+        latest_message_id = None
+        recent_min_message_id = None
+        msg_found = False
+        for i, w in enumerate(self.ids.chat_messages.children):
+            if isinstance(w, labels.ChatMessageLabel):
+                children_index[w.message_id] = i
+                if not latest_message_id:
+                    latest_message_id = w.message_id
+                if latest_message_id < w.message_id:
+                    latest_message_id = w.message_id
+                if not recent_min_message_id:
+                    recent_min_message_id = w.message_id
+                if w.message_id > msg_id and w.message_id - msg_id < recent_min_message_id - msg_id:
+                    recent_min_message_id = w.message_id
+                if w.message_id == msg_id:
+                    msg_found = True
+                    break
+        if msg_found:
+            children_index.clear()
+            return False
+        new_index = len(self.ids.chat_messages.children)
+        if not latest_message_id or latest_message_id < msg_id:
+            new_index = 0
+        else:
+            if recent_min_message_id:
+                if recent_min_message_id < msg_id:
+                    new_index = children_index[recent_min_message_id]
+                else:
+                    new_index = children_index[recent_min_message_id] + 1
+        children_index.clear()
+        sender_name = msg['sender']['glob_id']
+        sender_name, _ = sender_name.split('@')
+        sender_clr = colorhash.ColorHash(sender_name).hex
+        self.ids.chat_messages.add_widget(
+            widget=labels.ChatMessageLabel(
+                conversation_id=msg['conversation_id'],
+                message_id=msg_id,
+                message_time=msg['payload']['time'],
+                text='[color={}]{}[/color]  [color=#DDDDDD]{} #{}[/color]\n{}'.format(
+                    sender_clr,
+                    sender_name,
+                    time.strftime('%d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
+                    msg_id,
+                    msg['payload']['data']['message'],
+                ),
+            ),
+            index=new_index,
+        )
+        return True
 
     def on_chat_send_button_clicked(self, *args):
         msg = self.ids.chat_input.text
         if _Debug:
-            print('on_chat_send_button_clicked', self.global_id, msg)
+            print('GroupChatScreen.on_chat_send_button_clicked', self.global_id, msg)
         api_client.message_send_group(
             group_key_id=self.global_id,
             data={'message': msg, },
@@ -106,15 +145,9 @@ class GroupChatScreen(screen.AppScreen):
 
     def on_group_message_sent(self, resp):
         if _Debug:
-            print('on_group_message_sent', resp)
+            print('GroupChatScreen.on_group_message_sent', resp)
         if not api_client.is_ok(resp):
-            return
-        self.populate()
-
-    def on_group_message_received(self, json_data):
-        if _Debug:
-            print('on_group_message_received', json_data)
-        self.populate()
+            snackbar.error(text='message was not sent: %s' % api_client.response_err(resp))
 
     def on_action_button_clicked(self, btn):
         if _Debug:
@@ -161,7 +194,7 @@ class GroupChatScreen(screen.AppScreen):
 
     def on_user_selected(self, user_global_id):
         if _Debug:
-            print('on_user_selected', user_global_id)
+            print('GroupChatScreen.on_user_selected', user_global_id)
         self.main_win().select_screen(
             screen_id=self.global_id,
             screen_type='group_chat_screen',
@@ -177,7 +210,7 @@ class GroupChatScreen(screen.AppScreen):
 
     def on_group_share_result(self, resp, user_global_id):
         if _Debug:
-            print('on_group_share_result', resp)
+            print('GroupChatScreen.on_group_share_result', resp)
         if api_client.is_ok(resp):
             snackbar.success(text='group key shared with %s' % user_global_id)
         else:

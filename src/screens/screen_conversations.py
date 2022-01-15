@@ -60,7 +60,9 @@ class ConversationsScreen(screen.AppScreen):
         return 'comment-text-multiple'
 
     def populate(self, *args, **kwargs):
-        api_client.message_conversations_list(cb=self.on_message_conversations_list_result)
+        for snap_info in self.model('conversation').values():
+            if snap_info:
+                self.on_conversation(snap_info)
 
     def clear_selected_item(self):
         self.ids.conversations_list_view.clear_selection()
@@ -70,54 +72,92 @@ class ConversationsScreen(screen.AppScreen):
         self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id='service_message_history')
         self.clear_selected_item()
+        api_client.add_model_listener('conversation', listener_cb=self.on_conversation)
         self.populate()
 
     def on_leave(self, *args):
+        api_client.remove_model_listener('conversation', listener_cb=self.on_conversation)
         self.ids.action_button.close_stack()
         self.ids.state_panel.release()
         self.clear_selected_item()
 
-    def on_message_conversations_list_result(self, resp):
-        if _Debug:
-            print('ConversationsScreen.on_message_conversations_list_result  %s...' % str(resp)[:100])
-        if not api_client.is_ok(resp):
-            self.clear_selected_item()
-            self.ids.conversations_list_view.data = []
+    def on_conversation(self, payload):
+        one_conversation = payload['data']
+        one_conversation['automat_index'] = str(one_conversation.pop('index', '') or '')
+        one_conversation['automat_id'] = str(one_conversation.pop('id', '') or '')
+        item_found = False
+        for i in range(len(self.ids.conversations_list_view.data)):
+            item = self.ids.conversations_list_view.data[i]
+            if item['key_id'] == one_conversation['key_id']:
+                item_found = True
+                break
+        if item_found:
+            self.ids.conversations_list_view.data[i] = one_conversation
+            self.ids.conversations_list_view.refresh_from_data()
+            if _Debug:
+                print('ConversationsScreen.on_conversation updated existing item at position %d' % i, one_conversation['key_id'])
             return
-        conversations_list = api_client.response_result(resp)
-        for one_conversation in conversations_list:
-            one_conversation['automat_index'] = str(one_conversation.pop('index') or '')
-            one_conversation['automat_id'] = str(one_conversation.pop('id') or '')
-            item_found = False
-            for i in range(len(self.ids.conversations_list_view.data)):
-                item = self.ids.conversations_list_view.data[i]
-                if item['key_id'] == one_conversation['key_id']:
-                    item_found = True
-                    break
-            if item_found:
-                self.ids.conversations_list_view.data[i] = one_conversation
-                if _Debug:
-                    print('ConversationsScreen.on_message_conversations_list_result updated existing item at position %d' % i, one_conversation['key_id'])
-                continue
-            self.ids.conversations_list_view.data.append(one_conversation)
-            if _Debug:
-                print('ConversationsScreen.on_message_conversations_list_result added new item', one_conversation['key_id'])
-        to_be_removed = []
-        for item in self.ids.conversations_list_view.data:
-            item_found = False
-            for one_conversation in conversations_list:
-                one_conversation.pop('index', None)
-                if one_conversation['key_id'] == item['key_id']:
-                    item_found = True
-                    break
-            if item_found:
-                continue
-            to_be_removed.append(item)
-        for item in to_be_removed:
-            self.ids.conversations_list_view.data.remove(item)
-            if _Debug:
-                print('ConversationsScreen.on_message_conversations_list_result erased existing item', item['key_id'])
+        self.ids.conversations_list_view.data.append(one_conversation)
+#         to_be_removed = []
+#         for item in self.ids.conversations_list_view.data:
+#             item_found = False
+#             for one_conversation in conversations_list:
+#                 one_conversation.pop('index', None)
+#                 if one_conversation['key_id'] == item['key_id']:
+#                     item_found = True
+#                     break
+#             if item_found:
+#                 continue
+#             to_be_removed.append(item)
+#         for item in to_be_removed:
+#             self.ids.conversations_list_view.data.remove(item)
+#             if _Debug:
+#                 print('ConversationsScreen.on_message_conversations_list_result erased existing item', item['key_id'])
         self.ids.conversations_list_view.refresh_from_data()
+        if _Debug:
+            print('ConversationsScreen.on_conversation added new item', one_conversation['key_id'])
+
+#     def on_message_conversations_list_result(self, resp):
+#         if _Debug:
+#             print('ConversationsScreen.on_message_conversations_list_result  %s...' % str(resp)[:100])
+#         if not api_client.is_ok(resp):
+#             self.clear_selected_item()
+#             self.ids.conversations_list_view.data = []
+#             return
+#         conversations_list = api_client.response_result(resp)
+#         for one_conversation in conversations_list:
+#             one_conversation['automat_index'] = str(one_conversation.pop('index') or '')
+#             one_conversation['automat_id'] = str(one_conversation.pop('id') or '')
+#             item_found = False
+#             for i in range(len(self.ids.conversations_list_view.data)):
+#                 item = self.ids.conversations_list_view.data[i]
+#                 if item['key_id'] == one_conversation['key_id']:
+#                     item_found = True
+#                     break
+#             if item_found:
+#                 self.ids.conversations_list_view.data[i] = one_conversation
+#                 if _Debug:
+#                     print('ConversationsScreen.on_message_conversations_list_result updated existing item at position %d' % i, one_conversation['key_id'])
+#                 continue
+#             self.ids.conversations_list_view.data.append(one_conversation)
+#             if _Debug:
+#                 print('ConversationsScreen.on_message_conversations_list_result added new item', one_conversation['key_id'])
+#         to_be_removed = []
+#         for item in self.ids.conversations_list_view.data:
+#             item_found = False
+#             for one_conversation in conversations_list:
+#                 one_conversation.pop('index', None)
+#                 if one_conversation['key_id'] == item['key_id']:
+#                     item_found = True
+#                     break
+#             if item_found:
+#                 continue
+#             to_be_removed.append(item)
+#         for item in to_be_removed:
+#             self.ids.conversations_list_view.data.remove(item)
+#             if _Debug:
+#                 print('ConversationsScreen.on_message_conversations_list_result erased existing item', item['key_id'])
+#         self.ids.conversations_list_view.refresh_from_data()
 
     def on_action_button_clicked(self, btn):
         if _Debug:

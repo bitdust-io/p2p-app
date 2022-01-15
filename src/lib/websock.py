@@ -20,7 +20,7 @@ from lib import system
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 _DebugAPIResponses = False
 
 #------------------------------------------------------------------------------
@@ -246,7 +246,8 @@ def on_model_update(json_data):
     model_cb_list = model_update_callbacks().get(json_data['payload']['name']) or []
     if model_cb_list:
         for model_cb in model_cb_list:
-            model_cb(json_data['payload'])
+            if model_cb:
+                model_cb(json_data['payload'])
     return True
 
 #------------------------------------------------------------------------------

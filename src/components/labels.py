@@ -47,7 +47,12 @@ class VFlexMarkupLabel(ThemableBehavior, Label):
 
 
 class ChatMessageLabel(NormalLabel):
-    pass
+
+    def __init__(self, **kwargs):
+        self.conversation_id = kwargs.pop('conversation_id', None)
+        self.message_id = kwargs.pop('message_id', None)
+        self.message_time = kwargs.pop('message_time', None)
+        super().__init__(**kwargs)
 
 
 class StatusLabel(NormalLabel):

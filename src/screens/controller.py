@@ -247,6 +247,9 @@ class Controller(object):
             self.network_connected_latest = 0
             self.verify_process_health()
         api_client.start_model_streaming('service', request_all=True)
+        api_client.start_model_streaming('key', request_all=True)
+        api_client.start_model_streaming('conversation', request_all=True)
+        api_client.start_model_streaming('message', request_all=True)
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:
@@ -265,10 +268,6 @@ class Controller(object):
         event_data = json_data.get('payload', {}).get('data', {})
         if not event_id:
             return
-        if event_data.get('id', '').startswith('service_') and 'newstate' in event_data and 'oldstate' in event_data:
-            pass
-            # if self.mw().is_screen_active('connecting_screen'):
-            #     self.mw().get_active_screen('connecting_screen').on_service_state_changed(event_data)
         if event_id in ['service-started', 'service-stopped', ]:
             if self.mw().is_screen_active('settings_screen'):
                 self.mw().get_active_screen('settings_screen').on_service_started_stopped(
@@ -327,11 +326,15 @@ class Controller(object):
             return
 
     def on_private_message_received(self, json_data):
+        if _Debug:
+            print('Controller.on_private_message_received', json_data)
         cb_list = self.callbacks.get('on_private_message_received', [])
         for cb, _ in cb_list:
             cb(json_data)
 
     def on_group_message_received(self, json_data):
+        if _Debug:
+            print('Controller.on_group_message_received', json_data)
         cb_list = self.callbacks.get('on_group_message_received', [])
         for cb, _ in cb_list:
             cb(json_data)
@@ -339,12 +342,18 @@ class Controller(object):
     def on_model_update(self, json_data):
         model_name = json_data['payload']['name']
         snap_id = json_data['payload']['id']
+        if _Debug:
+            print('Controller.on_model_update [%s]:%s' % (model_name, snap_id, ))
         if model_name not in self.model_data:
             self.model_data[model_name] = {}
-        if snap_id not in self.model_data[model_name]:
-            self.model_data[model_name][snap_id] = {}
-        self.model_data[model_name][snap_id]['data'] = json_data['payload']['data']
-        self.model_data[model_name][snap_id]['created'] = json_data['payload']['created']
+        if json_data['payload'].get('deleted'):
+            self.model_data[model_name].pop(snap_id)
+        else:
+            if snap_id not in self.model_data[model_name]:
+                self.model_data[model_name][snap_id] = {}
+            self.model_data[model_name][snap_id]['id'] = snap_id
+            self.model_data[model_name][snap_id]['data'] = json_data['payload']['data']
+            self.model_data[model_name][snap_id]['created'] = json_data['payload']['created']
 
     def on_state_process_health(self, instance, value):
         if _Debug:

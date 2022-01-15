@@ -63,6 +63,15 @@ class AppScreen(ThemableBehavior, Screen):
     def control(self):
         return control()
 
+    def model(self, model_name=None, snap_id=None):
+        if model_name is None:
+            return control().model_data
+        if snap_id is not None:
+            return control().model_data.get(model_name, {}).get(snap_id, None)
+        if model_name == '*':
+            return control().model_data.keys()
+        return control().model_data.get(model_name, {})
+
     def on_opened(self):
         pass
 

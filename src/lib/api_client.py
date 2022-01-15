@@ -77,9 +77,8 @@ def red_err(response):
 #--- API streaming
 
 def add_model_listener(model_name, listener_cb):
-    if model_name in websock.model_update_callbacks():
-        if listener_cb in websock.model_update_callbacks()[model_name]:
-            return False
+    if listener_cb in (websock.model_update_callbacks().get(model_name) or []):
+        return False
     if model_name not in websock.model_update_callbacks():
         websock.model_update_callbacks()[model_name] = []
     websock.model_update_callbacks()[model_name].append(listener_cb)
