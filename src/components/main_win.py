@@ -4,8 +4,8 @@ import time
 #------------------------------------------------------------------------------
 
 from kivy.lang import Builder
+from kivy.clock import Clock
 from kivy.factory import Factory
-from kivy.metrics import dp
 from kivy.properties import StringProperty  # @UnresolvedImport
 from kivy.properties import NumericProperty  # @UnresolvedImport
 from kivy.properties import ObjectProperty  # @UnresolvedImport
@@ -156,8 +156,7 @@ class MainWin(Screen, ThemableBehavior):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         patch_kivy_core_window()
-        # Clock.schedule_once(self.on_init_done)
-        # self.on_init_done()
+        Clock.schedule_once(self.on_init_done)
 
     def nav(self):
         return self.ids.nav_drawer
@@ -279,6 +278,19 @@ class MainWin(Screen, ThemableBehavior):
         )
         self.dropdown_menus[screen_id].bind(on_release=self.on_dropdown_menu_callback)
 
+    def populate_action_button(self, screen_inst=None):
+        if not screen_inst:
+            self.footer_bar().set_action_button(False)
+            return
+        action_button_info = screen_inst.get_action_button()
+        if not action_button_info:
+            self.footer_bar().set_action_button(False)
+            return
+        self.footer_bar().set_action_button(
+            icon=action_button_info.get('icon'),
+            color=action_button_info.get('color'),
+        )
+
     #------------------------------------------------------------------------------
 
     def open_screen(self, screen_id, screen_type, **kwargs):
@@ -329,7 +341,7 @@ class MainWin(Screen, ThemableBehavior):
             if _Debug:
                 print('MainWin.close_screen   screen %r has not been opened' % screen_id)
             return
-        screen_inst, btn = self.active_screens.pop(screen_id)
+        screen_inst, _ = self.active_screens.pop(screen_id)
         self.screen_closed_time.pop(screen_id, None)
         if screen_inst not in self.ids.screen_manager.children:
             if _Debug:
@@ -387,6 +399,7 @@ class MainWin(Screen, ThemableBehavior):
                 print('MainWin.select_screen   skip, selected screen is already %r' % screen_id)
             return True
         self.populate_toolbar_content(self.active_screens[screen_id][0])
+        self.populate_action_button(self.active_screens[screen_id][0])
         if self.selected_screen:
             if _Debug:
                 print('MainWin.select_screen   is about to switch away screen manger from currently selected screen %r' % self.selected_screen)
@@ -424,25 +437,26 @@ class MainWin(Screen, ThemableBehavior):
     def on_init_done(self, *args):
         if _Debug:
             print('MainWin.on_init_done', self.footer_bar().height, self.footer_bar().action_button.x, self.footer_bar().action_button.y, )
-        self.footer().padding = [0, 0, ]
-        self.footer().minimum_height = 0
-
-        self.footer_bar().ids.left_actions.size_hint_y = None
-        self.footer_bar().ids.left_actions.height = dp(48)
-        self.footer_bar().ids.left_actions.padding = [0, 0, ]
-
-        self.footer_bar().ids.right_actions.padding = [0, 0, ]
-        self.footer_bar().ids.right_actions.size_hint_y = None
-        self.footer_bar().ids.right_actions.height = dp(48)
-
-        self.footer_bar().ids.label_title.font_style = 'Subtitle2'
-
-        self.footer_bar().padding = [0, 0, ]
-        self.footer_bar().minimum_height = 0
-        self.footer_bar().size_hint_y = None
-        self.footer_bar().height = dp(48)
-        self.footer_bar()._shift = -dp(12)
-        self.footer_bar().on_mode(None, 'end')
+        self.populate_action_button()
+#         self.footer().padding = [0, 0, ]
+#         self.footer().minimum_height = 0
+# 
+#         self.footer_bar().ids.left_actions.size_hint_y = None
+#         self.footer_bar().ids.left_actions.height = dp(48)
+#         self.footer_bar().ids.left_actions.padding = [0, 0, ]
+# 
+#         self.footer_bar().ids.right_actions.padding = [0, 0, ]
+#         self.footer_bar().ids.right_actions.size_hint_y = None
+#         self.footer_bar().ids.right_actions.height = dp(48)
+# 
+#         self.footer_bar().ids.label_title.font_style = 'Subtitle2'
+# 
+#         self.footer_bar().padding = [0, 0, ]
+#         self.footer_bar().minimum_height = 0
+#         self.footer_bar().size_hint_y = None
+#         self.footer_bar().height = dp(48)
+#         self.footer_bar()._shift = -dp(12)
+#         self.footer_bar().on_mode(None, 'end')
 
     def on_nav_back_button_clicked(self, *args):
         if _Debug:

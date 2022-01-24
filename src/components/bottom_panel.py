@@ -3,8 +3,13 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.metrics import dp
 
-from kivymd.uix.toolbar import MDToolbar, MDActionBottomAppBarButton, MDActionTopAppBarButton, MDBottomAppBar
+from kivymd.uix.toolbar import MDToolbar, MDBottomAppBar
 
+#------------------------------------------------------------------------------
+
+from components import styles
+
+#------------------------------------------------------------------------------
 
 class BottomToolbarContainer(MDBottomAppBar):
 
@@ -21,18 +26,39 @@ class BottomToolbarContainer(MDBottomAppBar):
 
 class BottomToolbar(MDToolbar):
 
-    action_button_offset_x = dp(52)
-    action_button_offset_y = -dp(36)
-    action_button_scale = 0.75
+    action_button_offset_x = dp(32)
+    action_button_offset_y = -dp(32)
+    action_button_scale = 1.0
     toolbar_height = dp(28)
-    _rounded_rectangle_height = dp(2)
+    notch_border = dp(4)
+    _total_angle = 162.0
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.action_button._shift = self.action_button_offset_y
         self.action_button._scale_x = self.action_button_scale
         self.action_button._scale_y = self.action_button_scale
+        self.action_button.md_bg_color = styles.app.color_success_green
+        # self._rounded_rectangle_height = dp(20)
         Clock.schedule_once(lambda x: self.on_ready())
+
+    def set_action_button(self, icon, color=None):
+        if icon:
+            self.action_button.icon = icon
+            self.action_button.md_bg_color = color or styles.app.color_success_green
+            self.action_button.disabled = False
+            self.action_button_scale = 1.0
+            # self._rounded_rectangle_height = dp(6)
+            # self.notch_border = dp(4)
+            self.on_mode(None, 'end')
+            self.set_notch()
+        else:
+            self.action_button.disabled = True
+            self.action_button_scale = 0.0
+            # self.notch_border = dp(0)
+            self._rounded_rectangle_height = 0
+            self.on_mode(None, 'end')
+            self.remove_notch()
 
     def remove_notch(self):
         anim = Animation(d=0.0) + Animation(
@@ -43,7 +69,7 @@ class BottomToolbar(MDToolbar):
 
     def set_notch(self):
         anim = Animation(d=0.0) + Animation(
-            notch_radius=self.action_button_scale * (self.action_button.width / 2) + dp(4),
+            notch_radius=self.action_button_scale * (self.action_button.width / 2) + self.notch_border,
             d=0.0,
         )
         anim.start(self)

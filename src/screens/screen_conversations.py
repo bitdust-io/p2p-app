@@ -59,6 +59,9 @@ class ConversationsScreen(screen.AppScreen):
     def get_icon(self):
         return 'comment-text-multiple'
 
+    def get_action_button(self):
+        return {'icon': 'plus', }
+
     def populate(self, *args, **kwargs):
         for snap_info in self.model('conversation').values():
             if snap_info:
