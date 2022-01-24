@@ -170,6 +170,8 @@ class BitDustApp(styles.AppStyle, MDApp):
 #:import AutomatStatusPanel components.status_panel.AutomatStatusPanel
 #:import AutomatShortStatusPanel components.status_panel.AutomatShortStatusPanel
 #:import AutomatShortStatusPanelByIndex components.status_panel.AutomatShortStatusPanelByIndex
+#:import BottomToolbarContainer components.bottom_panel.BottomToolbarContainer
+#:import BottomToolbar components.bottom_panel.BottomToolbar
         """)
 
         Builder.load_file('./components/layouts.kv')

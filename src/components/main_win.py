@@ -5,7 +5,7 @@ import time
 
 from kivy.lang import Builder
 from kivy.factory import Factory
-# from kivy.clock import Clock
+from kivy.metrics import dp
 from kivy.properties import StringProperty  # @UnresolvedImport
 from kivy.properties import NumericProperty  # @UnresolvedImport
 from kivy.properties import ObjectProperty  # @UnresolvedImport
@@ -24,7 +24,7 @@ from components import webfont
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -156,6 +156,8 @@ class MainWin(Screen, ThemableBehavior):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         patch_kivy_core_window()
+        # Clock.schedule_once(self.on_init_done)
+        # self.on_init_done()
 
     def nav(self):
         return self.ids.nav_drawer
@@ -165,6 +167,12 @@ class MainWin(Screen, ThemableBehavior):
 
     def tbar(self):
         return self.ids.toolbar
+
+    def footer(self):
+        return self.ids.footer
+
+    def footer_bar(self):
+        return self.ids.footer_bar
 
     def register_screens(self, screens_dict):
         for screen_type, screen_module_class in screens_dict.items():
@@ -412,6 +420,29 @@ class MainWin(Screen, ThemableBehavior):
         return True
 
     #------------------------------------------------------------------------------
+
+    def on_init_done(self, *args):
+        if _Debug:
+            print('MainWin.on_init_done', self.footer_bar().height, self.footer_bar().action_button.x, self.footer_bar().action_button.y, )
+        self.footer().padding = [0, 0, ]
+        self.footer().minimum_height = 0
+
+        self.footer_bar().ids.left_actions.size_hint_y = None
+        self.footer_bar().ids.left_actions.height = dp(48)
+        self.footer_bar().ids.left_actions.padding = [0, 0, ]
+
+        self.footer_bar().ids.right_actions.padding = [0, 0, ]
+        self.footer_bar().ids.right_actions.size_hint_y = None
+        self.footer_bar().ids.right_actions.height = dp(48)
+
+        self.footer_bar().ids.label_title.font_style = 'Subtitle2'
+
+        self.footer_bar().padding = [0, 0, ]
+        self.footer_bar().minimum_height = 0
+        self.footer_bar().size_hint_y = None
+        self.footer_bar().height = dp(48)
+        self.footer_bar()._shift = -dp(12)
+        self.footer_bar().on_mode(None, 'end')
 
     def on_nav_back_button_clicked(self, *args):
         if _Debug:
