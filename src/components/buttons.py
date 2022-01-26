@@ -144,6 +144,7 @@ class CustomIconButton(ButtonBehavior, labels.MarkupLabel):
 
     icon = StringProperty("circle")
     icon_pack = StringProperty("IconMD")
+    icon_size = StringProperty("12sp")
     button_width = NumericProperty("32dp")
     button_height = NumericProperty("32dp")
     background_color = ColorProperty([1, 1, 1, 1])

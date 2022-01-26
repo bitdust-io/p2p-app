@@ -30,30 +30,30 @@ class EngineStatusScreen(screen.AppScreen):
     def populate(self):
         if _Debug:
             print('EngineStatusScreen.populate state_panel_attached=%r' % self.state_panel_attached)
-        if self.main_win().state_process_health == 1:
-            if not self.state_panel_attached:
-                self.state_panel_attached = self.ids.state_panel.attach(automat_id='initializer')
         self.on_service(None)
 
     def on_enter(self, *args):
         if _Debug:
             print('EngineStatusScreen.on_enter')
+        if self.main_win().engine_is_on:
+            if not self.state_panel_attached:
+                self.state_panel_attached = self.ids.state_panel.attach(automat_id='initializer')
+        api_client.add_model_listener('service', listener_cb=self.on_service)
         Clock.schedule_once(self.control().verify_process_health)
         if not self.verify_process_health_task:
             self.verify_process_health_task = Clock.schedule_interval(self.control().verify_process_health, 5)
-        if self.main_win().engine_is_on:
-            self.state_panel_attached = self.ids.state_panel.attach(automat_id='initializer')
-        api_client.add_model_listener('service', listener_cb=self.on_service)
         self.populate()
 
     def on_leave(self, *args):
         if _Debug:
             print('EngineStatusScreen.on_leave')
-        api_client.remove_model_listener('service', listener_cb=self.on_service)
-        self.state_panel_attached = False
         if self.verify_process_health_task:
             Clock.unschedule(self.verify_process_health_task)
             self.verify_process_health_task = None
+        api_client.remove_model_listener('service', listener_cb=self.on_service)
+        if self.state_panel_attached:
+            self.ids.state_panel.release()
+        self.state_panel_attached = False
 
     def on_engine_on_off(self, *args):
         if _Debug:
@@ -65,9 +65,11 @@ class EngineStatusScreen(screen.AppScreen):
             self.populate()
         else:
             self.set_nw_progress(0)
-            self.ids.state_panel.release()
+            if self.state_panel_attached:
+                self.ids.state_panel.release()
             self.state_panel_attached = False
             self.app().stop_engine()
+            self.set_nw_progress(0)
 
     def on_network_connection_status_pressed(self, *args):
         if _Debug:

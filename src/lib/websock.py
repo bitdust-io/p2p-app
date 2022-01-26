@@ -203,7 +203,7 @@ def on_message(ws_inst, message):
 @mainthread
 def on_error(ws_inst, error):
     global _PendingCalls
-    if _Debug or True:
+    if _Debug:
         print('on_error', error)
     cb = registered_callbacks().get('on_error')
     if cb:

@@ -48,7 +48,7 @@ class AppScreen(ThemableBehavior, Screen):
     def get_title(self):
         return ''
 
-    def get_action_button(self):
+    def get_hot_button(self):
         return None
 
     def is_closable(self):
@@ -88,4 +88,7 @@ class AppScreen(ThemableBehavior, Screen):
         pass
 
     def on_action_button_clicked(self):
+        pass
+
+    def on_hot_button_clicked(self):
         pass

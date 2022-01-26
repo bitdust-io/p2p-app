@@ -266,8 +266,8 @@
     text_size: self.size
     valign: 'middle'
     halign: 'center'
-    font_style: self.icon_pack
-    text: get_icon_code(self.icon, self.icon_pack)
+    font_style: "Body1"
+    text: "[size={}]{}[/size]".format(self.icon_size, make_icon(self.icon, self.icon_pack))
     state_image: self.background_normal if self.state == 'normal' else self.background_down
     disabled_image: self.background_disabled_normal if self.state == 'normal' else self.background_disabled_down
 

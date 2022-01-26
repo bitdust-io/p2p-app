@@ -40,11 +40,15 @@ class PrivateChatScreen(screen.AppScreen):
     def get_title(self):
         return self.username
 
+    def get_hot_button(self):
+        return {'icon': 'send', 'color': 'green', }
+
     def on_enter(self, *args):
         self.ids.action_button.close_stack()
         self.ids.state_panel.attach(self.automat_index)
         api_client.add_model_listener('message', listener_cb=self.on_message)
         self.populate()
+        self.ids.chat_input.focus = True
 
     def on_leave(self, *args):
         api_client.remove_model_listener('message', listener_cb=self.on_message)
@@ -124,7 +128,7 @@ class PrivateChatScreen(screen.AppScreen):
                 conversation_id=msg['conversation_id'],
                 message_id=msg_id,
                 message_time=msg['payload']['time'],
-                text='[color={}]{}[/color]  [color=#DDDDDD]{}[/color]\n{}'.format(
+                text='[color={}]{}[/color]  [color=#DDDDDD]{}[/color]\n[font=data/fonts/RobotoMono-Regular.ttf]{}[/font]'.format(
                     sender_clr,
                     sender_name,
                     time.strftime('%Y %d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
@@ -135,10 +139,10 @@ class PrivateChatScreen(screen.AppScreen):
         )
         return True
 
-    def on_chat_send_button_clicked(self, *args):
+    def on_hot_button_clicked(self, *args):
         msg = self.ids.chat_input.text
         if _Debug:
-            print('PrivateChatScreen.on_chat_send_button_clicked', self.recipient_id, msg)
+            print('PrivateChatScreen.on_hot_button_clicked', self.recipient_id, msg)
         api_client.message_send(
             recipient_id=self.recipient_id,
             data={'message': msg, },

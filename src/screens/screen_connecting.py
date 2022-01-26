@@ -50,7 +50,8 @@ class ConnectingScreen(screen.AppScreen):
 
     def on_leave(self, *args):
         api_client.remove_model_listener('service', listener_cb=self.on_service)
-        self.ids.state_panel.release()
+        if self.state_panel_attached:
+            self.ids.state_panel.release()
         self.state_panel_attached = False
 
     def on_service(self, payload):

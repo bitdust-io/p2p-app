@@ -127,6 +127,15 @@ class AppStyle(object):
     #--- SCREEN PRIVATE CHAT
     chat_input_font_size = sp(14)
 
+    @staticmethod
+    def color(color_name):
+        if not color_name:
+            return None
+        return {
+            'green': AppStyle.color_success_green,
+            'button_green': AppStyle.color_btn_normal_green,
+        }.get(color_name)
+
 #------------------------------------------------------------------------------
 
 app = AppStyle()

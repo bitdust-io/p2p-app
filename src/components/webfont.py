@@ -4,7 +4,7 @@ from fonts.materialdesignicons_map import materialdesignicons_codes, materialdes
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 # Font Awesome
@@ -98,6 +98,19 @@ def get_icon_code(name, icon_pack='IconMD'):
         return fa_icon(name, font_file=None, with_spaces=False, with_font_tag=False)
     if icon_pack in ['ico', 'icofont', 'IconICO', ]:
         return icofont_icon(name, font_file=None, with_spaces=False, with_font_tag=False)
+    raise Exception('unknown icon pack: %r' % icon_pack)
+
+
+def get_font_path(icon_pack):
+    if icon_pack in ['Icon', 'Icons', ]:
+        from kivymd import fonts_path
+        return fonts_path + "materialdesignicons-webfont.ttf"
+    if icon_pack in ['md', 'materialdesignicons', 'IconMD', ]:
+        return materialdesignicons_ttf_filepath
+    if icon_pack in ['fa', 'fontawesome', 'IconFA', ]:
+        return fontawesome_ttf_filepath
+    if icon_pack in ['ico', 'icofont', 'IconICO', ]:
+        return icofont_ttf_filepath
     raise Exception('unknown icon pack: %r' % icon_pack)
 
 

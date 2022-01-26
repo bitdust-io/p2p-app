@@ -1,0 +1,92 @@
+#:import m_res kivymd.material_resources
+#:import make_icon components.webfont.make_icon
+
+
+<CustomActionBottomAppBarButton>
+
+    canvas.before:
+        PushMatrix
+        Scale:
+            origin: self.center
+            x: root._scale_x
+            y: root._scale_y
+    canvas.after:
+        PopMatrix
+
+    md_bg_color: self.theme_cls.primary_color
+    text_color: [.99, .99, .99, 1]
+
+
+<CustomNotchedBox>
+    size_hint_y: None
+    height: root.standard_increment
+    padding: [root.horizontal_margins - dp(12), 0, dp(120), 0]
+    # opposite_colors: False
+    elevation: root.elevation
+
+    canvas:
+        Color:
+            rgba:
+                (root.theme_cls.primary_color if root.md_bg_color == [0, 0, 0, 0] else root.md_bg_color) \
+                if root.type == "top" else \
+                (root.theme_cls.primary_color if root.parent.md_bg_color == [0, 0, 0, 0] else root.parent.md_bg_color)
+        Mesh:
+            vertices: root._vertices_left
+            indices: root._indices_left
+            mode: "triangle_fan"
+
+        Mesh:
+            vertices: root._vertices_right
+            indices: root._indices_right
+            mode: "triangle_fan"
+
+        RoundedRectangle:
+            pos: root._rectangle_left_pos
+            size: root._rectangle_left_width, root._rounded_rectangle_height
+            radius: [0,] if root.mode=="normal" else [0,root.notch_radius*root._rounding_percentage,0,0]
+
+        RoundedRectangle:
+            pos: root._rectangle_right_pos
+            size: root._rectangle_right_width, root._rounded_rectangle_height
+            radius: [0,] if root.mode=="normal" else [root.notch_radius*root._rounding_percentage,0,0,0]
+
+
+<CustomToolbar>
+    BoxLayout:
+        id: left_actions
+        orientation: "horizontal"
+        size_hint_x: None
+        size_hint_y: None
+        height: self.minimum_height
+        pos_hint: {"center_y": .5}
+
+    BoxLayout:
+        padding: [dp(12), dp(0)]
+        size_hint_y: None
+        height: self.minimum_height
+        pos_hint: {"center_y": .5}
+
+        MDLabel:
+            id: label_title
+            size_hint: 1, None
+            size: self.texture_size
+            pos_hint: {"center_x": .5, "center_y": .5}
+            text_size: None, dp(28)
+            font_style: "Body1"
+            opposite_colors: root.opposite_colors
+            theme_text_color: "Custom" if not root.opposite_colors else "Primary"
+            text_color: root.specific_text_color
+            text: root.title
+            shorten: True
+            shorten_from: 'right'
+            halign: root.anchor_title
+            valign: 'middle'
+            markup: True
+
+    BoxLayout:
+        id: right_actions
+        orientation: "horizontal"
+        size_hint_x: None
+        size_hint_y: None
+        height: self.minimum_height
+        pos_hint: {"center_y": .5}

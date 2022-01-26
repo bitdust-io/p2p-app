@@ -21,6 +21,7 @@ from kivymd.uix.menu import MDDropdownMenu
 from lib import system
 
 from components import webfont
+from components import styles
 
 #------------------------------------------------------------------------------
 
@@ -128,7 +129,7 @@ class ContentNavigationDrawer(BoxLayout):
 
 #------------------------------------------------------------------------------
 
-class MainWin(Screen, ThemableBehavior):
+class MainWin(Screen, ThemableBehavior, styles.AppStyle):
 
     control = None
     screens_map = {}
@@ -278,17 +279,17 @@ class MainWin(Screen, ThemableBehavior):
         )
         self.dropdown_menus[screen_id].bind(on_release=self.on_dropdown_menu_callback)
 
-    def populate_action_button(self, screen_inst=None):
+    def populate_hot_button(self, screen_inst=None):
         if not screen_inst:
             self.footer_bar().set_action_button(False)
             return
-        action_button_info = screen_inst.get_action_button()
+        action_button_info = screen_inst.get_hot_button()
         if not action_button_info:
             self.footer_bar().set_action_button(False)
             return
         self.footer_bar().set_action_button(
             icon=action_button_info.get('icon'),
-            color=action_button_info.get('color'),
+            color=self.color(action_button_info.get('color')),
         )
 
     #------------------------------------------------------------------------------
@@ -399,7 +400,7 @@ class MainWin(Screen, ThemableBehavior):
                 print('MainWin.select_screen   skip, selected screen is already %r' % screen_id)
             return True
         self.populate_toolbar_content(self.active_screens[screen_id][0])
-        self.populate_action_button(self.active_screens[screen_id][0])
+        self.populate_hot_button(self.active_screens[screen_id][0])
         if self.selected_screen:
             if _Debug:
                 print('MainWin.select_screen   is about to switch away screen manger from currently selected screen %r' % self.selected_screen)
@@ -437,26 +438,14 @@ class MainWin(Screen, ThemableBehavior):
     def on_init_done(self, *args):
         if _Debug:
             print('MainWin.on_init_done', self.footer_bar().height, self.footer_bar().action_button.x, self.footer_bar().action_button.y, )
-        self.populate_action_button()
-#         self.footer().padding = [0, 0, ]
-#         self.footer().minimum_height = 0
-# 
-#         self.footer_bar().ids.left_actions.size_hint_y = None
-#         self.footer_bar().ids.left_actions.height = dp(48)
-#         self.footer_bar().ids.left_actions.padding = [0, 0, ]
-# 
-#         self.footer_bar().ids.right_actions.padding = [0, 0, ]
-#         self.footer_bar().ids.right_actions.size_hint_y = None
-#         self.footer_bar().ids.right_actions.height = dp(48)
-# 
-#         self.footer_bar().ids.label_title.font_style = 'Subtitle2'
-# 
-#         self.footer_bar().padding = [0, 0, ]
-#         self.footer_bar().minimum_height = 0
-#         self.footer_bar().size_hint_y = None
-#         self.footer_bar().height = dp(48)
-#         self.footer_bar()._shift = -dp(12)
-#         self.footer_bar().on_mode(None, 'end')
+        if self.selected_screen:
+            self.populate_hot_button(self.active_screens[self.selected_screen][0])
+
+    def on_hot_button_clicked(self, *args):
+        if _Debug:
+            print('MainWin.on_hot_button_clicked', self.selected_screen)
+        if self.selected_screen:
+            self.active_screens[self.selected_screen][0].on_hot_button_clicked()
 
     def on_nav_back_button_clicked(self, *args):
         if _Debug:

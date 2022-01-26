@@ -9,7 +9,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -62,6 +62,7 @@ def all_screens():
 
 class Controller(object):
 
+    process_health_errors = 0
     process_health_latest = 0
     identity_get_latest = 0
     network_connected_latest = 0
@@ -206,10 +207,13 @@ class Controller(object):
             if _Debug:
                 print('on_process_health_result %r' % resp)
             self.process_health_latest = 0
+            self.process_health_errors += 1
             self.mw().state_process_health = -1
             return
-        self.mw().state_process_health = 1 if api_client.is_ok(resp) else -1
         self.process_health_latest = time.time() if api_client.is_ok(resp) else 0
+        self.mw().state_process_health = 1 if api_client.is_ok(resp) else -1
+        if self.mw().state_process_health == 1:
+            self.process_health_errors = 0
         self.run()
 
     def on_identity_get_result(self, resp):
@@ -220,8 +224,8 @@ class Controller(object):
             self.identity_get_latest = 0
             self.mw().state_identity_get = -1
             return
-        self.mw().state_identity_get = 1 if api_client.is_ok(resp) else -1
         self.identity_get_latest = time.time()
+        self.mw().state_identity_get = 1 if api_client.is_ok(resp) else -1
         self.run()
 
     def on_network_connected_result(self, resp):
@@ -232,8 +236,8 @@ class Controller(object):
             self.network_connected_latest = 0
             self.mw().state_network_connected = -1
             return
-        self.mw().state_network_connected = 1 if api_client.is_ok(resp) else -1
         self.network_connected_latest = time.time()
+        self.mw().state_network_connected = 1 if api_client.is_ok(resp) else -1
         self.run()
 
     #------------------------------------------------------------------------------
@@ -255,11 +259,15 @@ class Controller(object):
         if _Debug:
             print('Controller.on_websocket_error', websocket_instance, error)
         if self.mw().state_process_health != -1:
-            self.mw().state_process_health = -1
             self.process_health_latest = 0
             self.identity_get_latest = 0
             self.network_connected_latest = 0
-            self.verify_process_health()
+            self.mw().state_process_health = -1
+            if self.process_health_errors >= 20:
+                self.mw().engine_is_on = False
+            else:
+                from kivy.clock import Clock
+                Clock.schedule_once(lambda x: self.verify_process_health(), 1.0)
 
     def on_websocket_event(self, json_data):
         if _Debug:
@@ -362,15 +370,16 @@ class Controller(object):
             # if self.mw().selected_screen:
                 # if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
                 #     self.mw().latest_screen = self.mw().selected_screen
-            self.mw().latest_screen = 'welcome_screen'
             self.mw().state_identity_get = 0
             self.mw().state_network_connected = 0
             self.mw().update_menu_items()
+            self.model_data.clear()
+            self.mw().latest_screen = 'welcome_screen'
             # self.mw().select_screen('engine_status_screen')
             # self.mw().close_active_screens(exclude_screens=['engine_status_screen', ])
             return
         if value == 1:
-            self.mw().menu().ids.menu_item_my_identity.disabled = False
+            self.mw().update_menu_items()
             self.on_state_success()
             return
         if value == 0:
@@ -387,13 +396,14 @@ class Controller(object):
             # if self.mw().selected_screen:
                 # if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
                 #     self.mw().latest_screen = self.mw().selected_screen
-            self.mw().latest_screen = 'welcome_screen'
             self.mw().state_network_connected = 0
             self.mw().update_menu_items()
+            self.mw().latest_screen = 'welcome_screen'
             # self.mw().select_screen('new_identity_screen')
             # self.mw().close_screens(['engine_status_screen', 'connecting_screen', 'startup_screen', ])
             return
         if value == 1:
+            self.mw().update_menu_items()
             self.on_state_success()
             return
         if value == 0:
@@ -406,15 +416,20 @@ class Controller(object):
             print('Controller.on_state_network_connected', value)
         if self.mw().state_process_health != 1:
             return
+        if self.mw().state_identity_get != 1:
+            return
         if value == -1:
             # if self.mw().selected_screen:
             #     if self.mw().selected_screen not in ['engine_status_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
             #         self.mw().latest_screen = self.mw().selected_screen
+            self.mw().update_menu_items()
+            self.mw().latest_screen = 'welcome_screen'
             # if self.mw().selected_screen != 'welcome_screen':
             #     self.mw().select_screen('connecting_screen')
             # self.mw().close_screens(['engine_status_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ])
             return
         if value == 1:
+            self.mw().update_menu_items()
             self.on_state_success()
             return
         if value == 0:
@@ -427,7 +442,7 @@ class Controller(object):
             print('Controller.on_state_success %r %r %r, latest_screen=%r selected_screen=%r' % (
                 self.mw().state_process_health, self.mw().state_identity_get, self.mw().state_network_connected,
                 self.mw().latest_screen, self.mw().selected_screen, ))
-        self.mw().update_menu_items()
+        # self.mw().update_menu_items()
         # if self.mw().state_process_health == 1 and self.mw().state_identity_get == 1 and self.mw().state_network_connected == 1:
             # if self.mw().latest_screen in ['engine_status_screen', 'connecting_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ]:
             #     self.mw().latest_screen = 'welcome_screen'

@@ -59,6 +59,7 @@ if _Debug:
 
 from kivy.lang import Builder
 from kivy.clock import Clock, mainthread
+from kivy.metrics import dp
 
 from kivymd.app import MDApp
 
@@ -170,8 +171,9 @@ class BitDustApp(styles.AppStyle, MDApp):
 #:import AutomatStatusPanel components.status_panel.AutomatStatusPanel
 #:import AutomatShortStatusPanel components.status_panel.AutomatShortStatusPanel
 #:import AutomatShortStatusPanelByIndex components.status_panel.AutomatShortStatusPanelByIndex
-#:import BottomToolbarContainer components.bottom_panel.BottomToolbarContainer
-#:import BottomToolbar components.bottom_panel.BottomToolbar
+#:import CustomActionBottomAppBarButton components.tool_bar.CustomActionBottomAppBarButton
+#:import CustomBottomAppBar components.tool_bar.CustomBottomAppBar
+#:import CustomToolbar components.tool_bar.CustomToolbar
         """)
 
         Builder.load_file('./components/layouts.kv')
@@ -180,15 +182,16 @@ class BitDustApp(styles.AppStyle, MDApp):
         Builder.load_file('./components/text_input.kv')
         Builder.load_file('./components/list_view.kv')
         Builder.load_file('./components/status_panel.kv')
+        Builder.load_file('./components/tool_bar.kv')
         Builder.load_file('./components/dialogs.kv')
         Builder.load_file('./components/main_win.kv')
 
         from components import main_win
-        from components.layouts import DelayedResizeLayout
 
         self.control = controller.Controller(self)
 
         self.main_window = main_win.MainWin()
+        self.root_widget = self.main_window
 
         self.main_window.register_controller(self.control)
         self.main_window.register_screens(controller.all_screens())
@@ -196,9 +199,11 @@ class BitDustApp(styles.AppStyle, MDApp):
 
         # Window.bind(on_keyboard=self.on_key_input)
 
-        dr_layout = DelayedResizeLayout()
-        dr_layout.add_root_widget(self.main_window)
-        return dr_layout
+        # from components.layouts import DelayedResizeLayout
+        # dr_layout = DelayedResizeLayout()
+        # dr_layout.add_root_widget(self.main_window)
+        # return dr_layout
+        return self.main_window
 
     def do_start(self, *args, **kwargs):
         if _Debug:
