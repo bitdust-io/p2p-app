@@ -9,9 +9,10 @@ _Debug = False
 base_element_height = 32
 
 # those can be used to manipulate button's gamma
-btn_clr_rgb_top = .7
-btn_clr_rgb_mid = .5
-btn_clr_rgb_low = .3
+c_max = 1.0
+c_top = .7
+c_mid = .5
+c_low = .3
 
 #------------------------------------------------------------------------------
 
@@ -52,40 +53,42 @@ class AppStyle(object):
     color_transparent = (0,0,0,0)
     color_disabled = (0,0,0,.2)
     color_black = (0,0,0,1)
-    color_gray = (btn_clr_rgb_mid,btn_clr_rgb_mid,btn_clr_rgb_mid,1)
+    color_gray = (c_mid,c_mid,c_mid,1)
     color_white = (1,1,1,1)
     color_white99 = (.99,.99,.99,1)
     color_row_seleted = (.96, .96, 1, 1)
-    color_circle_connecting = (btn_clr_rgb_top, btn_clr_rgb_top, btn_clr_rgb_low+.1, 1)
-    color_circle_offline = (btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, btn_clr_rgb_top+.1, 1)
-    color_circle_online = (btn_clr_rgb_mid, btn_clr_rgb_top+.1, btn_clr_rgb_mid, 1)
+    color_circle_connecting = (c_top, c_top, c_low+.1, 1)
+    color_circle_offline = (c_top+.1, c_top+.1, c_top+.1, 1)
+    color_circle_online = (c_mid, c_top+.1, c_mid, 1)
     color_hyperlink = (0, 0, 1, 1)
-    color_success_green = (btn_clr_rgb_low, btn_clr_rgb_top, btn_clr_rgb_low)
+    color_success_green = (c_low, c_top, c_low)
 
-    color_root_button =  (btn_clr_rgb_low+.1,btn_clr_rgb_mid+.1,btn_clr_rgb_top+.1,1)
+    color_root_button =  (c_low+.1,c_mid+.1,c_top+.1,1)
 
     color_btn_text_light = (1,1,1,1)
-    color_btn_text_dark = (btn_clr_rgb_low+.1,btn_clr_rgb_top-.1,btn_clr_rgb_top+.1,1)
-    color_btn_normal = (btn_clr_rgb_low,btn_clr_rgb_mid,btn_clr_rgb_top,1)
-    color_btn_normal_blue = (btn_clr_rgb_low,btn_clr_rgb_mid,btn_clr_rgb_top,1)
-    color_btn_normal_green = (btn_clr_rgb_low,btn_clr_rgb_top,btn_clr_rgb_mid,1)
-    color_btn_normal_red = (btn_clr_rgb_top,btn_clr_rgb_mid,btn_clr_rgb_low,1)
-    color_btn_pressed = (btn_clr_rgb_low+.1,btn_clr_rgb_mid+.1,btn_clr_rgb_top+.1,1)
-    color_btn_inactive = (btn_clr_rgb_low-.1,btn_clr_rgb_mid-.1,btn_clr_rgb_top-.1,1)
+    color_btn_text_dark = (c_low+.1,c_top-.1,c_top+.1,1)
+    color_btn_normal = (c_low,c_mid,c_top,1)
+    color_btn_normal_blue = (c_low,c_mid,c_top,1)
+    color_btn_normal_green = (c_low,c_top,c_mid,1)
+    color_btn_normal_red = (c_top,c_mid,c_low,1)
+    color_btn_pressed = (c_low+.1,c_mid+.1,c_top+.1,1)
+    color_btn_inactive = (c_low-.1,c_mid-.1,c_top-.1,1)
     color_btn_disabled = (0,0,0,.2)
-    color_btn_pending_yellow_1 = (btn_clr_rgb_top+.3,btn_clr_rgb_top+.2,0,1)
-    color_btn_pending_yellow_2 = (btn_clr_rgb_top+.2,btn_clr_rgb_top+.1,0,1)
-    color_btn_pending_yellow_3 = (btn_clr_rgb_top+.1,btn_clr_rgb_top,0,1)
-    color_btn_pressed_green = (btn_clr_rgb_low+.1,btn_clr_rgb_top+.1,.6,1)
-    color_btn_inactive_green = (btn_clr_rgb_low-.1,btn_clr_rgb_top-.1,btn_clr_rgb_mid-.1,1)
-    color_btn_disabled_green = (btn_clr_rgb_top-.1,btn_clr_rgb_top+.1,btn_clr_rgb_top-.1,1)
+    color_btn_pressed_green = (c_low+.1,c_top+.1,.6,1)
+    color_btn_inactive_green = (c_low-.1,c_top-.1,c_mid-.1,1)
+    color_btn_disabled_green = (c_top-.1,c_top+.1,c_top-.1,1)
+    color_btn_pending_yellow_1 = (c_top+.3,c_top+.2,0,1)
+    color_btn_pending_yellow_2 = (c_top+.2,c_top+.1,0,1)
+    color_btn_pending_yellow_3 = (c_top+.1,c_top,0,1)
+    color_btn_pending_blue = (c_mid+.1,c_top+.1,c_max,1)
+    color_btn_offline_gray = (c_mid-.1,c_mid-.1,c_mid,1)
 
     color_text_input_foreground = (.1,.1,.1,1)
     color_text_input_foreground_empty = (.5,.5,.5,1)
     color_text_input_foreground_disabled = (.5,.5,.5,1)
     color_text_input_background = (.92,.92,.92,1)
     color_text_input_background_active = (.96,.96,.96,1)
-    color_text_input_background_disabled = (btn_clr_rgb_top,btn_clr_rgb_top,btn_clr_rgb_top,1)
+    color_text_input_background_disabled = (c_top,c_top,c_top,1)
     color_text_input_border = (.75,.75,.75,1)
 
     color_debug1 = (.99, .5, .5, .5)
@@ -135,6 +138,14 @@ class AppStyle(object):
             'green': AppStyle.color_success_green,
             'button_green': AppStyle.color_btn_normal_green,
         }.get(color_name)
+
+    @staticmethod
+    def state2color(state):
+        return {
+            0: AppStyle.color_btn_pending_blue,
+            1: AppStyle.color_white99,
+            -1: AppStyle.color_btn_offline_gray,
+        }.get(state)
 
 #------------------------------------------------------------------------------
 

@@ -237,7 +237,7 @@ class Controller(object):
             self.mw().state_network_connected = -1
             return
         self.network_connected_latest = time.time()
-        self.mw().state_network_connected = 1 if api_client.is_ok(resp) else -1
+        self.mw().state_network_connected = 1 # if api_client.is_ok(resp) else -1
         self.run()
 
     #------------------------------------------------------------------------------
@@ -257,17 +257,17 @@ class Controller(object):
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:
-            print('Controller.on_websocket_error', websocket_instance, error)
+            print('Controller.on_websocket_error', self.process_health_errors, error)
         if self.mw().state_process_health != -1:
             self.process_health_latest = 0
             self.identity_get_latest = 0
             self.network_connected_latest = 0
             self.mw().state_process_health = -1
-            if self.process_health_errors >= 20:
-                self.mw().engine_is_on = False
-            else:
-                from kivy.clock import Clock
-                Clock.schedule_once(lambda x: self.verify_process_health(), 1.0)
+        # if self.process_health_errors >= 3:
+        #     self.mw().engine_is_on = False
+        # else:
+        from kivy.clock import Clock
+        Clock.schedule_once(lambda x: self.verify_process_health(), 1.0)
 
     def on_websocket_event(self, json_data):
         if _Debug:
@@ -362,6 +362,10 @@ class Controller(object):
             self.model_data[model_name][snap_id]['id'] = snap_id
             self.model_data[model_name][snap_id]['data'] = json_data['payload']['data']
             self.model_data[model_name][snap_id]['created'] = json_data['payload']['created']
+            if model_name == 'service' and snap_id == 'service_my_data':
+                self.mw().state_my_data = 1 if json_data['payload']['data']['state'] == 'ON' else -1
+            elif model_name == 'service' and snap_id == 'service_message_history':
+                self.mw().state_message_history = 1 if json_data['payload']['data']['state'] == 'ON' else -1
 
     def on_state_process_health(self, instance, value):
         if _Debug:
@@ -414,6 +418,9 @@ class Controller(object):
     def on_state_network_connected(self, instance, value):
         if _Debug:
             print('Controller.on_state_network_connected', value)
+        if value != 1:
+            self.mw().state_my_data = 0
+            self.mw().state_message_history = 0
         if self.mw().state_process_health != 1:
             return
         if self.mw().state_identity_get != 1:

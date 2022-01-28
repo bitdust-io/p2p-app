@@ -112,8 +112,8 @@ class MyIDScreen(screen.AppScreen):
             )
         elif btn.icon == 'cellphone-erase':
             dialogs.open_yes_no_dialog(
-                title='This will erase your identity and the private key and all data will be lost',
-                text='WARNING!\n\nAll your data will become\ncompletely inaccessible\nwithout a private key',
+                title='Erase my identity and the private key',
+                text='WARNING!\n\nAll your data will become\ncompletely inaccessible\nwithout a private key!\n\nMake sure you already\nhave a backup copy\nof your private key.',
                 cb=self.on_confirm_erase_my_id,
             )
         elif btn.icon == 'lan-pending':

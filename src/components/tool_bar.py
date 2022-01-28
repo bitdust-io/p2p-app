@@ -27,6 +27,7 @@ from kivymd.uix.tooltip import MDTooltip
 #------------------------------------------------------------------------------
 
 from components.buttons import TransparentIconButton
+from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
@@ -41,10 +42,9 @@ class CustomActionBottomAppBarButton(MDFloatingActionButton):
 
 class CustomActionTopAppBarButton(TransparentIconButton, MDTooltip):
     pass
-
 #     def __init__(self, **kwargs):
-#         self.icon_pack = kwargs.pop('icon_pack', 'Icon')
 #         super().__init__(**kwargs)
+#         self.icon_pack = kwargs.pop('icon_pack', 'Icon')
 #         Clock.schedule_once(self.set_icon_text)
 # 
 #     def set_icon_text(self, interval):
@@ -204,7 +204,7 @@ class CustomNotchedBox(
         return points
 
 
-class CustomToolbar(CustomNotchedBox):
+class CustomToolbar(CustomNotchedBox, AppStyle):
 
     left_action_items = ListProperty()
     right_action_items = ListProperty()
@@ -284,32 +284,36 @@ class CustomToolbar(CustomNotchedBox):
         new_width = 0
         for item in action_bar_items:
             new_width += dp(48)
-            # if len(item) == 1:
-            #     item.append(lambda x: None)
-            # if len(item) > 1 and not item[1]:
-            #     item[1] = lambda x: None
-            # if len(item) == 2:
-            #     if type(item[1]) is str:
-            #         item.insert(1, lambda x: None)
-            #     else:
-            #         item.append("")
-            action_bar.add_widget(
-                CustomActionTopAppBarButton(
-                    icon=item['icon'],
-                    icon_pack=item.get('icon_pack') or 'Icon',
-                    icon_size=item.get('icon_size') or '18sp',
-                    button_width=self.height,
-                    button_height=self.height,
-                    theme_text_color="Custom",
-                    text_color=(1,1,1,1),
-                    tooltip_text=item.get('tooltip') or '',
-                    # on_release=item.get('cb') or (lambda x: None),
-                    # theme_text_color="Custom" if not self.opposite_colors else "Primary",
-                    # text_color=self.specific_text_color,
-                    # opposite_colors=self.opposite_colors,
-                )
+            w = CustomActionTopAppBarButton(
+                icon=item['icon'],
+                icon_pack=item.get('icon_pack') or 'Icon',
+                icon_size=item.get('size') or '22sp',
+                button_width=self.height,
+                button_height=self.height,
+                theme_text_color="Custom",
+                text_color=self.state2color(0),
+                tooltip_text=item.get('tooltip') or '',
+                # on_release=item.get('cb') or (lambda x: None),
+                # theme_text_color="Custom" if not self.opposite_colors else "Primary",
+                # text_color=self.specific_text_color,
+                # opposite_colors=self.opposite_colors,
             )
+            action_bar.add_widget(w)
         action_bar.width = new_width
+
+    def get_action_bar_item(self, icon_name):
+        for w in self.ids["left_actions"].children:
+            if w.icon == icon_name:
+                return w
+        for w in self.ids["right_actions"].children:
+            if w.icon == icon_name:
+                return w
+        return None
+
+    def update_action_bar_item(self, icon_name, state):
+        itm = self.get_action_bar_item(icon_name)
+        if itm:
+            itm.text_color = self.state2color(state)
 
     def update_md_bg_color(self, *args):
         self.md_bg_color = self.theme_cls._get_primary_color()

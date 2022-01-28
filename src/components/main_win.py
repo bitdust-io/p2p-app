@@ -21,7 +21,7 @@ from kivymd.uix.menu import MDDropdownMenu
 from lib import system
 
 from components import webfont
-from components import styles
+from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
@@ -129,7 +129,7 @@ class ContentNavigationDrawer(BoxLayout):
 
 #------------------------------------------------------------------------------
 
-class MainWin(Screen, ThemableBehavior, styles.AppStyle):
+class MainWin(Screen, ThemableBehavior, AppStyle):
 
     control = None
     screens_map = {}
@@ -143,16 +143,14 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
     # kivy properties
     engine_is_on = BooleanProperty(False)
     engine_log = StringProperty('')
-    state_process_health = NumericProperty(0)
-    state_identity_get = NumericProperty(0)
-    state_network_connected = NumericProperty(0)
     selected_screen = StringProperty('')
     dropdown_menu = ObjectProperty(None)
 
-    # menu_item_status = BooleanProperty(True)
-    # menu_item_my_identity = BooleanProperty(False)
-    # menu_item_chat = BooleanProperty(False)
-    # menu_item_settings = BooleanProperty(False)
+    state_process_health = NumericProperty(0)
+    state_identity_get = NumericProperty(0)
+    state_network_connected = NumericProperty(0)
+    state_my_data = NumericProperty(0)
+    state_message_history = NumericProperty(0)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -291,6 +289,9 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
             icon=action_button_info.get('icon'),
             color=self.color(action_button_info.get('color')),
         )
+
+    def populate_bottom_toolbar_icon(self, icon_name, state):
+        self.footer_bar().update_action_bar_item(icon_name, state)
 
     #------------------------------------------------------------------------------
 
@@ -482,18 +483,19 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
             )
 
     def on_state_process_health(self, instance, value):
+        self.populate_bottom_toolbar_icon('micro-chip', value)
         self.control.on_state_process_health(instance, value)
 
     def on_state_identity_get(self, instance, value):
+        self.populate_bottom_toolbar_icon('id-card', value)
         self.control.on_state_identity_get(instance, value)
 
     def on_state_network_connected(self, instance, value):
+        self.populate_bottom_toolbar_icon('lan-connect', value)
         self.control.on_state_network_connected(instance, value)
 
-    # def on_height(self, instance, value):
-    #     if _Debug:
-    #         print ('MainWin.on_height', instance, value)
+    def on_state_my_data(self, instance, value):
+        self.populate_bottom_toolbar_icon('database', value)
 
-    # def on_size(self, instance, value):
-    #     if _Debug:
-    #         print ('MainWin.on_size', instance, value)
+    def on_state_message_history(self, instance, value):
+        self.populate_bottom_toolbar_icon('comments', value)

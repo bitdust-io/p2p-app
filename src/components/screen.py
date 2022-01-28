@@ -20,6 +20,14 @@ def toolbar():
     return main_window().ids.toolbar
 
 
+def footer():
+    return main_window().ids.footer
+
+
+def footer_bar():
+    return main_window().ids.footer_bar
+
+
 def manager():
     return main_window().ids.screen_manager
 
