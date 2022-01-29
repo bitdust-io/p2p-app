@@ -142,10 +142,9 @@ class AppStyle(object):
     @staticmethod
     def state2color(state):
         return {
-            0: AppStyle.color_btn_pending_blue,
             1: AppStyle.color_white99,
-            -1: AppStyle.color_btn_offline_gray,
-        }.get(state)
+            -1: AppStyle.color_btn_pending_blue,
+        }[state]
 
 #------------------------------------------------------------------------------
 

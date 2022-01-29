@@ -234,6 +234,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.start_engine, after_restart=%r' % after_restart)
         self.main_window.engine_is_on = True
+        self.main_window.state_process_health = 0
         if system.is_android():
             self.start_android_service()
         else:
@@ -247,6 +248,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             return
         if _Debug:
             print('BitDustApp.restart_engine')
+        self.main_window.state_process_health = 0
         if system.is_android():
             self.stop_android_service()
             Clock.schedule_once(lambda x: self.start_android_service(), .5)
@@ -271,6 +273,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.stop_engine')
         self.main_window.engine_is_on = False
+        self.main_window.state_process_health = -1
         if system.is_android():
             self.stop_android_service()
         else:

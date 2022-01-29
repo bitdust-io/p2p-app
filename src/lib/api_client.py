@@ -24,6 +24,14 @@ def is_ok(response):
     return response_status(response) == 'OK'
 
 
+def is_exception(response, exc_message=None):
+    if not isinstance(response, Exception):
+        return False
+    if not exc_message:
+        return True
+    return response.args[0] == exc_message
+
+
 def response_payload(response):
     return response.get('payload', {})
 

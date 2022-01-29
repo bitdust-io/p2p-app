@@ -31,6 +31,10 @@ from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
+_Debug = True
+
+#------------------------------------------------------------------------------
+
 class CustomActionBottomAppBarButton(MDFloatingActionButton):
     _scale_x = NumericProperty(1)
     _scale_y = NumericProperty(1)
@@ -40,16 +44,30 @@ class CustomActionBottomAppBarButton(MDFloatingActionButton):
         self.height = "44dp"
 
 
-class CustomActionTopAppBarButton(TransparentIconButton, MDTooltip):
-    pass
-#     def __init__(self, **kwargs):
-#         super().__init__(**kwargs)
-#         self.icon_pack = kwargs.pop('icon_pack', 'Icon')
-#         Clock.schedule_once(self.set_icon_text)
-# 
-#     def set_icon_text(self, interval):
-#         self.ids.lbl_txt.font_style = 'Body1'
-#         self.ids.lbl_txt.text = make_icon(self.icon, self.icon_pack)
+class CustomActionTopAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
+    anim = None
+
+    def start_blinking(self):
+        import time
+        if _Debug:
+            print('CustomActionTopAppBarButton.start_blinking', self.icon, self.anim, time.asctime())
+        if self.anim:
+            self.anim.stop(self)
+            self.anim = None
+        self.anim = (
+            Animation(text_color=self.state2color(-1), duration=.5) +
+            Animation(text_color=self.state2color(1), duration=.5)
+        )
+        self.anim.repeat = True
+        self.anim.start(self)
+
+    def stop_blinking(self):
+        import time
+        if _Debug:
+            print('CustomActionTopAppBarButton.stop_blinking', self.icon, self.anim, time.asctime())
+        if self.anim:
+            self.anim.stop(self)
+            self.anim = None
 
 
 class CustomNotchedBox(
@@ -291,7 +309,7 @@ class CustomToolbar(CustomNotchedBox, AppStyle):
                 button_width=self.height,
                 button_height=self.height,
                 theme_text_color="Custom",
-                text_color=self.state2color(0),
+                text_color=self.state2color(-1),
                 tooltip_text=item.get('tooltip') or '',
                 # on_release=item.get('cb') or (lambda x: None),
                 # theme_text_color="Custom" if not self.opposite_colors else "Primary",
@@ -313,7 +331,14 @@ class CustomToolbar(CustomNotchedBox, AppStyle):
     def update_action_bar_item(self, icon_name, state):
         itm = self.get_action_bar_item(icon_name)
         if itm:
-            itm.text_color = self.state2color(state)
+            if state == 0:
+                itm.start_blinking()
+            else:
+                itm.stop_blinking()
+                itm.text_color = self.state2color(state)
+        else:
+            if _Debug:
+                print('action_bar_item was not found for name %r' % icon_name)
 
     def update_md_bg_color(self, *args):
         self.md_bg_color = self.theme_cls._get_primary_color()

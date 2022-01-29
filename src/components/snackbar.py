@@ -1,7 +1,5 @@
 from kivy.metrics import dp, sp
 from kivy.core.window import Window
-from kivy.core.text import Label as CoreLabel
-from kivy.resources import resource_find
 
 from kivymd.uix.snackbar import Snackbar
 
@@ -9,7 +7,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 

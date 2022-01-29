@@ -146,11 +146,13 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     selected_screen = StringProperty('')
     dropdown_menu = ObjectProperty(None)
 
-    state_process_health = NumericProperty(0)
-    state_identity_get = NumericProperty(0)
-    state_network_connected = NumericProperty(0)
-    state_my_data = NumericProperty(0)
-    state_message_history = NumericProperty(0)
+    state_process_health = NumericProperty(-1)
+    state_identity_get = NumericProperty(-1)
+    state_network_connected = NumericProperty(-1)
+    state_entangled_dht = NumericProperty(-1)
+    state_proxy_transport = NumericProperty(-1)
+    state_my_data = NumericProperty(-1)
+    state_message_history = NumericProperty(-1)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -483,19 +485,39 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             )
 
     def on_state_process_health(self, instance, value):
+        if _Debug:
+            print('MainWin.on_state_process_health', value)
         self.populate_bottom_toolbar_icon('micro-chip', value)
         self.control.on_state_process_health(instance, value)
 
     def on_state_identity_get(self, instance, value):
+        if _Debug:
+            print('MainWin.on_state_identity_get', value)
         self.populate_bottom_toolbar_icon('id-card', value)
         self.control.on_state_identity_get(instance, value)
 
     def on_state_network_connected(self, instance, value):
+        if _Debug:
+            print('MainWin.on_state_network_connected', value)
         self.populate_bottom_toolbar_icon('lan-connect', value)
         self.control.on_state_network_connected(instance, value)
 
+    def on_state_entangled_dht(self, instance, value):
+        if _Debug:
+            print('MainWin.on_state_entangled_dht', value)
+        self.populate_bottom_toolbar_icon('family-tree', value)
+
+    def on_state_proxy_transport(self, instance, value):
+        if _Debug:
+            print('MainWin.on_state_proxy_transport', value)
+        self.populate_bottom_toolbar_icon('transit-connection-variant', value)
+
     def on_state_my_data(self, instance, value):
+        if _Debug:
+            print('MainWin.on_state_my_data', value)
         self.populate_bottom_toolbar_icon('database', value)
 
     def on_state_message_history(self, instance, value):
+        if _Debug:
+            print('MainWin.on_state_message_history', value)
         self.populate_bottom_toolbar_icon('comments', value)
