@@ -13,7 +13,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -405,6 +405,10 @@ class Controller(object):
                 #     self.mw().latest_screen = self.mw().selected_screen
             self.mw().state_identity_get = -1
             self.mw().state_network_connected = -1
+            self.mw().state_entangled_dht = -1
+            self.mw().state_proxy_transport = -1
+            self.mw().state_my_data = -1
+            self.mw().state_message_history = -1
             self.mw().update_menu_items()
             self.model_data.clear()
             self.mw().latest_screen = 'welcome_screen'
