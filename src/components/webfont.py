@@ -4,7 +4,7 @@ from fonts.materialdesignicons_map import materialdesignicons_codes, materialdes
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 # Font Awesome

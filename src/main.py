@@ -32,20 +32,7 @@ if _Debug:
 
 #------------------------------------------------------------------------------
 
-# current_src_folder = os.path.abspath(os.path.join(os.getcwd(), 'src'))
-# if os.path.isdir(current_src_folder):
-#     if current_src_folder not in sys.path:
-#         sys.path.append(current_src_folder)
-#         if _Debug:
-#             print('added %r to Python sys.path' % current_src_folder)
-
-#------------------------------------------------------------------------------
-
 from kivy.config import Config
-
-from lib import system
-
-#------------------------------------------------------------------------------
 
 Config.set('kivy', 'window_icon', 'bitdust.png')
 
@@ -55,15 +42,15 @@ if 'ANDROID_ARGUMENT' not in os.environ:
 if _Debug:
     Config.set('kivy', 'log_level', 'debug')
 
-#------------------------------------------------------------------------------
-
 from kivy.lang import Builder
 from kivy.clock import Clock, mainthread
-from kivy.metrics import dp
+from kivy.core.window import Window
 
 from kivymd.app import MDApp
 
 #------------------------------------------------------------------------------
+
+from lib import system
 
 from screens import controller
 
@@ -79,40 +66,12 @@ if system.is_android():
     from android.storage import primary_external_storage_path, app_storage_path  # @UnresolvedImport
 
     from lib.permissions import check_permission, request_permissions  # @UnresolvedImport
-    # from android.permissions import check_permission, request_permissions  # @UnresolvedImport
 
-#------------------------------------------------------------------------------
-
-# os.environ['KIVY_METRICS_DENSITY'] = '1'
-# os.environ['KIVY_METRICS_FONTSCALE'] = '1'
-
-#------------------------------------------------------------------------------
-
-if system.is_android():
     PACKAGE_NAME = u'org.bitdust_io.bitdust1'
     SERVICE_NAME = u'{packagename}.Service{servicename}'.format(
         packagename=PACKAGE_NAME,
         servicename=u'Bitdustnode',
     )
-
-#------------------------------------------------------------------------------
-
-def check_app_permission(permission):
-    if not system.is_android():
-        return True
-    ret = check_permission(permission)
-    if _Debug:
-        print('BitDustApp.check_app_permission', permission, ret)
-    return ret
-
-
-def request_app_permissions(permissions, callback=None):
-    if not system.is_android():
-        return True
-    if _Debug:
-        print('BitDustApp.request_app_permissions', permissions, callback)
-    request_permissions(permissions, callback)
-    return True
 
 #------------------------------------------------------------------------------
 
@@ -197,12 +156,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.main_window.register_screens(controller.all_screens())
         self.main_window.bind(engine_log=self.on_engine_log)
 
-        # Window.bind(on_keyboard=self.on_key_input)
+        Window.bind(on_keyboard=self.on_key_input)
 
-        # from components.layouts import DelayedResizeLayout
-        # dr_layout = DelayedResizeLayout()
-        # dr_layout.add_root_widget(self.main_window)
-        # return dr_layout
         return self.main_window
 
     def do_start(self, *args, **kwargs):
@@ -356,6 +311,22 @@ class BitDustApp(styles.AppStyle, MDApp):
                 daemon=True,
             ).run()
 
+    def do_android_check_app_permission(self, permission):
+        if not system.is_android():
+            return True
+        ret = check_permission(permission)
+        if _Debug:
+            print('BitDustApp.do_android_check_app_permission', permission, ret)
+        return ret
+
+    def do_android_request_app_permissions(self, permissions, callback=None):
+        if not system.is_android():
+            return True
+        if _Debug:
+            print('BitDustApp.do_android_request_app_permissions', permissions, callback)
+        request_permissions(permissions, callback)
+        return True
+
     @mainthread
     def on_deploy_process_stdout(self, line):
         if _Debug:
@@ -389,13 +360,13 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.on_start required_permissions=%r' % required_permissions)
         missed_permissions = []
         for perm in required_permissions:
-            if not check_app_permission(perm):
+            if not self.do_android_check_app_permission(perm):
                 missed_permissions.append(perm)
         if _Debug:
             print('BitDustApp.on_start missed_permissions=%r' % missed_permissions)
         if not missed_permissions:
             return self.do_start()
-        request_app_permissions(permissions=missed_permissions, callback=self.do_start)
+        self.do_android_request_app_permissions(permissions=missed_permissions, callback=self.do_start)
         return True
 
     def on_stop(self):
@@ -433,11 +404,11 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_key_input(self, window_obj, key_code, scancode, codepoint, modifier):
         if _Debug:
             print('BitDustApp.on_key_input', key_code, scancode, modifier)
-        if system.is_android():
-            if key_code == 27:
-                return True
-            else:
-                return False
+        # if system.is_android():
+        #     if key_code == 27:
+        #         return True
+        #     else:
+        #         return False
         return False
 
     # def on_height(self, instance, value):

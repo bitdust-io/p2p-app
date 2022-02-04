@@ -37,16 +37,6 @@
                     size_hint_x: 1
                     text: ''
 
-                # RaisedIconButton:
-                #     id: chat_send_button
-                #     icon: 'send'
-                #     _radius: dp(0)
-                #     button_width: dp(32)
-                #     button_height: root.ids.chat_input.height
-                #     height: root.ids.chat_input.height
-                #     font_size: '12sp'
-                #     on_release: root.on_chat_send_button_clicked()
-
         BottomEmptyScreenSpace:
 
 
@@ -60,5 +50,5 @@
             'human-greeting-proximity': 'Join group',
             'account-plus': 'Invite people', }
         buttons_colors: {'trash-can-outline': root.theme_cls.error_color, 'account-plus': root.theme_cls.accent_light, }
-        icon: 'account-group'
+        icon: 'dots-vertical'
         callback: root.on_action_button_clicked

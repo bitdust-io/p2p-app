@@ -210,17 +210,14 @@ class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, 
 
 
 def RootActionButton_set_size(self, interval):
-    self.width = "36dp"
-    self.height = "36dp"
-    if _Debug:
-        print('    RootActionButton_set_size')
+    self.width = "24dp"
+    self.height = "24dp"
+
 
 def RootActionButton_on_touch_up(self, touch):
     super(MDFloatingRootButton, self).on_touch_up(touch)
     if self.collide_point(touch.x, touch.y):
         return True
-    if _Debug:
-        print('RootActionButton_on_touch_up going to close the stack')
     self.parent.close_stack()
 
 
