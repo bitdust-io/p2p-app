@@ -2,8 +2,7 @@
 #:import make_icon components.webfont.make_icon
 
 
-<CustomActionBottomAppBarButton>
-
+<CustomActionBottomAppBarButton>:
     canvas.before:
         PushMatrix
         Scale:
@@ -17,7 +16,7 @@
     text_color: [.99, .99, .99, 1]
 
 
-<CustomNotchedBox>
+<CustomNotchedBox>:
     size_hint_y: None
     height: root.standard_increment
     padding: [root.horizontal_margins - dp(12), 0, dp(120), 0]
@@ -51,7 +50,7 @@
             radius: [0,] if root.mode=="normal" else [root.notch_radius*root._rounding_percentage,0,0,0]
 
 
-<CustomToolbar>
+<CustomToolbar>:
     BoxLayout:
         id: left_actions
         orientation: "horizontal"

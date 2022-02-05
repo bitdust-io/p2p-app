@@ -117,38 +117,13 @@ class BitDustApp(styles.AppStyle, MDApp):
 
         self.title = 'BitDust'
         self.icon = './bitdust.png'
+
         self.apply_styles()
-
-        Builder.load_string("""
-#:import fa_icon components.webfont.fa_icon
-#:import md_icon components.webfont.md_icon
-#:import icofont_icon components.webfont.icofont_icon
-#:import make_icon components.webfont.make_icon
-#:import DynamicHeightTextInput components.text_input.DynamicHeightTextInput
-#:import RaisedIconButton components.buttons.RaisedIconButton
-#:import RootActionButton components.buttons.RootActionButton
-#:import AutomatStatusPanel components.status_panel.AutomatStatusPanel
-#:import AutomatShortStatusPanel components.status_panel.AutomatShortStatusPanel
-#:import AutomatShortStatusPanelByIndex components.status_panel.AutomatShortStatusPanelByIndex
-#:import CustomActionBottomAppBarButton components.tool_bar.CustomActionBottomAppBarButton
-#:import CustomBottomAppBar components.tool_bar.CustomBottomAppBar
-#:import CustomToolbar components.tool_bar.CustomToolbar
-        """)
-
-        Builder.load_file('./components/layouts.kv')
-        Builder.load_file('./components/labels.kv')
-        Builder.load_file('./components/buttons.kv')
-        Builder.load_file('./components/text_input.kv')
-        Builder.load_file('./components/list_view.kv')
-        Builder.load_file('./components/status_panel.kv')
-        Builder.load_file('./components/tool_bar.kv')
-        Builder.load_file('./components/dialogs.kv')
-        Builder.load_file('./components/main_win.kv')
-
-        from components import main_win
+        self.init_components()
 
         self.control = controller.Controller(self)
 
+        from components import main_win
         self.main_window = main_win.MainWin()
         self.root_widget = self.main_window
 
@@ -159,6 +134,12 @@ class BitDustApp(styles.AppStyle, MDApp):
         Window.bind(on_keyboard=self.on_key_input)
 
         return self.main_window
+
+    def init_components(self):
+        from components import all_components
+        Builder.load_string(all_components.KV_IMPORT)
+        for kv_file in all_components.KV_FILES:
+            Builder.load_file(kv_file)
 
     def do_start(self, *args, **kwargs):
         if _Debug:
