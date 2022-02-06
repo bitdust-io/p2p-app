@@ -83,6 +83,16 @@ class AppScreen(ThemableBehavior, Screen):
             return control().model_data.keys()
         return control().model_data.get(model_name, {})
 
+    def open_drop_down_menu(self):
+        dd_menu = self.ids.get('drop_down_menu')
+        if dd_menu:
+            dd_menu.open_stack()
+
+    def close_drop_down_menu(self):
+        dd_menu = self.ids.get('drop_down_menu')
+        if dd_menu:
+            dd_menu.close_stack()
+
     def on_opened(self):
         pass
 

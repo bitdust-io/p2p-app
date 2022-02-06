@@ -69,7 +69,6 @@ class ConversationsScreen(screen.AppScreen):
         self.ids.conversations_list_view.ids.selectable_layout.clear_selection()
 
     def on_enter(self, *args):
-        self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id='service_message_history')
         self.clear_selected_item()
         api_client.add_model_listener('conversation', listener_cb=self.on_conversation)
@@ -77,7 +76,6 @@ class ConversationsScreen(screen.AppScreen):
 
     def on_leave(self, *args):
         api_client.remove_model_listener('conversation', listener_cb=self.on_conversation)
-        self.ids.action_button.close_stack()
         self.ids.state_panel.release()
         self.clear_selected_item()
 
@@ -159,10 +157,9 @@ class ConversationsScreen(screen.AppScreen):
 #                 print('ConversationsScreen.on_message_conversations_list_result erased existing item', item['key_id'])
 #         self.ids.conversations_list_view.refresh_from_data()
 
-    def on_action_button_clicked(self, btn):
+    def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
-            print('ConversationsScreen.on_action_button_clicked', btn.icon)
-        self.ids.action_button.close_stack()
+            print('ConversationsScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'chat-plus-outline':
             self.main_win().select_screen('create_group_screen')
         elif btn.icon == 'account-key-outline':

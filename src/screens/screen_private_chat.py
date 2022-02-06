@@ -44,7 +44,6 @@ class PrivateChatScreen(screen.AppScreen):
         return {'icon': 'send', 'color': 'green', }
 
     def on_enter(self, *args):
-        self.ids.action_button.close_stack()
         self.ids.state_panel.attach(self.automat_index)
         api_client.add_model_listener('message', listener_cb=self.on_message)
         self.populate()
@@ -52,7 +51,6 @@ class PrivateChatScreen(screen.AppScreen):
 
     def on_leave(self, *args):
         api_client.remove_model_listener('message', listener_cb=self.on_message)
-        self.ids.action_button.close_stack()
         self.ids.state_panel.release()
 
     def populate(self, **kwargs):
@@ -157,10 +155,9 @@ class PrivateChatScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text='message was not sent: %s' % api_client.response_err(resp))
 
-    def on_action_button_clicked(self, btn):
+    def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
-            print('PrivateChatScreen.on_action_button_clicked', btn.icon)
-        self.ids.action_button.close_stack()
+            print('PrivateChatScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'trash-can-outline':
             api_client.friend_remove(global_user_id=self.recipient_id, cb=self.on_friend_remove_result)
 

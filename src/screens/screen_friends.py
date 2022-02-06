@@ -48,13 +48,11 @@ class FriendsScreen(screen.AppScreen):
         self.ids.friends_list_view.ids.selectable_layout.clear_selection()
 
     def on_enter(self, *args):
-        self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id='service_identity_propagate')
         self.clear_selected_item()
         self.populate()
 
     def on_leave(self, *args):
-        self.ids.action_button.close_stack()
         self.ids.state_panel.release()
         self.clear_selected_item()
 
@@ -113,9 +111,8 @@ class FriendsScreen(screen.AppScreen):
         else:
             self.ids.friends_list_view.refresh_from_data()
 
-    def on_action_button_clicked(self, btn):
+    def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
-            print('FriendsScreen.on_action_button_clicked', btn.icon)
-        self.ids.action_button.close_stack()
+            print('FriendsScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'account-plus':
             self.main_win().select_screen('search_people_screen')

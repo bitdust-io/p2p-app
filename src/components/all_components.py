@@ -6,7 +6,7 @@ KV_IMPORT = """
 #:import make_icon components.webfont.make_icon
 #:import DynamicHeightTextInput components.text_input.DynamicHeightTextInput
 #:import RaisedIconButton components.buttons.RaisedIconButton
-#:import RootActionButton components.drop_down_menu.RootActionButton
+#:import DropDownMenu components.drop_down_menu.DropDownMenu
 #:import AutomatStatusPanel components.status_panel.AutomatStatusPanel
 #:import AutomatShortStatusPanel components.status_panel.AutomatShortStatusPanel
 #:import AutomatShortStatusPanelByIndex components.status_panel.AutomatShortStatusPanelByIndex

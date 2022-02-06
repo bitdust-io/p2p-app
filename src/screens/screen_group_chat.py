@@ -61,14 +61,12 @@ class GroupChatScreen(screen.AppScreen):
             self.ids.chat_messages_view.scroll_y = 0
 
     def on_enter(self, *args):
-        self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id=self.automat_id)
         api_client.add_model_listener('message', listener_cb=self.on_message)
         self.populate()
 
     def on_leave(self, *args):
         api_client.remove_model_listener('message', listener_cb=self.on_message)
-        self.ids.action_button.close_stack()
         self.ids.state_panel.release()
 
     def on_message(self, payload):
@@ -149,10 +147,9 @@ class GroupChatScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text='message was not sent: %s' % api_client.response_err(resp))
 
-    def on_action_button_clicked(self, btn):
+    def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
-            print('GroupChatScreen.on_action_button_clicked', btn.icon)
-        self.ids.action_button.close_stack()
+            print('GroupChatScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'account-plus':
             self.main_win().select_screen(
                 screen_id='select_friend_screen',

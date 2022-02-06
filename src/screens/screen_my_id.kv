@@ -40,11 +40,10 @@
         BottomEmptyScreenSpace:
 
 
-    RootActionButton:
-        id: action_button
+    DropDownMenu:
+        id: drop_down_menu
         data:
-            {'cellphone-erase': 'Erase my ID',
+            {'width_mult': 5,
+            'cellphone-erase': 'Erase my ID',
             'shield-key': 'Backup my private key', }
-        buttons_colors: {'cellphone-erase': root.theme_cls.error_color, }
-        icon: 'dots-vertical'
-        callback: root.on_action_button_clicked
+        callback: root.on_drop_down_menu_item_clicked

@@ -15,7 +15,7 @@ from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -61,12 +61,10 @@ class MyIDScreen(screen.AppScreen):
         return 'my identity'
 
     def on_enter(self, *args):
-        self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id='service_identity_propagate')
         api_client.identity_get(cb=self.on_identity_get_result)
 
     def on_leave(self, *args):
-        self.ids.action_button.close_stack()
         self.ids.state_panel.release()
 
     def on_identity_get_result(self, resp):
@@ -97,10 +95,9 @@ class MyIDScreen(screen.AppScreen):
         if args[1] == 'new_identity':
             self.main_win().select_screen('new_identity_screen')
 
-    def on_action_button_clicked(self, btn):
+    def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
-            print('MyIDScreen.on_action_button_clicked', btn.icon)
-        self.ids.action_button.close_stack()
+            print('MyIDScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'shield-key':
             if system.is_android():
                 destination_filepath = os.path.join('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents', 'BitDust_key.txt')

@@ -40,8 +40,8 @@
         BottomEmptyScreenSpace:
 
 
-    RootActionButton:
-        id: action_button
+    DropDownMenu:
+        id: drop_down_menu
         data:
             {'trash-can-outline': 'Delete',
             'lan-check': 'Reconnect',
@@ -49,6 +49,4 @@
             'exit-run': 'Leave group',
             'human-greeting-proximity': 'Join group',
             'account-plus': 'Invite people', }
-        buttons_colors: {'trash-can-outline': root.theme_cls.error_color, 'account-plus': root.theme_cls.accent_light, }
-        icon: 'dots-vertical'
-        callback: root.on_action_button_clicked
+        callback: root.on_drop_down_menu_item_clicked

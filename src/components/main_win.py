@@ -14,7 +14,6 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 
 from kivymd.theming import ThemableBehavior
-from kivymd.uix.menu import MDDropdownMenu
 
 #------------------------------------------------------------------------------
 
@@ -135,7 +134,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     screens_map = {}
     screens_loaded = set()
     active_screens = {}
-    dropdown_menus = {}
+    # dropdown_menus = {}
     screen_closed_time = {}
     latest_screen = ''
     screens_stack = []
@@ -254,38 +253,47 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         else:
             self.ids.toolbar.title = 'BitDust'
 
-    def populate_dropdown_menu(self, screen_id, new_items):
+    def populate_dropdown_menu(self, screen_inst=None):
         if _Debug:
-            print('MainWin.populate_dropdown_menu', new_items)
-        # self.control.app.dropdown_menu.dismiss()
-        # self.control.app.dropdown_menu.menu.ids.box.clear_widgets()
-        itms = []
-        for itm in new_items:
-            itm.update({
-                "height": "40dp",
-                "top_pad": "10dp",
-                "bot_pad": "10dp",
-            })
-            itms.append(itm)
-        # self.control.app.dropdown_menu.items = itms
-        # self.control.app.dropdown_menu.create_menu_items()
-        self.dropdown_menus[screen_id] = MDDropdownMenu(
-            caller=self.ids.dropdown_menu_placeholder,
-            width_mult=3,
-            items=itms,
-            # selected_color=self.theme_cls.bg_darkest,
-            opening_time=0,
-            # radius=[0, ],
-        )
-        self.dropdown_menus[screen_id].bind(on_release=self.on_dropdown_menu_callback)
+            print('MainWin.populate_dropdown_menu', screen_inst)
+        if not screen_inst:
+            self.tbar().right_action_items = []
+            return
+        drop_down_menu = screen_inst.ids.get('drop_down_menu')
+        if not drop_down_menu:
+            self.tbar().right_action_items = []
+            return
+        self.tbar().right_action_items = [["dots-vertical", self.on_drop_down_menu_clicked, ], ]
+
+#         # self.control.app.dropdown_menu.dismiss()
+#         # self.control.app.dropdown_menu.menu.ids.box.clear_widgets()
+#         itms = []
+#         for itm in new_items:
+#             itm.update({
+#                 "height": "40dp",
+#                 "top_pad": "10dp",
+#                 "bot_pad": "10dp",
+#             })
+#             itms.append(itm)
+#         # self.control.app.dropdown_menu.items = itms
+#         # self.control.app.dropdown_menu.create_menu_items()
+#         self.dropdown_menus[screen_id] = MDDropdownMenu(
+#             caller=self.ids.dropdown_menu_placeholder,
+#             width_mult=3,
+#             items=itms,
+#             # selected_color=self.theme_cls.bg_darkest,
+#             opening_time=0,
+#             # radius=[0, ],
+#         )
+#         self.dropdown_menus[screen_id].bind(on_release=self.on_dropdown_menu_callback)
 
     def populate_hot_button(self, screen_inst=None):
         if not screen_inst:
-            self.footer_bar().set_action_button(False)
+            self.footer_bar().set_action_button(None)
             return
         action_button_info = screen_inst.get_hot_button()
         if not action_button_info:
-            self.footer_bar().set_action_button(False)
+            self.footer_bar().set_action_button(None)
             return
         self.footer_bar().set_action_button(
             icon=action_button_info.get('icon'),
@@ -332,10 +340,8 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             print('MainWin.open_screen   is about to create a new instance of %r with id %r' % (screen_class, screen_id, ))
         screen_inst = screen_class(name=screen_id, **kwargs)
         self.active_screens[screen_id] = (screen_inst, None, )
-        # menu_items = screen_inst.get_dropdown_menu_items()
-        # if menu_items:
-        #     self.populate_dropdown_menu(screen_id, menu_items)
         manager.add_widget(screen_inst)
+        screen_inst.close_drop_down_menu()
         screen_inst.on_opened()
         if _Debug:
             print('MainWin.open_screen   opened screen %r' % screen_id)
@@ -350,6 +356,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if screen_inst not in self.ids.screen_manager.children:
             if _Debug:
                 print('MainWin.close_screen   WARNING   screen instance %r was not found among screen manager children' % screen_inst)
+        screen_inst.close_drop_down_menu()
         self.ids.screen_manager.remove_widget(screen_inst)
         # screen_inst.on_closed()
         del screen_inst
@@ -404,11 +411,13 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             return True
         self.populate_toolbar_content(self.active_screens[screen_id][0])
         self.populate_hot_button(self.active_screens[screen_id][0])
+        self.populate_dropdown_menu(self.active_screens[screen_id][0])
         if self.selected_screen:
             if _Debug:
                 print('MainWin.select_screen   is about to switch away screen manger from currently selected screen %r' % self.selected_screen)
             self.screen_closed_time[self.selected_screen] = time.time()
             if self.selected_screen in self.active_screens:
+                self.active_screens[self.selected_screen][0].close_drop_down_menu()
                 self.active_screens[self.selected_screen][0].on_closed()
         if self.selected_screen and self.selected_screen not in ['startup_screen', ]:
             self.latest_screen = self.selected_screen
@@ -433,6 +442,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if _Debug:
             print('MainWin.select_screen   is going to switch screen manager to %r' % screen_id)
         self.ids.screen_manager.current = screen_id
+        self.active_screens[screen_id][0].close_drop_down_menu()
         self.active_screens[screen_id][0].on_opened()
         return True
 
@@ -443,6 +453,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             print('MainWin.on_init_done', self.footer_bar().height, self.footer_bar().action_button.x, self.footer_bar().action_button.y, )
         if self.selected_screen:
             self.populate_hot_button(self.active_screens[self.selected_screen][0])
+            self.populate_dropdown_menu(self.active_screens[self.selected_screen][0])
 
     def on_hot_button_clicked(self, *args):
         if _Debug:
@@ -469,20 +480,26 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             self.active_screens[self.selected_screen][0].on_nav_button_clicked()
         self.nav().set_state("open")
 
-    def on_right_menu_button_clicked(self, *args):
-        if _Debug:
-            print('MainWin.on_right_menu_button_clicked', self.selected_screen, len(self.dropdown_menus))
-        if self.selected_screen and self.selected_screen in self.dropdown_menus:
-            self.dropdown_menus[self.selected_screen].open()
+#     def on_right_menu_button_clicked(self, *args):
+#         if _Debug:
+#             print('MainWin.on_right_menu_button_clicked', self.selected_screen, len(self.dropdown_menus))
+#         if self.selected_screen and self.selected_screen in self.dropdown_menus:
+#             self.dropdown_menus[self.selected_screen].open()
 
-    def on_dropdown_menu_callback(self, instance_menu, instance_menu_item):
+    def on_drop_down_menu_clicked(self, *args):
         if _Debug:
-            print('MainWin.on_dropdown_menu_callback', self.selected_screen, instance_menu_item.text)
-        instance_menu.dismiss()
+            print('MainWin.on_drop_down_menu_clicked', args)
         if self.selected_screen:
-            self.active_screens[self.selected_screen][0].on_dropdown_menu_item_clicked(
-                instance_menu, instance_menu_item
-            )
+            self.active_screens[self.selected_screen][0].open_drop_down_menu()
+
+#     def on_dropdown_menu_callback(self, instance_menu, instance_menu_item):
+#         if _Debug:
+#             print('MainWin.on_dropdown_menu_callback', self.selected_screen, instance_menu_item.text)
+#         instance_menu.dismiss()
+#         if self.selected_screen:
+#             self.active_screens[self.selected_screen][0].on_dropdown_menu_item_clicked(
+#                 instance_menu, instance_menu_item
+#             )
 
     def on_state_process_health(self, instance, value):
         if _Debug:
