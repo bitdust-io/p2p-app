@@ -3,6 +3,8 @@ import time
 from lib import colorhash
 from lib import api_client
 
+from fonts import jet_brains
+
 from components import screen
 from components import labels
 from components import snackbar
@@ -121,11 +123,12 @@ class GroupChatScreen(screen.AppScreen):
                 conversation_id=msg['conversation_id'],
                 message_id=msg_id,
                 message_time=msg['payload']['time'],
-                text='[color={}]{}[/color]  [color=#DDDDDD]{} #{}[/color]\n[font=data/fonts/RobotoMono-Regular.ttf]{}[/font]'.format(
+                text='[color={}]{}[/color]  [color=#DDDDDD]{} #{}[/color]\n[font={}]{}[/font]'.format(
                     sender_clr,
                     sender_name,
                     time.strftime('%d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
                     msg_id,
+                    jet_brains.jetbrains_ttf_filepath,
                     msg['payload']['data']['message'],
                 ),
             ),

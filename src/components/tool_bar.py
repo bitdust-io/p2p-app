@@ -50,7 +50,7 @@ class CustomActionTopAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.shift_y = dp(60)
-        self.duration_long_touch = 0.1
+        self.duration_long_touch = 0
 
     def start_blinking(self):
         if self.anim:
@@ -67,6 +67,10 @@ class CustomActionTopAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
         if self.anim:
             self.anim.stop(self)
             self.anim = None
+
+    def animation_tooltip_show(self, interval):
+        super().animation_tooltip_show(interval)
+        Clock.schedule_once(self.remove_tooltip, 5)
 
 
 class CustomNotchedBox(
