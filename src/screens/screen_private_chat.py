@@ -3,7 +3,7 @@ import time
 from lib import colorhash
 from lib import api_client
 
-from fonts import jet_brains
+from fonts import all_fonts
 
 from components import screen
 from components import labels
@@ -128,11 +128,11 @@ class PrivateChatScreen(screen.AppScreen):
                 conversation_id=msg['conversation_id'],
                 message_id=msg_id,
                 message_time=msg['payload']['time'],
-                text='[color={}]{}[/color]  [color=#DDDDDD]{}[/color]\n[font={}]{}[/font]'.format(
+                text='[font={}][color={}]{}[/color]  [color=#DDDDDD]{}[/color][/font]\n[font={}]{}[/font]'.format(
                     sender_clr,
                     sender_name,
                     time.strftime('%Y %d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
-                    jet_brains.jetbrains_ttf_filepath,
+                    all_fonts.font_path('EversonMono.ttf'),
                     msg['payload']['data']['message'],
                 ),
             ),
