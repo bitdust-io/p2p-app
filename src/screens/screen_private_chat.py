@@ -43,16 +43,6 @@ class PrivateChatScreen(screen.AppScreen):
     def get_hot_button(self):
         return {'icon': 'send', 'color': 'green', }
 
-    def on_enter(self, *args):
-        self.ids.state_panel.attach(self.automat_index)
-        api_client.add_model_listener('message', listener_cb=self.on_message)
-        self.populate()
-        self.ids.chat_input.focus = True
-
-    def on_leave(self, *args):
-        api_client.remove_model_listener('message', listener_cb=self.on_message)
-        self.ids.state_panel.release()
-
     def populate(self, **kwargs):
         selected_messages = []
         for snap_info in self.model('message').values():
@@ -69,6 +59,16 @@ class PrivateChatScreen(screen.AppScreen):
                 updated = True
         if updated:
             self.ids.chat_messages_view.scroll_y = 0
+
+    def on_enter(self, *args):
+        self.ids.state_panel.attach(self.automat_index)
+        api_client.add_model_listener('message', listener_cb=self.on_message)
+        self.populate()
+        self.ids.chat_input.focus = True
+
+    def on_leave(self, *args):
+        api_client.remove_model_listener('message', listener_cb=self.on_message)
+        self.ids.state_panel.release()
 
     def on_message(self, payload):
         if _Debug:

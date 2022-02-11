@@ -42,6 +42,9 @@ class GroupChatScreen(screen.AppScreen):
             l = l[:20] + '...'
         return l
 
+    def get_hot_button(self):
+        return {'icon': 'send', 'color': 'green', }
+
     def populate(self, **kwargs):
         selected_messages = []
         for snap_info in self.model('message').values():
@@ -64,6 +67,7 @@ class GroupChatScreen(screen.AppScreen):
         self.ids.state_panel.attach(automat_id=self.automat_id)
         api_client.add_model_listener('message', listener_cb=self.on_message)
         self.populate()
+        self.ids.chat_input.focus = True
 
     def on_leave(self, *args):
         api_client.remove_model_listener('message', listener_cb=self.on_message)
@@ -117,7 +121,7 @@ class GroupChatScreen(screen.AppScreen):
                 conversation_id=msg['conversation_id'],
                 message_id=msg_id,
                 message_time=msg['payload']['time'],
-                text='[color={}]{}[/color]  [color=#DDDDDD]{} #{}[/color]\n{}'.format(
+                text='[color={}]{}[/color]  [color=#DDDDDD]{} #{}[/color]\n[font=data/fonts/RobotoMono-Regular.ttf]{}[/font]'.format(
                     sender_clr,
                     sender_name,
                     time.strftime('%d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
@@ -129,10 +133,10 @@ class GroupChatScreen(screen.AppScreen):
         )
         return True
 
-    def on_chat_send_button_clicked(self, *args):
+    def on_hot_button_clicked(self, *args):
         msg = self.ids.chat_input.text
         if _Debug:
-            print('GroupChatScreen.on_chat_send_button_clicked', self.global_id, msg)
+            print('GroupChatScreen.on_hot_button_clicked', self.global_id, msg)
         api_client.message_send_group(
             group_key_id=self.global_id,
             data={'message': msg, },

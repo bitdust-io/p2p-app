@@ -47,10 +47,12 @@ class CustomActionBottomAppBarButton(MDFloatingActionButton):
 class CustomActionTopAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
     anim = None
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.shift_y = dp(60)
+        self.duration_long_touch = 0.1
+
     def start_blinking(self):
-        import time
-        if _Debug:
-            print('CustomActionTopAppBarButton.start_blinking', self.icon, self.anim, time.asctime())
         if self.anim:
             self.anim.stop(self)
             self.anim = None
@@ -62,9 +64,6 @@ class CustomActionTopAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
         self.anim.start(self)
 
     def stop_blinking(self):
-        import time
-        if _Debug:
-            print('CustomActionTopAppBarButton.stop_blinking', self.icon, self.anim, time.asctime())
         if self.anim:
             self.anim.stop(self)
             self.anim = None
