@@ -1,7 +1,7 @@
 <SingleLineTextInput>:
     size_hint_y: None
     height: self.line_height * 1 + self.padding[1] + self.padding[3] + self.extra_padding
-	multiline: False
+    multiline: False
     padding: (app.text_input_padding_x, app.text_input_padding_y)
     cursor_width: '3sp'
 
@@ -13,8 +13,8 @@
     size_hint_y: None
     height: self.line_height * self.num_lines + self.text_padding_y * 2 + self.extra_padding
     padding: (app.text_input_padding_x, app.text_input_padding_y)
-	num_lines: 3
-	multiline: True
+    num_lines: 3
+    multiline: True
     cursor_width: '3sp'
 
 
@@ -26,7 +26,8 @@
     height: self.line_height * 1 + self.padding[1] + self.padding[3] + self.extra_padding
     padding: (app.text_input_padding_x, app.text_input_padding_y)
     font_size: app.chat_input_font_size
-    font_name: 'data/fonts/RobotoMono-Regular.ttf'
+    # font_name: 'data/fonts/RobotoMono-Regular.ttf'
+    font_name: font_path('JetBrainsMono-Medium.ttf')
     cursor_width: '3sp'
     max_lines: 7
     # background_color: (.5,.5,.5,1)

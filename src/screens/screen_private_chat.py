@@ -122,17 +122,18 @@ class PrivateChatScreen(screen.AppScreen):
         sender_name = msg['sender']['glob_id']
         sender_name, _, _ = sender_name.partition('@')
         _, _, sender_name = sender_name.partition('$')
-        sender_clr = colorhash.ColorHash(sender_name).hex
+        sender_clr = colorhash.ColorHash(sender_name, lightness=.5, saturation=.8).hex
         self.ids.chat_messages.add_widget(
             widget=labels.ChatMessageLabel(
                 conversation_id=msg['conversation_id'],
                 message_id=msg_id,
                 message_time=msg['payload']['time'],
-                text='[font={}][color={}]{}[/color]  [color=#DDDDDD]{}[/color][/font]\n[font={}]{}[/font]'.format(
+                text='[font={}][color={}]{}[/color]  [color=dddf]{}[/color][/font]\n[font={}]{}[/font]'.format(
+                    all_fonts.font_path('EversonMono.ttf'),
                     sender_clr,
                     sender_name,
                     time.strftime('%Y %d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
-                    all_fonts.font_path('EversonMono.ttf'),
+                    all_fonts.font_path('JetBrainsMono-Medium.ttf'),
                     msg['payload']['data']['message'],
                 ),
             ),

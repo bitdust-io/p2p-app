@@ -117,20 +117,20 @@ class GroupChatScreen(screen.AppScreen):
         children_index.clear()
         sender_name = msg['sender']['glob_id']
         sender_name, _ = sender_name.split('@')
-        sender_clr = colorhash.ColorHash(sender_name).hex
+        sender_clr = colorhash.ColorHash(sender_name, lightness=.5, saturation=.8).hex
         self.ids.chat_messages.add_widget(
             widget=labels.ChatMessageLabel(
                 conversation_id=msg['conversation_id'],
                 message_id=msg_id,
                 message_time=msg['payload']['time'],
-                text='[color={}]{}[/color]  [color=#DDDDDD]{} #{}[/color]\n{}'.format(
-                    # jet_brains.PragmataPro_I_ttf_filepath,
+                text='[font={}][color={}]{}[/color]  [color=dddf]{} #{}[/color][/font]\n[font={}]{}[/font]'.format(
+                    all_fonts.font_path('EversonMono.ttf'),
                     sender_clr,
                     sender_name,
                     time.strftime('%d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
                     msg_id,
-                    # jet_brains.PragmataPro_ttf_filepath,
-                    msg['payload']['data']['message'],
+                    all_fonts.font_path('JetBrainsMono-Medium.ttf'),
+                    msg['payload']['data']['message'].strip(),
                 ),
             ),
             index=new_index,

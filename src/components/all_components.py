@@ -4,6 +4,7 @@ KV_IMPORT = """
 #:import md_icon components.webfont.md_icon
 #:import icofont_icon components.webfont.icofont_icon
 #:import make_icon components.webfont.make_icon
+#:import font_path fonts.all_fonts.font_path
 #:import DynamicHeightTextInput components.text_input.DynamicHeightTextInput
 #:import RaisedIconButton components.buttons.RaisedIconButton
 #:import DropDownMenu components.drop_down_menu.DropDownMenu
