@@ -123,7 +123,7 @@ class GroupChatScreen(screen.AppScreen):
                 conversation_id=msg['conversation_id'],
                 message_id=msg_id,
                 message_time=msg['payload']['time'],
-                text='[font={}][color={}]{}[/color]  [color=dddf]{} #{}[/color][/font]\n[font={}]{}[/font]'.format(
+                text='[sub][font={}][size=11sp][color={}]{}[/color]  [color=dddf]{} #{}[/color][/size][/font][/sub]\n[font={}]{}[/font]'.format(
                     all_fonts.font_path('EversonMono.ttf'),
                     sender_clr,
                     sender_name,

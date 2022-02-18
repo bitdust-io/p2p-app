@@ -14,6 +14,7 @@ KV_IMPORT = """
 #:import CustomActionBottomAppBarButton components.tool_bar.CustomActionBottomAppBarButton
 #:import CustomBottomAppBar components.tool_bar.CustomBottomAppBar
 #:import CustomToolbar components.tool_bar.CustomToolbar
+#:import CustomSelectionList components.selection.CustomSelectionList
 """
 
 
@@ -27,5 +28,6 @@ KV_FILES = [
     './components/tool_bar.kv',
     './components/drop_down_menu.kv',
     './components/dialogs.kv',
+    './components/selection.kv',
     './components/main_win.kv',
 ]

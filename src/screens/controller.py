@@ -13,7 +13,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -273,6 +273,7 @@ class Controller(object):
         api_client.start_model_streaming('key', request_all=True)
         api_client.start_model_streaming('conversation', request_all=True)
         api_client.start_model_streaming('message', request_all=True)
+        api_client.start_model_streaming('correspondent', request_all=True)
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:

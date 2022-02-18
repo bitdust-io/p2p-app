@@ -31,7 +31,7 @@ class ConversationsListView(list_view.SelectableRecycleView):
             automat_index = int(automat_index) if automat_index is not None else None
             automat_id = self.selected_item.automat_id or None
             if typ in ['group_message', 'personal_message', ]:
-                screen.main_window().select_screen(
+                screen.select_screen(
                     screen_id=key_id,
                     screen_type='group_chat_screen',
                     global_id=key_id,
@@ -40,7 +40,7 @@ class ConversationsListView(list_view.SelectableRecycleView):
                     automat_id=automat_id,
                 )
             elif typ in ['private_message', ]:
-                screen.main_window().select_screen(
+                screen.select_screen(
                     screen_id='private_chat_{}'.format(key_id.replace('master$', '')),
                     screen_type='private_chat_screen',
                     global_id=key_id,
@@ -58,6 +58,9 @@ class ConversationsScreen(screen.AppScreen):
 
     def get_icon(self):
         return 'comment-text-multiple'
+
+    def get_hot_button(self):
+        return {'icon': 'chat-plus-outline', 'color': 'green', }
 
     def populate(self, *args, **kwargs):
         for snap_info in self.model('conversation').values():
@@ -216,3 +219,8 @@ class ConversationsScreen(screen.AppScreen):
             self.populate()
         else:
             self.ids.conversations_list_view.refresh_from_data()
+
+    def on_hot_button_clicked(self, *args):
+        if _Debug:
+            print('ConversationsScreen.on_hot_button_clicked', *args)
+        self.main_win().select_screen('friends_screen')

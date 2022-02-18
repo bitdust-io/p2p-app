@@ -35,6 +35,10 @@ def manager():
 def control():
     return my_app().control
 
+
+def select_screen(screen_id, verify_state=False, screen_type=None, **kwargs):
+    return main_window().select_screen(screen_id, verify_state=verify_state, screen_type=screen_type, **kwargs)
+
 #------------------------------------------------------------------------------
 
 class AppScreen(ThemableBehavior, Screen):
