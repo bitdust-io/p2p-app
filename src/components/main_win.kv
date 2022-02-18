@@ -13,7 +13,7 @@
             MDActionTopAppBarButton:
                 icon: 'arrow-left'
                 md_bg_color: app.color_transparent
-                on_release: app.root.root_widget.nav().set_state("close")
+                on_release: app.root.nav().set_state("close")
 
             Widget:
                 size_hint: None, None
@@ -24,57 +24,57 @@
                 id: menu_item_status
                 text: "status"
                 on_release:
-                    app.root.root_widget.nav().set_state("close")
-                    app.root.root_widget.select_screen('engine_status_screen', verify_state=True)
+                    app.root.nav().set_state("close")
+                    app.root.select_screen('engine_status_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "cellphone-information"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
-                        app.root.root_widget.nav().set_state("close")
-                        app.root.root_widget.select_screen('engine_status_screen', verify_state=True)
+                        app.root.nav().set_state("close")
+                        app.root.select_screen('engine_status_screen', verify_state=True)
 
             OneLineIconListItem:
                 id: menu_item_my_identity
                 text: "my identity"
                 on_release:
-                    app.root.root_widget.nav().set_state("close")
-                    app.root.root_widget.select_screen('my_id_screen', verify_state=True)
+                    app.root.nav().set_state("close")
+                    app.root.select_screen('my_id_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "passport"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
-                        app.root.root_widget.nav().set_state("close")
-                        app.root.root_widget.select_screen('my_id_screen', verify_state=True)
+                        app.root.nav().set_state("close")
+                        app.root.select_screen('my_id_screen', verify_state=True)
 
             OneLineIconListItem:
                 id: menu_item_chat
                 text: "chat"
                 on_release:
-                    app.root.root_widget.nav().set_state("close")
-                    app.root.root_widget.select_screen('conversations_screen', verify_state=True)
+                    app.root.nav().set_state("close")
+                    app.root.select_screen('conversations_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "chat-outline"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
-                        app.root.root_widget.nav().set_state("close")
-                        app.root.root_widget.select_screen('conversations_screen', verify_state=True)
+                        app.root.nav().set_state("close")
+                        app.root.select_screen('conversations_screen', verify_state=True)
 
             OneLineIconListItem:
                 id: menu_item_settings
                 text: "settings"
                 on_release:
-                    app.root.root_widget.nav().set_state("close")
-                    app.root.root_widget.select_screen('settings_screen', verify_state=True)
+                    app.root.nav().set_state("close")
+                    app.root.select_screen('settings_screen', verify_state=True)
                 IconLeftWidget:
                     icon: "cogs"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
-                        app.root.root_widget.nav().set_state("close")
-                        app.root.root_widget.select_screen('settings_screen', verify_state=True)
+                        app.root.nav().set_state("close")
+                        app.root.select_screen('settings_screen', verify_state=True)
 
 
 <MainWin>:
@@ -91,7 +91,7 @@
         id: dropdown_menu_placeholder
         size_hint: None, None
         size: 1,1
-        pos_hint: {"center_x": .98, "center_y": .89}
+        pos_hint: {"center_x": .99, "center_y": .98}
 
     MDToolbar:
         id: toolbar
@@ -120,3 +120,24 @@
 
             ContentNavigationDrawer:
                 id: nav_drawer_content
+
+    CustomBottomAppBar:
+        id: footer
+        size_hint_y: None
+        height: dp(28)
+
+        CustomToolbar:
+            id: footer_bar
+            title: ""
+            icon: "plus"
+            type: "bottom"
+            mode: "end"
+            left_action_items:
+                [{"icon": "micro-chip", "icon_pack": "IconICO", "tooltip": "engine status"},
+                {"icon": "id-card", "icon_pack": "IconICO", "tooltip": "my identity"},
+                {"icon": "lan-connect", "icon_pack": "IconMD", "tooltip": "peer-to-peer connections"},
+                {"icon": "family-tree", "icon_pack": "Icon", "tooltip": "distributed hash table"},
+                {"icon": "transit-connection-variant", "icon_pack": "Icon", "tooltip": "routing via third node"},
+                {"icon": "database", "icon_pack": "IconFA", "tooltip": "distributed storage", "size": "18sp"},
+                {"icon": "comments", "icon_pack": "IconFA", "tooltip": "chat messages"},]
+            on_action_button: root.on_hot_button_clicked()

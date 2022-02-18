@@ -7,13 +7,12 @@ from kivy.properties import BooleanProperty, ListProperty, StringProperty, Numer
 
 #------------------------------------------------------------------------------
 
+from lib import api_client
+
 from components import screen
 from components import labels
 from components import buttons
 from components import layouts
-
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -480,18 +479,18 @@ class SettingsScreen(screen.AppScreen):
 
     def on_services_list_result(self, resp):
         self.ids.status_label.from_api_response(resp)
-        if not websock.is_ok(resp):
+        if not api_client.is_ok(resp):
             return
         self.services_list_result = {}
-        for svc in websock.response_result(resp):
+        for svc in api_client.response_result(resp):
             self.services_list_result[svc['name']] = svc
         api_client.configs_list(sort=True, include_info=False, cb=self.on_configs_list_result)
 
     def on_configs_list_result(self, resp):
         self.ids.status_label.from_api_response(resp)
-        if not websock.is_ok(resp):
+        if not api_client.is_ok(resp):
             return
-        items_list = websock.response_result(resp)
+        items_list = api_client.response_result(resp)
         self.build_tree(items_list)
 
     def on_item_clicked(self, option_key, node):
@@ -501,9 +500,9 @@ class SettingsScreen(screen.AppScreen):
 
     def on_config_get_result(self, resp, option_key, node):
         self.ids.status_label.from_api_response(resp)
-        if not websock.is_ok(resp):
+        if not api_client.is_ok(resp):
             return
-        items_list = websock.response_result(resp)
+        items_list = api_client.response_result(resp)
         if _Debug:
             print('SettingsScreen.on_config_get_result', list(items_list))
         self.build_tree(items_list, active_node=node)

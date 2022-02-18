@@ -28,26 +28,17 @@
                 size_hint: 1, None
                 height: self.minimum_height
                 pos_hint: {'bottom': 1}
-                padding: dp(0), dp(0)
+                padding: [dp(0), dp(0), dp(110), dp(0), ]
 
                 DynamicHeightTextInput:
                     id: chat_input
                     size_hint_x: 1
                     text: ''
 
-                RaisedIconButton:
-                    id: chat_send_button
-                    icon: 'send'
-                    _radius: dp(0)
-                    button_width: dp(32)
-                    button_height: root.ids.chat_input.height
-                    height: root.ids.chat_input.height
-                    font_size: '12sp'
-                    on_release: root.on_chat_send_button_clicked()
+        BottomEmptyScreenSpace:
 
-    RootActionButton:
-        id: action_button
+
+    DropDownMenu:
+        id: drop_down_menu
         data: {'trash-can-outline': 'Delete contact', }
-        buttons_colors: {'trash-can-outline': root.theme_cls.error_color, }
-        icon: 'account'
-        callback: root.on_action_button_clicked
+        callback: root.on_drop_down_menu_item_clicked

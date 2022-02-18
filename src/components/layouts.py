@@ -19,6 +19,10 @@ class TopEmptyScreenSpace(Widget):
     pass
 
 
+class BottomEmptyScreenSpace(Widget):
+    pass
+
+
 class HorizontalLayout(BoxLayout):
     pass
 

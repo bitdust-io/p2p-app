@@ -1,14 +1,12 @@
-from kivy.metrics import dp
 from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
+from lib import api_client
+
 from components import screen
 from components import styles
 from components import buttons
-
-from lib import api_client
-from lib import websock
 
 #------------------------------------------------------------------------------
 
@@ -23,7 +21,6 @@ class NetworkServiceElement(buttons.CustomRaisedFlexButton):
 
 class ConnectingScreen(screen.AppScreen):
 
-    fetch_services_list_task = None
     known_services = {}
     state_panel_attached = False
 
@@ -36,38 +33,38 @@ class ConnectingScreen(screen.AppScreen):
     def is_closable(self):
         return False
 
+    def populate(self, *args, **kwargs):
+        if _Debug:
+            print('ConnectingScreen.populate')
+        if not self.state_panel_attached:
+            self.state_panel_attached = self.ids.state_panel.attach(automat_id='p2p_connector')
+        for snap_info in self.model('service').values():
+            if snap_info:
+                self.on_service(snap_info)
+
     def on_enter(self, *args):
         if not self.state_panel_attached:
             self.state_panel_attached = self.ids.state_panel.attach(automat_id='p2p_connector')
-        Clock.schedule_once(self.schedule_nw_task)
+        api_client.add_model_listener('service', listener_cb=self.on_service)
+        self.populate()
 
     def on_leave(self, *args):
-        self.ids.state_panel.release()
+        api_client.remove_model_listener('service', listener_cb=self.on_service)
+        if self.state_panel_attached:
+            self.ids.state_panel.release()
         self.state_panel_attached = False
-        self.unschedule_nw_task()
 
-    def on_services_list_result(self, resp):
+    def on_service(self, payload):
         if _Debug:
             print('ConnectingScreen.on_services_list_result', len(self.known_services))
-        if not websock.is_ok(resp):
-            self.known_services.clear()
-            self.ids.services_list.clear_widgets()
-            return
         services_by_state = {}
         services_by_name = {}
-        count_total = 0.0
-        count_on = 0.0
-        for svc in websock.response_result(resp):
-            st = svc.get('state')
-            if not svc.get('enabled'):
-                continue
-            if st not in services_by_state:
-                services_by_state[st] = {}
-            services_by_state[st][svc['name']] = svc
-            services_by_name[svc['name']] = svc
-            count_total += 1.0
-            if st == 'ON':
-                count_on += 1.0
+        svc = payload['data']
+        st = svc.get('state')
+        if st not in services_by_state:
+            services_by_state[st] = {}
+        services_by_state[st][svc['name']] = svc
+        services_by_name[svc['name']] = svc
         if not self.known_services:
             for st in ['ON', 'STARTING', 'DEPENDS_OFF', 'INFLUENCE', 'STOPPING', 'OFF', ]:
                 for svc_name in sorted(services_by_state.get(st, {}).keys()):
@@ -99,23 +96,6 @@ class ConnectingScreen(screen.AppScreen):
                     service_label.md_bg_color = clr
         services_by_name.clear()
         services_by_state.clear()
-
-    def schedule_nw_task(self, *a, **kw):
-        if not self.fetch_services_list_task:
-            Clock.schedule_once(self.populate)
-            self.fetch_services_list_task = Clock.schedule_interval(self.populate, 0.5)
-
-    def unschedule_nw_task(self, *a, **kw):
-        if self.fetch_services_list_task:
-            Clock.unschedule(self.fetch_services_list_task)
-            self.fetch_services_list_task = None
-
-    def populate(self, *args, **kwargs):
-        if _Debug:
-            print('ConnectingScreen.populate')
-        if not self.state_panel_attached:
-            self.state_panel_attached = self.ids.state_panel.attach(automat_id='p2p_connector')
-        api_client.services_list(cb=self.on_services_list_result)
 
     def get_service_label(self, svc):
         txt = '[size=14sp][b]{}[/b][/size]'.format(svc['name'].replace('service_', ''))

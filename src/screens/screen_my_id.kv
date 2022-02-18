@@ -37,11 +37,13 @@
                         text: ''
                         on_ref_press: root.on_my_id_details_ref_pressed(*args)
 
-    RootActionButton:
-        id: action_button
+        BottomEmptyScreenSpace:
+
+
+    DropDownMenu:
+        id: drop_down_menu
         data:
-            {'cellphone-erase': 'Erase my ID',
+            {'width_mult': 5,
+            'cellphone-erase': 'Erase my ID',
             'shield-key': 'Backup my private key', }
-        buttons_colors: {'cellphone-erase': root.theme_cls.error_color, }
-        icon: 'account-box'
-        callback: root.on_action_button_clicked
+        callback: root.on_drop_down_menu_item_clicked

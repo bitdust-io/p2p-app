@@ -54,13 +54,15 @@
     text: make_icon(self.icon, self.icon_pack)
 
 
-
 <ChatMessageLabel>:
     size_hint: 1, None
     size: self.texture_size
     text_size: root.width, None
     pos_hint: {'left': 0}
     halign: 'left'
+    font_size: sp(12)
+    line_height: 0.85
+    padding: (dp(0), dp(0), )
 
 
 <StatusLabel>:

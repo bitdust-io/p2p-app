@@ -10,7 +10,7 @@ from kivy.utils import platform
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -55,6 +55,41 @@ def is_ios():
 
 def is_osx():
     return current_platform() == 'macosx'
+
+#------------------------------------------------------------------------------
+
+def get_app_data_path():
+    """
+    A portable method to get the default data folder location, usually it is: "~/.bitdust/"
+    """
+    if is_windows():
+        # TODO: move somewhere on Win10 ...
+        return os.path.join(os.path.expanduser('~'), '.bitdust')
+
+    elif is_linux():
+        # This should be okay : /home/veselin/.bitdust/
+        return os.path.join(os.path.expanduser('~'), '.bitdust')
+
+    elif is_android():
+        try:
+            from jnius import autoclass  # @UnresolvedImport
+            Context = autoclass("android.content.Context")
+            Environment = autoclass("android.os.Environment")
+            documents_dir = Context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()
+        except Exception as e:
+            if _Debug:
+                print('get_app_data_path() failed', e)
+            documents_dir = "/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents"
+        if _Debug:
+            print('get_app_data_path() documents_dir=%r' % documents_dir)
+        return os.path.join(documents_dir, '.bitdust')
+
+    elif is_osx():
+        # This should be okay : /Users/veselin/.bitdust/
+        return os.path.join(os.path.expanduser('~'), '.bitdust')
+
+    # otherwise just default : ".bitdust/" in user root folder
+    return os.path.join(os.path.expanduser('~'), '.bitdust')
 
 #------------------------------------------------------------------------------
 
@@ -151,6 +186,25 @@ def set_android_system_ui_visibility():
         print('system.set_android_system_ui_visibility', decorView, flags)
 
 #------------------------------------------------------------------------------
+
+def ReadTextFile(filename):
+    """
+    Read text file and return its content.
+    """
+    if not os.path.isfile(filename):
+        return u''
+    if not os.access(filename, os.R_OK):
+        return u''
+    try:
+        infile = open(filename, 'rt', encoding="utf-8")
+        data = infile.read()
+        infile.close()
+        return data
+    except Exception as e:
+        if _Debug:
+            print('file %r read failed: %r' % (filename, e, ))
+    return u''
+
 
 def rmdir_recursive(dirpath, ignore_errors=False, pre_callback=None):
     """

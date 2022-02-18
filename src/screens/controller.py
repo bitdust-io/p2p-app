@@ -1,13 +1,19 @@
+import os
 import time
 
 #------------------------------------------------------------------------------
 
+from kivy.clock import Clock
+
+#------------------------------------------------------------------------------
+
+from lib import system
 from lib import websock
 from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -60,6 +66,7 @@ def all_screens():
 
 class Controller(object):
 
+    process_health_errors = 0
     process_health_latest = 0
     identity_get_latest = 0
     network_connected_latest = 0
@@ -70,6 +77,7 @@ class Controller(object):
         self.callbacks = {}
         self.state_changed_callbacks = {}
         self.state_changed_callbacks_by_id = {}
+        self.model_data = {}
 
     def mw(self):
         return self.app.main_window
@@ -78,12 +86,16 @@ class Controller(object):
         if _Debug:
             print('Controller.start')
         self.enabled = True
-        websock.start(callbacks={
-            'on_open': self.on_websocket_open,
-            'on_error': self.on_websocket_error,
-            'on_stream_message': self.on_websocket_stream_message,
-            'on_event': self.on_websocket_event,
-        })
+        websock.start(
+            callbacks={
+                'on_open': self.on_websocket_open,
+                'on_error': self.on_websocket_error,
+                'on_stream_message': self.on_websocket_stream_message,
+                'on_event': self.on_websocket_event,
+                'on_model_update': self.on_model_update,
+            },
+            api_secret_filepath=os.path.join(system.get_app_data_path(), 'metadata', 'apisecret'),
+        )
         self.mw().update_menu_items()
         self.mw().select_screen('welcome_screen')
         self.run()
@@ -124,14 +136,17 @@ class Controller(object):
     #------------------------------------------------------------------------------
 
     def verify_process_health(self, *args, **kwargs):
+        self.mw().state_process_health = 0
         return api_client.process_health(cb=self.on_process_health_result)
 
     def verify_identity_get(self, *args, **kwargs):
+        self.mw().state_identity_get = 0
         return api_client.identity_get(cb=self.on_identity_get_result)
 
     def verify_network_connected(self, *args, **kwargs):
         if _Debug:
             print('Controller.verify_network_connected', time.asctime())
+        self.mw().state_network_connected = 0
         return api_client.network_connected(cb=self.on_network_connected_result)
 
     #------------------------------------------------------------------------------
@@ -195,38 +210,53 @@ class Controller(object):
     #------------------------------------------------------------------------------
 
     def on_process_health_result(self, resp):
-        if not isinstance(resp, dict):
-            if _Debug:
-                print('on_process_health_result %r' % resp)
+        if _Debug:
+            print('Controller.on_process_health_result %r' % resp)
+        if not api_client.is_ok(resp):
             self.process_health_latest = 0
-            self.mw().state_process_health = -1
+            self.process_health_errors += 1
+            if api_client.is_exception(resp, 'web socket is closed'):
+                self.mw().state_process_health = 0
+            else:
+                self.mw().state_process_health = -1
             return
-        self.mw().state_process_health = 1 if websock.is_ok(resp) else -1
-        self.process_health_latest = time.time() if websock.is_ok(resp) else 0
+        self.process_health_latest = time.time() if api_client.is_ok(resp) else 0
+        self.mw().state_process_health = 1 if api_client.is_ok(resp) else -1
+        if self.mw().state_process_health == 1:
+            self.process_health_errors = 0
         self.run()
 
     def on_identity_get_result(self, resp):
+        if _Debug:
+            print('Controller.on_identity_get_result', api_client.is_ok(resp))
         self.identity_get_latest = time.time()
-        if not isinstance(resp, dict):
-            if _Debug:
-                print('on_identity_get_result', resp)
+        if not api_client.is_ok(resp):
             self.identity_get_latest = 0
-            self.mw().state_identity_get = -1
+            if api_client.response_errors(resp).count('local identity is not valid or not exist'):
+                self.mw().state_identity_get = 0
+            else:
+                self.mw().state_identity_get = -1
             return
-        self.mw().state_identity_get = 1 if websock.is_ok(resp) else -1
         self.identity_get_latest = time.time()
+        self.mw().state_identity_get = 1 if api_client.is_ok(resp) else -1
         self.run()
 
     def on_network_connected_result(self, resp):
+        if _Debug:
+            print('Controller.on_network_connected_result', time.asctime(), resp)
         self.network_connected_latest = time.time()
-        if not isinstance(resp, dict):
-            if _Debug:
-                print('on_network_connected_result', resp)
+        if not api_client.is_ok(resp):
             self.network_connected_latest = 0
-            self.mw().state_network_connected = -1
+            if api_client.response_errors(resp).count('local identity is not valid or not exist'):
+                self.mw().state_network_connected = 0
+            if api_client.response_errors(resp).count('disconnected'):
+                self.mw().state_network_connected = 0
+                Clock.schedule_once(lambda x: self.verify_network_connected(), 5.0)
+            else:
+                self.mw().state_network_connected = -1
             return
-        self.mw().state_network_connected = 1 if websock.is_ok(resp) else -1
         self.network_connected_latest = time.time()
+        self.mw().state_network_connected = 1 # if api_client.is_ok(resp) else -1
         self.run()
 
     #------------------------------------------------------------------------------
@@ -239,16 +269,27 @@ class Controller(object):
             self.identity_get_latest = 0
             self.network_connected_latest = 0
             self.verify_process_health()
+        api_client.start_model_streaming('service', request_all=True)
+        api_client.start_model_streaming('key', request_all=True)
+        api_client.start_model_streaming('conversation', request_all=True)
+        api_client.start_model_streaming('message', request_all=True)
+        api_client.start_model_streaming('correspondent', request_all=True)
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:
-            print('Controller.on_websocket_error', websocket_instance, error)
+            print('Controller.on_websocket_error', self.process_health_errors, error)
         if self.mw().state_process_health != -1:
-            self.mw().state_process_health = -1
             self.process_health_latest = 0
             self.identity_get_latest = 0
             self.network_connected_latest = 0
-            self.verify_process_health()
+            if self.mw().engine_is_on:
+                self.mw().state_process_health = 0
+            else:
+                self.mw().state_process_health = -1
+        # if self.process_health_errors >= 3:
+        #     self.mw().engine_is_on = False
+        # else:
+        Clock.schedule_once(lambda x: self.verify_process_health(), 1.0)
 
     def on_websocket_event(self, json_data):
         if _Debug:
@@ -257,10 +298,6 @@ class Controller(object):
         event_data = json_data.get('payload', {}).get('data', {})
         if not event_id:
             return
-        if event_data.get('id', '').startswith('service_') and 'newstate' in event_data and 'oldstate' in event_data:
-            pass
-            # if self.mw().is_screen_active('connecting_screen'):
-            #     self.mw().get_active_screen('connecting_screen').on_service_state_changed(event_data)
         if event_id in ['service-started', 'service-stopped', ]:
             if self.mw().is_screen_active('settings_screen'):
                 self.mw().get_active_screen('settings_screen').on_service_started_stopped(
@@ -319,14 +356,46 @@ class Controller(object):
             return
 
     def on_private_message_received(self, json_data):
+        if _Debug:
+            print('Controller.on_private_message_received', json_data)
         cb_list = self.callbacks.get('on_private_message_received', [])
         for cb, _ in cb_list:
             cb(json_data)
 
     def on_group_message_received(self, json_data):
+        if _Debug:
+            print('Controller.on_group_message_received', json_data)
         cb_list = self.callbacks.get('on_group_message_received', [])
         for cb, _ in cb_list:
             cb(json_data)
+
+    def on_model_update(self, json_data):
+        model_name = json_data['payload']['name']
+        snap_id = json_data['payload']['id']
+        if _Debug:
+            print('Controller.on_model_update [%s] %s : %r' % (model_name, snap_id, json_data['payload']['data'].get('state'), ))
+        if model_name not in self.model_data:
+            self.model_data[model_name] = {}
+        if json_data['payload'].get('deleted'):
+            self.model_data[model_name].pop(snap_id)
+        else:
+            if snap_id not in self.model_data[model_name]:
+                self.model_data[model_name][snap_id] = {}
+            self.model_data[model_name][snap_id]['id'] = snap_id
+            self.model_data[model_name][snap_id]['data'] = json_data['payload']['data']
+            self.model_data[model_name][snap_id]['created'] = json_data['payload']['created']
+            if model_name == 'service':
+                def _st(d):
+                    return 1 if d['state'] == 'ON' else (
+                        -1 if d['state'] in ['OFF', 'NOT_INSTALLED', 'DEPENDS_OFF', 'CLOSED', ] else 0)
+                if snap_id == 'service_my_data':
+                    self.mw().state_my_data = _st(json_data['payload']['data'])
+                elif snap_id == 'service_message_history':
+                    self.mw().state_message_history = _st(json_data['payload']['data'])
+                elif snap_id == 'service_entangled_dht':
+                    self.mw().state_entangled_dht = _st(json_data['payload']['data'])
+                elif snap_id == 'service_proxy_transport':
+                    self.mw().state_proxy_transport = _st(json_data['payload']['data'])
 
     def on_state_process_health(self, instance, value):
         if _Debug:
@@ -335,18 +404,25 @@ class Controller(object):
             # if self.mw().selected_screen:
                 # if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', ]:
                 #     self.mw().latest_screen = self.mw().selected_screen
-            self.mw().latest_screen = 'welcome_screen'
-            self.mw().state_identity_get = 0
-            self.mw().state_network_connected = 0
+            self.mw().state_identity_get = -1
+            self.mw().state_network_connected = -1
+            self.mw().state_entangled_dht = -1
+            self.mw().state_proxy_transport = -1
+            self.mw().state_my_data = -1
+            self.mw().state_message_history = -1
             self.mw().update_menu_items()
+            self.model_data.clear()
+            self.mw().latest_screen = 'welcome_screen'
             # self.mw().select_screen('engine_status_screen')
             # self.mw().close_active_screens(exclude_screens=['engine_status_screen', ])
             return
         if value == 1:
-            self.mw().menu().ids.menu_item_my_identity.disabled = False
+            self.mw().update_menu_items()
             self.on_state_success()
             return
         if value == 0:
+            self.mw().state_identity_get = -1
+            self.mw().state_network_connected = -1
             self.run()
             return
         raise Exception('unexpected process_health state: %r' % value)
@@ -360,16 +436,18 @@ class Controller(object):
             # if self.mw().selected_screen:
                 # if self.mw().selected_screen not in ['process_dead_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
                 #     self.mw().latest_screen = self.mw().selected_screen
-            self.mw().latest_screen = 'welcome_screen'
-            self.mw().state_network_connected = 0
+            self.mw().state_network_connected = -1
             self.mw().update_menu_items()
+            self.mw().latest_screen = 'welcome_screen'
             # self.mw().select_screen('new_identity_screen')
             # self.mw().close_screens(['engine_status_screen', 'connecting_screen', 'startup_screen', ])
             return
         if value == 1:
+            self.mw().update_menu_items()
             self.on_state_success()
             return
         if value == 0:
+            self.mw().state_network_connected = -1
             self.run()
             return
         raise Exception('unexpected identity_get state: %r' % value)
@@ -377,17 +455,27 @@ class Controller(object):
     def on_state_network_connected(self, instance, value):
         if _Debug:
             print('Controller.on_state_network_connected', value)
+        if value == -1:
+            self.mw().state_entangled_dht = -1
+            self.mw().state_proxy_transport = -1
+            self.mw().state_my_data = -1
+            self.mw().state_message_history = -1
         if self.mw().state_process_health != 1:
+            return
+        if self.mw().state_identity_get != 1:
             return
         if value == -1:
             # if self.mw().selected_screen:
             #     if self.mw().selected_screen not in ['engine_status_screen', 'connecting_screen', 'welcome_screen', 'startup_screen', ]:
             #         self.mw().latest_screen = self.mw().selected_screen
+            self.mw().update_menu_items()
+            self.mw().latest_screen = 'welcome_screen'
             # if self.mw().selected_screen != 'welcome_screen':
             #     self.mw().select_screen('connecting_screen')
             # self.mw().close_screens(['engine_status_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ])
             return
         if value == 1:
+            self.mw().update_menu_items()
             self.on_state_success()
             return
         if value == 0:
@@ -400,7 +488,7 @@ class Controller(object):
             print('Controller.on_state_success %r %r %r, latest_screen=%r selected_screen=%r' % (
                 self.mw().state_process_health, self.mw().state_identity_get, self.mw().state_network_connected,
                 self.mw().latest_screen, self.mw().selected_screen, ))
-        self.mw().update_menu_items()
+        # self.mw().update_menu_items()
         # if self.mw().state_process_health == 1 and self.mw().state_identity_get == 1 and self.mw().state_network_connected == 1:
             # if self.mw().latest_screen in ['engine_status_screen', 'connecting_screen', 'new_identity_screen', 'recover_identity_screen', 'startup_screen', ]:
             #     self.mw().latest_screen = 'welcome_screen'

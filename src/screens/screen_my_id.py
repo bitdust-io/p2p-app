@@ -6,17 +6,16 @@ from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
+from lib import system
+from lib import api_client
+
 from components import screen
 from components import dialogs
 from components import snackbar
 
-from lib import system
-from lib import api_client
-from lib import websock
-
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -62,19 +61,17 @@ class MyIDScreen(screen.AppScreen):
         return 'my identity'
 
     def on_enter(self, *args):
-        self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id='service_identity_propagate')
         api_client.identity_get(cb=self.on_identity_get_result)
 
     def on_leave(self, *args):
-        self.ids.action_button.close_stack()
         self.ids.state_panel.release()
 
     def on_identity_get_result(self, resp):
-        if not websock.is_ok(resp):
+        if not api_client.is_ok(resp):
             self.ids.my_id_details.text = create_new_identity_text
             return
-        result = websock.response_result(resp)
+        result = api_client.response_result(resp)
         if not result:
             self.ids.my_id_details.text = create_new_identity_text
             return
@@ -98,23 +95,22 @@ class MyIDScreen(screen.AppScreen):
         if args[1] == 'new_identity':
             self.main_win().select_screen('new_identity_screen')
 
-    def on_action_button_clicked(self, btn):
+    def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
-            print('MyIDScreen.on_action_button_clicked', btn.icon)
-        self.ids.action_button.close_stack()
+            print('MyIDScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'shield-key':
             if system.is_android():
-                destination_filepath = os.path.join('/storage/emulated/0/', 'bitdust_key.txt')
+                destination_filepath = os.path.join('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents', 'BitDust_key.txt')
             else:
-                destination_filepath = os.path.join(os.path.expanduser('~'), 'bitdust_key.txt')
+                destination_filepath = os.path.join(os.path.expanduser('~'), 'BitDust_key.txt')
             api_client.identity_backup(
                 destination_filepath=destination_filepath,
                 cb=lambda resp: self.on_identity_backup_result(resp, destination_filepath),
             )
         elif btn.icon == 'cellphone-erase':
             dialogs.open_yes_no_dialog(
-                title='This will erase your identity and the private key and all data will be lost',
-                text='WARNING!\n\nAll your data will become\ncompletely inaccessible\nwithout a private key',
+                title='Erase my identity and the private key',
+                text='WARNING!\n\nAll your data will become\ncompletely inaccessible\nwithout a private key!\n\nMake sure you already\nhave a backup copy\nof your private key.',
                 cb=self.on_confirm_erase_my_id,
             )
         elif btn.icon == 'lan-pending':
@@ -135,16 +131,16 @@ class MyIDScreen(screen.AppScreen):
             Clock.schedule_once(self.on_process_stop_result_erase_my_id, 1)
 
     def on_network_reconnect_result(self, resp):
-        if not websock.is_ok(resp):
-            snackbar.error(text='disconnected: %s' % websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text='disconnected: %s' % api_client.response_err(resp))
         else:
             snackbar.info(text='network connection refreshed')
 
     def on_identity_backup_result(self, resp, destination_filepath):
         if _Debug:
             print('MyIDScreen.on_identity_backup_result', destination_filepath, resp)
-        if not websock.is_ok(resp):
-            snackbar.error(text='identity backup failed: %s' % websock.response_err(resp))
+        if not api_client.is_ok(resp):
+            snackbar.error(text='identity backup failed: %s' % api_client.response_err(resp))
         else:
             snackbar.success(text='key file created: %s' % destination_filepath)
 
@@ -159,7 +155,7 @@ class MyIDScreen(screen.AppScreen):
             print('MyIDScreen.on_process_stop_result_erase_my_id', args)
         home_folder_path = os.path.join(os.path.expanduser('~'), '.bitdust')
         if system.is_android():
-            home_folder_path = os.path.join('/storage/emulated/0/', '.bitdust')
+            home_folder_path = os.path.join('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents', '.bitdust')
         system.rmdir_recursive(os.path.join(home_folder_path, 'metadata'), ignore_errors=False)
         system.rmdir_recursive(os.path.join(home_folder_path, 'backups'), ignore_errors=True)
         system.rmdir_recursive(os.path.join(home_folder_path, 'config'), ignore_errors=True)

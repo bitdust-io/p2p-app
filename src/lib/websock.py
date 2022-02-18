@@ -1,3 +1,4 @@
+import os
 import time
 
 try:
@@ -15,6 +16,7 @@ from kivy.clock import mainthread
 #------------------------------------------------------------------------------
 
 from lib import websocket
+from lib import system
 
 #------------------------------------------------------------------------------
 
@@ -23,6 +25,7 @@ _DebugAPIResponses = False
 
 #------------------------------------------------------------------------------
 
+_APISecretFilePath = None
 _WebSocketApp = None
 _WebSocketQueue = None
 _WebSocketReady = False
@@ -33,10 +36,12 @@ _LastCallID = 0
 _PendingCalls = []
 _CallbacksQueue = {}
 _RegisteredCallbacks = {}
+_ModelUpdateCallbacks = {}
 
 #------------------------------------------------------------------------------
 
-def start(callbacks={}):
+def start(callbacks={}, api_secret_filepath=None):
+    global _APISecretFilePath
     global _WebSocketStarted
     global _WebSocketConnecting
     global _WebSocketQueue
@@ -44,7 +49,8 @@ def start(callbacks={}):
     if is_started():
         raise Exception('already started')
     if _Debug:
-        print('websock.start()')
+        print('websock.start() api_secret_filepath=%r' % api_secret_filepath)
+    _APISecretFilePath = api_secret_filepath
     _RegisteredCallbacks = callbacks or {}
     _WebSocketConnecting = True
     _WebSocketStarted = True
@@ -54,6 +60,7 @@ def start(callbacks={}):
 
 
 def stop():
+    global _APISecretFilePath
     global _WebSocketStarted
     global _WebSocketQueue
     global _WebSocketConnecting
@@ -62,6 +69,7 @@ def stop():
         raise Exception('has not been started')
     if _Debug:
         print('websock.stop()')
+    _APISecretFilePath = None
     _RegisteredCallbacks = {}
     _WebSocketStarted = False
     _WebSocketConnecting = False
@@ -113,6 +121,11 @@ def registered_callbacks():
     global _RegisteredCallbacks
     return _RegisteredCallbacks
 
+
+def model_update_callbacks():
+    global _ModelUpdateCallbacks
+    return _ModelUpdateCallbacks
+
 #------------------------------------------------------------------------------
 
 @mainthread
@@ -149,24 +162,6 @@ def on_close(ws_inst):
         cb(ws_inst)
 
 
-def on_event(json_data):
-    if _Debug:
-        print('    WS EVENT:', json_data['payload']['event_id'])
-    cb = registered_callbacks().get('on_event')
-    if cb:
-        cb(json_data)
-    return True
-
-
-def on_stream_message(json_data):
-    if _Debug:
-        print('    WS STREAM MSG:', json_data['payload']['payload']['message_id'])
-    cb = registered_callbacks().get('on_stream_message')
-    if cb:
-        cb(json_data)
-    return True
-
-
 @mainthread
 def on_message(ws_inst, message):
     global _CallbacksQueue
@@ -182,6 +177,8 @@ def on_message(ws_inst, message):
         return on_event(json_data)
     if payload_type == 'stream_message':
         return on_stream_message(json_data)
+    if payload_type == 'model':
+        return on_model_update(json_data)
     if payload_type == 'api_call':
         if 'call_id' not in json_data['payload']:
             if _Debug:
@@ -206,7 +203,7 @@ def on_message(ws_inst, message):
 @mainthread
 def on_error(ws_inst, error):
     global _PendingCalls
-    if _Debug or True:
+    if _Debug:
         print('on_error', error)
     cb = registered_callbacks().get('on_error')
     if cb:
@@ -219,6 +216,39 @@ def on_fail(err, result_callback=None):
         print('on_fail', err)
     if result_callback:
         result_callback(err)
+
+#------------------------------------------------------------------------------
+
+def on_event(json_data):
+    if _Debug:
+        print('    WS EVENT:', json_data['payload']['event_id'])
+    cb = registered_callbacks().get('on_event')
+    if cb:
+        cb(json_data)
+    return True
+
+
+def on_stream_message(json_data):
+    if _Debug:
+        print('    WS STREAM MSG:', json_data['payload']['payload']['message_id'])
+    cb = registered_callbacks().get('on_stream_message')
+    if cb:
+        cb(json_data)
+    return True
+
+
+def on_model_update(json_data):
+    if _Debug:
+        print('    WS MODEL:', json_data['payload']['name'], json_data['payload']['id'])
+    cb = registered_callbacks().get('on_model_update')
+    if cb:
+        cb(json_data)
+    model_cb_list = model_update_callbacks().get(json_data['payload']['name']) or []
+    if model_cb_list:
+        for model_cb in model_cb_list:
+            if model_cb:
+                model_cb(json_data['payload'])
+    return True
 
 #------------------------------------------------------------------------------
 
@@ -259,17 +289,26 @@ def requests_thread(active_queue):
 
 
 def websocket_thread():
+    global _APISecretFilePath
     global _WebSocketApp
     global _WebSocketClosed
     websocket.enableTrace(False)
     if _Debug:
-        print('websocket_thread() beginning')
+        print('websocket_thread() beginning _APISecretFilePath=%r' % _APISecretFilePath)
     while is_started():
         if _Debug:
             print('websocket_thread() calling run_forever(ping_interval=10) %r' % time.asctime())
         _WebSocketClosed = False
+        ws_url = "ws://localhost:8280/"
+        if _APISecretFilePath:
+            if os.path.isfile(_APISecretFilePath):
+                api_secret = system.ReadTextFile(_APISecretFilePath)
+                if api_secret:
+                    ws_url += '?api_secret=' + api_secret
+        if _Debug:
+            print('websocket_thread() ws_url=%r' % ws_url)
         _WebSocketApp = websocket.WebSocketApp(
-            "ws://localhost:8280/",
+            ws_url,
             on_message = on_message,
             on_error = on_error,
             on_close = on_close,
@@ -281,14 +320,15 @@ def websocket_thread():
             _WebSocketApp = None
             if _Debug:
                 print('websocket_thread(): %r' % exc)
-            time.sleep(3)
+            time.sleep(1)
         if _Debug:
             print('websocket_thread().run_forever() returned: %r  is_started: %r' % (ret, is_started(), ))
-        del _WebSocketApp
-        _WebSocketApp = None
+        if _WebSocketApp:
+            del _WebSocketApp
+            _WebSocketApp = None
         if not is_started():
             break
-        time.sleep(3)
+        time.sleep(1)
     _WebSocketApp = None
     if _Debug:
         print('websocket_thread() finished')
@@ -340,59 +380,3 @@ def ws_call(json_data, cb=None):
             cb(Exception('web socket was not started'))
         return False
     raise Exception('unexpected state %r' % st)
-
-#------------------------------------------------------------------------------
-
-def is_ok(response):
-    if not isinstance(response, dict):
-        return False
-    return response_status(response) == 'OK'
-
-
-def response_payload(response):
-    return response.get('payload', {})
-
-
-def response_errors(response):
-    if not isinstance(response, dict):
-        return ['no response', ]
-    return response_payload(response).get('response', {}).get('errors', [])
-
-
-def response_err(response):
-    return ', '.join(response_errors(response))
-
-
-def response_status(response):
-    if not isinstance(response, dict):
-        return ''
-    return response_payload(response).get('response', {}).get('status', '')
-
-
-def response_message(response):
-    if not isinstance(response, dict):
-        return ''
-    return response_payload(response).get('response', {}).get('message', '')
-
-
-def response_result(response):
-    if not isinstance(response, dict):
-        return None
-    return response_payload(response).get('response', {}).get('result', [])
-
-#------------------------------------------------------------------------------
-
-def status(response):
-    return response_status(response)
-
-
-def message(response):
-    return response_message(response)
-
-
-def result(response):
-    return response_result(response) or {}
-
-
-def red_err(response):
-    return '[color=#f00]{}[/color]'.format(response_err(response))

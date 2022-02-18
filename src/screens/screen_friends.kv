@@ -1,47 +1,46 @@
-<FriendRecord>:
-    size_hint: 1, None
-    height: app.friend_record_height
-    padding: 0
-    spacing: 1
-    selectable: True
-    global_id: 'global_id'
-    username: 'username'
-    idhost: 'idhost'
-    alias: 'alias'
-    contact_state: 'contact_state'
-    automat_index: 'automat_index'
-    automat_id: 'automat_id'
+<NewFriendItem>:
+    text: 'New contact'
+    divider: None
+    on_release: root.on_pressed()
 
-    CustomIcon:
-        id: contact_state_field
-        size_hint: None, 1
-        width: dp(20)
-        font_size: '14sp'
-        color: app.color_circle_offline if root.contact_state != 'CONNECTED' else app.color_circle_online
-        icon: 'lan-disconnect' if root.contact_state != 'CONNECTED' else 'circle'
-
-    HFlexMarkupLabel:
-        id: label_field
-        label_height: root.height
-        # text: '[color=#000000][b]{}[/b][/color][color=#a0a0a0]@{}[/color]'.format(root.username, root.idhost)
-        text: root.username
-
-    HFixedEmptySpace:
-        width: dp(5)
+    CustomIconLeftWidget:
+        icon: 'account-plus'
+        padding: (0, 0, 0, 0)
+        pos_hint: {'center_y': 0.5}
+        md_bg_color: app.theme_cls.accent_color
+        theme_text_color: "Custom"
+        text_color: app.color_white
+        on_release: root.on_pressed()
 
 
-<FriendsListView>:
-    viewclass: 'FriendRecord'
+<NewGroupItem>:
+    text: 'New group'
+    divider: None
+    on_release: root.on_pressed()
 
-    SelectableRecycleBoxLayout:
-        id: selectable_layout
-        default_size: None, app.friend_record_height
-        default_size_hint: 1, None
-        size_hint_y: None
-        height: self.minimum_height
-        orientation: 'vertical'
-        multiselect: False
-        touch_multiselect: False
+    CustomIconLeftWidget:
+        icon: 'account-multiple-plus'
+        padding: (0, 0, 0, 0)
+        pos_hint: {'center_y': 0.5}
+        md_bg_color: app.theme_cls.accent_color
+        theme_text_color: "Custom"
+        text_color: app.color_white
+        on_release: root.on_pressed()
+
+
+<FriendItem>:
+    text: root.username
+    divider: None
+    on_release: root.on_pressed()
+
+    CustomIconLeftWidget:
+        icon: 'account'
+        padding: (0, 0, 0, 0)
+        pos_hint: {'center_y': 0.5}
+        md_bg_color: app.theme_cls.primary_color
+        theme_text_color: "Custom"
+        text_color: app.color_white
+        on_release: root.on_pressed()
 
 
 <FriendsScreen>:
@@ -68,18 +67,13 @@
 
             VerticalScrollView:
 
-                PageContainerWithLeftPaddingLayout:
-                    id: friends_list
-                    size_hint_x: None
-                    width: root.width - app.scroll_bar_width
+                CustomSelectionList:
+                    id: friends_list_view
+                    pos_hint: {'top': 1}
 
-                    FriendsListView:
-                        id: friends_list_view
-                        size_hint: 1, 1
+        BottomEmptyScreenSpace:
 
-    RootActionButton:
-        id: action_button
-        data: {'account-plus': 'Search people on-line', }
-        icon: 'account-box-multiple'
-        buttons_colors: {}
-        callback: root.on_action_button_clicked
+    # DropDownMenu:
+    #     id: drop_down_menu
+    #     data: {'account-plus': 'Search people on-line', }
+    #     callback: root.on_drop_down_menu_item_clicked

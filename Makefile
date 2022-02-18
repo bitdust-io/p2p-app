@@ -136,7 +136,7 @@ test_apk:
 	@adb install -r bin/BitDustAndroid_arm64_v8a.apk
 
 shell:
-	@adb shell "cd /storage/emulated/0/.bitdust/; ls -la; sh;"
+	@adb shell "cd /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/; ls -la; sh;"
 
 log_adb:
 	@adb logcat | grep -E "python|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust|bitdust_io|Exception"
@@ -151,13 +151,13 @@ log_adb_full:
 	@adb logcat
 
 log_main:
-	@adb shell tail -f /storage/emulated/0/.bitdust/logs/android.log
+	@adb shell tail -f /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/android.log
 
 log_states:
-	@adb shell tail -f /storage/emulated/0/.bitdust/logs/automats.log
+	@adb shell tail -f /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/automats.log
 
 cat_log_main:
-	@adb shell cat /storage/emulated/0/.bitdust/logs/android.log
+	@adb shell cat /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/android.log
 
 cat_log_automat:
-	@adb shell cat /storage/emulated/0/.bitdust/logs/automats.log
+	@adb shell cat /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/automats.log

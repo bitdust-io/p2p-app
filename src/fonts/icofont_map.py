@@ -1,9 +1,9 @@
 import os
- 
+
 icofont_ttf_filepath = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'icofont.ttf')
 
 from kivy.utils import platform
-if platform == 'android': 
+if platform == 'android':
     icofont_ttf_filepath = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts', 'icofont.ttf')
 
 icofont_codes = {

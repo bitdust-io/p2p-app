@@ -1,3 +1,4 @@
+from kivy.metrics import dp
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.popup import Popup
 from kivy.properties import StringProperty  # @UnresolvedImport
@@ -23,9 +24,10 @@ def open_yes_no_dialog(title, text, cb=None):
     content = YesNoPopup(text=text)
     popup = Popup(
         title=title,
+        title_align='center',
         content=content,
         size_hint=(None, None),
-        size=(480,400),
+        size=(dp(480),dp(400)),
         auto_dismiss=False,
     )
 

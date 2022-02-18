@@ -6,7 +6,7 @@ from kivymd.theming import ThemableBehavior
 
 #------------------------------------------------------------------------------
 
-from lib import websock
+from lib import api_client
 
 #------------------------------------------------------------------------------
 
@@ -47,16 +47,21 @@ class VFlexMarkupLabel(ThemableBehavior, Label):
 
 
 class ChatMessageLabel(NormalLabel):
-    pass
+
+    def __init__(self, **kwargs):
+        self.conversation_id = kwargs.pop('conversation_id', None)
+        self.message_id = kwargs.pop('message_id', None)
+        self.message_time = kwargs.pop('message_time', None)
+        super().__init__(**kwargs)
 
 
 class StatusLabel(NormalLabel):
 
     def from_api_response(self, response):
-        if websock.is_ok(response):
+        if api_client.is_ok(response):
             self.text = ''
             return
-        errors = websock.response_errors(response)
+        errors = api_client.response_errors(response)
         if not isinstance(errors, list):
             errors = [errors, ]
         txt = ', '.join(errors)

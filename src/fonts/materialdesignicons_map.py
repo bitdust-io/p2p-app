@@ -3,7 +3,7 @@ import os
 materialdesignicons_ttf_filepath = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'md.ttf')
 
 from kivy.utils import platform
-if platform == 'android': 
+if platform == 'android':
     materialdesignicons_ttf_filepath = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts', 'md.ttf')
 
 materialdesignicons_codes = {

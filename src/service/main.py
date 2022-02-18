@@ -146,7 +146,7 @@ def start_bitdust():
             print('BitDustService.start_bitdust() error changing current path to "bitdust" sub-folder:', exc)
     if _Debug:
         print('BitDustService.start_bitdust() executing the entry point     os.getcwd() : %r' % os.getcwd())
-    from main.bpmain import main
+    from main.bpmain import main  # @UnresolvedImport
     main(executable_path, start_reactor=False)
     if _Debug:
         print('BitDustService.start_bitdust() OK!')
@@ -163,7 +163,7 @@ def stop_bitdust():
         pass
     if _Debug:
         print('BitDustService.stop_bitdust() executable_path after : %r' % os.getcwd())
-    from main import shutdowner
+    from main import shutdowner  # @UnresolvedImport
     shutdowner.A('stop', 'exit')
     return True
 

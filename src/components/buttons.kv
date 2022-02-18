@@ -151,84 +151,6 @@
     font_size: sp(16)
 
 
-<CustomFloatingActionButton>:
-    canvas:
-        Clear
-        Color:
-            rgba:
-                (self.md_bg_color if root.icon in md_icons else (0, 0, 0, 0)) \
-                if not root.disabled else \
-                (root.md_bg_color_disabled if root.md_bg_color_disabled \
-                else root.theme_cls.disabled_hint_text_color)
-        Ellipse:
-            size: self.size
-            pos: self.pos
-            source: self.source if hasattr(self, "source") else ""
-
-    lbl_txt: lbl_txt
-    padding: "0dp" if root.icon in md_icons else (0, 0, 0, 0)
-    md_bg_color: app.theme_cls.accent_color
-    theme_text_color: 'Custom'
-    text_color: app.theme_cls.primary_color
-    user_font_size: '20sp'
-
-    CustomIcon:
-        id: lbl_txt
-        icon: root.icon
-        icon_pack: root.icon_pack
-        icon_width: root.button_size
-        icon_height: root.button_size
-        font_size: root.user_font_size if root.user_font_size else self.font_size
-        font_name: root.font_name if root.font_name else self.font_name
-        color:
-            root.text_color if not root.disabled else \
-            (root.md_bg_color_disabled if root.md_bg_color_disabled \
-            else root.theme_cls.disabled_hint_text_color)
-        disabled: root.disabled
-        valign: "middle"
-        halign: "center"
-        opposite_colors: root.opposite_colors
-
-
-<MDFloatingRootButton>:
-    canvas:
-        Clear
-        Color:
-            rgba: (1,1,1,1)
-        Ellipse:
-            size: self.size[0] + dp(4), self.size[1] + dp(4)
-            pos: self.pos[0] - dp(2), self.pos[1] - dp(2)
-        Color:
-            rgba:
-                (self.md_bg_color if root.icon in md_icons else (0, 0, 0, 0)) \
-                if not root.disabled else \
-                (root.md_bg_color_disabled if root.md_bg_color_disabled \
-                else root.theme_cls.disabled_hint_text_color)
-        Ellipse:
-            size: self.size
-            pos: self.pos
-            source: self.source if hasattr(self, "source") else ""
-
-    size: "48dp", "48dp"
-    lbl_txt: lbl_txt
-    padding: "12dp" if root.icon in md_icons else (0, 0, 0, 0)
-
-    MDIcon:
-        id: lbl_txt
-        icon: root.icon
-        font_size: root.user_font_size if root.user_font_size else self.font_size
-        font_name: root.font_name if root.font_name else self.font_name
-        theme_text_color: root.theme_text_color
-        text_color:
-            root.text_color if not root.disabled else \
-            (root.md_bg_color_disabled if root.md_bg_color_disabled \
-            else root.theme_cls.disabled_hint_text_color)
-        disabled: root.disabled
-        valign: "middle"
-        halign: "center"
-        opposite_colors: root.opposite_colors
-
-
 <RoundedButton>:
     _radius: 8
     increment_width: dp(20)
@@ -266,8 +188,8 @@
     text_size: self.size
     valign: 'middle'
     halign: 'center'
-    font_style: self.icon_pack
-    text: get_icon_code(self.icon, self.icon_pack)
+    font_style: "Body1"
+    text: "[size={}]{}[/size]".format(self.icon_size, make_icon(self.icon, self.icon_pack))
     state_image: self.background_normal if self.state == 'normal' else self.background_down
     disabled_image: self.background_disabled_normal if self.state == 'normal' else self.background_disabled_down
 
