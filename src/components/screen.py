@@ -103,6 +103,12 @@ class AppScreen(ThemableBehavior, Screen):
     def on_closed(self):
         pass
 
+    def on_created(self):
+        pass
+
+    def on_destroying(self):
+        pass
+
     def on_nav_button_clicked(self):
         pass
 

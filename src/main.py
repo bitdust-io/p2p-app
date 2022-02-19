@@ -131,6 +131,10 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.main_window.register_screens(controller.all_screens())
         self.main_window.bind(engine_log=self.on_engine_log)
 
+        if system.is_android():
+            from android import map_key, KEYCODE_BACK  # @UnresolvedImport
+            map_key(KEYCODE_BACK, 1001)
+
         Window.bind(on_keyboard=self.on_key_input)
 
         return self.main_window
@@ -385,11 +389,9 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_key_input(self, window_obj, key_code, scancode, codepoint, modifier):
         if _Debug:
             print('BitDustApp.on_key_input', key_code, scancode, modifier)
-        # if system.is_android():
-        #     if key_code == 27:
-        #         return True
-        #     else:
-        #         return False
+        if key_code in [27, 1001, ]:
+            ret = self.main_window.on_system_back_button_clicked()
+            return ret
         return False
 
     # def on_height(self, instance, value):

@@ -1,46 +1,17 @@
-<ConversationRecord>:
-    size_hint: 1, None
-    height: app.conversation_record_height
-    padding: 0
-    spacing: 1
-    selectable: True
-    type: 'type'
-    conversation_id: 'conversation_id'
-    key_id: 'key_id'
-    state: 'state'
-    label: 'label'
-    automat_index: 'automat_index'
-    automat_id: 'automat_id'
+<ConversationItem>:
+    text: root.label
+    secondary_text: root.get_secondary_text()
+    divider: None
+    on_release: root.on_pressed()
 
-    CustomIcon:
-        id: conversation_state_field
-        size_hint: None, 1
-        width: dp(20)
-        font_size: '14sp'
-        color: root.get_icon_color(root.state)
-        icon: 'circle'
-
-    HFlexMarkupLabel:
-        id: label_field
-        label_height: root.height
-        text: root.label
-
-    HFixedEmptySpace:
-        width: dp(5)
-
-
-<ConversationsListView>:
-    viewclass: 'ConversationRecord'
-
-    SelectableRecycleBoxLayout:
-        id: selectable_layout
-        default_size: None, app.conversation_record_height
-        default_size_hint: 1, None
-        size_hint_y: None
-        height: self.minimum_height
-        orientation: 'vertical'
-        multiselect: False
-        touch_multiselect: False
+    CustomIconLeftWidget:
+        icon: 'account'
+        padding: (0, 0, 0, 0)
+        pos_hint: {'center_y': 0.5}
+        md_bg_color: get_user_color(root.key_id, alpha=0.7)
+        theme_text_color: "Custom"
+        text_color: app.color_white
+        on_release: root.on_pressed()
 
 
 <ConversationsScreen>:
@@ -68,22 +39,17 @@
             VerticalScrollView:
                 id: scroll_view
 
-                PageContainerWithLeftPaddingLayout:
-                    id: conversations_list
-                    size_hint_x: None
-                    width: root.width - app.scroll_bar_width
-
-                    ConversationsListView:
-                        id: conversations_list_view
-                        size_hint: 1, 1
+                CustomSelectionList:
+                    id: conversations_list_view
+                    pos_hint: {'top': 1}
 
         BottomEmptyScreenSpace:
 
 
-    DropDownMenu:
-        id: drop_down_menu
-        data:
-            {'chat-plus-outline': 'Create new group',
-            'account-key-outline': 'Start private chat',
-            'account-box-multiple': 'My contacts', }
-        callback: root.on_drop_down_menu_item_clicked
+    # DropDownMenu:
+    #     id: drop_down_menu
+    #     data:
+    #         {'chat-plus-outline': 'Create new group',
+    #         'account-key-outline': 'Start private chat',
+    #         'account-box-multiple': 'My contacts', }
+    #     callback: root.on_drop_down_menu_item_clicked
