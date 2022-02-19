@@ -1,6 +1,6 @@
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
-from kivymd.uix.list import OneLineIconListItem, IconLeftWidget
+from kivymd.uix.list import OneLineIconListItem
 
 from lib import api_client
 
@@ -8,16 +8,9 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
-
-class CustomIconLeftWidget(IconLeftWidget):
-
-    def set_size(self, interval):
-        self.width = '36dp'
-        self.height = '36dp'
-
 
 class NewFriendItem(OneLineIconListItem):
 
@@ -48,19 +41,16 @@ class FriendItem(OneLineIconListItem):
     def on_pressed(self):
         if _Debug:
             print('FriendItem.on_pressed', self)
-        global_id = self.global_id
-        username = self.username
         automat_index = self.automat_index or None
         automat_index = int(automat_index) if automat_index not in ['None', None, '', ] else None
         screen.select_screen(
-            screen_id='private_chat_{}'.format(global_id),
+            screen_id='private_chat_{}'.format(self.global_id),
             screen_type='private_chat_screen',
-            global_id=global_id,
-            username=username,
+            global_id=self.global_id,
+            username=self.username,
             automat_index=automat_index,
         )
 
-#------------------------------------------------------------------------------
 
 class FriendsScreen(screen.AppScreen):
 
@@ -79,10 +69,6 @@ class FriendsScreen(screen.AppScreen):
 
     def on_leave(self, *args):
         self.ids.state_panel.release()
-
-    def on_friend_state_changed(self, event_id, idurl, global_id, old_state, new_state):
-        if _Debug:
-            print('FriendsScreen.on_friend_state_changed', event_id, idurl, global_id)
 
     def on_friends_list_result(self, resp):
         if not isinstance(resp, dict):
@@ -105,9 +91,3 @@ class FriendsScreen(screen.AppScreen):
                 automat_index=one_friend['index'],
                 automat_id=one_friend['id'],
             ))
-
-    # def on_drop_down_menu_item_clicked(self, btn):
-    #     if _Debug:
-    #         print('FriendsScreen.on_drop_down_menu_item_clicked', btn.icon)
-    #     if btn.icon == 'account-plus':
-    #         self.main_win().select_screen('search_people_screen')

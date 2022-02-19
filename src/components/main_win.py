@@ -342,6 +342,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         self.active_screens[screen_id] = (screen_inst, None, )
         manager.add_widget(screen_inst)
         screen_inst.close_drop_down_menu()
+        screen_inst.on_created()
         screen_inst.on_opened()
         if _Debug:
             print('MainWin.open_screen   opened screen %r' % screen_id)
@@ -352,13 +353,13 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
                 print('MainWin.close_screen   screen %r has not been opened' % screen_id)
             return
         screen_inst, _ = self.active_screens.pop(screen_id)
+        screen_inst.on_destroying()
         self.screen_closed_time.pop(screen_id, None)
         if screen_inst not in self.ids.screen_manager.children:
             if _Debug:
                 print('MainWin.close_screen   WARNING   screen instance %r was not found among screen manager children' % screen_inst)
         screen_inst.close_drop_down_menu()
         self.ids.screen_manager.remove_widget(screen_inst)
-        # screen_inst.on_closed()
         del screen_inst
         if _Debug:
             print('MainWin.close_screen  closed screen %r' % screen_id)
@@ -471,6 +472,20 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             self.select_screen(back_to_screen)
         else:
             self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
+
+    def on_system_back_button_clicked(self, *args):
+        if _Debug:
+            print('MainWin.on_system_back_button_clicked', self.screens_stack, *args)
+        back_to_screen = None
+        if self.screens_stack:
+            back_to_screen = self.screens_stack[-1]
+        if back_to_screen:
+            self.select_screen(back_to_screen)
+            return True
+        self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
+        if system.is_android():
+            return False
+        return True
 
     def on_left_menu_button_clicked(self, *args):
         if _Debug:

@@ -142,3 +142,18 @@ class ColorHash:
     @property
     def hex(self):
         return rgb2hex(self.rgb)
+
+#------------------------------------------------------------------------------
+
+def get_user_color(key_id, alpha=1.0):
+    key_username, _, _ = key_id.partition('@')
+    _, _, username = key_username.rpartition('$')
+    ret = [float(i)/255.0 for i in ColorHash(username, lightness=.5, saturation=.8).rgb] + [alpha, ]
+    return ret
+
+
+def get_user_color_hex(key_id, alpha='ff'):
+    key_username, _, _ = key_id.partition('@')
+    _, _, username = key_username.rpartition('$')
+    ret = ColorHash(username, lightness=.5, saturation=.8).hex + alpha
+    return ret
