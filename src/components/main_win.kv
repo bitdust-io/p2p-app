@@ -63,6 +63,20 @@
                         app.root.select_screen('conversations_screen', verify_state=True)
 
             OneLineIconListItem:
+                id: menu_item_friends
+                text: "contacts"
+                on_release:
+                    app.root.nav().set_state("close")
+                    app.root.select_screen('friends_screen', verify_state=True)
+                IconLeftWidget:
+                    icon: "contacts"
+                    md_bg_color: app.color_transparent
+                    md_bg_color_disabled: app.color_transparent
+                    on_release:
+                        app.root.nav().set_state("close")
+                        app.root.select_screen('friends_screen', verify_state=True)
+
+            OneLineIconListItem:
                 id: menu_item_settings
                 text: "settings"
                 on_release:
