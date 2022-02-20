@@ -1,5 +1,5 @@
-from kivy.properties import StringProperty  # @UnresolvedImport
-from kivymd.uix.list import OneLineAvatarListItem
+from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
+from kivymd.uix.list import OneLineIconListItem
 
 #------------------------------------------------------------------------------
 
@@ -10,30 +10,25 @@ from components import list_view
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
-class SelectFriendRecord(list_view.SelectableHorizontalRecord):
-    pass
+class SelectFriendItem(OneLineIconListItem):
 
+    global_id = StringProperty()
+    username = StringProperty()
+    idhost = StringProperty()
+    alias = StringProperty()
+    contact_state = StringProperty()
+    automat_index = NumericProperty()
+    automat_id = StringProperty()
 
-class SelectFriendListView(list_view.SelectableRecycleView):
-
-    def on_selection_applied(self, item, index, is_selected, prev_selected):
+    def on_pressed(self):
         if _Debug:
-            print('SelectFriendListView.on_selection_applied', item.global_id, self.selected_item)
-        if self.selected_item:
-            global_id = self.selected_item.global_id
-            if self.parent.parent.parent.parent.parent.result_callback:
-                self.parent.parent.parent.parent.parent.result_callback(global_id)
-        self.clear_selection()
-        self.ids.selectable_layout.clear_selection()
-
-#------------------------------------------------------------------------------
-
-class SelectFriendItem(OneLineAvatarListItem):
-    pass
+            print('SelectFriendItem.on_pressed', self)
+        if self.parent.parent.parent.parent.parent.parent.result_callback:
+            self.parent.parent.parent.parent.parent.parent.result_callback(self.global_id)
 
 #------------------------------------------------------------------------------
 
@@ -55,48 +50,29 @@ class SelectFriendScreen(screen.AppScreen):
     def populate(self, *args, **kwargs):
         api_client.friends_list(cb=self.on_friends_list_result)
 
-    def clear_selected_item(self):
-        pass
-        # self.ids.friends_list_view.clear_selection()
-        # self.ids.friends_list_view.ids.selectable_layout.clear_selection()
-
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_identity_propagate')
-        self.clear_selected_item()
         self.populate()
 
     def on_leave(self, *args):
         self.ids.state_panel.release()
-        self.clear_selected_item()
 
     def on_friends_list_result(self, resp):
         if not isinstance(resp, dict):
-            self.clear_selected_item()
             self.ids.friends_list_view.clear_widgets()
-            # self.ids.friends_list_view.data = []
             return
         result = api_client.response_result(resp)
         if not result:
-            # self.ids.friends_list_view.data = []
-            self.clear_selected_item()
             self.ids.friends_list_view.clear_widgets()
             return
-        self.clear_selected_item()
         self.ids.friends_list_view.clear_widgets()
-        # self.ids.friends_list_view.data = []
         for one_friend in result:
-            # one_friend['automat_index'] = str(one_friend.pop('index', ''))
-            # one_friend['automat_id'] = str(one_friend.pop('id', ''))
-            # self.ids.friends_list_view.data.append(one_friend)
             self.ids.friends_list_view.add_widget(SelectFriendItem(
-                text=one_friend['username'],
+                global_id=one_friend['global_id'],
+                username=one_friend['username'],
+                idhost=one_friend['idhost'],
+                alias=one_friend['alias'],
+                contact_state=one_friend['contact_state'],
+                automat_index=one_friend['index'],
+                automat_id=one_friend['id'],
             ))
-
-    def on_drop_down_menu_item_clicked(self, btn):
-        if _Debug:
-            print('SelectFriendScreen.on_drop_down_menu_item_clicked', btn.icon)
-        if btn.icon == 'account-search-outline':
-            self.main_win().select_screen(
-                screen_id='search_people_screen',
-                return_screen_id='select_friend_screen',
-            )

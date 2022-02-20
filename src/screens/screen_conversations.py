@@ -35,7 +35,7 @@ class ConversationItem(TwoLineIconListItem):
 
     def on_pressed(self):
         if _Debug:
-            print('FriendItem.on_pressed', self)
+            print('ConversationItem.on_pressed', self)
         automat_index = self.automat_index or None
         automat_index = int(automat_index) if automat_index is not None else None
         if self.type in ['group_message', 'personal_message', ]:
