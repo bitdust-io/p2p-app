@@ -5,6 +5,7 @@ import time
 
 from kivy.lang import Builder
 from kivy.clock import Clock
+from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.properties import StringProperty  # @UnresolvedImport
 from kivy.properties import NumericProperty  # @UnresolvedImport
@@ -28,95 +29,21 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
+_orig_request_keyboard = None
+_orig_release_keyboard = None
+
+#------------------------------------------------------------------------------
+
 def patch_kivy_core_window():
-    from kivy.core.window import Window
-
-    def _get_android_kheight(self=Window):
-        ret = system.get_android_keyboard_height()
-        return ret
-
-    def _get_size(self=Window):
-        if _Debug:
-            print('main_window._get_size', self)
-        r = self._rotation
-        w, h = self._size
-        if self._density != 1:
-            w, h = self._win._get_gl_size()
-        if self.softinput_mode == 'resize':
-            h -= system.get_android_keyboard_height()  # self.keyboard_height
-        if r in (0, 180):
-            return w, h
-        return h, w
-
-    def update_viewport(self=Window):
-        from kivy.graphics.opengl import glViewport  # @UnresolvedImport
-        from kivy.graphics.transformation import Matrix  # @UnresolvedImport
-        from math import radians
-
-        w, h = self.system_size
-        if self._density != 1:
-            w, h = self.size
-
-        smode = self.softinput_mode
-        target = self._system_keyboard.target
-        targettop = max(0, target.to_window(0, target.y)[1]) if target else 0
-        kheight = system.get_android_keyboard_height()
-
-        w2, h2 = w / 2., h / 2.
-        r = radians(self.rotation)
-
-        x, y = 0, 0
-        _h = h
-        if smode == 'pan':
-            y = kheight
-        elif smode == 'below_target':
-            y = 0 if kheight < targettop else (kheight - targettop)
-        if smode == 'scale':
-            _h -= kheight
-        if smode == 'resize':
-            y += kheight
-        # prepare the viewport
-        glViewport(x, y, w, _h)
-
-        try:
-            # do projection matrix
-            projection_mat = Matrix()
-            projection_mat.view_clip(0.0, w, 0.0, h, -1.0, 1.0, 0)
-        except Exception as exc:
-            if _Debug:
-                print('main_window.update_viewport', exc)
-            return
-        self.render_context['projection_mat'] = projection_mat
-
-        # do modelview matrix
-        modelview_mat = Matrix().translate(w2, h2, 0)
-        modelview_mat = modelview_mat.multiply(Matrix().rotate(r, 0, 0, 1))
-
-        w, h = self.size
-        w2, h2 = w / 2., h / 2.
-        modelview_mat = modelview_mat.multiply(Matrix().translate(-w2, -h2, 0))
-        self.render_context['modelview_mat'] = modelview_mat
-        frag_modelview_mat = Matrix()
-        frag_modelview_mat.set(flat=modelview_mat.get())
-        self.render_context['frag_modelview_mat'] = frag_modelview_mat
-
-        # redraw canvas
-        self.canvas.ask_update()
-
-        # and update childs
-        self.update_childsize()
+    global _orig_request_keyboard
+    global _orig_release_keyboard
 
     Window.clearcolor = (1, 1, 1, 1)
     Window.fullscreen = False
 
     if system.is_android():
-        Window.update_viewport = update_viewport
-        Window._get_size = _get_size
-        Window._get_android_kheight = _get_android_kheight
-        Window.keyboard_anim_args = {"d": 0.1,"t": "linear", }
-        softinput_mode = 'resize'
-        Window.softinput_mode = softinput_mode
-        # set_android_system_ui_visibility()
+        Window.keyboard_anim_args = {"d": 0.001, "t": "linear", }
+        Window.softinput_mode = ''
 
     if _Debug:
         print('main_window.patch_kivy_core_window', Window)
@@ -134,12 +61,10 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     screens_map = {}
     screens_loaded = set()
     active_screens = {}
-    # dropdown_menus = {}
     screen_closed_time = {}
     latest_screen = ''
     screens_stack = []
 
-    # kivy properties
     engine_is_on = BooleanProperty(False)
     engine_log = StringProperty('')
     selected_screen = StringProperty('')
@@ -533,8 +458,8 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         self.control.on_state_identity_get(instance, value)
 
     def on_state_network_connected(self, instance, value):
-        if _Debug:
-            print('MainWin.on_state_network_connected', value)
+        # if _Debug:
+        #     print('MainWin.on_state_network_connected', value)
         self.populate_bottom_toolbar_icon('lan-connect', value)
         self.control.on_state_network_connected(instance, value)
 

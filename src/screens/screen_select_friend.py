@@ -6,7 +6,6 @@ from kivymd.uix.list import OneLineIconListItem
 from lib import api_client
 
 from components import screen
-from components import list_view
 
 #------------------------------------------------------------------------------
 
@@ -21,7 +20,7 @@ class SelectFriendItem(OneLineIconListItem):
     idhost = StringProperty()
     alias = StringProperty()
     contact_state = StringProperty()
-    automat_index = NumericProperty()
+    automat_index = NumericProperty(None, allownone=True)
     automat_id = StringProperty()
 
     def on_pressed(self):
@@ -73,6 +72,6 @@ class SelectFriendScreen(screen.AppScreen):
                 idhost=one_friend['idhost'],
                 alias=one_friend['alias'],
                 contact_state=one_friend['contact_state'],
-                automat_index=one_friend['index'],
-                automat_id=one_friend['id'],
+                automat_index=one_friend.get('index') or None,
+                automat_id=one_friend.get('id') or '',
             ))

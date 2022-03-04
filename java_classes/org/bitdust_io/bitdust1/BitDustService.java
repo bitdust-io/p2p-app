@@ -33,7 +33,7 @@ public class BitDustService extends PythonService {
             process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
             Log.v(TAG, "onDestroy() process_stop_result retry from the Service: " + process_stop_result);
             attempts++;
-            if (attempts > 50) break;
+            if (attempts > 5) break;
         }
         Log.v(TAG, "onDestroy()   about to call super onDestroy");
         super.onDestroy();

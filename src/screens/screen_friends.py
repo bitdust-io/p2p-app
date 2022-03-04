@@ -35,7 +35,7 @@ class FriendItem(OneLineIconListItem):
     idhost = StringProperty()
     alias = StringProperty()
     contact_state = StringProperty()
-    automat_index = NumericProperty()
+    automat_index = NumericProperty(None, allownone=True)
     automat_id = StringProperty()
 
     def on_pressed(self):
@@ -82,12 +82,14 @@ class FriendsScreen(screen.AppScreen):
         self.ids.friends_list_view.add_widget(NewGroupItem())
         self.ids.friends_list_view.add_widget(NewFriendItem())
         for one_friend in result:
+            automat_index = one_friend.get('index')
+            automat_index = int(automat_index) if automat_index not in ['None', None, '', ] else None
             self.ids.friends_list_view.add_widget(FriendItem(
                 global_id=one_friend['global_id'],
                 username=one_friend['username'],
                 idhost=one_friend['idhost'],
                 alias=one_friend['alias'],
                 contact_state=one_friend['contact_state'],
-                automat_index=one_friend['index'],
-                automat_id=one_friend['id'],
+                automat_index=automat_index,
+                automat_id=one_friend.get('id') or '',
             ))
