@@ -131,13 +131,13 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.main_window.register_screens(controller.all_screens())
         self.main_window.bind(engine_log=self.on_engine_log)
 
-        if system.is_android():
-            from android import map_key, KEYCODE_BACK  # @UnresolvedImport
-            map_key(KEYCODE_BACK, 1001)
-
         Window.bind(on_keyboard=self.on_key_input)
 
-        return self.main_window
+        from kivy.uix.anchorlayout import AnchorLayout
+        self.wrapper = AnchorLayout()
+        self.wrapper.padding = [0, 0, 0, 0, ]
+        self.wrapper.add_widget(self.main_window)
+        return self.wrapper
 
     def init_components(self):
         from components import all_components
@@ -389,7 +389,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_key_input(self, window_obj, key_code, scancode, codepoint, modifier):
         if _Debug:
             print('BitDustApp.on_key_input', key_code, scancode, modifier)
-        if key_code in [27, 1001, ]:
+        if key_code in [27, ]:
             ret = self.main_window.on_system_back_button_clicked()
             return ret
         return False

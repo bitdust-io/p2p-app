@@ -68,7 +68,7 @@ mv -v ./bin/BitDustAndroid.apk ./bin/BitDustAndroid_arm64_v8a.apk
 
 
 # extract .APK file for development purposes
-apktool d -o ./bin/apk/ -f ./bin/BitDustAndroid_x86_64.apk
+apktool d -o ./bin/apk/ -f ./bin/BitDustAndroid_arm64_v8a.apk
 rm -rf ./bin/apk/private_mp3/
 mkdir -p ./bin/apk/private_mp3/
 cp ./bin/apk/assets/private.mp3 ./bin/apk/private_mp3/private_mp3.tar.gz

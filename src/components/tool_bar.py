@@ -26,12 +26,14 @@ from kivymd.uix.tooltip import MDTooltip
 
 #------------------------------------------------------------------------------
 
+from lib import system
+
 from components.buttons import TransparentIconButton
 from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -255,6 +257,8 @@ class CustomToolbar(CustomNotchedBox, AppStyle):
             + self.theme_cls.standard_increment / 2
             + self._shift
         )
+        if system.is_android():
+            self.action_button.y = self.action_button.y + dp(4)
         if not self.icon_color:
             self.icon_color = self.theme_cls.primary_color
         Window.bind(on_resize=self._on_resize)

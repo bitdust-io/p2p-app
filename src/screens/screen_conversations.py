@@ -8,7 +8,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ class ConversationItem(TwoLineIconListItem):
 
     def on_pressed(self):
         if _Debug:
-            print('FriendItem.on_pressed', self)
+            print('ConversationItem.on_pressed', self)
         automat_index = self.automat_index or None
         automat_index = int(automat_index) if automat_index is not None else None
         if self.type in ['group_message', 'personal_message', ]:
@@ -143,30 +143,6 @@ class ConversationsScreen(screen.AppScreen):
         if _Debug:
             print('ConversationsScreen.on_conversation added new item', conv['key_id'], conv['automat_id'], conv['automat_index'])
 
-#     def on_drop_down_menu_item_clicked(self, btn):
-#         if _Debug:
-#             print('ConversationsScreen.on_drop_down_menu_item_clicked', btn.icon)
-#         if btn.icon == 'chat-plus-outline':
-#             self.main_win().select_screen('create_group_screen')
-#         elif btn.icon == 'account-key-outline':
-#             self.main_win().select_screen('select_friend_screen')
-#         elif btn.icon == 'account-box-multiple':
-#             self.main_win().select_screen('friends_screen')
-
-#     def on_state_changed(self, event_data):
-#         if _Debug:
-#             print('ConversationsScreen.on_state_changed', event_data)
-#         item_found = None
-#         for w in self.ids.conversations_list_view.children:
-#             if w.instance_item.automat_index == event_data['index'] and w.instance_item.automat_id == event_data['id']:
-#                 item_found = w
-#                 break
-#         if item_found:
-#             item_found.instance_item.state = event_data['newstate']
-#             item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
-#             if _Debug:
-#                 print('ConversationsScreen.on_state_changed updated existing item', event_data['id'], event_data['newstate'])
-
     def on_group_state_changed(self, event_id, group_key_id, old_state, new_state):
         if _Debug:
             print('ConversationsScreen.on_group_state_changed', event_id, group_key_id)
@@ -181,26 +157,6 @@ class ConversationsScreen(screen.AppScreen):
             item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
             if _Debug:
                 print('ConversationsScreen.on_group_state_changed %r updated : %r -> %r' % (group_key_id, prev_state, new_state, ))
-
-#     def on_friend_state_changed(self, event_id, idurl, global_id, old_state, new_state):
-#         if _Debug:
-#             print('ConversationsScreen.on_friend_state_changed', event_id, idurl, global_id)
-#         item_found = False
-#         for i in range(len(self.ids.conversations_list_view.data)):
-#             item = self.ids.conversations_list_view.data[i]
-#             if item['type'] not in ['private_message', ]:
-#                 continue
-#             if item['key_id'] == global_id:
-#                 item_found = True
-#                 prev_state = self.ids.conversations_list_view.data[i]['state']
-#                 self.ids.conversations_list_view.data[i]['state'] = new_state
-#                 if _Debug:
-#                     print('ConversationsScreen.on_friend_state_changed %r updated : %r -> %r' % (global_id, prev_state, new_state, ))
-#                 break
-#         if not item_found:
-#             self.populate()
-#         else:
-#             self.ids.conversations_list_view.refresh_from_data()
 
     def on_hot_button_clicked(self, *args):
         if _Debug:

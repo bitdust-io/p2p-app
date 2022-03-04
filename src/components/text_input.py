@@ -1,12 +1,41 @@
 from kivy.uix.textinput import TextInput
 from kivy.properties import NumericProperty  # @UnresolvedImport
+from kivy.clock import Clock
 
 from kivymd.uix.textfield import MDTextFieldRect, MDTextFieldRound, MDTextField
 from kivymd.theming import ThemableBehavior
 
+from lib import system
+
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
+
+#------------------------------------------------------------------------------
+
+def on_text_input_focus(instance, value):
+    if not system.is_android():
+        return
+    update_main_app_wrapper()
+    Clock.schedule_once(update_main_app_wrapper, 0.01)
+    Clock.schedule_once(update_main_app_wrapper, 0.02)
+    Clock.schedule_once(update_main_app_wrapper, 0.04)
+    Clock.schedule_once(update_main_app_wrapper, 0.08)
+    Clock.schedule_once(update_main_app_wrapper, 0.16)
+    Clock.schedule_once(update_main_app_wrapper, 0.32)
+    Clock.schedule_once(update_main_app_wrapper, 0.64)
+    Clock.schedule_once(update_main_app_wrapper, 1.28)
+    Clock.schedule_once(update_main_app_wrapper, 2.56)
+
+
+def update_main_app_wrapper(*a):
+    from components import screen
+    change = system.get_android_keyboard_height()
+    if change < 0:
+        change = 0
+    screen.my_app().wrapper.padding = [0, 0, 0, change, ]
+    if _Debug:
+        print('text_input.on_text_input_focus', change, screen.main_window().size, screen.my_app().wrapper.size)
 
 #------------------------------------------------------------------------------
 
@@ -62,7 +91,9 @@ class SingleLineTextInput(ThemableBehavior, TextInput):
     def on_focus(self, instance, value):
         if _Debug:
             print('SingleLineTextInput.on_focus', instance, value)
+        on_text_input_focus(instance, value)
 
+#------------------------------------------------------------------------------
 
 class DynamicHeightTextInput(ThemableBehavior, TextInput):
 
@@ -109,32 +140,34 @@ class DynamicHeightTextInput(ThemableBehavior, TextInput):
 
     def on_focus(self, instance, value):
         if _Debug:
-            print('SingleLineTextInput.on_focus', instance, value)
+            print('DynamicHeightTextInput.on_focus', instance, value)
+        on_text_input_focus(instance, value)
 
+#------------------------------------------------------------------------------
 
 class CustomTextField(MDTextField):
-    pass
 
-#     def on_focus(self, instance, value):
-#         if _Debug:
-#             print('CustomTextField.on_focus', instance, value)
-#         update_app_screen_soft_keyboard_area(value)
+    def on_focus(self, instance, value):
+        if _Debug:
+            print('CustomTextField.on_focus', instance, value)
+        on_text_input_focus(instance, value)
 
+#------------------------------------------------------------------------------
 
 class RoundedTextInput(MDTextFieldRound):
-    pass
 
-#     def on_focus(self, instance, value):
-#         if _Debug:
-#             print('RoundedTextInput.on_focus', instance, value)
-#         update_app_screen_soft_keyboard_area(value)
+    def on_focus(self, instance, value):
+        if _Debug:
+            print('RoundedTextInput.on_focus', instance, value)
+        on_text_input_focus(instance, value)
 
+#------------------------------------------------------------------------------
 
 class MultiLineTextInput(MDTextFieldRect):
 
     extra_padding = NumericProperty('0dp')
 
-#     def on_focus(self, instance, value):
-#         if _Debug:
-#             print('MultiLineTextInput.on_focus', instance, value)
-#         update_app_screen_soft_keyboard_area(value)
+    def on_focus(self, instance, value):
+        if _Debug:
+            print('MultiLineTextInput.on_focus', instance, value)
+        on_text_input_focus(instance, value)

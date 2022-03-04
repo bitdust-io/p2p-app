@@ -10,7 +10,7 @@ from kivy.utils import platform
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -150,9 +150,12 @@ def get_android_keyboard_height():
     _LatestAndroidBottomBarSize = bottom_size_latest
     visible_height = rctx.bottom - rctx.top
     keyboard_height = _LatestAndroidDisplayDefaultHeight - rctx.bottom + _LatestAndroidBottomBarSize
-    if _LatestAndroidDisplayDefaultHeight > 2000:
-        if keyboard_height >= 32:
-            keyboard_height -= 32
+    if _LatestAndroidDisplayDefaultHeight > 1800:
+        if keyboard_height >= 41:
+            if _Debug:
+                print('system.get_android_keyboard_height keyboard_height=%d going to be decreased and _LatestAndroidDisplayDefaultHeight=%d' % (
+                    keyboard_height, _LatestAndroidDisplayDefaultHeight, ))
+            keyboard_height -= 41
     if _LatestAndroidKeyboardHeightSnapshot != keyboard_height:
         old_keyboard_height = _LatestAndroidKeyboardHeightSnapshot
         _LatestAndroidKeyboardHeightSnapshot = keyboard_height

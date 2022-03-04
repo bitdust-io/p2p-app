@@ -159,11 +159,14 @@ class GroupChatScreen(screen.AppScreen):
         if _Debug:
             print('GroupChatScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'account-plus':
-            self.main_win().select_screen(
-                screen_id='select_friend_screen',
-                result_callback=self.on_user_selected,
-                screen_header='Invite user to the group:'
-            )
+            if self.model('correspondent'):
+                self.main_win().select_screen(
+                    screen_id='select_friend_screen',
+                    result_callback=self.on_user_selected,
+                    screen_header='Select user to be invited to the group [b]%s[/b]:' % self.label,
+                )
+            else:
+                self.main_win().select_screen(screen_id='friends_screen')
         elif btn.icon == 'human-greeting-proximity':
             api_client.group_join(
                 group_key_id=self.global_id,
