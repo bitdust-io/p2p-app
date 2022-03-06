@@ -68,8 +68,8 @@ install_buildozer:
 
 install_p4a:
 	@rm -rf python-for-android/
-	@git clone --single-branch --branch master https://github.com/kivy/python-for-android.git
-	# @git clone --single-branch --branch develop https://github.com/kivy/python-for-android.git
+	# @git clone --single-branch --branch master https://github.com/kivy/python-for-android.git
+	@git clone --single-branch --branch develop https://github.com/kivy/python-for-android.git
 	# @git clone --single-branch --branch master https://github.com/vesellov/python-for-android.git
 	# @git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
 	# @git clone --single-branch --branch develop_more https://github.com/vesellov/python-for-android.git
