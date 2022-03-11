@@ -42,3 +42,4 @@ class CreateGroupScreen(screen.AppScreen):
         self.ids.group_label_input.disabled = False
         self.main_win().select_screen('conversations_screen')
         self.main_win().close_screen('create_group_screen')
+        self.main_win().screens_stack.clear()

@@ -8,7 +8,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -18,14 +18,6 @@ class NewFriendItem(OneLineIconListItem):
         if _Debug:
             print('NewFriendItem.on_pressed', self)
         screen.select_screen('search_people_screen')
-
-
-class NewGroupItem(OneLineIconListItem):
-
-    def on_pressed(self):
-        if _Debug:
-            print('NewGroupItem.on_pressed', self)
-        screen.select_screen('create_group_screen')
 
 
 class FriendItem(OneLineIconListItem):
@@ -71,16 +63,15 @@ class FriendsScreen(screen.AppScreen):
         self.ids.state_panel.release()
 
     def on_friends_list_result(self, resp):
+        if _Debug:
+            print('FriendsScreen.on_friends_list_result', resp)
+        self.ids.friends_list_view.clear_widgets()
+        self.ids.friends_list_view.add_widget(NewFriendItem())
         if not isinstance(resp, dict):
-            self.ids.friends_list_view.clear_widgets()
             return
         result = api_client.response_result(resp)
         if not result:
-            self.ids.friends_list_view.clear_widgets()
             return
-        self.ids.friends_list_view.clear_widgets()
-        self.ids.friends_list_view.add_widget(NewGroupItem())
-        self.ids.friends_list_view.add_widget(NewFriendItem())
         for one_friend in result:
             automat_index = one_friend.get('index')
             automat_index = int(automat_index) if automat_index not in ['None', None, '', ] else None

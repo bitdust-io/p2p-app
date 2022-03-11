@@ -15,7 +15,7 @@ from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -54,6 +54,8 @@ To be able to start using BitDust, please [u][color=#0000ff][ref=new_identity]cr
 
 class MyIDScreen(screen.AppScreen):
 
+    my_identity_name = None
+
     def get_icon(self):
         return 'account-box'
 
@@ -75,6 +77,7 @@ class MyIDScreen(screen.AppScreen):
         if not result:
             self.ids.my_id_details.text = create_new_identity_text
             return
+        self.my_identity_name = result.get('name', '')
         self.ids.my_id_details.text = identity_details_temlate_text.format(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             small_text_size='{}sp'.format(self.app().font_size_small_absolute),
@@ -99,10 +102,11 @@ class MyIDScreen(screen.AppScreen):
         if _Debug:
             print('MyIDScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'shield-key':
+            filename = 'BitDust_key_{}.txt'.format(self.my_identity_name) if self.my_identity_name else 'BitDust_key.txt'
             if system.is_android():
-                destination_filepath = os.path.join('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents', 'BitDust_key.txt')
+                destination_filepath = os.path.join('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents', filename)
             else:
-                destination_filepath = os.path.join(os.path.expanduser('~'), 'BitDust_key.txt')
+                destination_filepath = os.path.join(os.path.expanduser('~'), filename)
             api_client.identity_backup(
                 destination_filepath=destination_filepath,
                 cb=lambda resp: self.on_identity_backup_result(resp, destination_filepath),
@@ -169,3 +173,7 @@ class MyIDScreen(screen.AppScreen):
         system.rmdir_recursive(os.path.join(home_folder_path, 'temp'), ignore_errors=True)
         snackbar.info(text='private key erased')
         self.app().start_engine()
+        self.main_win().select_screen('welcome_screen')
+        self.main_win().close_screen('new_identity_screen')
+        self.main_win().close_screen('recover_identity_screen')
+        self.main_win().screens_stack.clear()

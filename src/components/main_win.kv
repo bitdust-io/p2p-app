@@ -146,7 +146,7 @@
         size_hint_y: None
         height: dp(28)
 
-        CustomToolbar:
+        CustomBottomToolbar:
 
             id: footer_bar
             size_hint_y: None
@@ -160,7 +160,7 @@
                 {"icon": "id-card", "icon_pack": "IconICO", "tooltip": "my identity"},
                 {"icon": "lan-connect", "icon_pack": "IconMD", "tooltip": "peer-to-peer connections"},
                 {"icon": "family-tree", "icon_pack": "Icon", "tooltip": "distributed hash table"},
-                {"icon": "transit-connection-variant", "icon_pack": "Icon", "tooltip": "routing via third node"},
+                {"icon": "transit-connection-variant", "icon_pack": "Icon", "tooltip": "safe packets re-routing"},
                 {"icon": "database", "icon_pack": "IconFA", "tooltip": "distributed storage", "size": "18sp"},
                 {"icon": "comments", "icon_pack": "IconFA", "tooltip": "chat messages"},]
             on_action_button: root.on_hot_button_clicked()

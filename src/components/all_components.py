@@ -17,7 +17,7 @@ KV_IMPORT = """
 #:import AutomatShortStatusPanelByIndex components.status_panel.AutomatShortStatusPanelByIndex
 #:import CustomActionBottomAppBarButton components.tool_bar.CustomActionBottomAppBarButton
 #:import CustomBottomAppBar components.tool_bar.CustomBottomAppBar
-#:import CustomToolbar components.tool_bar.CustomToolbar
+#:import CustomBottomToolbar components.tool_bar.CustomBottomToolbar
 #:import CustomSelectionList components.selection.CustomSelectionList
 #:import CustomIconLeftWidget components.buttons.CustomIconLeftWidget
 """

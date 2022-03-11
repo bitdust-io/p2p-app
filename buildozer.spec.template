@@ -217,7 +217,12 @@ android.logcat_filters = *:S python:D
 # (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
 # android.arch = armeabi-v7a
 # android.arch = x86_64
-android.arch = arm64-v8a
+# android.arch = arm64-v8a
+android.archs = arm64-v8a, armeabi-v7a, x86_64
+
+# (str) The format used to package the app for release mode (aab or apk).
+android.release_artifact = aab
+
 
 #
 # Python for android (p4a) specific
@@ -327,9 +332,12 @@ source.exclude_patterns = license,data/audio/*.wav,data/images/original/*,.git,b
 
 [app@armeabi_v7a]
 android.arch = armeabi-v7a
+android.release_artifact = apk
 
 [app@x86_64]
 android.arch = x86_64
+android.release_artifact = apk
 
 [app@arm64_v8a]
 android.arch = arm64-v8a
+android.release_artifact = apk

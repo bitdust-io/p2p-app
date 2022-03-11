@@ -1,5 +1,6 @@
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
+from kivymd.uix.list import OneLineIconListItem
 from kivymd.uix.list import TwoLineIconListItem
 
 from lib import api_client
@@ -8,7 +9,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -57,6 +58,22 @@ class ConversationItem(TwoLineIconListItem):
             )
 
 
+class NewPrivateChat(OneLineIconListItem):
+
+    def on_pressed(self):
+        if _Debug:
+            print('NewFriendItem.on_pressed', self)
+        screen.select_screen('search_people_screen')
+
+
+class NewGroupChat(OneLineIconListItem):
+
+    def on_pressed(self):
+        if _Debug:
+            print('NewGroupItem.on_pressed', self)
+        screen.select_screen('create_group_screen')
+
+
 class ConversationsScreen(screen.AppScreen):
 
     def get_title(self):
@@ -69,6 +86,9 @@ class ConversationsScreen(screen.AppScreen):
         return {'icon': 'chat-plus-outline', 'color': 'green', }
 
     def populate(self, *args, **kwargs):
+        self.ids.conversations_list_view.clear_widgets()
+        self.ids.conversations_list_view.add_widget(NewGroupChat())
+        self.ids.conversations_list_view.add_widget(NewPrivateChat())
         for snap_info in self.model('conversation').values():
             if snap_info:
                 self.on_conversation(snap_info)
@@ -93,9 +113,10 @@ class ConversationsScreen(screen.AppScreen):
             print('ConversationsScreen.on_online_status', payload)
         item_found = None
         for w in self.ids.conversations_list_view.children:
-            if w.instance_item.key_id == payload['data']['global_id']:
-                item_found = w
-                break
+            if isinstance(w, ConversationItem):
+                if w.instance_item.key_id == payload['data']['global_id']:
+                    item_found = w
+                    break
         if item_found:
             prev_state = item_found.instance_item.state
             if prev_state != payload['data']['state']:
@@ -113,9 +134,10 @@ class ConversationsScreen(screen.AppScreen):
         conv['automat_id'] = str(conv.pop('id', '') or '')
         item_found = None
         for w in self.ids.conversations_list_view.children:
-            if w.instance_item.key_id == conv['key_id']:
-                item_found = w
-                break
+            if isinstance(w, ConversationItem):
+                if w.instance_item.key_id == conv['key_id']:
+                    item_found = w
+                    break
         if item_found:
             item_found.instance_item.type = conv['type']
             item_found.instance_item.conversation_id = conv['conversation_id']
@@ -148,9 +170,10 @@ class ConversationsScreen(screen.AppScreen):
             print('ConversationsScreen.on_group_state_changed', event_id, group_key_id)
         item_found = None
         for w in self.ids.conversations_list_view.children:
-            if w.instance_item.key_id == group_key_id:
-                item_found = w
-                break
+            if isinstance(w, ConversationItem):
+                if w.instance_item.key_id == group_key_id:
+                    item_found = w
+                    break
         if item_found:
             prev_state = item_found.instance_item.state
             item_found.instance_item.state = new_state

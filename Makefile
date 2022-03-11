@@ -68,8 +68,8 @@ install_buildozer:
 
 install_p4a:
 	@rm -rf python-for-android/
-	@git clone --single-branch --branch master https://github.com/kivy/python-for-android.git
-	# @git clone --single-branch --branch develop https://github.com/kivy/python-for-android.git
+	# @git clone --single-branch --branch master https://github.com/kivy/python-for-android.git
+	@git clone --single-branch --branch develop https://github.com/kivy/python-for-android.git
 	# @git clone --single-branch --branch master https://github.com/vesellov/python-for-android.git
 	# @git clone --single-branch --branch develop https://github.com/vesellov/python-for-android.git
 	# @git clone --single-branch --branch develop_more https://github.com/vesellov/python-for-android.git
@@ -139,6 +139,9 @@ shell:
 	@adb shell "cd /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/; ls -la; sh;"
 
 log_adb:
+	@adb logcat | grep -E "python|Bitdustnode|Exception"
+
+log_adb_quick:
 	@adb logcat | grep -E "python|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust|bitdust_io|Exception"
 
 log_adb_brief:

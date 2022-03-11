@@ -13,21 +13,6 @@
         on_release: root.on_pressed()
 
 
-<NewGroupItem>:
-    text: 'New group'
-    divider: None
-    on_release: root.on_pressed()
-
-    CustomIconLeftWidget:
-        icon: 'account-multiple-plus'
-        padding: (0, 0, 0, 0)
-        pos_hint: {'center_y': 0.5}
-        md_bg_color: app.theme_cls.accent_color
-        theme_text_color: "Custom"
-        text_color: app.color_white
-        on_release: root.on_pressed()
-
-
 <FriendItem>:
     text: root.username
     divider: None

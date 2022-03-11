@@ -4,7 +4,7 @@ import json
 
 #------------------------------------------------------------------------------ 
 
-_Debug = True
+_Debug = False
 
 if _Debug:
     print('BitDustService ENTRYPOINT')

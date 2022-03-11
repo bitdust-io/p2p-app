@@ -33,7 +33,7 @@ from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -227,7 +227,7 @@ class CustomNotchedBox(
         return points
 
 
-class CustomToolbar(CustomNotchedBox, AppStyle):
+class CustomBottomToolbar(CustomNotchedBox, AppStyle):
 
     left_action_items = ListProperty()
     right_action_items = ListProperty()
@@ -241,7 +241,7 @@ class CustomToolbar(CustomNotchedBox, AppStyle):
     icon_color = ColorProperty()
     type = OptionProperty("top", options=["top", "bottom"])
     opposite_colors = BooleanProperty(True)
-    _shift = NumericProperty("-24dp")
+    _shift = NumericProperty("26dp")
 
     def __init__(self, **kwargs):
         self.action_button = CustomActionBottomAppBarButton()
@@ -255,7 +255,7 @@ class CustomToolbar(CustomNotchedBox, AppStyle):
         self.action_button.y = (
             (self.center[1] - self.height / 2)
             + self.theme_cls.standard_increment / 2
-            + self._shift
+            - self._shift
         )
         if system.is_android():
             self.action_button.y = self.action_button.y + dp(4)
@@ -345,7 +345,7 @@ class CustomToolbar(CustomNotchedBox, AppStyle):
                 itm.text_color = self.state2color(state)
         else:
             if _Debug:
-                print('action_bar_item was not found for name %r' % icon_name)
+                print('CustomBottomToolbar.update_action_bar_item item was not found for name %r' % icon_name)
 
     def update_md_bg_color(self, *args):
         self.md_bg_color = self.theme_cls._get_primary_color()
@@ -382,7 +382,7 @@ class CustomToolbar(CustomNotchedBox, AppStyle):
             y = (
                 (self.center[1] - self.height / 2)
                 + self.theme_cls.standard_increment / 2
-                + self._shift
+                - self._shift
             )
         elif value == "end":
 
@@ -391,7 +391,7 @@ class CustomToolbar(CustomNotchedBox, AppStyle):
             y = (
                 (self.center[1] - self.height / 2)
                 + self.theme_cls.standard_increment / 2
-                + self._shift
+                - self._shift
             )
             #self.right_action_items = []
         elif value == "free-end":
@@ -402,6 +402,8 @@ class CustomToolbar(CustomNotchedBox, AppStyle):
             self.remove_notch()
             x = Window.width / 2 - self.action_button.width / 2
             y = self.action_button.height + self.action_button.height / 2
+        if system.is_android():
+            y = y + dp(4)
         self.remove_shadow()
         anim = Animation(_scale_x=0, _scale_y=0, d=0)
         anim.bind(on_complete=set_button_pos)
@@ -454,6 +456,6 @@ class CustomBottomAppBar(FloatLayout):
         self.size_hint_y = None
 
     def add_widget(self, widget, index=0, canvas=None):
-        if isinstance(widget, CustomToolbar):
+        if isinstance(widget, CustomBottomToolbar):
             super().add_widget(widget)
             return super().add_widget(widget.action_button)

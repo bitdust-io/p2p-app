@@ -1,7 +1,6 @@
 import os
 
 fontawesome_ttf_filepath = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'fa-solid.ttf')
-print('fontawesome_ttf_filepath', fontawesome_ttf_filepath)
 
 from kivy.utils import platform
 if platform == 'android':
