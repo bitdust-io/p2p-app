@@ -9,7 +9,7 @@ from components import buttons
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -19,6 +19,30 @@ class WelcomeScreen(screen.AppScreen):
 
     def get_title(self):
         return 'BitDust'
+
+    def populate_buttons(self, state_identity):
+        if _Debug:
+            print('WelcomeScreen.populate_buttons state_identity=%r' % state_identity)
+        if state_identity:
+            exists = False
+            for w in self.ids.central_widget.children:
+                if isinstance(w, buttons.FillRoundFlatButton):
+                    exists = True
+                    break
+            if not exists:
+                btn = buttons.FillRoundFlatButton(
+                    text='create new identity',
+                    pos_hint={'center_x': .5},
+                    md_bg_color=self.app().color_success_green,
+                    text_color=self.app().color_white99,
+                    on_release=self.on_create_identity_button_clicked,
+                )
+                self.ids.central_widget.add_widget(btn)
+        else:
+            for w in self.ids.central_widget.children:
+                if isinstance(w, buttons.FillRoundFlatButton):
+                    self.ids.central_widget.remove_widget(w)
+                    break
 
     def on_enter(self, *args):
         # self.ids.action_button.close_stack()
@@ -54,22 +78,6 @@ class WelcomeScreen(screen.AppScreen):
         if _Debug:
             print('WelcomeScreen.on_identity_get_result', self.main_win().state_process_health, self.main_win().state_identity_get, resp)
         if self.main_win().state_process_health == 1 and self.main_win().state_identity_get != 1 and not api_client.is_ok(resp):
-            exists = False
-            for w in self.ids.central_widget.children:
-                if isinstance(w, buttons.FillRoundFlatButton):
-                    exists = True
-                    break
-            if not exists:
-                btn = buttons.FillRoundFlatButton(
-                    text='create new identity',
-                    pos_hint={'center_x': .5},
-                    md_bg_color=self.app().color_success_green,
-                    text_color=self.app().color_white99,
-                    on_release=self.on_create_identity_button_clicked,
-                )
-                self.ids.central_widget.add_widget(btn)
+            self.populate_buttons(True)
         else:
-            for w in self.ids.central_widget.children:
-                if isinstance(w, buttons.FillRoundFlatButton):
-                    self.ids.central_widget.remove_widget(w)
-                    break
+            self.populate_buttons(False)

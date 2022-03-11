@@ -8,7 +8,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@ class NewIdentityScreen(screen.AppScreen):
         self.ids.create_identity_result_message.from_api_response(resp)
         if not api_client.is_ok(resp):
             return
-        self.main_win().screens_stack.clear()
         self.main_win().select_screen('welcome_screen')
         self.main_win().close_screen('new_identity_screen')
         self.main_win().close_screen('recover_identity_screen')
+        self.main_win().screens_stack.clear()
         self.control().identity_get_latest = time.time()
         self.main_win().state_identity_get = 1
 
     def on_recover_identity_button_clicked(self, *args):
-        self.main_win().screens_stack.clear()
         self.main_win().select_screen('recover_identity_screen')
+        self.main_win().screens_stack.clear()

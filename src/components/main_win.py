@@ -25,7 +25,7 @@ from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -456,6 +456,10 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             print('MainWin.on_state_identity_get', value)
         self.populate_bottom_toolbar_icon('id-card', value)
         self.control.on_state_identity_get(instance, value)
+        if self.is_screen_active('welcome_screen'):
+            welcome_screen = self.get_active_screen('welcome_screen')
+            if welcome_screen:
+                welcome_screen.populate_buttons(False if value == 1 else True)
 
     def on_state_network_connected(self, instance, value):
         # if _Debug:
