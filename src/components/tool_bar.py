@@ -33,7 +33,7 @@ from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -258,7 +258,7 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
             - self._shift
         )
         if system.is_android():
-            self.action_button.y = self.action_button.y + dp(10)
+            self.action_button.y = self.action_button.y + dp(4)
         if not self.icon_color:
             self.icon_color = self.theme_cls.primary_color
         Window.bind(on_resize=self._on_resize)
@@ -403,7 +403,7 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
             x = Window.width / 2 - self.action_button.width / 2
             y = self.action_button.height + self.action_button.height / 2
         if system.is_android():
-            y = y + dp(10)
+            y = y + dp(4)
         self.remove_shadow()
         anim = Animation(_scale_x=0, _scale_y=0, d=0)
         anim.bind(on_complete=set_button_pos)

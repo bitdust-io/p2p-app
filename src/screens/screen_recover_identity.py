@@ -39,6 +39,7 @@ class RecoverIdentityScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             # self.ids.recover_identity_result_message.text =  '[color=#ff0000]{}[/color]'.format('\n'.join(api_client.response_errors(resp)))
             return
+        self.main_win().screens_stack.clear()
         self.main_win().close_screen('new_identity_screen')
         self.main_win().close_screen('recover_identity_screen')
         self.main_win().select_screen('connecting_screen')
