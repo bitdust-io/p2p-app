@@ -459,7 +459,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                welcome_screen.populate_buttons(False if value == 1 else True)
+                welcome_screen.populate_buttons(False if value != -1 else True)
 
     def on_state_network_connected(self, instance, value):
         # if _Debug:

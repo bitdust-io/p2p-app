@@ -13,7 +13,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -58,6 +58,8 @@ def all_screens():
             'screens/screen_group_chat.kv', 'screens.screen_group_chat', 'GroupChatScreen', ),
         'group_info_screen': (
             'screens/screen_group_info.kv', 'screens.screen_group_info', 'GroupInfoScreen', ),
+        'private_files_screen': (
+            'screens/screen_private_files.kv', 'screens.screen_private_files', 'PrivateFilesScreen', ),
     }
 
 #------------------------------------------------------------------------------
@@ -273,6 +275,7 @@ class Controller(object):
         api_client.start_model_streaming('message', request_all=True)
         api_client.start_model_streaming('correspondent', request_all=True)
         api_client.start_model_streaming('online_status', request_all=True)
+        api_client.start_model_streaming('private_file', request_all=True)
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:

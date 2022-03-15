@@ -39,6 +39,16 @@ def control():
 def select_screen(screen_id, verify_state=False, screen_type=None, **kwargs):
     return main_window().select_screen(screen_id, verify_state=verify_state, screen_type=screen_type, **kwargs)
 
+
+def model(model_name=None, snap_id=None):
+    if model_name is None:
+        return control().model_data
+    if snap_id is not None:
+        return control().model_data.get(model_name, {}).get(snap_id, None)
+    if model_name == '*':
+        return control().model_data.keys()
+    return control().model_data.get(model_name, {})
+
 #------------------------------------------------------------------------------
 
 class AppScreen(ThemableBehavior, Screen):
@@ -79,13 +89,7 @@ class AppScreen(ThemableBehavior, Screen):
         return control()
 
     def model(self, model_name=None, snap_id=None):
-        if model_name is None:
-            return control().model_data
-        if snap_id is not None:
-            return control().model_data.get(model_name, {}).get(snap_id, None)
-        if model_name == '*':
-            return control().model_data.keys()
-        return control().model_data.get(model_name, {})
+        return model(model_name=model_name, snap_id=snap_id)
 
     def open_drop_down_menu(self):
         dd_menu = self.ids.get('drop_down_menu')

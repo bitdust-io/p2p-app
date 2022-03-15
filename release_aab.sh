@@ -27,7 +27,7 @@ make refresh_android_environment_full
 rm -rfv ./bin/BitDustAndroid.aab
 rm -rfv ./bin/BitDustAndroid_unsigned.aab
 rm -rfv ./bin/bitdust1-*-release.aab
-(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release)
+(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release 1>aab.out.log 2>aab.err.log || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release 1>aab.out.log 2>aab.err.log)
 
 
 cp -T -v ./bin/bitdust*arm64-v8a_armeabi-v7a_x86_64-release.aab ./bin/BitDustAndroid_unsigned.aab

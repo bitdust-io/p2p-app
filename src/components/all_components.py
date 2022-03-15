@@ -20,6 +20,10 @@ KV_IMPORT = """
 #:import CustomBottomToolbar components.tool_bar.CustomBottomToolbar
 #:import CustomSelectionList components.selection.CustomSelectionList
 #:import CustomIconLeftWidget components.buttons.CustomIconLeftWidget
+#:import DistributedFileSystem components.file_browser.DistributedFileSystem
+#:import DistributedFileChooserListView components.file_browser.DistributedFileChooserListView
+#:import DistributedFileChooserListLayout components.file_browser.DistributedFileChooserListLayout
+
 """
 
 
@@ -35,4 +39,5 @@ KV_FILES = [
     './components/dialogs.kv',
     './components/selection.kv',
     './components/main_win.kv',
+    './components/file_browser.kv',
 ]

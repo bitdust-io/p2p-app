@@ -1,0 +1,63 @@
+
+
+<UploadPrivateFile>:
+    text: 'Upload private file'
+    divider: None
+    on_release: root.on_pressed()
+
+    CustomIconLeftWidget:
+        icon: 'file-upload-outline'
+        padding: (0, 0, 0, 0)
+        pos_hint: {'center_y': 0.5}
+        md_bg_color: app.theme_cls.accent_color
+        theme_text_color: "Custom"
+        text_color: app.color_white
+        on_release: root.on_pressed()
+
+
+<PrivateFileItem>:
+    text: root.name
+    secondary_text: root.get_secondary_text()
+    divider: None
+    on_release: root.on_pressed()
+
+    CustomIconLeftWidget:
+        icon: 'file'
+        padding: (0, 0, 0, 0)
+        pos_hint: {'center_y': 0.5}
+        md_bg_color: app.theme_cls.secondary_color
+        theme_text_color: "Custom"
+        text_color: app.color_white
+        on_release: root.on_pressed()
+
+
+<PrivateFilesScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'files are not available at the moment',
+                    'ON': 'distributed storage is ready',
+                    'OFF': 'private storage service is not started',
+                    'NOT_INSTALLED': 'private storage service was not installed',
+                    'INFLUENCE': 'verifying related network services',
+                    'DEPENDS_OFF': 'related network services not yet started',
+                    'STARTING': 'turning on private storage service',
+                    'STOPPING': 'turning off private storage service',
+                    'CLOSED': 'private storage service is stopped', }
+
+            VerticalScrollView:
+                id: scroll_view
+
+                DistributedFileChooserListView:
+                    id: files_list_view
+                    file_system: DistributedFileSystem()
+
+        BottomEmptyScreenSpace:

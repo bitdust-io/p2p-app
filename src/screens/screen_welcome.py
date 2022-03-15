@@ -20,10 +20,10 @@ class WelcomeScreen(screen.AppScreen):
     def get_title(self):
         return 'BitDust'
 
-    def populate_buttons(self, state_identity):
+    def populate_buttons(self, show_button):
         if _Debug:
-            print('WelcomeScreen.populate_buttons state_identity=%r' % state_identity)
-        if state_identity:
+            print('WelcomeScreen.populate_buttons show_button=%r' % show_button)
+        if show_button:
             exists = False
             for w in self.ids.central_widget.children:
                 if isinstance(w, buttons.FillRoundFlatButton):
