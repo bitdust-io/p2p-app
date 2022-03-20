@@ -6,7 +6,7 @@ from lib import websock
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -177,6 +177,16 @@ def config_set(key, value, cb=None):
 def services_list(with_configs=False, cb=None):
     return run('services_list', kwargs={'with_configs': with_configs, }, cb=cb)
 
+
+def files_list(remote_path=None, key_id=None, recursive=False, all_customers=False, include_uploads=False, include_downloads=False, cb=None):
+    return run('files_list', kwargs={
+        'remote_path': remote_path,
+        'key_id': key_id,
+        'recursive': recursive,
+        'all_customers': all_customers,
+        'include_uploads': include_uploads,
+        'include_downloads': include_downloads,
+    }, cb=cb)
 
 def user_observe(nickname, attempts=5, cb=None):
     return run('user_observe', kwargs={'nickname': nickname, 'attempts': attempts, }, cb=cb)

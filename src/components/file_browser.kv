@@ -1,0 +1,107 @@
+[DistributedFileListEntry@FloatLayout+TreeViewNode]:
+    locked: False
+    entries: []
+    path: ctx.path
+    is_selected: False
+    no_selection: True
+
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '36dp'
+    is_leaf: not ctx.isdir or ctx.name.endswith('..' + ctx.sep) or self.locked
+    on_touch_down: self.collide_point(*args[1].pos) and ctx.controller().entry_touched(self, args[1])
+    on_touch_up: self.collide_point(*args[1].pos) and ctx.controller().entry_released(self, args[1])
+    odd_color: (1,1,1,1)
+    even_color: (.98,.98,.98,1)
+
+    BoxLayout:
+        pos: root.pos
+        size_hint_x: None
+        width: root.width - dp(10)
+
+        Label:
+            id: filename
+            text_size: self.width, None
+            halign: 'left'
+            shorten: True
+            text: ctx.name
+            font_name: ctx.controller().font_name
+            color: (0, 0, 0, 1)
+
+        Label:
+            text_size: self.width, None
+            size_hint_x: None
+            halign: 'right'
+            text: '{}'.format(ctx.get_nice_size())
+            font_name: ctx.controller().font_name
+            color: (0, 0, 0, 1)
+
+
+<DistributedFileChooserListLayout>:
+    on_entry_added: treeview.add_node(args[1])
+    on_entries_cleared: treeview.root.nodes = []
+    on_subentry_to_entry: not args[2].locked and treeview.add_node(args[1], args[2])
+    on_remove_subentry: args[2].nodes = []
+
+    BoxLayout:
+        pos: root.pos
+        size: root.size
+        size_hint: None, None
+        orientation: 'vertical'
+
+        BoxLayout:
+            size_hint_y: None
+            height: '30dp'
+            orientation: 'horizontal'
+
+            Widget:
+                width: '10dp'
+                size_hint_x: None
+
+            Label:
+                text: 'Name'
+                text_size: self.size
+                halign: 'left'
+                color: (.7,.7,.7,1)
+
+            Label:
+                text: 'Size'
+                text_size: self.size
+                size_hint_x: None
+                halign: 'right'
+                color: (.7,.7,.7,1)
+
+            Widget:
+                width: '10dp'
+                size_hint_x: None
+
+        ScrollView:
+            id: scrollview
+            do_scroll_x: False
+
+            Scatter:
+                do_rotation: False
+                do_scale: False
+                do_translation: False
+                size: treeview.size
+                size_hint_y: None
+
+                TreeView:
+                    id: treeview
+                    hide_root: True
+                    size_hint_y: None
+                    width: scrollview.width
+                    height: self.minimum_height
+                    indent_start: '30dp'
+                    on_node_expand: root.controller.entry_subselect(args[1])
+                    on_node_collapse: root.controller.close_subselection(args[1])
+
+
+<DistributedFileChooserListView>:
+    layout: layout
+    # rootpath: '/'
+    dirselect: True
+
+    DistributedFileChooserListLayout:
+        id: layout
+        controller: root

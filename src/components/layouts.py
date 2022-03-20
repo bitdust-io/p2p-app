@@ -1,5 +1,3 @@
-from functools import partial
-
 from kivy.clock import Clock
 from kivy.properties import ObjectProperty, NumericProperty  # @UnresolvedImport
 from kivy.uix.anchorlayout import AnchorLayout

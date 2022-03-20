@@ -13,9 +13,9 @@
             radius: (root._radius, )
 
     lbl_txt: lbl_txt
-    height: dp(36) if not root._height else root._height
+    height: (dp(48) if not root._height else root._height)
     width: lbl_txt.texture_size[0] + root.increment_width
-    padding: (dp(8), 0)
+    padding: (dp(8), dp(0))
     theme_text_color: 'Primary' if not root.text_color else 'Custom'
     markup: False
 
@@ -25,8 +25,9 @@
         font_size: root.font_size
         can_capitalize: root.can_capitalize
         size_hint_x: None
+        size_hint_y: None
         text_size: (None, root.height)
-        height: self.texture_size[1]
+        height: self.texture_size[1] + dp(40)
         theme_text_color: root.theme_text_color
         text_color: root.text_color
         markup: root.markup
@@ -153,7 +154,8 @@
 
 <RoundedButton>:
     _radius: 8
-    increment_width: dp(20)
+    increment_width: dp(16)
+    increment_height: dp(16)
     markup: True
 
 
@@ -164,6 +166,9 @@
 
 
 <RoundedFlexButton>:
+    _radius: 8
+    increment_width: dp(16)
+    increment_height: dp(16)
 
 
 <CustomIconButton>:

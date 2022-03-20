@@ -82,9 +82,6 @@ class ConversationsScreen(screen.AppScreen):
     def get_icon(self):
         return 'comment-text-multiple'
 
-    def get_hot_button(self):
-        return {'icon': 'chat-plus-outline', 'color': 'green', }
-
     def populate(self, *args, **kwargs):
         self.ids.conversations_list_view.clear_widgets()
         self.ids.conversations_list_view.add_widget(NewGroupChat())
@@ -180,8 +177,3 @@ class ConversationsScreen(screen.AppScreen):
             item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
             if _Debug:
                 print('ConversationsScreen.on_group_state_changed %r updated : %r -> %r' % (group_key_id, prev_state, new_state, ))
-
-    def on_hot_button_clicked(self, *args):
-        if _Debug:
-            print('ConversationsScreen.on_hot_button_clicked', *args)
-        self.main_win().select_screen('friends_screen')

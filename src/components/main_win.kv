@@ -76,6 +76,20 @@
                         app.main_window.nav().set_state("close")
                         app.main_window.select_screen('friends_screen', verify_state=True)
 
+            # OneLineIconListItem:
+            #     id: menu_item_private_files
+            #     text: "my files"
+            #     on_release:
+            #         app.main_window.nav().set_state("close")
+            #         app.main_window.select_screen('private_files_screen', verify_state=True)
+            #     IconLeftWidget:
+            #         icon: "file-tree"
+            #         md_bg_color: app.color_transparent
+            #         md_bg_color_disabled: app.color_transparent
+            #         on_release:
+            #             app.main_window.nav().set_state("close")
+            #             app.main_window.select_screen('private_files_screen', verify_state=True)
+
             OneLineIconListItem:
                 id: menu_item_settings
                 text: "settings"

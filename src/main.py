@@ -19,7 +19,7 @@ if 'ANDROID_ARGUMENT' not in os.environ:
 
 #------------------------------------------------------------------------------ 
 
-_Debug = False
+_Debug = True
 _DebugProfilingEnabled = False
 
 #------------------------------------------------------------------------------
@@ -114,6 +114,8 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   android_sdk_version() : %r' % system.android_sdk_version())
                 print('BitDustApp.build   ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
+                # from android.activity import _activity
+                # print('BitDustApp.build   _activity=%r' % _activity)
 
         self.title = 'BitDust'
         self.icon = './bitdust.png'
