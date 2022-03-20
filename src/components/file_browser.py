@@ -9,7 +9,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -19,7 +19,6 @@ class DistributedFileSystem(FileSystemAbstract):
     def listdir(self, fn):
         if _Debug:
             print('DistributedFileSystem.listdir', fn)
-        # api_client.files_list(remote_path=fn)
         dirs = []
         files = []
         sep_count = 1
@@ -87,12 +86,6 @@ class DistributedFileChooserListLayout(FileChooserLayout):
 class DistributedFileChooserListView(FileChooserController):
 
     _ENTRY_TEMPLATE = 'DistributedFileListEntry'
-
-    def _create_entry_widget(self, ctx):
-        ret = super()._create_entry_widget(ctx)
-        if _Debug:
-            print('DistributedFileChooserListView._create_entry_widget', ret, ctx)
-        return ret
 
     def entry_touched(self, entry, touch):
         if _Debug:

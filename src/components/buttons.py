@@ -1,4 +1,3 @@
-from kivy.metrics import dp
 from kivy.clock import Clock
 from kivy.properties import (
     BooleanProperty,  # @UnresolvedImport
@@ -7,20 +6,15 @@ from kivy.properties import (
     BoundedNumericProperty,  # @UnresolvedImport
     ColorProperty,  # @UnresolvedImport
     ListProperty,  # @UnresolvedImport
-    DictProperty,  # @UnresolvedImport
-    ObjectProperty,  # @UnresolvedImport
 )
-from kivy.animation import Animation
-from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.switch import Switch
-from kivymd.uix.list import OneLineIconListItem, IconLeftWidget
+from kivymd.uix.list import IconLeftWidget
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.button import (
     BaseButton,
     BaseElevationButton,
     BasePressedButton,
-    MDFloatingActionButton,
     MDFlatButton,
     MDFillRoundFlatButton,
 )
@@ -46,11 +40,12 @@ class CustomRectangularButton(RectangularRippleBehavior, BaseButton):
         10, min=10, max=None, errorhandler=lambda x: 10
     )
     text = StringProperty("")
-    increment_width = NumericProperty("0dp")
+    increment_width = NumericProperty("16dp")
+    increment_height = NumericProperty("16dp")
     button_label = BooleanProperty(True)
     can_capitalize = BooleanProperty(True)
-    _radius = NumericProperty("2dp")
-    _height = NumericProperty(36)
+    _radius = NumericProperty("8dp")
+    _height = NumericProperty("48dp")
     text_halign = StringProperty('center')
 
 
@@ -100,16 +95,6 @@ class CustomRaisedButton(CustomRectangularButton, RectangularElevationBehavior, 
 
 class CustomRaisedFlexButton(CustomRectangularFlexButton, RectangularElevationBehavior, SpecificBackgroundColorBehavior, BaseElevationButton, BasePressedButton):
     pass
-
-
-# class CustomFloatingActionButton(MDFloatingActionButton):
-# 
-#     button_size = NumericProperty(styles.app.btn_icon_normal_width)
-#     icon_pack = StringProperty('IconMD')
-# 
-#     def set_size(self, interval):
-#         self.width = self.button_size
-#         self.height = self.button_size
 
 
 class FillRoundFlatButton(MDFillRoundFlatButton):

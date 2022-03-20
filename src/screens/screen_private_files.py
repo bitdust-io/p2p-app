@@ -1,7 +1,10 @@
+from kivy.clock import mainthread
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
 from kivymd.uix.list import OneLineIconListItem
 from kivymd.uix.list import TwoLineIconListItem
+
+from plyer import filechooser
 
 from lib import api_client
 
@@ -50,11 +53,6 @@ class PrivateFilesScreen(screen.AppScreen):
 
     def populate(self, *args, **kwargs):
         pass
-        # self.ids.files_list_view.clear_widgets()
-        # self.ids.files_list_view.add_widget(PrivateFilesScreen())
-        # for snap_info in self.model('private_file').values():
-        #     if snap_info:
-        #         self.on_private_file(snap_info)
 
     def on_created(self):
         api_client.add_model_listener('private_file', listener_cb=self.on_private_file)
@@ -72,3 +70,20 @@ class PrivateFilesScreen(screen.AppScreen):
     def on_private_file(self, payload):
         if _Debug:
             print('PrivateFilesScreen.on_private_file', payload)
+
+    # @mainthread
+    def on_upload_file_button_clicked(self, *args):
+        if _Debug:
+            print('PrivateFilesScreen.on_upload_file_button_clicked', args)
+        raw_path = filechooser.open_file(
+            title="Upload new file",
+            preview=True,
+            show_hidden=False,
+            on_selection=self.on_upload_file_selected,
+        )
+        if _Debug:
+            print('raw_path', raw_path)
+
+    def on_upload_file_selected(self, *args, **kwargs):
+        if _Debug:
+            print('PrivateFilesScreen.on_upload_file_selected', args, kwargs)
