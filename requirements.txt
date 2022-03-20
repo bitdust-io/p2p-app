@@ -1,4 +1,4 @@
-kivy>=2.0.0
+kivy==2.0.0
 # kivymd
 # https://github.com/vesellov/KivyMD/archive/master.zip
 # git+https://github.com/kivymd/KivyMD.git@a51aa9faf1f9a70edecd4a993b9705d05baddaaf
