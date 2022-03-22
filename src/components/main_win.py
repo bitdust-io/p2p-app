@@ -450,6 +450,10 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             print('MainWin.on_state_process_health', value)
         self.populate_bottom_toolbar_icon('micro-chip', value)
         self.control.on_state_process_health(instance, value)
+        if self.is_screen_active('welcome_screen'):
+            welcome_screen = self.get_active_screen('welcome_screen')
+            if welcome_screen:
+                welcome_screen.populate(process_health=value)
 
     def on_state_identity_get(self, instance, value):
         if _Debug:
@@ -459,7 +463,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                welcome_screen.populate_buttons(False if value != -1 else True)
+                welcome_screen.populate(create_identity=(False if value != -1 else True))
 
     def on_state_network_connected(self, instance, value):
         # if _Debug:

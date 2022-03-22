@@ -1,4 +1,4 @@
-from kivy.clock import Clock
+from kivy.clock import Clock  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
@@ -6,10 +6,11 @@ from lib import api_client
 
 from components import screen
 from components import buttons
+from components import labels
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -20,10 +21,15 @@ class WelcomeScreen(screen.AppScreen):
     def get_title(self):
         return 'BitDust'
 
-    def populate_buttons(self, show_button):
+    def populate(self, create_identity=None, process_health=None, start_engine=None):
         if _Debug:
-            print('WelcomeScreen.populate_buttons show_button=%r' % show_button)
-        if show_button:
+            print('WelcomeScreen.populate create_identity=%r process_health=%r start_engine=%r' % (create_identity, process_health, start_engine, ))
+        if create_identity:
+            for w in self.ids.central_widget.children:
+                if isinstance(w, labels.HFlexMarkupLabel):
+                    if w.text == 'starting...':
+                        self.ids.central_widget.remove_widget(w)
+                        break
             exists = False
             for w in self.ids.central_widget.children:
                 if isinstance(w, buttons.FillRoundFlatButton):
@@ -43,6 +49,26 @@ class WelcomeScreen(screen.AppScreen):
                 if isinstance(w, buttons.FillRoundFlatButton):
                     self.ids.central_widget.remove_widget(w)
                     break
+        if process_health != 1 or start_engine:
+            exists = False
+            for w in self.ids.central_widget.children:
+                if isinstance(w, labels.HFlexMarkupLabel):
+                    if w.text == 'starting...':
+                        exists = True
+                        break
+            if not exists:
+                lbl = labels.HFlexMarkupLabel(
+                    text='starting...',
+                    pos_hint={'center_x': .5},
+                    halign='center',
+                )
+                self.ids.central_widget.add_widget(lbl)
+        else:
+            for w in self.ids.central_widget.children:
+                if isinstance(w, labels.HFlexMarkupLabel):
+                    if w.text == 'starting...':
+                        self.ids.central_widget.remove_widget(w)
+                        break
 
     def on_enter(self, *args):
         # self.ids.action_button.close_stack()
@@ -78,6 +104,6 @@ class WelcomeScreen(screen.AppScreen):
         if _Debug:
             print('WelcomeScreen.on_identity_get_result', self.main_win().state_process_health, self.main_win().state_identity_get, resp)
         if self.main_win().state_process_health == 1 and self.main_win().state_identity_get != 1 and not api_client.is_ok(resp):
-            self.populate_buttons(True)
+            self.populate(create_identity=True)
         else:
-            self.populate_buttons(False)
+            self.populate()

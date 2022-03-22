@@ -234,6 +234,10 @@ class BitDustApp(styles.AppStyle, MDApp):
                 os.rename('/storage/emulated/0/.bitdust', '/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust')
             except Exception as e:
                 print('Failed to move data folder from legacy location:', e)
+        if self.main_window.is_screen_active('welcome_screen'):
+            welcome_screen = self.main_window.get_active_screen('welcome_screen')
+            if welcome_screen:
+                welcome_screen.populate(start_engine=True)
         self.main_window.engine_log = '\n'
         service = autoclass(SERVICE_NAME)
         if _Debug:
@@ -280,6 +284,10 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.do_start_deploy_process params=%r finishing=%r' % (params, self.finishing.is_set(), ))
         if self.finishing.is_set():
             return
+        if self.main_window.is_screen_active('welcome_screen'):
+            welcome_screen = self.main_window.get_active_screen('welcome_screen')
+            if welcome_screen:
+                welcome_screen.populate(start_engine=True)
         self.main_window.engine_log = '\n'
         if system.is_linux():
             system.BackgroundProcess(
