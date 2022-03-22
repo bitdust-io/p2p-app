@@ -55,6 +55,7 @@ from lib import system
 from screens import controller
 
 from components import styles
+from components import snackbar
 
 #------------------------------------------------------------------------------
 
@@ -296,6 +297,7 @@ class BitDustApp(styles.AppStyle, MDApp):
                 stderr_callback=self.on_deploy_process_stderr,
                 finishing=self.finishing,
                 daemon=True,
+                result_callback=self.on_deploy_process_result,
             ).run()
         elif system.is_osx():
             system.BackgroundProcess(
@@ -304,6 +306,7 @@ class BitDustApp(styles.AppStyle, MDApp):
                 stderr_callback=self.on_deploy_process_stderr,
                 finishing=self.finishing,
                 daemon=True,
+                result_callback=self.on_deploy_process_result,
             ).run()
 
     def do_android_check_app_permission(self, permission):
@@ -334,6 +337,14 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_deploy_process_stderr(self, line):
         if _Debug:
             print('DEPLOY ERR:', line.decode().rstrip())
+
+    @mainthread
+    def on_deploy_process_result(self, retcode):
+        if _Debug:
+            print('BitDustApp.on_deploy_process_result', retcode)
+        if retcode == 2:
+            pth = os.path.join(os.path.expanduser('~'), '.bitdust', 'install.log')
+            snackbar.error(text='installation failed, see %s file for details' % pth)
 
     def on_start(self):
         if _Debug:
