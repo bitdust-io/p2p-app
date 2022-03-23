@@ -6,7 +6,7 @@ from queue import Queue
 
 #------------------------------------------------------------------------------
 
-from kivy.utils import platform
+from kivy.utils import platform  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 

@@ -64,6 +64,10 @@ if system.is_android():
     import encodings.idna  # @UnusedImport
 
     from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE  # @UnresolvedImport
+
+    from android import activity  # @UnresolvedImport
+    activity._activity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
+
     from android.storage import primary_external_storage_path, app_storage_path  # @UnresolvedImport
 
     from lib.permissions import check_permission, request_permissions  # @UnresolvedImport
@@ -115,8 +119,8 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   android_sdk_version() : %r' % system.android_sdk_version())
                 print('BitDustApp.build   ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
-                # from android.activity import _activity
-                # print('BitDustApp.build   _activity=%r' % _activity)
+                from android.activity import _activity  # @UnresolvedImport
+                print('BitDustApp.build   _activity=%r' % _activity)
 
         self.title = 'BitDust'
         self.icon = './bitdust.png'

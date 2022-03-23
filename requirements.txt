@@ -11,3 +11,4 @@ toml
 colorama
 pep517
 zipp
+plyer

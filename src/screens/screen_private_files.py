@@ -4,9 +4,8 @@ from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 from kivymd.uix.list import OneLineIconListItem
 from kivymd.uix.list import TwoLineIconListItem
 
-from plyer import filechooser
-
 from lib import api_client
+from lib import system
 
 from components import screen
 
@@ -75,6 +74,10 @@ class PrivateFilesScreen(screen.AppScreen):
     def on_upload_file_button_clicked(self, *args):
         if _Debug:
             print('PrivateFilesScreen.on_upload_file_button_clicked', args)
+        if system.is_android():
+            from lib import filechooser
+        else:
+            from plyer import filechooser
         raw_path = filechooser.open_file(
             title="Upload new file",
             preview=True,

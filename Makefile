@@ -74,6 +74,13 @@ install_p4a:
 	# @git clone --single-branch --branch develop_more https://github.com/vesellov/python-for-android.git
 	@mkdir -p ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 	@cp -r -v etc/res/xml/network_security_config.xml ./python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
+	@python3 -c "fn='./python-for-android/pythonforandroid/recipes/android/src/android/activity.py';s=open(fn).read();s=s.replace('autoclass(ACTIVITY_CLASS_NAME).mActivity','autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity');open(fn,'w').write(s);"
+	@python3 -c "fn='./python-for-android/pythonforandroid/recipes/android/src/android/loadingscreen.py';s=open(fn).read();s=s.replace('autoclass(ACTIVITY_CLASS_NAME).mActivity','autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity');open(fn,'w').write(s);"
+	@python3 -c "fn='./python-for-android/pythonforandroid/recipes/android/src/android/_ctypes_library_finder.py';s=open(fn).read();s=s.replace('hasattr(activity_class, \"mActivity\")','hasattr(activity_class, \"mBitDustActivity\")');open(fn,'w').write(s);"
+	@python3 -c "fn='./python-for-android/pythonforandroid/recipes/android/src/android/_ctypes_library_finder.py';s=open(fn).read();s=s.replace('activity_class.mActivity','activity_class.mBitDustActivity');open(fn,'w').write(s);"
+	@python3 -c "fn='./python-for-android/pythonforandroid/recipes/android/src/android/permissions.py';s=open(fn).read();s=s.replace('autoclass(ACTIVITY_CLASS_NAME).mActivity','autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity');open(fn,'w').write(s);"
+	@python3 -c "fn='./python-for-android/pythonforandroid/recipes/android/src/android/storage.py';s=open(fn).read();s=s.replace('PythonActivity.mActivity','PythonActivity.mBitDustActivity');open(fn,'w').write(s);"
+	@python3 -c "fn='./python-for-android/pythonforandroid/recipes/android/src/android/_android.pyx';s=open(fn).read();s=s.replace('mActivity = python_act.mActivity','mActivity = python_act.mBitDustActivity');open(fn,'w').write(s);"
 
 update_p4a:
 	# @cd ./python-for-android; git fetch --all; git reset --hard origin/master; cd ..;
