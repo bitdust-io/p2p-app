@@ -120,7 +120,9 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
                 from android.activity import _activity  # @UnresolvedImport
+                from android import mActivity  # @UnresolvedImport
                 print('BitDustApp.build   _activity=%r' % _activity)
+                print('BitDustApp.build   mActivity=%r' % mActivity)
 
         self.title = 'BitDust'
         self.icon = './bitdust.png'

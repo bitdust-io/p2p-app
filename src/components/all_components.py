@@ -21,6 +21,7 @@ KV_IMPORT = """
 #:import CustomSelectionList components.selection.CustomSelectionList
 #:import CustomIconLeftWidget components.buttons.CustomIconLeftWidget
 #:import DistributedFileSystem components.file_browser.DistributedFileSystem
+#:import DistributedFileListEntry components.file_browser.DistributedFileListEntry
 #:import DistributedFileChooserListView components.file_browser.DistributedFileChooserListView
 #:import DistributedFileChooserListLayout components.file_browser.DistributedFileChooserListLayout
 

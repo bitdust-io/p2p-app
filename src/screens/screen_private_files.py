@@ -1,3 +1,5 @@
+import os
+
 from kivy.clock import mainthread
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
@@ -5,7 +7,6 @@ from kivymd.uix.list import OneLineIconListItem
 from kivymd.uix.list import TwoLineIconListItem
 
 from lib import api_client
-from lib import system
 
 from components import screen
 
@@ -54,11 +55,10 @@ class PrivateFilesScreen(screen.AppScreen):
         pass
 
     def on_created(self):
-        api_client.add_model_listener('private_file', listener_cb=self.on_private_file)
-        self.populate()
+        self.ids.files_list_view.init(file_clicked_callback=self.on_file_clicked)
 
     def on_destroying(self):
-        api_client.remove_model_listener('private_file', listener_cb=self.on_private_file)
+        self.ids.files_list_view.shutdown()
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_my_data')
@@ -70,23 +70,60 @@ class PrivateFilesScreen(screen.AppScreen):
         if _Debug:
             print('PrivateFilesScreen.on_private_file', payload)
 
-    # @mainthread
+    def on_remote_version(self, payload):
+        if _Debug:
+            print('PrivateFilesScreen.on_remote_version', payload)
+
+    @mainthread
     def on_upload_file_button_clicked(self, *args):
         if _Debug:
             print('PrivateFilesScreen.on_upload_file_button_clicked', args)
+        from lib import system
         if system.is_android():
             from lib import filechooser
+            raw_path = filechooser.instance().open_file(
+                title="Upload new file",
+                preview=True,
+                show_hidden=False,
+                on_selection=self.on_upload_file_selected,
+            )
         else:
             from plyer import filechooser
-        raw_path = filechooser.open_file(
-            title="Upload new file",
-            preview=True,
-            show_hidden=False,
-            on_selection=self.on_upload_file_selected,
-        )
+            raw_path = filechooser.open_file(
+                title="Upload new file",
+                preview=True,
+                show_hidden=False,
+                on_selection=self.on_upload_file_selected,
+            )
         if _Debug:
             print('raw_path', raw_path)
 
     def on_upload_file_selected(self, *args, **kwargs):
         if _Debug:
             print('PrivateFilesScreen.on_upload_file_selected', args, kwargs)
+        file_path = args[0][0]
+        file_name = os.path.basename(file_path)
+        api_client.file_create(
+            remote_path=file_name,
+            as_folder=False,
+            exist_ok=True,
+            cb=lambda resp: self.on_file_created(resp, file_path),
+        )
+
+    def on_file_created(self, resp, file_path):
+        if _Debug:
+            print('PrivateFilesScreen.on_file_created', file_path, resp)
+        file_name = os.path.basename(file_path)
+        api_client.file_upload_start(
+            local_path=file_path,
+            remote_path=file_name,
+            cb=self.on_upload_file_started,
+        )
+
+    def on_upload_file_started(self, resp):
+        if _Debug:
+            print('PrivateFilesScreen.on_upload_file_started', resp)
+
+    def on_file_clicked(self, *args, **kwargs):
+        if _Debug:
+            print('PrivateFilesScreen.on_file_clicked', args[0].global_id)

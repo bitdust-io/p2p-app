@@ -148,23 +148,27 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             self.menu().ids.menu_item_chat.disabled = True
             self.menu().ids.menu_item_friends.disabled = True
             self.menu().ids.menu_item_settings.disabled = True
+            self.menu().ids.menu_item_private_files.disabled = True
             return
         if self.state_identity_get != 1:
             self.menu().ids.menu_item_my_identity.disabled = False
             self.menu().ids.menu_item_chat.disabled = True
             self.menu().ids.menu_item_friends.disabled = True
             self.menu().ids.menu_item_settings.disabled = False
+            self.menu().ids.menu_item_private_files.disabled = True
             return
         if self.state_network_connected != 1:
             self.menu().ids.menu_item_my_identity.disabled = False
             self.menu().ids.menu_item_friends.disabled = True
             self.menu().ids.menu_item_chat.disabled = True
             self.menu().ids.menu_item_settings.disabled = False
+            self.menu().ids.menu_item_private_files.disabled = True
             return
         self.menu().ids.menu_item_my_identity.disabled = False
         self.menu().ids.menu_item_chat.disabled = False
         self.menu().ids.menu_item_friends.disabled = False
         self.menu().ids.menu_item_settings.disabled = False
+        self.menu().ids.menu_item_private_files.disabled = False
 
     #------------------------------------------------------------------------------
 

@@ -49,7 +49,7 @@ class WelcomeScreen(screen.AppScreen):
                 if isinstance(w, buttons.FillRoundFlatButton):
                     self.ids.central_widget.remove_widget(w)
                     break
-        if (process_health != 1 or start_engine) and not create_identity:
+        if (process_health in [0, -1, ] or start_engine) and not create_identity:
             exists = False
             for w in self.ids.central_widget.children:
                 if isinstance(w, labels.HFlexMarkupLabel):

@@ -188,6 +188,35 @@ def files_list(remote_path=None, key_id=None, recursive=False, all_customers=Fal
         'include_downloads': include_downloads,
     }, cb=cb)
 
+
+def file_create(remote_path, as_folder=False, exist_ok=False, force_path_id=None, cb=None):
+    return run('file_create', kwargs={
+        'remote_path': remote_path,
+        'as_folder': as_folder,
+        'exist_ok': exist_ok,
+        'force_path_id': force_path_id,
+    }, cb=cb)
+
+
+def file_upload_start(local_path, remote_path, wait_result=False, wait_finish=False, open_share=False, cb=None):
+    return run('file_upload_start', kwargs={
+        'local_path': local_path,
+        'remote_path': remote_path,
+        'wait_result': wait_result,
+        'wait_finish': wait_finish,
+        'open_share': open_share,
+    }, cb=cb)
+
+
+def file_download_start(remote_path, destination_path=None, wait_result=False, open_share=True, cb=None):
+    return run('file_download_start', kwargs={
+        'remote_path': remote_path,
+        'destination_path': destination_path,
+        'wait_result': wait_result,
+        'open_share': open_share,
+    }, cb=cb)
+
+
 def user_observe(nickname, attempts=5, cb=None):
     return run('user_observe', kwargs={'nickname': nickname, 'attempts': attempts, }, cb=cb)
 

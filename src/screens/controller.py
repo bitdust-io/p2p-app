@@ -13,7 +13,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -60,6 +60,8 @@ def all_screens():
             'screens/screen_group_info.kv', 'screens.screen_group_info', 'GroupInfoScreen', ),
         'private_files_screen': (
             'screens/screen_private_files.kv', 'screens.screen_private_files', 'PrivateFilesScreen', ),
+        'single_private_file_screen': (
+            'screens/screen_single_private_file.kv', 'screens.screen_single_private_file', 'SinglePrivateFileScreen', ),
     }
 
 #------------------------------------------------------------------------------
@@ -78,6 +80,8 @@ class Controller(object):
         self.state_changed_callbacks = {}
         self.state_changed_callbacks_by_id = {}
         self.model_data = {}
+        self.private_files_by_path = {}
+        self.private_files_by_id = {}
 
     def mw(self):
         return self.app.main_window
@@ -259,8 +263,6 @@ class Controller(object):
         self.mw().state_network_connected = 1 # if api_client.is_ok(resp) else -1
         self.run()
 
-    #------------------------------------------------------------------------------
-
     def on_websocket_open(self, websocket_instance):
         if _Debug:
             print('Controller.on_websocket_open', websocket_instance)
@@ -276,6 +278,7 @@ class Controller(object):
         api_client.start_model_streaming('correspondent', request_all=True)
         api_client.start_model_streaming('online_status', request_all=True)
         api_client.start_model_streaming('private_file', request_all=True)
+        api_client.start_model_streaming('remote_version', request_all=True)
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:
@@ -374,8 +377,9 @@ class Controller(object):
     def on_model_update(self, json_data):
         model_name = json_data['payload']['name']
         snap_id = json_data['payload']['id']
+        d = json_data['payload']['data']
         if _Debug:
-            print('Controller.on_model_update [%s] %s : %r' % (model_name, snap_id, json_data['payload']['data'].get('state'), ))
+            print('Controller.on_model_update [%s] %s\n    %r' % (model_name, snap_id, d, ))
         if model_name not in self.model_data:
             self.model_data[model_name] = {}
         if json_data['payload'].get('deleted'):
@@ -384,20 +388,23 @@ class Controller(object):
             if snap_id not in self.model_data[model_name]:
                 self.model_data[model_name][snap_id] = {}
             self.model_data[model_name][snap_id]['id'] = snap_id
-            self.model_data[model_name][snap_id]['data'] = json_data['payload']['data']
+            self.model_data[model_name][snap_id]['data'] = d
             self.model_data[model_name][snap_id]['created'] = json_data['payload']['created']
             if model_name == 'service':
                 def _st(d):
                     return 1 if d['state'] == 'ON' else (
                         -1 if d['state'] in ['OFF', 'NOT_INSTALLED', 'DEPENDS_OFF', 'CLOSED', ] else 0)
                 if snap_id == 'service_my_data':
-                    self.mw().state_my_data = _st(json_data['payload']['data'])
+                    self.mw().state_my_data = _st(d)
                 elif snap_id == 'service_message_history':
-                    self.mw().state_message_history = _st(json_data['payload']['data'])
+                    self.mw().state_message_history = _st(d)
                 elif snap_id == 'service_entangled_dht':
-                    self.mw().state_entangled_dht = _st(json_data['payload']['data'])
+                    self.mw().state_entangled_dht = _st(d)
                 elif snap_id == 'service_proxy_transport':
-                    self.mw().state_proxy_transport = _st(json_data['payload']['data'])
+                    self.mw().state_proxy_transport = _st(d)
+            elif model_name == 'private_file':
+                self.private_files_by_path[d['remote_path']] = d['global_id']
+                self.private_files_by_id[d['global_id']] = d['remote_path']
 
     def on_state_process_health(self, instance, value):
         if _Debug:
