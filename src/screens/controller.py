@@ -378,11 +378,12 @@ class Controller(object):
         model_name = json_data['payload']['name']
         snap_id = json_data['payload']['id']
         d = json_data['payload']['data']
-        if _Debug:
-            print('Controller.on_model_update [%s] %s\n    %r' % (model_name, snap_id, d, ))
         if model_name not in self.model_data:
             self.model_data[model_name] = {}
-        if json_data['payload'].get('deleted'):
+        deleted = json_data['payload'].get('deleted')
+        if _Debug:
+            print('Controller.on_model_update [%s] %s deleted=%r\n    %r' % (model_name, snap_id, deleted, d, ))
+        if deleted:
             self.model_data[model_name].pop(snap_id)
         else:
             if snap_id not in self.model_data[model_name]:

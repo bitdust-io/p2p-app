@@ -67,8 +67,9 @@ class DistributedFileSystem(FileSystemAbstract):
     def is_hidden(self, fn):
         # if _Debug:
         #     print('DistributedFileSystem.is_hidden', fn, fn.lstrip('/').startswith('.'))
-        # return fn.lstrip('/').startswith('.')
-        return False
+        _, _, fn = fn.rpartition(':')
+        # return False
+        return fn.startswith('.')
 
     def is_dir(self, fn):
         if fn == '/':
@@ -110,10 +111,11 @@ class DistributedFileChooserListView(FileChooserController):
         self.index_by_path = {}
         self.index_by_global_id = {}
         self.file_clicked_callback = None
+        # self.show_hidden = True
 
     def init(self, file_clicked_callback=None):
         if _Debug:
-            print('DistributedFileChooserListView.init')
+            print('DistributedFileChooserListView.init show_hidden=%r' % self.show_hidden)
         self.file_clicked_callback = file_clicked_callback
         api_client.add_model_listener('private_file', listener_cb=self.on_private_file)
         api_client.add_model_listener('remote_version', listener_cb=self.on_remote_version)
@@ -131,8 +133,11 @@ class DistributedFileChooserListView(FileChooserController):
             print('DistributedFileChooserListView.on_private_file', payload)
         remote_path = payload['data']['remote_path']
         _, _, path = remote_path.rpartition(':')
-        if path not in self.index_by_path:
-            self._update_files(files=[path, ])
+        if payload.get('deleted'):
+            self._update_files()
+        else:
+            if path not in self.index_by_path:
+                self._update_files(files=[path, ])
 
     def on_remote_version(self, payload):
         if _Debug:
@@ -343,9 +348,9 @@ class DistributedFileChooserListView(FileChooserController):
         template = self.layout._ENTRY_TEMPLATE\
             if self.layout else self._ENTRY_TEMPLATE
         global_id = screen.control().private_files_by_path.get(ctx['remote_path'])
+        ctx['global_id'] = global_id
         if _Debug:
             print('    DistributedFileChooserListView._create_entry_widget', ctx['remote_path'], global_id)
-        ctx['global_id'] = global_id
         w = Builder.template(template, **ctx)
         self.index_by_path[ctx['path']] = w
         if global_id:

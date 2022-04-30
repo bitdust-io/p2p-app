@@ -80,8 +80,8 @@ class PrivateFilesScreen(screen.AppScreen):
             print('PrivateFilesScreen.on_upload_file_button_clicked', args)
         from lib import system
         if system.is_android():
-            from lib import filechooser
-            raw_path = filechooser.instance().open_file(
+            from lib import filechooser as lib_filechooser
+            raw_path = lib_filechooser.instance().open_file(
                 title="Upload new file",
                 preview=True,
                 show_hidden=False,
@@ -126,4 +126,10 @@ class PrivateFilesScreen(screen.AppScreen):
 
     def on_file_clicked(self, *args, **kwargs):
         if _Debug:
-            print('PrivateFilesScreen.on_file_clicked', args[0].global_id)
+            print('PrivateFilesScreen.on_file_clicked', args[0])
+        screen.select_screen(
+            screen_id='private_file_{}'.format(args[0].global_id),
+            screen_type='single_private_file_screen',
+            global_id=args[0].global_id,
+            remote_path=args[0].remote_path,
+        )

@@ -347,3 +347,12 @@ class BackgroundProcess(object):
         thread = threading.Thread(target=target, kwargs=kwargs, daemon=self.daemon)
         thread.start()
 
+#------------------------------------------------------------------------------
+
+def get_nice_size(size_bytes):
+    sz = float(size_bytes)
+    for unit in ('B', 'KB', 'MB', 'GB', 'TB'):
+        if sz < 1024.0:
+            return '%1.0f %s' % (sz, unit)
+        sz /= 1024.0
+    return '%1.0f %s' % (sz, 'TB')

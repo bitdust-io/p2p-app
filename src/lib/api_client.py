@@ -189,6 +189,10 @@ def files_list(remote_path=None, key_id=None, recursive=False, all_customers=Fal
     }, cb=cb)
 
 
+def file_info(remote_path, cb=None):
+    return run('file_info', kwargs={'remote_path': remote_path, }, cb=cb)
+
+
 def file_create(remote_path, as_folder=False, exist_ok=False, force_path_id=None, cb=None):
     return run('file_create', kwargs={
         'remote_path': remote_path,
@@ -196,6 +200,10 @@ def file_create(remote_path, as_folder=False, exist_ok=False, force_path_id=None
         'exist_ok': exist_ok,
         'force_path_id': force_path_id,
     }, cb=cb)
+
+
+def file_delete(remote_path, cb=None):
+    return run('file_delete', kwargs={'remote_path': remote_path, }, cb=cb)
 
 
 def file_upload_start(local_path, remote_path, wait_result=False, wait_finish=False, open_share=False, cb=None):
