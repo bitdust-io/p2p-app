@@ -22,14 +22,17 @@ class AppStyle(object):
     font_size_extra_small_absolute = 9
     font_size_extra_small = sp(9)
 
-    font_size_small_absolute = 10
-    font_size_small = sp(10)
+    font_size_tiny_absolute = 10
+    font_size_tiny = sp(10)
 
     font_size_small_absolute = 12
     font_size_small = sp(12)
 
     font_size_normal_absolute = 14
     font_size_normal = sp(14)
+
+    font_size_medium_absolute = 16
+    font_size_medium = sp(16)
 
     font_size_large_absolute = 18
     font_size_large = sp(18)

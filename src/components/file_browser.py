@@ -132,12 +132,15 @@ class DistributedFileChooserListView(FileChooserController):
         if _Debug:
             print('DistributedFileChooserListView.on_private_file', payload)
         remote_path = payload['data']['remote_path']
+        global_id = payload['data']['global_id']
         _, _, path = remote_path.rpartition(':')
         if payload.get('deleted'):
+            self.index_by_path.pop(path, None)
+            self.index_by_global_id.pop(global_id, None)
             self._update_files()
         else:
             if path not in self.index_by_path:
-                self._update_files(files=[path, ])
+                self._update_files()
 
     def on_remote_version(self, payload):
         if _Debug:
@@ -146,12 +149,12 @@ class DistributedFileChooserListView(FileChooserController):
         global_id = payload['data']['global_id']
         _, _, path = remote_path.rpartition(':')
         if path not in self.index_by_path:
-            self._update_files(files=[path, ])
+            self._update_files()
         else:
             if global_id in self.index_by_global_id:
                 self.index_by_global_id[global_id].ids.file_size.text = self.get_nice_size(path)
             else:
-                self._update_files(files=[path, ])
+                self._update_files()
 
     def entry_touched(self, entry, touch):
         if _Debug:
@@ -192,7 +195,7 @@ class DistributedFileChooserListView(FileChooserController):
 
     def _update_files(self, *args, **kwargs):
         if _Debug:
-            print('DistributedFileChooserListView._update_files')
+            print('DistributedFileChooserListView._update_files', args, kwargs)
         self._gitems = []
         self._gitems_parent = kwargs.get('parent', None)
         self._gitems_gen = self._generate_file_entries(
@@ -303,10 +306,15 @@ class DistributedFileChooserListView(FileChooserController):
         files = []
         extra_files = kwargs.get('files', []) or []
         fappend = files.append
-        for remote_path in self.file_system.listdir(path):
-            # fappend(os.path.join(path, f))
-            fappend(remote_path)
-        files += extra_files
+        if extra_files:
+            for remote_path in extra_files:
+                fappend(remote_path)
+        else:
+            for remote_path in self.file_system.listdir(path):
+                # fappend(os.path.join(path, f))
+                fappend(remote_path)
+        print('!!!!!! files', files, 'extra_files', extra_files)
+        # files += extra_files
         # Apply filename filters
         files = self._apply_filters(files)
         # Sort the list of files
@@ -324,6 +332,11 @@ class DistributedFileChooserListView(FileChooserController):
         for index, remote_path in enumerate(files):
             _, _, fn = remote_path.rpartition(':')
             fn = '/' + fn
+
+            # if fn in self.index_by_path:
+            #     w = self.index_by_path[fn]
+            #     w.ids.file_size.text = '{}'.format(self.get_nice_size(fn))
+            #     continue
 
             def get_nice_size():
                 # Use a closure for lazy-loading here
@@ -350,7 +363,7 @@ class DistributedFileChooserListView(FileChooserController):
         global_id = screen.control().private_files_by_path.get(ctx['remote_path'])
         ctx['global_id'] = global_id
         if _Debug:
-            print('    DistributedFileChooserListView._create_entry_widget', ctx['remote_path'], global_id)
+            print('    DistributedFileChooserListView._create_entry_widget', ctx['remote_path'], ctx['isdir'], global_id)
         w = Builder.template(template, **ctx)
         self.index_by_path[ctx['path']] = w
         if global_id:

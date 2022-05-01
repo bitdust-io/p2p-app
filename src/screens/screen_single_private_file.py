@@ -17,7 +17,15 @@ private_file_info_text = """
 [color=#909090]remote_path:[/color] {remote_path}
 [color=#909090]global_id:[/color] {global_id}
 [color=#909090]size:[/color] {size_text}
+{versions_text}
 [/size]
+"""
+
+version_info_text = """
+[size={header_text_size}]{label}[/size]
+[color=#909090]    fragments:[/color] {fragments}
+[color=#909090]    delivered:[/color] {delivered}
+[color=#909090]    reliable:[/color] {reliable}
 """
 
 
@@ -62,6 +70,11 @@ class SinglePrivateFileScreen(screen.AppScreen):
         )
         if _Debug:
             print('SinglePrivateFileScreen.on_private_file_info_result', result)
+        versions_text = ''
+        for v in result['versions']:
+            v['header_text_size'] = '{}sp'.format(self.app().font_size_medium)
+            versions_text += version_info_text.format(**v)
+        result['versions_text'] = versions_text
         self.ids.private_file_details.text = private_file_info_text.format(**result)
 
     def on_download_file_button_clicked(self):
