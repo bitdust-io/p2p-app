@@ -1,0 +1,59 @@
+<NewShareItem>:
+    text: 'Create shared location'
+    divider: None
+    on_release: root.on_pressed()
+
+    CustomIconLeftWidget:
+        icon: 'folder-plus'
+        padding: (0, 0, 0, 0)
+        pos_hint: {'center_y': 0.5}
+        md_bg_color: app.theme_cls.accent_color
+        theme_text_color: "Custom"
+        text_color: app.color_white
+        on_release: root.on_pressed()
+
+
+<ShareItem>:
+    text: root.label
+    divider: None
+    on_release: root.on_pressed()
+
+    CustomIconLeftWidget:
+        icon: 'folder-key-network-outline'
+        padding: (0, 0, 0, 0)
+        pos_hint: {'center_y': 0.5}
+        md_bg_color: app.theme_cls.primary_color
+        theme_text_color: "Custom"
+        text_color: app.color_white
+        on_release: root.on_pressed()
+
+
+<SharesScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'network service is not started',
+                    'ON': 'shared files are synchronized',
+                    'OFF': 'network service is switched off',
+                    'NOT_INSTALLED': 'network services is not ready yet',
+                    'INFLUENCE': 'turning off dependent network services',
+                    'STARTING': 'network service is starting',
+                    'DEPENDS_OFF': 'related network services were not started yet',
+                    'STOPPING': 'network service is stopping',
+                    'CLOSED': 'network service is closed', }
+
+            VerticalScrollView:
+
+                CustomSelectionList:
+                    id: shares_list_view
+                    pos_hint: {'top': 1}
+
+        BottomEmptyScreenSpace:

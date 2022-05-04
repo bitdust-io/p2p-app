@@ -225,6 +225,14 @@ def file_download_start(remote_path, destination_path=None, wait_result=False, o
     }, cb=cb)
 
 
+def shares_list(only_active=False, include_mine=True, include_granted=True, cb=None):
+    return run('shares_list', kwargs={
+        'only_active': only_active,
+        'include_mine': include_mine,
+        'include_granted': include_granted,
+    }, cb=cb)
+
+
 def user_observe(nickname, attempts=5, cb=None):
     return run('user_observe', kwargs={'nickname': nickname, 'attempts': attempts, }, cb=cb)
 
