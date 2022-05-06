@@ -150,7 +150,9 @@ class CustomTextField(MDTextField):
     def on_focus(self, instance, value):
         if _Debug:
             print('CustomTextField.on_focus', instance, value)
+        r = super().on_focus(instance, value)
         on_text_input_focus(instance, value)
+        return r
 
 #------------------------------------------------------------------------------
 

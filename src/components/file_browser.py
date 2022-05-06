@@ -23,11 +23,11 @@ class DistributedFileListEntry(FloatLayout, TreeViewNode):
     pass
 
 
-class DistributedFileSystem(FileSystemAbstract):
+class PrivateDistributedFileSystem(FileSystemAbstract):
 
     def listdir(self, fn):
         if _Debug:
-            print('DistributedFileSystem.listdir', fn)
+            print('PrivateDistributedFileSystem.listdir', fn)
         dirs = []
         files = []
         sep_count = 1
@@ -53,7 +53,7 @@ class DistributedFileSystem(FileSystemAbstract):
 
     def getsize(self, fn):
         # if _Debug:
-        #     print('DistributedFileSystem.getsize', fn)
+        #     print('PrivateDistributedFileSystem.getsize', fn)
         if fn == '/':
             return 0
         for pf in screen.model('private_file').values():
@@ -66,7 +66,7 @@ class DistributedFileSystem(FileSystemAbstract):
 
     def is_hidden(self, fn):
         # if _Debug:
-        #     print('DistributedFileSystem.is_hidden', fn, fn.lstrip('/').startswith('.'))
+        #     print('PrivateDistributedFileSystem.is_hidden', fn, fn.lstrip('/').startswith('.'))
         _, _, fn = fn.rpartition(':')
         # return False
         return fn.startswith('.')
@@ -74,7 +74,7 @@ class DistributedFileSystem(FileSystemAbstract):
     def is_dir(self, fn):
         if fn == '/':
             # if _Debug:
-            #     print('DistributedFileSystem.is_dir', fn, True)
+            #     print('PrivateDistributedFileSystem.is_dir', fn, True)
             return True
         for pf in screen.model('private_file').values():
             remote_path = pf['data']['remote_path']
@@ -82,10 +82,10 @@ class DistributedFileSystem(FileSystemAbstract):
             path = '/' + path
             if path == fn:
                 # if _Debug:
-                #     print('DistributedFileSystem.is_dir', fn, pf['data']['type'] == 'dir')
+                #     print('PrivateDistributedFileSystem.is_dir', fn, pf['data']['type'] == 'dir')
                 return pf['data']['type'] == 'dir'
         # if _Debug:
-        #     print('DistributedFileSystem.is_dir', fn, False)
+        #     print('PrivateDistributedFileSystem.is_dir', fn, False)
         return False
 
 
@@ -111,20 +111,27 @@ class DistributedFileChooserListView(FileChooserController):
         self.index_by_path = {}
         self.index_by_global_id = {}
         self.file_clicked_callback = None
-        # self.show_hidden = True
+        self.file_system_type = 'private'
 
-    def init(self, file_clicked_callback=None):
+    def init(self, file_system_type='private', file_clicked_callback=None):
         if _Debug:
             print('DistributedFileChooserListView.init show_hidden=%r' % self.show_hidden)
+        self.file_system_type = file_system_type
         self.file_clicked_callback = file_clicked_callback
-        api_client.add_model_listener('private_file', listener_cb=self.on_private_file)
+        if self.file_system_type == 'private':
+            api_client.add_model_listener('private_file', listener_cb=self.on_private_file)
+        elif self.file_system_type == 'shared':
+            api_client.add_model_listener('shared_file', listener_cb=self.on_shared_file)
         api_client.add_model_listener('remote_version', listener_cb=self.on_remote_version)
         self._trigger_update()
 
     def shutdown(self):
         if _Debug:
             print('DistributedFileChooserListView.shutdown')
-        api_client.remove_model_listener('private_file', listener_cb=self.on_private_file)
+        if self.file_system_type == 'private':
+            api_client.remove_model_listener('private_file', listener_cb=self.on_private_file)
+        elif self.file_system_type == 'shared':
+            api_client.remove_model_listener('shared_file', listener_cb=self.on_shared_file)
         api_client.remove_model_listener('remote_version', listener_cb=self.on_remote_version)
         self.file_clicked_callback = None
 

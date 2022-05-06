@@ -17,7 +17,7 @@ class NewShareItem(OneLineIconListItem):
     def on_pressed(self):
         if _Debug:
             print('NewShareItem.on_pressed', self)
-        # screen.select_screen('search_people_screen')
+        screen.select_screen('create_share_screen')
 
 
 class ShareItem(OneLineIconListItem):

@@ -64,6 +64,8 @@ def all_screens():
             'screens/screen_single_private_file.kv', 'screens.screen_single_private_file', 'SinglePrivateFileScreen', ),
         'shares_screen': (
             'screens/screen_shares.kv', 'screens.screen_shares', 'SharesScreen', ),
+        'create_share_screen': (
+            'screens/screen_create_share.kv', 'screens.screen_create_share', 'CreateShareScreen', ),
     }
 
 #------------------------------------------------------------------------------

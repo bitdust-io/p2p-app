@@ -49,8 +49,8 @@ class FriendsScreen(screen.AppScreen):
     def get_title(self):
         return 'contacts'
 
-    def get_icon(self):
-        return 'account-box-multiple'
+    # def get_icon(self):
+    #     return 'account-box-multiple'
 
     def populate(self, *args, **kwargs):
         api_client.friends_list(cb=self.on_friends_list_result)

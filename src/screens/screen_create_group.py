@@ -43,3 +43,4 @@ class CreateGroupScreen(screen.AppScreen):
         self.main_win().select_screen('conversations_screen')
         self.main_win().close_screen('create_group_screen')
         self.main_win().screens_stack.clear()
+        self.main_win().screens_stack.append('welcome_screen')

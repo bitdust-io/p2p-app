@@ -26,6 +26,7 @@ class SearchPeopleResult(layouts.HorizontalLayout):
     def on_friend_added(self, resp):
         screen.select_screen('friends_screen')
         screen.main_window().screens_stack.clear()
+        screen.main_window().screens_stack.append('welcome_screen')
 
 
 class NoUsersFound(labels.NormalLabel):

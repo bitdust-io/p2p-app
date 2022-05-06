@@ -233,6 +233,14 @@ def shares_list(only_active=False, include_mine=True, include_granted=True, cb=N
     }, cb=cb)
 
 
+def share_create(owner_id=None, key_size=None, label='', cb=None):
+    return run('share_create', kwargs={'owner_id': owner_id, 'key_size': key_size, 'label': label, }, cb=cb)
+
+
+def share_open(key_id, publish_events=False, cb=None):
+    return run('share_open', kwargs={'key_id': key_id, 'publish_events': publish_events, }, cb=cb)
+
+
 def user_observe(nickname, attempts=5, cb=None):
     return run('user_observe', kwargs={'nickname': nickname, 'attempts': attempts, }, cb=cb)
 
