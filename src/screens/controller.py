@@ -66,6 +66,8 @@ def all_screens():
             'screens/screen_shares.kv', 'screens.screen_shares', 'SharesScreen', ),
         'create_share_screen': (
             'screens/screen_create_share.kv', 'screens.screen_create_share', 'CreateShareScreen', ),
+        'shared_location_screen': (
+            'screens/screen_shared_location.kv', 'screens.screen_shared_location', 'SharedLocationScreen', ),
     }
 
 #------------------------------------------------------------------------------
@@ -282,6 +284,7 @@ class Controller(object):
         api_client.start_model_streaming('correspondent', request_all=True)
         api_client.start_model_streaming('online_status', request_all=True)
         api_client.start_model_streaming('private_file', request_all=True)
+        api_client.start_model_streaming('shared_file', request_all=True)
         api_client.start_model_streaming('remote_version', request_all=True)
 
     def on_websocket_error(self, websocket_instance, error):

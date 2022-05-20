@@ -23,7 +23,10 @@ class DistributedFileListEntry(FloatLayout, TreeViewNode):
     pass
 
 
-class PrivateDistributedFileSystem(FileSystemAbstract):
+class DistributedFileSystem(FileSystemAbstract):
+
+    def model_name(self):
+        raise NotImplementedError()
 
     def listdir(self, fn):
         if _Debug:
@@ -33,7 +36,7 @@ class PrivateDistributedFileSystem(FileSystemAbstract):
         sep_count = 1
         if fn != '/':
             sep_count = fn.rstrip('/').count('/') + 1
-        for pf in screen.model('private_file').values():
+        for pf in screen.model(self.model_name()).values():
             remote_path = pf['data']['remote_path']
             _, _, path = remote_path.rpartition(':')
             path = '/' + path
@@ -56,7 +59,7 @@ class PrivateDistributedFileSystem(FileSystemAbstract):
         #     print('PrivateDistributedFileSystem.getsize', fn)
         if fn == '/':
             return 0
-        for pf in screen.model('private_file').values():
+        for pf in screen.model(self.model_name()).values():
             remote_path = pf['data']['remote_path']
             _, _, path = remote_path.rpartition(':')
             path = '/' + path
@@ -76,7 +79,7 @@ class PrivateDistributedFileSystem(FileSystemAbstract):
             # if _Debug:
             #     print('PrivateDistributedFileSystem.is_dir', fn, True)
             return True
-        for pf in screen.model('private_file').values():
+        for pf in screen.model(self.model_name()).values():
             remote_path = pf['data']['remote_path']
             _, _, path = remote_path.rpartition(':')
             path = '/' + path
@@ -87,6 +90,18 @@ class PrivateDistributedFileSystem(FileSystemAbstract):
         # if _Debug:
         #     print('PrivateDistributedFileSystem.is_dir', fn, False)
         return False
+
+
+class PrivateDistributedFileSystem(DistributedFileSystem):
+
+    def model_name(self):
+        return 'private_file'
+
+
+class SharedDistributedFileSystem(DistributedFileSystem):
+
+    def model_name(self):
+        return 'shared_file'
 
 
 class DistributedFileChooserListLayout(FileChooserLayout):

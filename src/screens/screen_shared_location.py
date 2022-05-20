@@ -66,9 +66,9 @@ class SharedLocationScreen(screen.AppScreen):
     def on_leave(self, *args):
         self.ids.state_panel.release()
 
-    def on_private_file(self, payload):
+    def on_shared_file(self, payload):
         if _Debug:
-            print('SharedLocationScreen.on_private_file', payload)
+            print('SharedLocationScreen.on_shared_file', payload)
 
     def on_remote_version(self, payload):
         if _Debug:

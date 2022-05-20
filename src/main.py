@@ -93,10 +93,12 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.apply_styles   App.get_running_app() : %r' % App.get_running_app())
             print('BitDustApp.apply_styles                    self : %r' % self)
+
         self.theme_cls.theme_style = 'Light'
         self.theme_cls.primary_palette = 'Blue'
         self.theme_cls.primary_hue = "400"
         self.theme_cls.accent_palette = 'Green'
+
         fonts_path = './src/fonts'
         if system.is_android():
             fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
@@ -109,6 +111,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         LabelBase.register(name="IconICO", fn_regular=os.path.join(fonts_path, "icofont.ttf"))
         theme_font_styles.append('IconICO')
         self.theme_cls.font_styles["IconICO"] = ["IconICO", 24, False, 0, ]
+
         if _Debug:
             print('BitDustApp.apply_styles', self.theme_cls)
 
