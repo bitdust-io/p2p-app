@@ -1,3 +1,4 @@
+from kivy.metrics import dp
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
 from kivymd.uix.list import OneLineIconListItem
@@ -23,16 +24,21 @@ class ConversationItem(TwoLineIconListItem):
     automat_index = NumericProperty(None, allownone=True)
     automat_id = StringProperty()
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.height = dp(48) if not self._height else self._height
+
     def get_secondary_text(self):
+        sec_text = 'connecting'
+        sec_color = 'bbbf'
         if self.state in ['IN_SYNC!', 'CONNECTED', ]:
             sec_text = 'on-line'
+            sec_color = 'adaf'
         elif self.state in ['OFFLINE', 'DISCONNECTED', ]:
             sec_text = 'offline'
-        else:
-            sec_text = 'connecting'
         if _Debug:
             print('ConversationItem.get_secondary_text', self.key_id, sec_text)
-        return '[color=dddf]%s[/color]' % sec_text
+        return '[size=10sp][color=%s]%s[/color][/size]' % (sec_color, sec_text, )
 
     def on_pressed(self):
         if _Debug:
