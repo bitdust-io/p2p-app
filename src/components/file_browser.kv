@@ -31,6 +31,15 @@
             color: (0, 0, 0, 1)
 
         Label:
+            id: file_condition
+            text_size: self.width, None
+            size_hint_x: None
+            halign: 'right'
+            text: '{}'.format(ctx.get_condition())
+            font_name: ctx.controller().font_name
+            color: (0, 0, 0, 1)
+
+        Label:
             id: file_size
             text_size: self.width, None
             size_hint_x: None

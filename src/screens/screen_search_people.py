@@ -44,8 +44,8 @@ class SearchPeopleScreen(screen.AppScreen):
     def get_title(self):
         return "search people"
 
-    def get_icon(self):
-        return 'account-search'
+    # def get_icon(self):
+    #     return 'account-search'
 
     def clean_view(self, clear_input_field=False):
         if clear_input_field:

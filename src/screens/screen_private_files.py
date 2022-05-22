@@ -9,6 +9,7 @@ from kivymd.uix.list import TwoLineIconListItem
 from lib import api_client
 
 from components import screen
+from components import snackbar
 
 #------------------------------------------------------------------------------
 
@@ -48,8 +49,8 @@ class PrivateFilesScreen(screen.AppScreen):
     def get_title(self):
         return 'private files'
 
-    def get_icon(self):
-        return 'file-lock'
+    # def get_icon(self):
+    #     return 'file-lock'
 
     def populate(self, *args, **kwargs):
         pass
@@ -127,9 +128,19 @@ class PrivateFilesScreen(screen.AppScreen):
     def on_file_clicked(self, *args, **kwargs):
         if _Debug:
             print('PrivateFilesScreen.on_file_clicked', args[0])
-        screen.select_screen(
-            screen_id='private_file_{}'.format(args[0].global_id),
-            screen_type='single_private_file_screen',
-            global_id=args[0].global_id,
+        api_client.file_info(
             remote_path=args[0].remote_path,
+            cb=lambda resp: self.on_private_file_info_result(resp, args[0].remote_path, args[0].global_id),
+        )
+
+    def on_private_file_info_result(self, resp, remote_path, global_id):
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
+            return
+        screen.select_screen(
+            screen_id='private_file_{}'.format(global_id),
+            screen_type='single_private_file_screen',
+            global_id=global_id,
+            remote_path=remote_path,
+            details=api_client.response_result(resp),
         )

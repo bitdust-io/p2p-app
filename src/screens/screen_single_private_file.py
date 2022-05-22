@@ -7,15 +7,15 @@ from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
 private_file_info_text = """
 [size={header_text_size}]{path}[/size]
 [size={text_size}]
-[color=#909090]remote_path:[/color] {remote_path}
-[color=#909090]global_id:[/color] {global_id}
+[color=#909090]remote path:[/color] {remote_path}
+[color=#909090]global ID:[/color] {global_id}
 [color=#909090]size:[/color] {size_text}
 {versions_text}
 [/size]
@@ -34,20 +34,37 @@ class SinglePrivateFileScreen(screen.AppScreen):
     def __init__(self, **kwargs):
         self.global_id = ''
         self.remote_path = ''
+        self.details = {}
         super(SinglePrivateFileScreen, self).__init__(**kwargs)
 
     def init_kwargs(self, **kw):
-        self.global_id = kw.pop('global_id', '')
-        self.remote_path = kw.pop('remote_path', '')
         if _Debug:
             print('SinglePrivateFileScreen.init_kwargs', kw)
+        self.global_id = kw.pop('global_id', '')
+        self.remote_path = kw.pop('remote_path', '')
+        self.details = kw.pop('details', {})
         return kw
 
+    def get_title(self):
+        return 'private file'
+
     def populate(self, **kwargs):
-        api_client.file_info(
+        ctx = self.details.copy()
+        ctx.update(
+            text_size='{}sp'.format(self.app().font_size_normal_absolute),
+            header_text_size='{}sp'.format(self.app().font_size_large),
             remote_path=self.remote_path,
-            cb=self.on_private_file_info_result,
+            global_id=self.global_id,
+            size_text=system.get_nice_size(self.details.get('size', 0)),
         )
+        if _Debug:
+            print('SinglePrivateFileScreen.populate', ctx)
+        versions_text = ''
+        for v in ctx['versions']:
+            v['header_text_size'] = '{}sp'.format(self.app().font_size_medium)
+            versions_text += version_info_text.format(**v)
+        ctx['versions_text'] = versions_text
+        self.ids.private_file_details.text = private_file_info_text.format(**ctx)
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_my_data')
@@ -55,27 +72,6 @@ class SinglePrivateFileScreen(screen.AppScreen):
 
     def on_leave(self, *args):
         self.ids.state_panel.release()
-
-    def on_private_file_info_result(self, resp):
-        if not api_client.is_ok(resp):
-            snackbar.error(text=api_client.response_err(resp))
-            return
-        result = api_client.response_result(resp)
-        result.update(
-            text_size='{}sp'.format(self.app().font_size_normal_absolute),
-            header_text_size='{}sp'.format(self.app().font_size_large),
-            remote_path=self.remote_path,
-            global_id=self.global_id,
-            size_text=system.get_nice_size(result['size']),
-        )
-        if _Debug:
-            print('SinglePrivateFileScreen.on_private_file_info_result', result)
-        versions_text = ''
-        for v in result['versions']:
-            v['header_text_size'] = '{}sp'.format(self.app().font_size_medium)
-            versions_text += version_info_text.format(**v)
-        result['versions_text'] = versions_text
-        self.ids.private_file_details.text = private_file_info_text.format(**result)
 
     def on_download_file_button_clicked(self):
         if _Debug:

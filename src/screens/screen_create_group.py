@@ -7,11 +7,11 @@ from components import snackbar
 
 class CreateGroupScreen(screen.AppScreen):
 
-    def get_icon(self):
-        return 'chat-plus'
+    # def get_icon(self):
+    #     return 'chat-plus'
 
     def get_title(self):
-        return 'create group'
+        return 'create new group'
 
     def clean_view(self, clear_input_field=False):
         if clear_input_field:

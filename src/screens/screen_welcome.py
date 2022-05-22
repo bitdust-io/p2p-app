@@ -73,16 +73,16 @@ class WelcomeScreen(screen.AppScreen):
     def on_enter(self, *args):
         # self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id='initializer')
-        if not self.verify_network_connected_task:
-            self.verify_network_connected_task = Clock.schedule_interval(self.control().verify_network_connected, 10)
+        # if not self.verify_network_connected_task:
+        #     self.verify_network_connected_task = Clock.schedule_interval(self.control().verify_network_connected, 20)
         api_client.identity_get(cb=self.on_identity_get_result)
 
     def on_leave(self, *args):
         # self.ids.action_button.close_stack()
         self.ids.state_panel.release()
-        if self.verify_network_connected_task:
-            Clock.unschedule(self.verify_network_connected_task)
-            self.verify_network_connected_task = None
+        # if self.verify_network_connected_task:
+        #     Clock.unschedule(self.verify_network_connected_task)
+        #     self.verify_network_connected_task = None
 
 #     def on_action_button_clicked(self, btn):
 #         if _Debug:

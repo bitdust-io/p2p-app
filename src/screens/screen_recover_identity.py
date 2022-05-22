@@ -14,8 +14,8 @@ _Debug = False
 
 class RecoverIdentityScreen(screen.AppScreen):
 
-    def get_icon(self):
-        return 'account-key'
+    # def get_icon(self):
+    #     return 'account-key'
 
     def get_title(self):
         return 'recover identity'

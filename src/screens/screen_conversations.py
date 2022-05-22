@@ -79,8 +79,8 @@ class ConversationsScreen(screen.AppScreen):
     def get_title(self):
         return 'conversations'
 
-    def get_icon(self):
-        return 'comment-text-multiple'
+    # def get_icon(self):
+    #     return 'comment-text-multiple'
 
     def populate(self, *args, **kwargs):
         self.ids.conversations_list_view.clear_widgets()

@@ -81,6 +81,7 @@ class Controller(object):
 
     def __init__(self, app):
         self.enabled = False
+        self.connecting = False
         self.app = app
         self.callbacks = {}
         self.state_changed_callbacks = {}
@@ -88,6 +89,7 @@ class Controller(object):
         self.model_data = {}
         self.private_files_by_path = {}
         self.private_files_by_id = {}
+        self.remote_versions_by_path = {}
 
     def mw(self):
         return self.app.main_window
@@ -122,22 +124,23 @@ class Controller(object):
         # BitDust node process must be running already
         if self.mw().state_process_health == 0:
             return self.verify_process_health()
-        elif self.mw().state_process_health == -1:
+        if self.mw().state_process_health == -1:
             if time.time() - self.process_health_latest > 30.0:
                 return self.verify_process_health()
             return None
         # user identity must be already existing
         if self.mw().state_identity_get == 0:
             return self.verify_identity_get()
-        elif self.mw().state_identity_get == -1:
+        if self.mw().state_identity_get == -1:
             if time.time() - self.identity_get_latest > 600.0:
                 return self.verify_identity_get()
             return None
         # BitDust node must be already connected to the network
         if self.mw().state_network_connected == 0:
-            return self.verify_network_connected()
-        elif self.mw().state_network_connected == -1:
-            if time.time() - self.network_connected_latest > 30.0:
+            return None
+            # return self.verify_network_connected()
+        if self.mw().state_network_connected == -1:
+            if time.time() - self.network_connected_latest > 30.0 and not self.connecting:
                 return self.verify_network_connected()
             return None
         # all is good
@@ -154,9 +157,18 @@ class Controller(object):
         return api_client.identity_get(cb=self.on_identity_get_result)
 
     def verify_network_connected(self, *args, **kwargs):
+        dt = 0
+        if self.network_connected_latest:
+            dt = time.time() - self.network_connected_latest
+        if self.connecting:
+            self.mw().state_network_connected = 0
+            if _Debug:
+                print('Controller.verify_network_connected skipped, already connecting', dt, time.asctime())
+            return False
         if _Debug:
-            print('Controller.verify_network_connected', time.asctime())
+            print('Controller.verify_network_connected', dt, time.asctime())
         self.mw().state_network_connected = 0
+        self.connecting = True
         return api_client.network_connected(cb=self.on_network_connected_result)
 
     #------------------------------------------------------------------------------
@@ -254,6 +266,7 @@ class Controller(object):
     def on_network_connected_result(self, resp):
         if _Debug:
             print('Controller.on_network_connected_result', time.asctime(), resp)
+        self.connecting = False
         self.network_connected_latest = time.time()
         if not api_client.is_ok(resp):
             self.network_connected_latest = 0
@@ -266,7 +279,7 @@ class Controller(object):
                 self.mw().state_network_connected = -1
             return
         self.network_connected_latest = time.time()
-        self.mw().state_network_connected = 1 # if api_client.is_ok(resp) else -1
+        self.mw().state_network_connected = 1
         self.run()
 
     def on_websocket_open(self, websocket_instance):
@@ -411,8 +424,20 @@ class Controller(object):
                 elif snap_id == 'service_proxy_transport':
                     self.mw().state_proxy_transport = _st(d)
             elif model_name == 'private_file':
-                self.private_files_by_path[d['remote_path']] = d['global_id']
-                self.private_files_by_id[d['global_id']] = d['remote_path']
+                _, _, path = d['remote_path'].rpartition(':')
+                self.private_files_by_path[path] = d['global_id']
+                # self.private_files_by_id[d['global_id']] = d['remote_path']
+            elif model_name == 'remote_version':
+                # if d['remote_path'] not in self.remote_versions_by_path:
+                #     self.remote_versions_by_path[d['remote_path']] = []
+                # if snap_id not in self.remote_versions_by_path[d['remote_path']]:
+                #     self.remote_versions_by_path[d['remote_path']].append(snap_id)
+                if d['global_id'] in self.model_data.get('private_file', {}):
+                    self.model_data['private_file'][d['global_id']]['data'].update(
+                        size=d['size'],
+                        delivered=d['delivered'],
+                        reliable=d['reliable'],
+                    )
 
     def on_state_process_health(self, instance, value):
         if _Debug:

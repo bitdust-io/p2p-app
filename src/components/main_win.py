@@ -181,6 +181,9 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             self.ids.toolbar.title = 'BitDust'
             return
         title = screen_inst.get_title()
+        if system.is_android():
+            if len(title) > 20:
+                title = title[:20] + '...'
         icn = screen_inst.get_icon()
         if icn:
             icn_pack = screen_inst.get_icon_pack()
@@ -334,6 +337,8 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
                 screen_type = 'group_info_screen'
             elif screen_type.startswith('private_file_'):
                 screen_type = 'single_private_file_screen'
+            elif screen_type.startswith('shared_location_'):
+                screen_type = 'shared_location_screen'
         if verify_state:
             if not self.is_screen_selectable(screen_id):
                 if _Debug:

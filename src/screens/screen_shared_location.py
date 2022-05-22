@@ -45,8 +45,26 @@ class UploadSharedFile(OneLineIconListItem):
 
 class SharedLocationScreen(screen.AppScreen):
 
+    def __init__(self, **kwargs):
+        self.key_id = ''
+        self.label = ''
+        self.automat_index = None
+        self.automat_id = None
+        super(SharedLocationScreen, self).__init__(**kwargs)
+
+    def init_kwargs(self, **kw):
+        if not self.key_id and kw.get('key_id'):
+            self.key_id = kw.pop('key_id', '')
+        if not self.label and kw.get('label'):
+            self.label = kw.pop('label', '')
+        if 'automat_index' in kw:
+            self.automat_index = kw.pop('automat_index', None)
+        if 'automat_id' in kw:
+            self.automat_id = kw.pop('automat_id', None)
+        return kw
+
     def get_title(self):
-        return 'shared files'
+        return self.label
 
     # def get_icon(self):
     #     return 'file-lock'

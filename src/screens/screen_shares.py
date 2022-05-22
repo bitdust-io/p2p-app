@@ -34,13 +34,13 @@ class ShareItem(OneLineIconListItem):
             print('ShareItem.on_pressed', self)
         automat_index = self.automat_index or None
         automat_index = int(automat_index) if automat_index not in ['None', None, '', ] else None
-#         screen.select_screen(
-#             screen_id='private_chat_{}'.format(self.global_id),
-#             screen_type='private_chat_screen',
-#             global_id=self.global_id,
-#             username=self.username,
-#             automat_index=automat_index,
-#         )
+        screen.select_screen(
+            screen_id='shared_location_{}'.format(self.key_id),
+            screen_type='shared_location_screen',
+            key_id=self.key_id,
+            label=self.label,
+            automat_index=automat_index,
+        )
 
 
 class SharesScreen(screen.AppScreen):

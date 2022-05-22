@@ -230,8 +230,8 @@ class SettingsScreen(screen.AppScreen):
 
     recent_tree_index = {}
 
-    def get_icon(self):
-        return 'cogs'
+    # def get_icon(self):
+    #     return 'cogs'
 
     def get_title(self):
         return "settings"
