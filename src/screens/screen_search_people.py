@@ -26,6 +26,7 @@ class SearchPeopleResult(layouts.HorizontalLayout):
     def on_friend_added(self, resp):
         screen.select_screen('friends_screen')
         screen.main_window().screens_stack.clear()
+        screen.main_window().screens_stack.append('welcome_screen')
 
 
 class NoUsersFound(labels.NormalLabel):
@@ -43,8 +44,8 @@ class SearchPeopleScreen(screen.AppScreen):
     def get_title(self):
         return "search people"
 
-    def get_icon(self):
-        return 'account-search'
+    # def get_icon(self):
+    #     return 'account-search'
 
     def clean_view(self, clear_input_field=False):
         if clear_input_field:

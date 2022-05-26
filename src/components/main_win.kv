@@ -26,8 +26,9 @@
                 on_release:
                     app.main_window.nav().set_state("close")
                     app.main_window.select_screen('engine_status_screen', verify_state=True)
-                IconLeftWidget:
+                CustomIconPackLeftWidget:
                     icon: "cellphone-information"
+                    icon_size: "32sp"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
@@ -40,8 +41,9 @@
                 on_release:
                     app.main_window.nav().set_state("close")
                     app.main_window.select_screen('my_id_screen', verify_state=True)
-                IconLeftWidget:
+                CustomIconPackLeftWidget:
                     icon: "passport"
+                    icon_size: "32sp"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
@@ -54,8 +56,9 @@
                 on_release:
                     app.main_window.nav().set_state("close")
                     app.main_window.select_screen('conversations_screen', verify_state=True)
-                IconLeftWidget:
+                CustomIconPackLeftWidget:
                     icon: "chat-outline"
+                    icon_size: "32sp"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
@@ -68,27 +71,44 @@
                 on_release:
                     app.main_window.nav().set_state("close")
                     app.main_window.select_screen('friends_screen', verify_state=True)
-                IconLeftWidget:
+                CustomIconPackLeftWidget:
                     icon: "contacts"
+                    icon_size: "32sp"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:
                         app.main_window.nav().set_state("close")
                         app.main_window.select_screen('friends_screen', verify_state=True)
 
-            # OneLineIconListItem:
-            #     id: menu_item_private_files
-            #     text: "my files"
-            #     on_release:
-            #         app.main_window.nav().set_state("close")
-            #         app.main_window.select_screen('private_files_screen', verify_state=True)
-            #     IconLeftWidget:
-            #         icon: "file-tree"
-            #         md_bg_color: app.color_transparent
-            #         md_bg_color_disabled: app.color_transparent
-            #         on_release:
-            #             app.main_window.nav().set_state("close")
-            #             app.main_window.select_screen('private_files_screen', verify_state=True)
+            OneLineIconListItem:
+                id: menu_item_private_files
+                text: "my files"
+                on_release:
+                    app.main_window.nav().set_state("close")
+                    app.main_window.select_screen('private_files_screen', verify_state=True)
+                CustomIconPackLeftWidget:
+                    icon: "file-tree"
+                    icon_size: "32sp"
+                    md_bg_color: app.color_transparent
+                    md_bg_color_disabled: app.color_transparent
+                    on_release:
+                        app.main_window.nav().set_state("close")
+                        app.main_window.select_screen('private_files_screen', verify_state=True)
+
+            OneLineIconListItem:
+                id: menu_item_shares
+                text: "shared files"
+                on_release:
+                    app.main_window.nav().set_state("close")
+                    app.main_window.select_screen('shares_screen', verify_state=True)
+                CustomIconPackLeftWidget:
+                    icon: "folder-arrow-left-right"
+                    icon_size: "32sp"
+                    md_bg_color: app.color_transparent
+                    md_bg_color_disabled: app.color_transparent
+                    on_release:
+                        app.main_window.nav().set_state("close")
+                        app.main_window.select_screen('shares_screen', verify_state=True)
 
             OneLineIconListItem:
                 id: menu_item_settings
@@ -96,8 +116,9 @@
                 on_release:
                     app.main_window.nav().set_state("close")
                     app.main_window.select_screen('settings_screen', verify_state=True)
-                IconLeftWidget:
+                CustomIconPackLeftWidget:
                     icon: "cogs"
+                    icon_size: "32sp"
                     md_bg_color: app.color_transparent
                     md_bg_color_disabled: app.color_transparent
                     on_release:

@@ -3,6 +3,7 @@
 # TODO: check "appdata" file and detect location of $ROOT_DIR if it is there
 
 ROOT_DIR="$HOME/.bitdust"
+LOG_FILE="${ROOT_DIR}/install.log"
 SOURCE_DIR="${ROOT_DIR}/src"
 VENV_DIR="${ROOT_DIR}/venv"
 BITDUST_PY="${SOURCE_DIR}/bitdust.py"

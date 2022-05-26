@@ -43,8 +43,8 @@ class SelectFriendScreen(screen.AppScreen):
     def get_title(self):
         return 'select contact'
 
-    def get_icon(self):
-        return 'target-account'
+    # def get_icon(self):
+    #     return 'target-account'
 
     def populate(self, *args, **kwargs):
         api_client.friends_list(cb=self.on_friends_list_result)

@@ -25,7 +25,7 @@ from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -148,23 +148,31 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             self.menu().ids.menu_item_chat.disabled = True
             self.menu().ids.menu_item_friends.disabled = True
             self.menu().ids.menu_item_settings.disabled = True
+            self.menu().ids.menu_item_private_files.disabled = True
+            self.menu().ids.menu_item_shares.disabled = True
             return
         if self.state_identity_get != 1:
             self.menu().ids.menu_item_my_identity.disabled = False
             self.menu().ids.menu_item_chat.disabled = True
             self.menu().ids.menu_item_friends.disabled = True
             self.menu().ids.menu_item_settings.disabled = False
+            self.menu().ids.menu_item_private_files.disabled = True
+            self.menu().ids.menu_item_shares.disabled = True
             return
         if self.state_network_connected != 1:
             self.menu().ids.menu_item_my_identity.disabled = False
             self.menu().ids.menu_item_friends.disabled = True
             self.menu().ids.menu_item_chat.disabled = True
             self.menu().ids.menu_item_settings.disabled = False
+            self.menu().ids.menu_item_private_files.disabled = True
+            self.menu().ids.menu_item_shares.disabled = True
             return
         self.menu().ids.menu_item_my_identity.disabled = False
         self.menu().ids.menu_item_chat.disabled = False
         self.menu().ids.menu_item_friends.disabled = False
         self.menu().ids.menu_item_settings.disabled = False
+        self.menu().ids.menu_item_private_files.disabled = False
+        self.menu().ids.menu_item_shares.disabled = False
 
     #------------------------------------------------------------------------------
 
@@ -173,6 +181,9 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             self.ids.toolbar.title = 'BitDust'
             return
         title = screen_inst.get_title()
+        if system.is_android():
+            if len(title) > 20:
+                title = title[:20] + '...'
         icn = screen_inst.get_icon()
         if icn:
             icn_pack = screen_inst.get_icon_pack()
@@ -266,7 +277,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if not screen_class:
             raise Exception('screen class %r was not registered' % screen_class_name)
         if _Debug:
-            print('MainWin.open_screen   is about to create a new instance of %r with id %r' % (screen_class, screen_id, ))
+            print('MainWin.open_screen   is about to create a new instance of %r with id %r, kwargs=%r' % (screen_class, screen_id, kwargs, ))
         screen_inst = screen_class(name=screen_id, **kwargs)
         self.active_screens[screen_id] = (screen_inst, None, )
         manager.add_widget(screen_inst)
@@ -324,6 +335,10 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
                 screen_type = 'group_chat_screen'
             elif screen_type.startswith('info_group_'):
                 screen_type = 'group_info_screen'
+            elif screen_type.startswith('private_file_'):
+                screen_type = 'single_private_file_screen'
+            elif screen_type.startswith('shared_location_'):
+                screen_type = 'shared_location_screen'
         if verify_state:
             if not self.is_screen_selectable(screen_id):
                 if _Debug:
@@ -450,6 +465,10 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             print('MainWin.on_state_process_health', value)
         self.populate_bottom_toolbar_icon('micro-chip', value)
         self.control.on_state_process_health(instance, value)
+        if self.is_screen_active('welcome_screen'):
+            welcome_screen = self.get_active_screen('welcome_screen')
+            if welcome_screen:
+                welcome_screen.populate(process_health=value)
 
     def on_state_identity_get(self, instance, value):
         if _Debug:
@@ -459,7 +478,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                welcome_screen.populate_buttons(False if value != -1 else True)
+                welcome_screen.populate(create_identity=(False if value != -1 else True))
 
     def on_state_network_connected(self, instance, value):
         # if _Debug:

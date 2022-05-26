@@ -56,8 +56,8 @@ class MyIDScreen(screen.AppScreen):
 
     my_identity_name = None
 
-    def get_icon(self):
-        return 'account-box'
+    # def get_icon(self):
+    #     return 'account-box'
 
     def get_title(self):
         return 'my identity'

@@ -55,6 +55,7 @@ from lib import system
 from screens import controller
 
 from components import styles
+from components import snackbar
 
 #------------------------------------------------------------------------------
 
@@ -63,6 +64,10 @@ if system.is_android():
     import encodings.idna  # @UnusedImport
 
     from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE  # @UnresolvedImport
+
+    from android import activity  # @UnresolvedImport
+    activity._activity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
+
     from android.storage import primary_external_storage_path, app_storage_path  # @UnresolvedImport
 
     from lib.permissions import check_permission, request_permissions  # @UnresolvedImport
@@ -88,10 +93,12 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.apply_styles   App.get_running_app() : %r' % App.get_running_app())
             print('BitDustApp.apply_styles                    self : %r' % self)
+
         self.theme_cls.theme_style = 'Light'
         self.theme_cls.primary_palette = 'Blue'
         self.theme_cls.primary_hue = "400"
         self.theme_cls.accent_palette = 'Green'
+
         fonts_path = './src/fonts'
         if system.is_android():
             fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
@@ -104,6 +111,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         LabelBase.register(name="IconICO", fn_regular=os.path.join(fonts_path, "icofont.ttf"))
         theme_font_styles.append('IconICO')
         self.theme_cls.font_styles["IconICO"] = ["IconICO", 24, False, 0, ]
+
         if _Debug:
             print('BitDustApp.apply_styles', self.theme_cls)
 
@@ -114,8 +122,10 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   android_sdk_version() : %r' % system.android_sdk_version())
                 print('BitDustApp.build   ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
-                # from android.activity import _activity
-                # print('BitDustApp.build   _activity=%r' % _activity)
+                from android.activity import _activity  # @UnresolvedImport
+                from android import mActivity  # @UnresolvedImport
+                print('BitDustApp.build   _activity=%r' % _activity)
+                print('BitDustApp.build   mActivity=%r' % mActivity)
 
         self.title = 'BitDust'
         self.icon = './bitdust.png'
@@ -234,6 +244,10 @@ class BitDustApp(styles.AppStyle, MDApp):
                 os.rename('/storage/emulated/0/.bitdust', '/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust')
             except Exception as e:
                 print('Failed to move data folder from legacy location:', e)
+        if self.main_window.is_screen_active('welcome_screen'):
+            welcome_screen = self.main_window.get_active_screen('welcome_screen')
+            if welcome_screen:
+                welcome_screen.populate(start_engine=True)
         self.main_window.engine_log = '\n'
         service = autoclass(SERVICE_NAME)
         if _Debug:
@@ -280,6 +294,10 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.do_start_deploy_process params=%r finishing=%r' % (params, self.finishing.is_set(), ))
         if self.finishing.is_set():
             return
+        if self.main_window.is_screen_active('welcome_screen'):
+            welcome_screen = self.main_window.get_active_screen('welcome_screen')
+            if welcome_screen:
+                welcome_screen.populate(start_engine=True)
         self.main_window.engine_log = '\n'
         if system.is_linux():
             system.BackgroundProcess(
@@ -288,6 +306,7 @@ class BitDustApp(styles.AppStyle, MDApp):
                 stderr_callback=self.on_deploy_process_stderr,
                 finishing=self.finishing,
                 daemon=True,
+                result_callback=self.on_deploy_process_result,
             ).run()
         elif system.is_osx():
             system.BackgroundProcess(
@@ -296,6 +315,7 @@ class BitDustApp(styles.AppStyle, MDApp):
                 stderr_callback=self.on_deploy_process_stderr,
                 finishing=self.finishing,
                 daemon=True,
+                result_callback=self.on_deploy_process_result,
             ).run()
 
     def do_android_check_app_permission(self, permission):
@@ -326,6 +346,14 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_deploy_process_stderr(self, line):
         if _Debug:
             print('DEPLOY ERR:', line.decode().rstrip())
+
+    @mainthread
+    def on_deploy_process_result(self, retcode):
+        if _Debug:
+            print('BitDustApp.on_deploy_process_result', retcode)
+        if retcode == 2:
+            pth = os.path.join(os.path.expanduser('~'), '.bitdust', 'install.log')
+            snackbar.error(text='installation failed, see %s file for details' % pth)
 
     def on_start(self):
         if _Debug:

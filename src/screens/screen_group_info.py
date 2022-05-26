@@ -50,8 +50,8 @@ class GroupInfoScreen(screen.AppScreen):
             self.automat_id = kw.pop('automat_id', None)
         return kw
 
-    def get_icon(self):
-        return 'account-group'
+    # def get_icon(self):
+    #     return 'account-group'
 
     def get_title(self):
         l = self.label

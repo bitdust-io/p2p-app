@@ -1,4 +1,4 @@
-<PrivateFilesScreen>:
+<SharedLocationScreen>:
 
     ScreenContainerLayout:
 
@@ -10,15 +10,15 @@
                 id: state_panel
                 size_hint_x: 1
                 statuses:
-                    { None: 'files are not available at the moment',
-                    'ON': 'distributed storage is ready',
-                    'OFF': 'private storage service is not started',
-                    'NOT_INSTALLED': 'private storage service was not installed',
-                    'INFLUENCE': 'verifying related network services',
-                    'DEPENDS_OFF': 'related network services not yet started',
-                    'STARTING': 'starting distributed private storage service',
-                    'STOPPING': 'turning off distributed private storage service',
-                    'CLOSED': 'private storage service is stopped', }
+                    { None: 'shared files are not available at the moment',
+                    'ON': 'shared files are synchronized',
+                    'OFF': 'network service is switched off',
+                    'NOT_INSTALLED': 'network services is not ready yet',
+                    'INFLUENCE': 'turning off dependent network services',
+                    'STARTING': 'network service is starting',
+                    'DEPENDS_OFF': 'related network services were not started yet',
+                    'STOPPING': 'network service is stopping',
+                    'CLOSED': 'network service is closed', }
 
             HorizontalContainerLayout:
 
@@ -37,6 +37,6 @@
 
                 DistributedFileChooserListView:
                     id: files_list_view
-                    file_system: PrivateDistributedFileSystem()
+                    file_system: SharedDistributedFileSystem()
 
         BottomEmptyScreenSpace:

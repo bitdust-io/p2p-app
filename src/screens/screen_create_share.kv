@@ -1,0 +1,49 @@
+<CreateShareScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            PageContainerWithPaddingLayout:
+
+                HorizontalContainerLayout:
+                    pos_hint: {'top': 1, 'left': 0}
+
+                    NormalLabel:
+                        id: status_message_label
+                        size_hint: 1, None
+                        height: self.texture_size[1]
+                        text: ''
+
+                HorizontalLayout:
+                    size_hint: 1, None
+                    height: self.minimum_height
+                    pos_hint: {'top': 1, 'left': 0}
+
+                    CustomTextField:
+                        id: share_label_input
+                        size_hint_x: None
+                        width: dp(250)
+                        hint_text: 'Name of the new shared location'
+                        text: ''
+
+                    VerticalLayout:
+                        size_hint: None, None
+                        width: self.minimum_width
+                        height: self.minimum_height
+
+                        RaisedIconButton:
+                            id: create_share_button
+                            _radius: dp(3)
+                            icon: 'plus'
+                            on_press: root.on_create_share_button_clicked()
+
+                        Widget:
+                            size_hint: None, None
+                            size: dp(16), dp(16)
+
+                VEmptySpace:
+
+        BottomEmptyScreenSpace:

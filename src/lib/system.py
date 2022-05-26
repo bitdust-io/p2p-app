@@ -6,11 +6,11 @@ from queue import Queue
 
 #------------------------------------------------------------------------------
 
-from kivy.utils import platform
+from kivy.utils import platform  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -285,13 +285,14 @@ class AsynchronousFileReader(threading.Thread):
 
 class BackgroundProcess(object):
 
-    def __init__(self, cmd, stdout_callback=None, stderr_callback=None, finishing=None, daemon=False):
+    def __init__(self, cmd, stdout_callback=None, stderr_callback=None, finishing=None, daemon=False, result_callback=None):
         self.cmd = cmd
         self.process = None
         self.stdout_callback = stdout_callback
         self.stderr_callback = stderr_callback
         self.finishing = finishing
         self.daemon = daemon
+        self.result_callback = result_callback
 
     def run(self, **kwargs):
 
@@ -327,7 +328,7 @@ class BackgroundProcess(object):
                     break
                 time.sleep(.2)
             if _Debug:
-                print('BackgroundProcess.run.target EOF reached')
+                print('BackgroundProcess.run.target EOF reached finishing=%r' % self.finishing)
             if self.finishing and self.finishing.is_set():
                 if _Debug:
                     print('BackgroundProcess.run.target terminating the process because finishing flag is set')
@@ -337,9 +338,21 @@ class BackgroundProcess(object):
                 stderr_reader.join()
                 self.process.stdout.close()
                 self.process.stderr.close()
+            rc = self.process.wait()
             if _Debug:
-                print('BackgroundProcess.run.target finished')
+                print('BackgroundProcess.run.target finished rc=%r' % rc)
+            if self.result_callback:
+                self.result_callback(rc)
 
         thread = threading.Thread(target=target, kwargs=kwargs, daemon=self.daemon)
         thread.start()
 
+#------------------------------------------------------------------------------
+
+def get_nice_size(size_bytes):
+    sz = float(size_bytes)
+    for unit in ('B', 'KB', 'MB', 'GB', 'TB'):
+        if sz < 1024.0:
+            return '%1.0f %s' % (sz, unit)
+        sz /= 1024.0
+    return '%1.0f %s' % (sz, 'TB')

@@ -2,6 +2,8 @@
     locked: False
     entries: []
     path: ctx.path
+    global_id: ctx.global_id
+    remote_path: ctx.remote_path
     is_selected: False
     no_selection: True
 
@@ -29,6 +31,16 @@
             color: (0, 0, 0, 1)
 
         Label:
+            id: file_condition
+            text_size: self.width, None
+            size_hint_x: None
+            halign: 'right'
+            text: '{}'.format(ctx.get_condition())
+            font_name: ctx.controller().font_name
+            color: (0, 0, 0, 1)
+
+        Label:
+            id: file_size
             text_size: self.width, None
             size_hint_x: None
             halign: 'right'
@@ -49,31 +61,31 @@
         size_hint: None, None
         orientation: 'vertical'
 
-        BoxLayout:
-            size_hint_y: None
-            height: '30dp'
-            orientation: 'horizontal'
+        # BoxLayout:
+        #     size_hint_y: None
+        #     height: '30dp'
+        #     orientation: 'horizontal'
 
-            Widget:
-                width: '10dp'
-                size_hint_x: None
+        #     Widget:
+        #         width: '10dp'
+        #         size_hint_x: None
 
-            Label:
-                text: 'Name'
-                text_size: self.size
-                halign: 'left'
-                color: (.7,.7,.7,1)
+        #     Label:
+        #         text: 'Name'
+        #         text_size: self.size
+        #         halign: 'left'
+        #         color: (.7,.7,.7,1)
 
-            Label:
-                text: 'Size'
-                text_size: self.size
-                size_hint_x: None
-                halign: 'right'
-                color: (.7,.7,.7,1)
+        #     Label:
+        #         text: 'Size'
+        #         text_size: self.size
+        #         size_hint_x: None
+        #         halign: 'right'
+        #         color: (.7,.7,.7,1)
 
-            Widget:
-                width: '10dp'
-                size_hint_x: None
+        #     Widget:
+        #         width: '10dp'
+        #         size_hint_x: None
 
         ScrollView:
             id: scrollview

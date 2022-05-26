@@ -9,7 +9,7 @@ from kivy.properties import (
 )
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.switch import Switch
-from kivymd.uix.list import IconLeftWidget
+from kivymd.uix.list import IconLeftWidget, ILeftBodyTouch
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.button import (
     BaseButton,
@@ -196,3 +196,7 @@ class CustomIconLeftWidget(IconLeftWidget):
     def set_size(self, interval):
         self.width = '36dp'
         self.height = '36dp'
+
+
+class CustomIconPackLeftWidget(ILeftBodyTouch, CustomIconButton):
+    pass

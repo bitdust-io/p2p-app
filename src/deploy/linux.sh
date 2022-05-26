@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ROOT_DIR="$HOME/.bitdust"
-LOG_FILE="${ROOT_DIR}/venv.log"
+LOG_FILE="${ROOT_DIR}/install.log"
 SOURCE_DIR="${ROOT_DIR}/src"
 VENV_DIR="${ROOT_DIR}/venv"
 PYTHON_BIN="${ROOT_DIR}/venv/bin/python"
@@ -89,6 +89,13 @@ else
     echo "##### updating Python virtual environment"
     $PIP_BIN install -U -r $SOURCE_DIR/requirements.txt  1>$LOG_FILE 2>$LOG_FILE
 fi
+
+
+if [ ! -f $BITDUST_COMMAND_FILE ]; then
+    cat $LOG_FILE
+    exit 2
+fi
+
 
 if [ -w $GLOBAL_COMMAND_LOCATION ]; then
     echo ''

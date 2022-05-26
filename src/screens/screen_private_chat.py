@@ -36,8 +36,8 @@ class PrivateChatScreen(screen.AppScreen):
             self.automat_index = kw.pop('automat_index', None)
         return kw
 
-    def get_icon(self):
-        return ''
+    # def get_icon(self):
+    #     return ''
 
     def get_title(self):
         return self.username

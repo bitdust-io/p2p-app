@@ -7,6 +7,7 @@ from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
+from lib import misc
 from lib import system
 from lib import websock
 from lib import api_client
@@ -60,6 +61,14 @@ def all_screens():
             'screens/screen_group_info.kv', 'screens.screen_group_info', 'GroupInfoScreen', ),
         'private_files_screen': (
             'screens/screen_private_files.kv', 'screens.screen_private_files', 'PrivateFilesScreen', ),
+        'single_private_file_screen': (
+            'screens/screen_single_private_file.kv', 'screens.screen_single_private_file', 'SinglePrivateFileScreen', ),
+        'shares_screen': (
+            'screens/screen_shares.kv', 'screens.screen_shares', 'SharesScreen', ),
+        'create_share_screen': (
+            'screens/screen_create_share.kv', 'screens.screen_create_share', 'CreateShareScreen', ),
+        'shared_location_screen': (
+            'screens/screen_shared_location.kv', 'screens.screen_shared_location', 'SharedLocationScreen', ),
     }
 
 #------------------------------------------------------------------------------
@@ -73,11 +82,16 @@ class Controller(object):
 
     def __init__(self, app):
         self.enabled = False
+        self.connecting = False
         self.app = app
         self.callbacks = {}
         self.state_changed_callbacks = {}
         self.state_changed_callbacks_by_id = {}
         self.model_data = {}
+        self.private_files_index = {}
+        self.shared_files_index = {}
+        self.remote_versions_index = {}
+        self.remote_files_details = {}
 
     def mw(self):
         return self.app.main_window
@@ -112,22 +126,23 @@ class Controller(object):
         # BitDust node process must be running already
         if self.mw().state_process_health == 0:
             return self.verify_process_health()
-        elif self.mw().state_process_health == -1:
+        if self.mw().state_process_health == -1:
             if time.time() - self.process_health_latest > 30.0:
                 return self.verify_process_health()
             return None
         # user identity must be already existing
         if self.mw().state_identity_get == 0:
             return self.verify_identity_get()
-        elif self.mw().state_identity_get == -1:
+        if self.mw().state_identity_get == -1:
             if time.time() - self.identity_get_latest > 600.0:
                 return self.verify_identity_get()
             return None
         # BitDust node must be already connected to the network
         if self.mw().state_network_connected == 0:
-            return self.verify_network_connected()
-        elif self.mw().state_network_connected == -1:
-            if time.time() - self.network_connected_latest > 30.0:
+            return None
+            # return self.verify_network_connected()
+        if self.mw().state_network_connected == -1:
+            if time.time() - self.network_connected_latest > 30.0 and not self.connecting:
                 return self.verify_network_connected()
             return None
         # all is good
@@ -144,9 +159,18 @@ class Controller(object):
         return api_client.identity_get(cb=self.on_identity_get_result)
 
     def verify_network_connected(self, *args, **kwargs):
+        dt = 0
+        if self.network_connected_latest:
+            dt = time.time() - self.network_connected_latest
+        if self.connecting:
+            self.mw().state_network_connected = 0
+            if _Debug:
+                print('Controller.verify_network_connected skipped, already connecting', dt, time.asctime())
+            return False
         if _Debug:
-            print('Controller.verify_network_connected', time.asctime())
+            print('Controller.verify_network_connected', dt, time.asctime())
         self.mw().state_network_connected = 0
+        self.connecting = True
         return api_client.network_connected(cb=self.on_network_connected_result)
 
     #------------------------------------------------------------------------------
@@ -244,6 +268,7 @@ class Controller(object):
     def on_network_connected_result(self, resp):
         if _Debug:
             print('Controller.on_network_connected_result', time.asctime(), resp)
+        self.connecting = False
         self.network_connected_latest = time.time()
         if not api_client.is_ok(resp):
             self.network_connected_latest = 0
@@ -256,10 +281,8 @@ class Controller(object):
                 self.mw().state_network_connected = -1
             return
         self.network_connected_latest = time.time()
-        self.mw().state_network_connected = 1 # if api_client.is_ok(resp) else -1
+        self.mw().state_network_connected = 1
         self.run()
-
-    #------------------------------------------------------------------------------
 
     def on_websocket_open(self, websocket_instance):
         if _Debug:
@@ -276,6 +299,8 @@ class Controller(object):
         api_client.start_model_streaming('correspondent', request_all=True)
         api_client.start_model_streaming('online_status', request_all=True)
         api_client.start_model_streaming('private_file', request_all=True)
+        api_client.start_model_streaming('shared_file', request_all=True)
+        api_client.start_model_streaming('remote_version', request_all=True)
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:
@@ -374,30 +399,71 @@ class Controller(object):
     def on_model_update(self, json_data):
         model_name = json_data['payload']['name']
         snap_id = json_data['payload']['id']
-        if _Debug:
-            print('Controller.on_model_update [%s] %s : %r' % (model_name, snap_id, json_data['payload']['data'].get('state'), ))
+        d = json_data['payload']['data']
         if model_name not in self.model_data:
             self.model_data[model_name] = {}
-        if json_data['payload'].get('deleted'):
+        deleted = json_data['payload'].get('deleted')
+        if _Debug:
+            print('Controller.on_model_update [%s] %s deleted=%r\n    %r' % (model_name, snap_id, deleted, d, ))
+        if deleted:
             self.model_data[model_name].pop(snap_id)
+            if model_name == 'private_file':
+                _, _, path = d['remote_path'].rpartition(':')
+                self.private_files_index.pop(path, None)
+            elif model_name == 'shared_file':
+                self.shared_files_index.pop(d['remote_path'], None)
+            elif model_name == 'remote_version':
+                self.remote_versions_index.pop(d['global_id'], None)
+                self.remote_files_details.pop(d['global_id'], None)
         else:
             if snap_id not in self.model_data[model_name]:
                 self.model_data[model_name][snap_id] = {}
             self.model_data[model_name][snap_id]['id'] = snap_id
-            self.model_data[model_name][snap_id]['data'] = json_data['payload']['data']
+            self.model_data[model_name][snap_id]['data'] = d
             self.model_data[model_name][snap_id]['created'] = json_data['payload']['created']
             if model_name == 'service':
                 def _st(d):
                     return 1 if d['state'] == 'ON' else (
                         -1 if d['state'] in ['OFF', 'NOT_INSTALLED', 'DEPENDS_OFF', 'CLOSED', ] else 0)
                 if snap_id == 'service_my_data':
-                    self.mw().state_my_data = _st(json_data['payload']['data'])
+                    self.mw().state_my_data = _st(d)
                 elif snap_id == 'service_message_history':
-                    self.mw().state_message_history = _st(json_data['payload']['data'])
+                    self.mw().state_message_history = _st(d)
                 elif snap_id == 'service_entangled_dht':
-                    self.mw().state_entangled_dht = _st(json_data['payload']['data'])
+                    self.mw().state_entangled_dht = _st(d)
                 elif snap_id == 'service_proxy_transport':
-                    self.mw().state_proxy_transport = _st(json_data['payload']['data'])
+                    self.mw().state_proxy_transport = _st(d)
+            elif model_name == 'private_file':
+                _, _, path = d['remote_path'].rpartition(':')
+                self.private_files_index[path] = d['global_id']
+            elif model_name == 'shared_file':
+                self.shared_files_index[d['remote_path']] = d['global_id']
+            elif model_name == 'remote_version':
+                global_id = d['global_id']
+                _, _, version_id = d['backup_id'].rpartition('/')
+                if global_id not in self.remote_versions_index:
+                    self.remote_versions_index[global_id] = {}
+                self.remote_versions_index[global_id][version_id] = snap_id
+                sz = 0
+                delivered = 0.0
+                reliable = 0.0
+                total_file_versions = 0
+                for one_snap_id in self.remote_versions_index[global_id].values():
+                    version_details = self.model_data['remote_version'].get(one_snap_id)
+                    if version_details:
+                        sz += version_details['data']['size']
+                        delivered += float(version_details['data']['delivered'].replace('%', ''))
+                        reliable += float(version_details['data']['reliable'].replace('%', ''))
+                        total_file_versions += 1
+                if total_file_versions:
+                    self.remote_files_details[global_id] = dict(
+                        size=sz,
+                        delivered=misc.percent2string(delivered / total_file_versions),
+                        reliable=misc.percent2string(reliable / total_file_versions),
+                        count=total_file_versions,
+                    )
+                else:
+                    self.remote_files_details.pop(global_id, None)
 
     def on_state_process_health(self, instance, value):
         if _Debug:

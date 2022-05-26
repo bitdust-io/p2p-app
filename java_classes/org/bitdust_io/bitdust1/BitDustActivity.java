@@ -253,36 +253,78 @@ public class BitDustActivity extends PythonActivity {
 
 
 
+    //----------------------------------------------------------------------------
+    // Listener interface for onNewIntent
+    //
+
+    public interface CustomNewIntentListener {
+        void onNewIntent(Intent intent);
+    }
+
+    private List<CustomNewIntentListener> newCustomIntentListeners = null;
+
+    public void registerCustomNewIntentListener(CustomNewIntentListener listener) {
+        Log.v(TAG, "registerCustomNewIntentListener()");
+        if ( this.newCustomIntentListeners == null )
+            this.newCustomIntentListeners = Collections.synchronizedList(new ArrayList<CustomNewIntentListener>());
+        this.newCustomIntentListeners.add(listener);
+    }
+
+    public void unregisterCustomNewIntentListener(CustomNewIntentListener listener) {
+        Log.v(TAG, "unregisterCustomNewIntentListener()");
+        if ( this.newCustomIntentListeners == null )
+            return;
+        this.newCustomIntentListeners.remove(listener);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.v(TAG, "onNewIntent()");
+        if ( this.newCustomIntentListeners == null )
+            return;
+        this.onResume();
+        synchronized ( this.newCustomIntentListeners ) {
+            Iterator<CustomNewIntentListener> iterator = this.newCustomIntentListeners.iterator();
+            while ( iterator.hasNext() ) {
+                (iterator.next()).onNewIntent(intent);
+            }
+        }
+    }
+
+
 
     //----------------------------------------------------------------------------
     // Listener interface for onActivityResult
     //
 
-    public interface ActivityResultListener {
+    public interface CustomActivityResultListener {
         void onActivityResult(int requestCode, int resultCode, Intent data);
     }
 
-    private List<ActivityResultListener> activityResultListeners = null;
+    private List<CustomActivityResultListener> activityResultListenersCustom = null;
 
-    public void registerActivityResultListener(ActivityResultListener listener) {
-        if ( this.activityResultListeners == null )
-            this.activityResultListeners = Collections.synchronizedList(new ArrayList<ActivityResultListener>());
-        this.activityResultListeners.add(listener);
+    public void registerCustomActivityResultListener(CustomActivityResultListener listener) {
+        Log.v(TAG, "registerCustomActivityResultListener()");
+        if ( this.activityResultListenersCustom == null )
+            this.activityResultListenersCustom = Collections.synchronizedList(new ArrayList<CustomActivityResultListener>());
+        this.activityResultListenersCustom.add(listener);
     }
 
-    public void unregisterActivityResultListener(ActivityResultListener listener) {
-        if ( this.activityResultListeners == null )
+    public void unregisterCustomActivityResultListener(CustomActivityResultListener listener) {
+        Log.v(TAG, "unregisterCustomActivityResultListener()");
+        if ( this.activityResultListenersCustom == null )
             return;
-        this.activityResultListeners.remove(listener);
+        this.activityResultListenersCustom.remove(listener);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if ( this.activityResultListeners == null )
+        Log.v(TAG, "onActivityResult()");
+        if ( this.activityResultListenersCustom == null )
             return;
         this.onResume();
-        synchronized ( this.activityResultListeners ) {
-            Iterator<ActivityResultListener> iterator = this.activityResultListeners.iterator();
+        synchronized ( this.activityResultListenersCustom ) {
+            Iterator<CustomActivityResultListener> iterator = this.activityResultListenersCustom.iterator();
             while ( iterator.hasNext() )
                 (iterator.next()).onActivityResult(requestCode, resultCode, intent);
         }

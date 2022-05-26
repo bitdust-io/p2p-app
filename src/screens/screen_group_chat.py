@@ -35,14 +35,11 @@ class GroupChatScreen(screen.AppScreen):
             self.automat_id = kw.pop('automat_id', None)
         return kw
 
-    def get_icon(self):
-        return 'account-group'
+    # def get_icon(self):
+    #     return 'account-group'
 
     def get_title(self):
-        l = self.label
-        if len(l) > 20:
-            l = l[:20] + '...'
-        return l
+        return self.label
 
     def get_hot_button(self):
         return {'icon': 'send', 'color': 'green', }
