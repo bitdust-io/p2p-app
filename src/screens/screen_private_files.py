@@ -56,7 +56,10 @@ class PrivateFilesScreen(screen.AppScreen):
         pass
 
     def on_created(self):
-        self.ids.files_list_view.init(file_clicked_callback=self.on_file_clicked)
+        self.ids.files_list_view.init(
+            file_system_type='private',
+            file_clicked_callback=self.on_file_clicked,
+        )
 
     def on_destroying(self):
         self.ids.files_list_view.shutdown()
@@ -67,13 +70,13 @@ class PrivateFilesScreen(screen.AppScreen):
     def on_leave(self, *args):
         self.ids.state_panel.release()
 
-    def on_private_file(self, payload):
-        if _Debug:
-            print('PrivateFilesScreen.on_private_file', payload)
-
-    def on_remote_version(self, payload):
-        if _Debug:
-            print('PrivateFilesScreen.on_remote_version', payload)
+#     def on_private_file(self, payload):
+#         if _Debug:
+#             print('PrivateFilesScreen.on_private_file', payload)
+# 
+#     def on_remote_version(self, payload):
+#         if _Debug:
+#             print('PrivateFilesScreen.on_remote_version', payload)
 
     @mainthread
     def on_upload_file_button_clicked(self, *args):

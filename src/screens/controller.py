@@ -7,13 +7,14 @@ from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
+from lib import misc
 from lib import system
 from lib import websock
 from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -87,9 +88,10 @@ class Controller(object):
         self.state_changed_callbacks = {}
         self.state_changed_callbacks_by_id = {}
         self.model_data = {}
-        self.private_files_by_path = {}
-        self.private_files_by_id = {}
-        self.remote_versions_by_path = {}
+        self.private_files_index = {}
+        self.shared_files_index = {}
+        self.remote_versions_index = {}
+        self.remote_files_details = {}
 
     def mw(self):
         return self.app.main_window
@@ -405,6 +407,14 @@ class Controller(object):
             print('Controller.on_model_update [%s] %s deleted=%r\n    %r' % (model_name, snap_id, deleted, d, ))
         if deleted:
             self.model_data[model_name].pop(snap_id)
+            if model_name == 'private_file':
+                _, _, path = d['remote_path'].rpartition(':')
+                self.private_files_index.pop(path, None)
+            elif model_name == 'shared_file':
+                self.shared_files_index.pop(d['remote_path'], None)
+            elif model_name == 'remote_version':
+                self.remote_versions_index.pop(d['global_id'], None)
+                self.remote_files_details.pop(d['global_id'], None)
         else:
             if snap_id not in self.model_data[model_name]:
                 self.model_data[model_name][snap_id] = {}
@@ -425,19 +435,35 @@ class Controller(object):
                     self.mw().state_proxy_transport = _st(d)
             elif model_name == 'private_file':
                 _, _, path = d['remote_path'].rpartition(':')
-                self.private_files_by_path[path] = d['global_id']
-                # self.private_files_by_id[d['global_id']] = d['remote_path']
+                self.private_files_index[path] = d['global_id']
+            elif model_name == 'shared_file':
+                self.shared_files_index[d['remote_path']] = d['global_id']
             elif model_name == 'remote_version':
-                # if d['remote_path'] not in self.remote_versions_by_path:
-                #     self.remote_versions_by_path[d['remote_path']] = []
-                # if snap_id not in self.remote_versions_by_path[d['remote_path']]:
-                #     self.remote_versions_by_path[d['remote_path']].append(snap_id)
-                if d['global_id'] in self.model_data.get('private_file', {}):
-                    self.model_data['private_file'][d['global_id']]['data'].update(
-                        size=d['size'],
-                        delivered=d['delivered'],
-                        reliable=d['reliable'],
+                global_id = d['global_id']
+                _, _, version_id = d['backup_id'].rpartition('/')
+                if global_id not in self.remote_versions_index:
+                    self.remote_versions_index[global_id] = {}
+                self.remote_versions_index[global_id][version_id] = snap_id
+                sz = 0
+                delivered = 0.0
+                reliable = 0.0
+                total_file_versions = 0
+                for one_snap_id in self.remote_versions_index[global_id].values():
+                    version_details = self.model_data['remote_version'].get(one_snap_id)
+                    if version_details:
+                        sz += version_details['data']['size']
+                        delivered += float(version_details['data']['delivered'].replace('%', ''))
+                        reliable += float(version_details['data']['reliable'].replace('%', ''))
+                        total_file_versions += 1
+                if total_file_versions:
+                    self.remote_files_details[global_id] = dict(
+                        size=sz,
+                        delivered=misc.percent2string(delivered / total_file_versions),
+                        reliable=misc.percent2string(reliable / total_file_versions),
+                        count=total_file_versions,
                     )
+                else:
+                    self.remote_files_details.pop(global_id, None)
 
     def on_state_process_health(self, instance, value):
         if _Debug:
