@@ -11,23 +11,12 @@ from kivy.uix.filechooser import FileSystemAbstract, FileChooserController, File
 
 from components import screen
 
+from lib import system
 from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = True
-
-#------------------------------------------------------------------------------
-
-def make_nice_size(sz):
-    for unit in ('B', 'KB', 'MB', 'GB', 'TB', ):
-        if sz < 1024.0:
-            return '%1.0f %s' % (sz, unit)
-        sz /= 1024.0
-
-
-def make_nice_file_condition(file_info):
-    return '{}/{}'.format(file_info.get('delivered', '0%'), file_info.get('reliable', '0%'))
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -43,9 +32,37 @@ class DistributedFileSystem(FileSystemAbstract):
     def model_name(self):
         raise NotImplementedError()
 
+    def is_hidden(self, fn):
+        _, _, fn = fn.rpartition(':')
+        return fn.startswith('.')
+
+#------------------------------------------------------------------------------
+
+class PrivateDistributedFileSystem(DistributedFileSystem):
+
+    def model_name(self):
+        return 'private_file'
+
+    def is_dir(self, fn):
+        if fn == '/':
+            return True
+        path = fn.lstrip('/')
+        indexed_global_id = screen.control().private_files_index.get(path)
+        if indexed_global_id:
+            pf = screen.model(self.model_name(), snap_id=indexed_global_id)
+            if pf:
+                return pf['data']['type'] == 'dir'
+        for pf in screen.model(self.model_name()).values():
+            remote_path = pf['data']['remote_path']
+            _, _, path = remote_path.rpartition(':')
+            path = '/' + path
+            if path == fn:
+                return pf['data']['type'] == 'dir'
+        return False
+
     def listdir(self, fn):
         if _Debug:
-            print('DistributedFileSystem.listdir', self.model_name(), fn)
+            print('PrivateDistributedFileSystem.listdir', self.model_name(), fn)
         dirs = []
         files = []
         sep_count = 1
@@ -68,28 +85,6 @@ class DistributedFileSystem(FileSystemAbstract):
         if _Debug:
             print('    dirs=%d files=%d' % (len(dirs), len(files), ))
         return dirs + files
-
-    def is_hidden(self, fn):
-        _, _, fn = fn.rpartition(':')
-        return fn.startswith('.')
-
-    def is_dir(self, fn):
-        if fn == '/':
-            return True
-        for pf in screen.model(self.model_name()).values():
-            remote_path = pf['data']['remote_path']
-            _, _, path = remote_path.rpartition(':')
-            path = '/' + path
-            if path == fn:
-                return pf['data']['type'] == 'dir'
-        return False
-
-#------------------------------------------------------------------------------
-
-class PrivateDistributedFileSystem(DistributedFileSystem):
-
-    def model_name(self):
-        return 'private_file'
 
     def getsize(self, fn):
         if fn == '/':
@@ -118,7 +113,7 @@ class PrivateDistributedFileSystem(DistributedFileSystem):
             if details:
                 if _Debug:
                     print('PrivateDistributedFileSystem.get_condition found indexed', fn, details)
-                return make_nice_file_condition(details)
+                return system.make_nice_file_condition(details)
         if _Debug:
             print('PrivateDistributedFileSystem.get_condition', fn, 'model data was not found')
         return ''
@@ -130,10 +125,56 @@ class SharedDistributedFileSystem(DistributedFileSystem):
     def model_name(self):
         return 'shared_file'
 
+    def is_dir(self, fn):
+        if fn == '/':
+            return True
+        path = fn.lstrip('/')
+        remote_path = '{}:{}'.format(self.key_id, path)
+        indexed_global_id = screen.control().shared_files_index.get(remote_path)
+        if indexed_global_id:
+            sf = screen.model(self.model_name(), snap_id=indexed_global_id)
+            if sf:
+                return sf['data']['type'] == 'dir'
+        for pf in screen.model(self.model_name()).values():
+            remote_path = pf['data']['remote_path']
+            _, _, path = remote_path.rpartition(':')
+            path = '/' + path
+            if path == fn:
+                return pf['data']['type'] == 'dir'
+        return False
+
+    def listdir(self, fn):
+        if _Debug:
+            print('SharedDistributedFileSystem.listdir', self.key_id, fn)
+        dirs = []
+        files = []
+        sep_count = 1
+        if fn != '/':
+            sep_count = fn.rstrip('/').count('/') + 1
+        for sf in screen.model(self.model_name()).values():
+            if not sf['data']['global_id'].startswith(self.key_id):
+                continue
+            remote_path = sf['data']['remote_path']
+            _, _, path = remote_path.rpartition(':')
+            path = '/' + path
+            if not path.startswith(fn):
+                continue
+            if sep_count != path.count('/'):
+                continue
+            if sf['data']['type'] == 'dir':
+                dirs.append(remote_path)
+            else:
+                files.append(remote_path)
+        dirs.sort()
+        files.sort()
+        if _Debug:
+            print('    dirs=%d files=%d' % (len(dirs), len(files), ))
+        return dirs + files
+
     def getsize(self, fn):
         if fn == '/':
             if _Debug:
-                print('SharedDistributedFileSystem.getsize', fn, 'returned 0')
+                print('SharedDistributedFileSystem.getsize', self.key_id, fn, 'returned 0')
             return 0
         path = fn.lstrip('/')
         remote_path = '{}:{}'.format(self.key_id, path)
@@ -142,10 +183,10 @@ class SharedDistributedFileSystem(DistributedFileSystem):
             details = screen.control().remote_files_details.get(indexed_global_id)
             if details:
                 if _Debug:
-                    print('SharedDistributedFileSystem.getsize found indexed', remote_path, details['size'])
+                    print('SharedDistributedFileSystem.getsize found indexed', self.key_id, remote_path, details['size'])
                 return details['size']
         if _Debug:
-            print('SharedDistributedFileSystem.getsize', remote_path, 'model data was not found')
+            print('SharedDistributedFileSystem.getsize', self.key_id, remote_path, 'model data was not found')
         return 0
 
     def get_condition(self, fn):
@@ -158,10 +199,10 @@ class SharedDistributedFileSystem(DistributedFileSystem):
             details = screen.control().remote_files_details.get(indexed_global_id)
             if details:
                 if _Debug:
-                    print('SharedDistributedFileSystem.get_condition found indexed', remote_path, details)
-                return make_nice_file_condition(details)
+                    print('SharedDistributedFileSystem.get_condition found indexed', self.key_id, remote_path, details)
+                return system.make_nice_file_condition(details)
         if _Debug:
-            print('SharedDistributedFileSystem.get_condition', remote_path, 'model data was not found')
+            print('SharedDistributedFileSystem.get_condition', self.key_id, remote_path, 'model data was not found')
         return ''
 
 #------------------------------------------------------------------------------
@@ -232,9 +273,12 @@ class DistributedFileChooserListView(FileChooserController):
 
     def on_shared_file(self, payload):
         if _Debug:
-            print('DistributedFileChooserListView.on_shared_file', payload)
+            print('DistributedFileChooserListView.on_shared_file', self.file_system.key_id, payload)
         remote_path = payload['data']['remote_path']
         global_id = payload['data']['global_id']
+        if self.file_system_type == 'shared':
+            if not global_id.startswith(self.file_system.key_id):
+                return
         if payload.get('deleted'):
             self.index_by_global_id.pop(global_id, None)
             w = self.index_by_remote_path.pop(remote_path, None)
@@ -251,6 +295,9 @@ class DistributedFileChooserListView(FileChooserController):
             print('DistributedFileChooserListView.on_remote_version', payload)
         remote_path = payload['data']['remote_path']
         global_id = payload['data']['global_id']
+        if self.file_system_type == 'shared':
+            if not global_id.startswith(self.file_system.key_id):
+                return
         _, _, path = remote_path.rpartition(':')
         path = '/' + path
         if global_id in self.index_by_global_id:
@@ -309,7 +356,7 @@ class DistributedFileChooserListView(FileChooserController):
 
     def _update_files(self, *args, **kwargs):
         if _Debug:
-            print('DistributedFileChooserListView._update_files', args, kwargs)
+            print('DistributedFileChooserListView._update_files', self.file_system.key_id, args, kwargs)
         self._gitems = []
         self._gitems_parent = kwargs.get('parent', None)
         self._gitems_gen = self._generate_file_entries(

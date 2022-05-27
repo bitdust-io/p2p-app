@@ -391,6 +391,16 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         self.active_screens[screen_id][0].on_opened()
         return True
 
+    def screen_back(self):
+        back_to_screen = None
+        if self.screens_stack:
+            back_to_screen = self.screens_stack[-1]
+        if back_to_screen:
+            self.select_screen(back_to_screen)
+            return True
+        self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
+        return False
+
     #------------------------------------------------------------------------------
 
     def on_init_done(self, *args):
@@ -409,27 +419,26 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     def on_nav_back_button_clicked(self, *args):
         if _Debug:
             print('MainWin.on_nav_back_button_clicked', self.screens_stack)
-        back_to_screen = None
-        if self.screens_stack:
-            back_to_screen = self.screens_stack[-1]
-        if back_to_screen:
-            self.select_screen(back_to_screen)
-        else:
-            self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
+        self.screen_back()
 
     def on_system_back_button_clicked(self, *args):
         if _Debug:
             print('MainWin.on_system_back_button_clicked', self.screens_stack, *args)
-        back_to_screen = None
-        if self.screens_stack:
-            back_to_screen = self.screens_stack[-1]
-        if back_to_screen:
-            self.select_screen(back_to_screen)
+        if self.screen_back():
             return True
-        self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
         if system.is_android():
             return False
         return True
+#         back_to_screen = None
+#         if self.screens_stack:
+#             back_to_screen = self.screens_stack[-1]
+#         if back_to_screen:
+#             self.select_screen(back_to_screen)
+#             return True
+#         self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
+#         if system.is_android():
+#             return False
+#         return True
 
     def on_left_menu_button_clicked(self, *args):
         if _Debug:

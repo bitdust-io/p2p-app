@@ -122,11 +122,11 @@ class SharedLocationScreen(screen.AppScreen):
             print('raw_path', raw_path)
 
     def on_upload_file_selected(self, *args, **kwargs):
-        if _Debug:
-            print('SharedLocationScreen.on_upload_file_selected', args, kwargs)
         file_path = args[0][0]
         file_name = os.path.basename(file_path)
         remote_path = '{}:{}'.format(self.key_id, file_name)
+        if _Debug:
+            print('SharedLocationScreen.on_upload_file_selected', args, kwargs, remote_path)
         api_client.file_create(
             remote_path=remote_path,
             as_folder=False,
@@ -137,6 +137,9 @@ class SharedLocationScreen(screen.AppScreen):
     def on_file_created(self, resp, file_path, remote_path):
         if _Debug:
             print('SharedLocationScreen.on_file_created', file_path, remote_path, resp)
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
+            return
         api_client.file_upload_start(
             local_path=file_path,
             remote_path=remote_path,
@@ -166,3 +169,7 @@ class SharedLocationScreen(screen.AppScreen):
             remote_path=remote_path,
             details=api_client.response_result(resp),
         )
+
+    def on_grant_access_button_clicked(self, *args):
+        if _Debug:
+            print('SharedLocationScreen.on_grant_access_button_clicked', args)
