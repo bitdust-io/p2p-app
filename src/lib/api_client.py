@@ -206,22 +206,19 @@ def file_delete(remote_path, cb=None):
     return run('file_delete', kwargs={'remote_path': remote_path, }, cb=cb)
 
 
-def file_upload_start(local_path, remote_path, wait_result=False, wait_finish=False, open_share=False, cb=None):
+def file_upload_start(local_path, remote_path, wait_result=False, cb=None):
     return run('file_upload_start', kwargs={
         'local_path': local_path,
         'remote_path': remote_path,
         'wait_result': wait_result,
-        'wait_finish': wait_finish,
-        'open_share': open_share,
     }, cb=cb)
 
 
-def file_download_start(remote_path, destination_path=None, wait_result=False, open_share=True, cb=None):
+def file_download_start(remote_path, destination_path=None, wait_result=False, cb=None):
     return run('file_download_start', kwargs={
         'remote_path': remote_path,
         'destination_path': destination_path,
         'wait_result': wait_result,
-        'open_share': open_share,
     }, cb=cb)
 
 
@@ -239,6 +236,10 @@ def share_create(owner_id=None, key_size=None, label='', cb=None):
 
 def share_open(key_id, publish_events=False, cb=None):
     return run('share_open', kwargs={'key_id': key_id, 'publish_events': publish_events, }, cb=cb)
+
+
+def share_grant(key_id, trusted_user_id, cb=None):
+    return run('share_grant', kwargs={'key_id': key_id, 'trusted_user_id': trusted_user_id, }, cb=cb)
 
 
 def user_observe(nickname, attempts=5, cb=None):
