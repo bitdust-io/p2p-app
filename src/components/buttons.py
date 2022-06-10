@@ -1,4 +1,5 @@
 from kivy.clock import Clock
+from kivy.animation import Animation
 from kivy.properties import (
     BooleanProperty,  # @UnresolvedImport
     StringProperty,  # @UnresolvedImport
@@ -13,13 +14,13 @@ from kivymd.uix.list import IconLeftWidget, ILeftBodyTouch
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.button import (
     BaseButton,
-    BaseElevationButton,
     BasePressedButton,
     MDFlatButton,
     MDFillRoundFlatButton,
+    MDFloatingActionButton,
 )
 from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
-from kivymd.uix.behaviors.elevation import RectangularElevationBehavior
+from kivymd.uix.behaviors.elevation import RectangularElevationBehavior, CommonElevationBehavior
 from kivymd.uix.behaviors.backgroundcolor_behavior import SpecificBackgroundColorBehavior
 
 #------------------------------------------------------------------------------
@@ -33,6 +34,98 @@ from components import labels
 _Debug = False
 
 #------------------------------------------------------------------------------
+
+class BasePressedButton(BaseButton):
+
+    animation_fade_bg = None
+    current_md_bg_color = ColorProperty(None)
+
+    def on_touch_down(self, touch):
+        if touch.is_mouse_scrolling:
+            return False
+        elif not self.collide_point(touch.x, touch.y):
+            return False
+        elif self in touch.ud:
+            return False
+        elif self.disabled:
+            return False
+        else:
+            if self.md_bg_color == [0.0, 0.0, 0.0, 0.0]:
+                self.current_md_bg_color = self.md_bg_color
+                self.animation_fade_bg = Animation(
+                    duration=0.5, md_bg_color=[0.0, 0.0, 0.0, 0.1]
+                )
+                self.animation_fade_bg.start(self)
+            return super().on_touch_down(touch)
+
+    def on_touch_up(self, touch):
+        if (
+            self.collide_point(touch.x, touch.y)
+            and self.animation_fade_bg
+            and not self.disabled
+        ):
+            self.animation_fade_bg.stop_property(self, "md_bg_color")
+            Animation(
+                duration=0.05, md_bg_color=self.current_md_bg_color
+            ).start(self)
+        return super().on_touch_up(touch)
+
+
+class BaseElevationButton(CommonElevationBehavior, BaseButton):
+
+    _elevation_normal = NumericProperty(0)
+    _elevation_raised = NumericProperty(0)
+    _anim_raised = None
+
+    def on_elevation(self, instance, value):
+        self._elevation_normal = self.elevation
+        self._elevation_raised = self.elevation
+        self._anim_raised = Animation(_elevation=value + 2, d=0.5)
+        self._anim_raised.bind(on_progress=self._do_anim_raised)
+        self._update_elevation(instance, value)
+
+    def on_disabled(self, instance, value):
+        # FIXME: If a button has a default `disabled` parameter of `True`,
+        #  the `elevation` value is not cleared.
+        if self.disabled:
+            self._elevation = 0
+            self._update_shadow(instance, 0)
+        else:
+            self._update_elevation(instance, self._elevation_normal)
+        super().on_disabled(instance, value)
+
+    def on_touch_down(self, touch):
+        if not self.disabled:
+            if touch.is_mouse_scrolling:
+                return False
+            if not self.collide_point(touch.x, touch.y):
+                return False
+            if self in touch.ud:
+                return False
+            if self._anim_raised:
+                self._anim_raised.start(self)
+        return super().on_touch_down(touch)
+
+    def on_touch_up(self, touch):
+        if not self.disabled:
+            if touch.grab_current is not self:
+                if isinstance(self, MDFloatingActionButton):
+                    self.stop_elevation_anim()
+                return super().on_touch_up(touch)
+            self.stop_elevation_anim()
+        return super().on_touch_up(touch)
+
+    def stop_elevation_anim(self):
+        Animation.cancel_all(self, "_elevation")
+        self._elevation = self._elevation_raised
+        self._elevation_normal = self._elevation_raised
+        self._update_shadow(self, self._elevation)
+
+    def _do_anim_raised(self, animation, instance, value):
+        self._elevation += value
+        if self._elevation < self._elevation_raised + 2:
+            self._update_shadow(instance, self._elevation)
+
 
 class CustomRectangularButton(RectangularRippleBehavior, BaseButton):
 
