@@ -85,6 +85,7 @@ class SharedLocationScreen(screen.AppScreen):
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_shared_data')
+        # self.ids.state_panel.attach(automat_id=self.automat_id)
 
     def on_leave(self, *args):
         self.ids.state_panel.release()
@@ -122,11 +123,11 @@ class SharedLocationScreen(screen.AppScreen):
             print('raw_path', raw_path)
 
     def on_upload_file_selected(self, *args, **kwargs):
-        if _Debug:
-            print('SharedLocationScreen.on_upload_file_selected', args, kwargs)
         file_path = args[0][0]
         file_name = os.path.basename(file_path)
         remote_path = '{}:{}'.format(self.key_id, file_name)
+        if _Debug:
+            print('SharedLocationScreen.on_upload_file_selected', args, kwargs, remote_path)
         api_client.file_create(
             remote_path=remote_path,
             as_folder=False,
@@ -137,6 +138,9 @@ class SharedLocationScreen(screen.AppScreen):
     def on_file_created(self, resp, file_path, remote_path):
         if _Debug:
             print('SharedLocationScreen.on_file_created', file_path, remote_path, resp)
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
+            return
         api_client.file_upload_start(
             local_path=file_path,
             remote_path=remote_path,
@@ -166,3 +170,40 @@ class SharedLocationScreen(screen.AppScreen):
             remote_path=remote_path,
             details=api_client.response_result(resp),
         )
+
+    def on_grant_access_button_clicked(self, *args):
+        if _Debug:
+            print('SharedLocationScreen.on_grant_access_button_clicked', args)
+        if self.model('correspondent'):
+            self.main_win().select_screen(
+                screen_id='select_friend_screen',
+                result_callback=self.on_grant_access_user_selected,
+                screen_header='Select user to be granted access to the shared location [b]%s[/b]:' % self.label,
+            )
+        else:
+            self.main_win().select_screen(screen_id='friends_screen')
+
+    def on_grant_access_user_selected(self, user_global_id):
+        if _Debug:
+            print('SharedLocationScreen.on_grant_access_user_selected', user_global_id)
+        screen.select_screen(
+            screen_id='shared_location_{}'.format(self.key_id),
+            screen_type='shared_location_screen',
+            key_id=self.key_id,
+            label=self.label,
+            # automat_index=self.automat_index,
+        )
+        self.main_win().close_screen(screen_id='select_friend_screen')
+        api_client.share_grant(
+            key_id=self.key_id,
+            trusted_user_id=user_global_id,
+            cb=lambda resp: self.on_grant_access_result(resp, user_global_id),
+        )
+
+    def on_grant_access_result(self, resp, user_global_id):
+        if _Debug:
+            print('SharedLocationScreen.on_grant_access_result', resp)
+        if api_client.is_ok(resp):
+            snackbar.success(text='access granted for user %s' % user_global_id)
+        else:
+            snackbar.error(text=api_client.response_err(resp))

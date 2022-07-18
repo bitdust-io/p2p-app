@@ -7,14 +7,13 @@ from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
-from lib import misc
 from lib import system
 from lib import websock
 from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -69,6 +68,8 @@ def all_screens():
             'screens/screen_create_share.kv', 'screens.screen_create_share', 'CreateShareScreen', ),
         'shared_location_screen': (
             'screens/screen_shared_location.kv', 'screens.screen_shared_location', 'SharedLocationScreen', ),
+        'single_shared_file_screen': (
+            'screens/screen_single_shared_file.kv', 'screens.screen_single_shared_file', 'SingleSharedFileScreen', ),
     }
 
 #------------------------------------------------------------------------------
@@ -458,8 +459,8 @@ class Controller(object):
                 if total_file_versions:
                     self.remote_files_details[global_id] = dict(
                         size=sz,
-                        delivered=misc.percent2string(delivered / total_file_versions),
-                        reliable=misc.percent2string(reliable / total_file_versions),
+                        delivered=system.percent2string(delivered / total_file_versions),
+                        reliable=system.percent2string(reliable / total_file_versions),
                         count=total_file_versions,
                     )
                 else:

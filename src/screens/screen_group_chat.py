@@ -76,11 +76,11 @@ class GroupChatScreen(screen.AppScreen):
         if _Debug:
             print('GroupChatScreen.on_message', payload)
         msg = payload['data']
-        msg_id = int(msg['payload']['message_id'])
         if msg['payload']['msg_type'] != 'group_message':
             return False
         if msg['recipient']['glob_id'] != self.global_id:
             return False
+        msg_id = int(msg['payload']['message_id'])
         children_index = {}
         latest_message_id = None
         recent_min_message_id = None
