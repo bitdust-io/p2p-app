@@ -1,6 +1,8 @@
+from kivy.metrics import dp
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
 from kivymd.uix.list import OneLineIconListItem
+from kivymd.uix.list import TwoLineIconListItem
 
 from lib import api_client
 
@@ -20,7 +22,7 @@ class NewShareItem(OneLineIconListItem):
         screen.select_screen('create_share_screen')
 
 
-class ShareItem(OneLineIconListItem):
+class ShareItem(TwoLineIconListItem):
 
     key_id = StringProperty()
     label = StringProperty()
@@ -28,6 +30,22 @@ class ShareItem(OneLineIconListItem):
     share_state = StringProperty()
     automat_index = NumericProperty(None, allownone=True)
     automat_id = StringProperty()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.height = dp(48) if not self._height else self._height
+
+    def get_secondary_text(self):
+        sec_text = 'connecting...'
+        sec_color = 'bbbf'
+        if self.share_state in ['CONNECTED', ]:
+            sec_text = 'connected'
+            sec_color = 'adaf'
+        elif self.share_state in ['DISCONNECTED', 'CLOSED', None, ]:
+            sec_text = 'disconnected'
+        if _Debug:
+            print('ShareItem.get_secondary_text', self.key_id, sec_text)
+        return '[size=10sp][color=%s]%s[/color][/size]' % (sec_color, sec_text, )
 
     def on_pressed(self):
         if _Debug:
@@ -40,6 +58,7 @@ class ShareItem(OneLineIconListItem):
             key_id=self.key_id,
             label=self.label,
             automat_index=automat_index,
+            automat_id=self.automat_id,
         )
 
 
@@ -53,6 +72,12 @@ class SharesScreen(screen.AppScreen):
 
     def populate(self, *args, **kwargs):
         api_client.shares_list(cb=self.on_shares_list_result)
+
+    def on_created(self):
+        api_client.add_model_listener('shared_location', listener_cb=self.on_shared_location)
+
+    def on_destroying(self):
+        api_client.remove_model_listener('shared_location', listener_cb=self.on_shared_location)
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_shared_data')
@@ -82,3 +107,22 @@ class SharesScreen(screen.AppScreen):
                 automat_index=automat_index,
                 automat_id=one_share.get('id') or '',
             ))
+
+    def on_shared_location(self, payload):
+        if _Debug:
+            print('SharesScreen.on_shared_location', payload, self.ids.shares_list_view.children)
+        item_found = None
+        for w in self.ids.shares_list_view.children:
+            if isinstance(w.instance_item, ShareItem):
+                print('w.instance_item.key_id', w.instance_item.key_id, w.instance_item.share_state)
+                if w.instance_item.key_id == payload['data']['key_id']:
+                    item_found = w
+                    break
+        if item_found:
+            prev_state = item_found.instance_item.share_state
+            if prev_state != payload['data']['state']:
+                item_found.instance_item.share_state = payload['data']['state']
+                item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
+                if _Debug:
+                    print('SharesScreen.on_shared_location %r updated : %r -> %r' % (
+                        item_found.instance_item.key_id, prev_state, payload['data']['state'], ))

@@ -37,7 +37,7 @@ class FriendItem(TwoLineIconListItem):
         self.height = dp(48) if not self._height else self._height
 
     def get_secondary_text(self):
-        sec_text = 'connecting'
+        sec_text = 'connecting...'
         sec_color = 'bbbf'
         if self.contact_state in ['CONNECTED', ]:
             sec_text = 'on-line'
@@ -114,7 +114,7 @@ class FriendsScreen(screen.AppScreen):
             print('FriendsScreen.on_online_status', payload)
         item_found = None
         for w in self.ids.friends_list_view.children:
-            if isinstance(w, FriendItem):
+            if isinstance(w.instance_item, FriendItem):
                 if w.instance_item.global_id == payload['data']['global_id']:
                     item_found = w
                     break

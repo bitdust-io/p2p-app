@@ -189,8 +189,12 @@ def files_list(remote_path=None, key_id=None, recursive=False, all_customers=Fal
     }, cb=cb)
 
 
-def file_info(remote_path, cb=None):
-    return run('file_info', kwargs={'remote_path': remote_path, }, cb=cb)
+def file_info(remote_path, include_uploads=False, include_downloads=False, cb=None):
+    return run('file_info', kwargs={
+        'remote_path': remote_path,
+        'include_uploads': include_uploads,
+        'include_downloads': include_downloads,
+    }, cb=cb)
 
 
 def file_create(remote_path, as_folder=False, exist_ok=False, force_path_id=None, cb=None):
@@ -232,6 +236,10 @@ def shares_list(only_active=False, include_mine=True, include_granted=True, cb=N
 
 def share_create(owner_id=None, key_size=None, label='', cb=None):
     return run('share_create', kwargs={'owner_id': owner_id, 'key_size': key_size, 'label': label, }, cb=cb)
+
+
+def share_delete(key_id, cb=None):
+    return run('share_delete', kwargs={'key_id': key_id, }, cb=cb)
 
 
 def share_open(key_id, publish_events=False, cb=None):

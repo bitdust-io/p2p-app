@@ -62,6 +62,7 @@ class SingleSharedFileScreen(screen.AppScreen):
         versions_text = ''
         for v in ctx['versions']:
             v['header_text_size'] = '{}sp'.format(self.app().font_size_medium_absolute)
+            v['fragments'] = v.get('fragments') or []
             versions_text += version_info_text.format(**v)
         ctx['versions_text'] = versions_text
         self.ids.shared_file_details.text = shared_file_info_text.format(**ctx)
