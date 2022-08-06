@@ -72,14 +72,15 @@ class SharedLocationInfoScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
             return
-        result = api_client.response_result(resp)
+        result = api_client.result(resp)
         result.update(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             small_text_size='{}sp'.format(self.app().font_size_small_absolute),
             suppliers=('\n'.join(result.get('suppliers', []))),
             key_id=result.get('key_id', ''),
             creator=result.get('creator', ''),
-            state=result.get('state', ''),
+            state=result.get('state', '') or 'CLOSED',
+            ecc_map=result.get('ecc_map', '') or 'unknown'
         )
         self.ids.shared_location_info_details.text = shared_location_info_temlate_text.format(**result)
 

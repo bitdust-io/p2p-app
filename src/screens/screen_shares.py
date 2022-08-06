@@ -41,10 +41,12 @@ class ShareItem(TwoLineIconListItem):
         if self.share_state in ['CONNECTED', ]:
             sec_text = 'connected'
             sec_color = 'adaf'
-        elif self.share_state in ['DISCONNECTED', 'CLOSED', None, ]:
+        elif self.share_state in ['DISCONNECTED', 'CLOSED', ]:
             sec_text = 'disconnected'
+        elif self.share_state in [None, '', ]:
+            sec_text = 'closed'
         if _Debug:
-            print('ShareItem.get_secondary_text', self.key_id, sec_text)
+            print('ShareItem.get_secondary_text', self.key_id, self.share_state, sec_text)
         return '[size=10sp][color=%s]%s[/color][/size]' % (sec_color, sec_text, )
 
     def on_pressed(self):
@@ -114,7 +116,6 @@ class SharesScreen(screen.AppScreen):
         item_found = None
         for w in self.ids.shares_list_view.children:
             if isinstance(w.instance_item, ShareItem):
-                print('w.instance_item.key_id', w.instance_item.key_id, w.instance_item.share_state)
                 if w.instance_item.key_id == payload['data']['key_id']:
                     item_found = w
                     break

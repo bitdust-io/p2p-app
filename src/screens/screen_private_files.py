@@ -65,18 +65,18 @@ class PrivateFilesScreen(screen.AppScreen):
         self.ids.files_list_view.shutdown()
 
     def on_enter(self, *args):
-        self.ids.state_panel.attach(automat_id='service_my_data')
+        self.ids.state_panel.attach(automat_id='service_my_data', callback_start=self.on_state_panel_attach)
 
     def on_leave(self, *args):
-        self.ids.state_panel.release()
+        self.ids.files_list_view.close()
+        self.ids.state_panel.release(callback_stop=self.on_state_panel_release)
 
-#     def on_private_file(self, payload):
-#         if _Debug:
-#             print('PrivateFilesScreen.on_private_file', payload)
-# 
-#     def on_remote_version(self, payload):
-#         if _Debug:
-#             print('PrivateFilesScreen.on_remote_version', payload)
+    def on_state_panel_attach(self, resp):
+        if api_client.is_ok(resp):
+            self.ids.files_list_view.open()
+
+    def on_state_panel_release(self, resp):
+        pass
 
     @mainthread
     def on_upload_file_button_clicked(self, *args):

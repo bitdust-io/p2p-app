@@ -22,22 +22,25 @@ class AutomatPanel(object):
     def update_fields(self, **kwargs):
         raise NotImplementedError()
 
-    def start_automat_events(self, index=None, automat_id=None):
+    def start_automat_events(self, index=None, automat_id=None, callback_start=None):
         return api_client.automat_events_start(
             index=None if index is None else int(index),
             automat_id=automat_id,
-            cb=self.on_automat_events_start_result,
+            cb=lambda resp: self.on_automat_events_start_result(resp, callback_start),
         )
 
-    def stop_automat_events(self, index=None, automat_id=None):
+    def stop_automat_events(self, index=None, automat_id=None, callback_stop=None):
         return api_client.automat_events_stop(
             index=None if index is None else int(index),
             automat_id=automat_id,
+            cb=callback_stop,
         )
 
-    def on_automat_events_start_result(self, resp):
+    def on_automat_events_start_result(self, resp, callback_start):
         if _Debug:
             print('AutomatPanel.on_automat_events_start_result', api_client.is_ok(resp))
+        if callback_start:
+            callback_start(resp)
         if not api_client.is_ok(resp):
             self.update_fields(error=self.statuses.get(None, api_client.red_err(resp)))
             return
@@ -55,7 +58,7 @@ class AutomatPanelByIndex(AutomatPanel):
 
     automat_index = None
 
-    def attach(self, automat_index, callback_automat_state_changed=None):
+    def attach(self, automat_index, callback_automat_state_changed=None, callback_start=None):
         if self.automat_index is not None:
             if _Debug:
                 print('AutomatPanelByIndex.attach SKIP, already attached with automat_index=%r' % self.automat_index)
@@ -64,18 +67,20 @@ class AutomatPanelByIndex(AutomatPanel):
             print('AutomatPanelByIndex.attach with automat_index:', automat_index)
         self.automat_index = automat_index
         if self.automat_index is None:
+            if callback_start:
+                callback_start(None)
             self.update_fields(state=None)
             return None
         self.automat_index = int(self.automat_index)
         self.callback_automat_state_changed = callback_automat_state_changed
         screen.control().add_state_changed_callback(self.automat_index, self.on_automat_state_changed)
-        ret = self.start_automat_events(index=int(self.automat_index))
+        ret = self.start_automat_events(index=int(self.automat_index), callback_start=callback_start)
         if not ret:
             self.automat_index = None
             self.update_fields(state=None)
         return ret
 
-    def release(self):
+    def release(self, callback_stop=None):
         if self.automat_index is None:
             if _Debug:
                 print('AutomatPanelByIndex.release SKIP, already released')
@@ -87,9 +92,11 @@ class AutomatPanelByIndex(AutomatPanel):
         self.callback_automat_state_changed = None
         if _i is None:
             self.update_fields(error='unexpected error, automat index was not set')
+            if callback_stop:
+                callback_stop(None)
             return None
         screen.control().remove_state_changed_callback(_i, self.on_automat_state_changed)
-        ret = self.stop_automat_events(index=_i)
+        ret = self.stop_automat_events(index=_i, callback_stop=callback_stop)
         self.update_fields(state=None)
         return ret
 
@@ -107,7 +114,7 @@ class AutomatPanelByID(AutomatPanel):
 
     automat_id = None
 
-    def attach(self, automat_id, callback_automat_state_changed=None):
+    def attach(self, automat_id, callback_automat_state_changed=None, callback_start=None):
         if self.automat_id is not None:
             if _Debug:
                 print('AutomatPanelByID.attach SKIP, already attached with automat_id=%r' % self.automat_id)
@@ -120,13 +127,13 @@ class AutomatPanelByID(AutomatPanel):
             return None
         self.callback_automat_state_changed = callback_automat_state_changed
         screen.control().add_state_changed_callback_by_id(self.automat_id, self.on_automat_state_changed)
-        ret = self.start_automat_events(automat_id=self.automat_id)
+        ret = self.start_automat_events(automat_id=self.automat_id, callback_start=callback_start)
         if not ret:
             self.automat_id = None
             self.update_fields(state=None)
         return ret
 
-    def release(self):
+    def release(self, callback_stop=None):
         if self.automat_id is None:
             if _Debug:
                 print('AutomatPanelByID.release SKIP, already released')
@@ -137,10 +144,12 @@ class AutomatPanelByID(AutomatPanel):
         self.automat_id = None
         self.callback_automat_state_changed = None
         if _id is None:
+            if callback_stop:
+                callback_stop(None)
             self.update_fields(error='unexpected error, automat id was not set')
             return None
         screen.control().remove_state_changed_callback_by_id(_id, self.on_automat_state_changed)
-        ret = self.stop_automat_events(automat_id=_id)
+        ret = self.stop_automat_events(automat_id=_id, callback_stop=callback_stop)
         self.update_fields(state=None)
         return ret
 

@@ -84,19 +84,26 @@ class SharedLocationScreen(screen.AppScreen):
         self.ids.files_list_view.shutdown()
 
     def on_enter(self, *args):
-        # self.ids.state_panel.attach(automat_id='service_shared_data')
-        self.ids.state_panel.attach(automat_id=self.automat_id)
+        self.ids.state_panel.attach(automat_id=self.automat_id, callback_start=self.on_state_panel_attach)
 
     def on_leave(self, *args):
-        self.ids.state_panel.release()
+        self.ids.files_list_view.close()
+        self.ids.state_panel.release(callback_stop=self.on_state_panel_release)
 
-#     def on_shared_file(self, payload):
-#         if _Debug:
-#             print('SharedLocationScreen.on_shared_file', payload)
-# 
-#     def on_remote_version(self, payload):
-#         if _Debug:
-#             print('SharedLocationScreen.on_remote_version', payload)
+    def on_state_panel_attach(self, resp):
+        if _Debug:
+            print('SharedLocationScreen.on_state_panel_attach', resp)
+        if api_client.is_ok(resp):
+            if api_client.result(resp)['active']:
+                self.ids.files_list_view.open()
+                self.ids.upload_file_button.disabled = False
+                self.ids.upload_file_button.md_bg_color = self.app().theme_cls.accent_color
+                return
+        self.ids.upload_file_button.disabled = True
+        self.ids.files_list_view.close()
+
+    def on_state_panel_release(self, resp):
+        pass
 
     @mainthread
     def on_upload_file_button_clicked(self, *args):
@@ -227,7 +234,7 @@ class SharedLocationScreen(screen.AppScreen):
         elif btn.icon == 'folder-cancel':
             api_client.share_close(
                 key_id=self.key_id,
-                cb=self.on_share_close_result,
+                cb=lambda resp: self.on_share_close_result(resp, self.key_id),
             )
         elif btn.icon == 'folder-open':
             api_client.share_open(
@@ -239,14 +246,18 @@ class SharedLocationScreen(screen.AppScreen):
         if _Debug:
             print('SharedLocationScreen.on_share_open_result', resp)
         if api_client.is_ok(resp):
-            snackbar.success(text='shared location synchronized')
+            snackbar.success(text='shared location connected')
+            self.ids.state_panel.release()
+            self.ids.state_panel.attach(automat_id=api_client.result(resp)['id'], callback_start=self.on_state_panel_attach)
         else:
             snackbar.error(text=api_client.response_err(resp))
 
-    def on_share_close_result(self, resp):
+    def on_share_close_result(self, resp, key_id):
         if _Debug:
             print('SharedLocationScreen.on_share_close_result', resp)
         if api_client.is_ok(resp):
+            self.ids.upload_file_button.disabled = True
+            self.ids.files_list_view.close()
             snackbar.success(text='shared location closed')
         else:
             snackbar.error(text=api_client.response_err(resp))
@@ -259,3 +270,4 @@ class SharedLocationScreen(screen.AppScreen):
         else:
             self.main_win().select_screen('shares_screen')
             self.main_win().close_screen(screen_id='shared_location_{}'.format(key_id))
+            snackbar.success(text='shared location deleted')
