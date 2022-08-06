@@ -68,6 +68,8 @@ def all_screens():
             'screens/screen_create_share.kv', 'screens.screen_create_share', 'CreateShareScreen', ),
         'shared_location_screen': (
             'screens/screen_shared_location.kv', 'screens.screen_shared_location', 'SharedLocationScreen', ),
+        'shared_location_info_screen': (
+            'screens/screen_shared_location_info.kv', 'screens.screen_shared_location_info', 'SharedLocationInfoScreen', ),
         'single_shared_file_screen': (
             'screens/screen_single_shared_file.kv', 'screens.screen_single_shared_file', 'SingleSharedFileScreen', ),
     }

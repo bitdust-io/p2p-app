@@ -217,34 +217,34 @@ class GroupChatScreen(screen.AppScreen):
         if _Debug:
             print('GroupChatScreen.on_group_share_result', resp)
         if api_client.is_ok(resp):
-            snackbar.success(text='group key shared with %s' % user_global_id)
+            snackbar.success(text='group key shared with %s' % user_global_id, bottom=False)
         else:
-            snackbar.error(text=api_client.response_err(resp))
+            snackbar.error(text=api_client.response_err(resp), bottom=False)
 
     def on_group_join_result(self, resp):
         if not api_client.is_ok(resp):
-            snackbar.error(text='failed to join the group: %s' % api_client.response_err(resp))
+            snackbar.error(text='failed to join the group: %s' % api_client.response_err(resp), bottom=False)
         else:
             self.ids.state_panel.release()
             self.ids.state_panel.attach(automat_id=api_client.result(resp).get('id'))
 
     def on_group_leave_result(self, resp):
         if not api_client.is_ok(resp):
-            snackbar.error(text=api_client.response_err(resp))
+            snackbar.error(text=api_client.response_err(resp), bottom=False)
         else:
             self.main_win().select_screen('conversations_screen')
             self.main_win().close_screen(screen_id=self.global_id)
 
     def on_group_close_result(self, resp):
         if not api_client.is_ok(resp):
-            snackbar.error(text=api_client.response_err(resp))
+            snackbar.error(text=api_client.response_err(resp), bottom=False)
         else:
             self.main_win().select_screen('conversations_screen')
             self.main_win().close_screen(screen_id=self.global_id)
 
     def on_group_reconnect_result(self, resp):
         if not api_client.is_ok(resp):
-            snackbar.error(text='failed connect to the group: %s' % api_client.response_err(resp))
+            snackbar.error(text='failed connect to the group: %s' % api_client.response_err(resp), bottom=False)
         else:
             self.ids.state_panel.release()
             self.ids.state_panel.attach(automat_id=api_client.result(resp).get('id'))

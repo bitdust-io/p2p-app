@@ -43,10 +43,10 @@
     DropDownMenu:
         id: drop_down_menu
         data:
-            {'trash-can-outline': 'Delete',
-            'lan-check': 'Reconnect',
-            'information': 'Info',
-            'exit-run': 'Leave group',
-            'human-greeting-proximity': 'Join group',
-            'account-plus': 'Invite people', }
+            [('account-plus', 'Invite people', ),
+            ('human-greeting-proximity', 'Join group', ),
+            ('exit-run', 'Leave group', ),
+            ('information', 'Info', ),
+            ('lan-check', 'Reconnect', ),
+            ('trash-can-outline', 'Delete', ), ]
         callback: root.on_drop_down_menu_item_clicked

@@ -156,7 +156,7 @@ class PrivateChatScreen(screen.AppScreen):
         if _Debug:
             print('PrivateChatScreen.on_message_sent', resp)
         if not api_client.is_ok(resp):
-            snackbar.error(text='message was not sent: %s' % api_client.response_err(resp))
+            snackbar.error(text='message was not sent: %s' % api_client.response_err(resp), bottom=False)
 
     def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
@@ -168,6 +168,6 @@ class PrivateChatScreen(screen.AppScreen):
         if _Debug:
             print('PrivateChatScreen.on_friend_remove_result', resp)
         if not api_client.is_ok(resp):
-            snackbar.error(text='contact was not deleted: %s' % api_client.response_err(resp))
+            snackbar.error(text='contact was not deleted: %s' % api_client.response_err(resp), bottom=False)
             return
         self.main_win().select_screen('friends_screen')

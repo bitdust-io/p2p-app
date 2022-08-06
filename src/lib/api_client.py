@@ -246,8 +246,16 @@ def share_open(key_id, publish_events=False, cb=None):
     return run('share_open', kwargs={'key_id': key_id, 'publish_events': publish_events, }, cb=cb)
 
 
+def share_close(key_id, cb=None):
+    return run('share_close', kwargs={'key_id': key_id, }, cb=cb)
+
+
 def share_grant(key_id, trusted_user_id, cb=None):
     return run('share_grant', kwargs={'key_id': key_id, 'trusted_user_id': trusted_user_id, }, cb=cb)
+
+
+def share_info(key_id, cb=None):
+    return run('share_info', kwargs={'key_id': key_id, }, cb=cb)
 
 
 def user_observe(nickname, attempts=5, cb=None):

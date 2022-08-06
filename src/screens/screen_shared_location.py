@@ -224,7 +224,12 @@ class SharedLocationScreen(screen.AppScreen):
                 key_id=self.key_id,
                 cb=lambda resp: self.on_share_delete_result(resp, self.key_id),
             )
-        elif btn.icon == 'lan-check':
+        elif btn.icon == 'folder-cancel':
+            api_client.share_close(
+                key_id=self.key_id,
+                cb=self.on_share_close_result,
+            )
+        elif btn.icon == 'folder-open':
             api_client.share_open(
                 key_id=self.key_id,
                 cb=self.on_share_open_result,
@@ -232,9 +237,17 @@ class SharedLocationScreen(screen.AppScreen):
 
     def on_share_open_result(self, resp):
         if _Debug:
-            print('SharedLocationScreen.on_share_delete_result', resp)
+            print('SharedLocationScreen.on_share_open_result', resp)
         if api_client.is_ok(resp):
             snackbar.success(text='shared location synchronized')
+        else:
+            snackbar.error(text=api_client.response_err(resp))
+
+    def on_share_close_result(self, resp):
+        if _Debug:
+            print('SharedLocationScreen.on_share_close_result', resp)
+        if api_client.is_ok(resp):
+            snackbar.success(text='shared location closed')
         else:
             snackbar.error(text=api_client.response_err(resp))
 

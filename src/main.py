@@ -102,12 +102,15 @@ class BitDustApp(styles.AppStyle, MDApp):
         fonts_path = './src/fonts'
         if system.is_android():
             fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
+        # https://materialdesignicons.com
         LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
         theme_font_styles.append('IconMD')
         self.theme_cls.font_styles["IconMD"] = ["IconMD", 24, False, 0, ]
+        # https://fontawesome.com
         LabelBase.register(name="IconFA", fn_regular=os.path.join(fonts_path, "fa-solid.ttf"))
         theme_font_styles.append('IconFA')
         self.theme_cls.font_styles["IconFA"] = ["IconFA", 24, False, 0, ]
+        # https://icofont.com
         LabelBase.register(name="IconICO", fn_regular=os.path.join(fonts_path, "icofont.ttf"))
         theme_font_styles.append('IconICO')
         self.theme_cls.font_styles["IconICO"] = ["IconICO", 24, False, 0, ]
