@@ -29,7 +29,7 @@ class ConversationItem(TwoLineIconListItem):
         self.height = dp(48) if not self._height else self._height
 
     def get_secondary_text(self):
-        sec_text = 'connecting'
+        sec_text = 'connecting...'
         sec_color = 'bbbf'
         if self.state in ['IN_SYNC!', 'CONNECTED', ]:
             sec_text = 'on-line'
@@ -116,7 +116,7 @@ class ConversationsScreen(screen.AppScreen):
             print('ConversationsScreen.on_online_status', payload)
         item_found = None
         for w in self.ids.conversations_list_view.children:
-            if isinstance(w, ConversationItem):
+            if isinstance(w.instance_item, ConversationItem):
                 if w.instance_item.key_id == payload['data']['global_id']:
                     item_found = w
                     break
@@ -137,7 +137,7 @@ class ConversationsScreen(screen.AppScreen):
         conv['automat_id'] = str(conv.pop('id', '') or '')
         item_found = None
         for w in self.ids.conversations_list_view.children:
-            if isinstance(w, ConversationItem):
+            if isinstance(w.instance_item, ConversationItem):
                 if w.instance_item.key_id == conv['key_id']:
                     item_found = w
                     break
@@ -173,7 +173,7 @@ class ConversationsScreen(screen.AppScreen):
             print('ConversationsScreen.on_group_state_changed', event_id, group_key_id)
         item_found = None
         for w in self.ids.conversations_list_view.children:
-            if isinstance(w, ConversationItem):
+            if isinstance(w.instance_item, ConversationItem):
                 if w.instance_item.key_id == group_key_id:
                     item_found = w
                     break

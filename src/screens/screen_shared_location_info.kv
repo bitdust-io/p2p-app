@@ -1,0 +1,37 @@
+<SharedLocationInfoScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses:
+                    { None: 'shared files are not available at the moment',
+                    'AT_STARTUP': 'shared files are not available at the moment',
+                    'DHT_LOOKUP': 'connecting to the distributed hash table',
+                    'SUPPLIERS?': 'connecting with remote suppliers',
+                    'DISCONNECTED': 'shared location is disconnected',
+                    'CONNECTED': 'shared location is synchronized',
+                    'CLOSED': 'shared location is not active', }
+
+            VerticalScrollView:
+
+                VerticalWithPaddingLayout:
+                    size_hint: None, None
+                    pos_hint: {'top': 1}
+                    height: self.minimum_height
+                    width: root.width - app.scroll_bar_width
+
+                    MarkupLabel:
+                        id: shared_location_info_details
+                        size_hint_y: None
+                        text_size: self.width, None
+                        height: self.texture_size[1]
+                        color: app.color_black
+                        text: ''
+
+        BottomEmptyScreenSpace:

@@ -15,8 +15,11 @@
 
 <ShareItem>:
     text: root.label
+    secondary_text: root.get_secondary_text()
     divider: None
     on_release: root.on_pressed()
+    _txt_top_pad: dp(4)
+    _txt_bot_pad: dp(4)
 
     CustomIconLeftWidget:
         icon: 'folder-key-network-outline'

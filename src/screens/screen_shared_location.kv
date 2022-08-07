@@ -10,35 +10,34 @@
                 id: state_panel
                 size_hint_x: 1
                 statuses:
-                    { None: 'shared files are not available at the moment',
-                    'ON': 'shared files are synchronized',
-                    'OFF': 'network service is switched off',
-                    'NOT_INSTALLED': 'network services is not ready yet',
-                    'INFLUENCE': 'turning off dependent network services',
-                    'STARTING': 'network service is starting',
-                    'DEPENDS_OFF': 'related network services were not started yet',
-                    'STOPPING': 'network service is stopping',
-                    'CLOSED': 'network service is closed', }
+                    { None: 'shared location is currently inactive',
+                    'AT_STARTUP': 'shared location is currently inactive',
+                    'DHT_LOOKUP': 'connecting to the distributed hash table',
+                    'SUPPLIERS?': 'connecting with remote suppliers',
+                    'DISCONNECTED': 'shared location is disconnected',
+                    'CONNECTED': 'shared location is synchronized',
+                    'CLOSED': 'shared location is not active', }
 
             HorizontalContainerLayout:
+
+                FillRoundFlatButton:
+                    id: grant_access_button
+                    text: "[size=22sp]{}[/size] [size=16sp]grant access[/size]".format(md_icon("account-key"))
+                    md_bg_color: app.theme_cls.primary_color
+                    theme_text_color: "Custom"
+                    text_color: app.color_white99
+                    on_release: root.on_grant_access_button_clicked()
+
+                HFixedEmptySpace:
 
                 FillRoundFlatButton:
                     id: upload_file_button
                     text: "[size=22sp]{}[/size] [size=16sp]upload[/size]".format(md_icon("file-upload"))
                     md_bg_color: app.theme_cls.accent_color
+                    md_bg_color_disabled: app.color_btn_disabled
                     theme_text_color: "Custom"
                     text_color: app.color_white99
                     on_release: root.on_upload_file_button_clicked()
-
-                HFixedEmptySpace:
-
-                FillRoundFlatButton:
-                    id: grant_access_button
-                    text: "[size=22sp]{}[/size] [size=16sp]grant access[/size]".format(md_icon("account-key"))
-                    md_bg_color: app.theme_cls.accent_color
-                    theme_text_color: "Custom"
-                    text_color: app.color_white99
-                    on_release: root.on_grant_access_button_clicked()
 
                 HEmptySpace:
 
@@ -50,3 +49,13 @@
                     file_system: SharedDistributedFileSystem()
 
         BottomEmptyScreenSpace:
+
+
+    DropDownMenu:
+        id: drop_down_menu
+        data:
+            [('folder-open', 'Open/Refresh', ),
+            ('folder-cancel', 'Close', 'IconMD', ),
+            ('information', 'Info', ),
+            ('trash-can-outline', 'Delete', ), ]
+        callback: root.on_drop_down_menu_item_clicked

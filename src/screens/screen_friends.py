@@ -1,6 +1,8 @@
+from kivy.metrics import dp
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
 from kivymd.uix.list import OneLineIconListItem
+from kivymd.uix.list import TwoLineIconListItem
 
 from lib import api_client
 
@@ -20,7 +22,7 @@ class NewFriendItem(OneLineIconListItem):
         screen.select_screen('search_people_screen')
 
 
-class FriendItem(OneLineIconListItem):
+class FriendItem(TwoLineIconListItem):
 
     global_id = StringProperty()
     username = StringProperty()
@@ -29,6 +31,22 @@ class FriendItem(OneLineIconListItem):
     contact_state = StringProperty()
     automat_index = NumericProperty(None, allownone=True)
     automat_id = StringProperty()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.height = dp(48) if not self._height else self._height
+
+    def get_secondary_text(self):
+        sec_text = 'connecting...'
+        sec_color = 'bbbf'
+        if self.contact_state in ['CONNECTED', ]:
+            sec_text = 'on-line'
+            sec_color = 'adaf'
+        elif self.contact_state in ['OFFLINE', ]:
+            sec_text = 'offline'
+        if _Debug:
+            print('FriendItem.get_secondary_text', self.global_id, sec_text)
+        return '[size=10sp][color=%s]%s[/color][/size]' % (sec_color, sec_text, )
 
     def on_pressed(self):
         if _Debug:
@@ -54,6 +72,12 @@ class FriendsScreen(screen.AppScreen):
 
     def populate(self, *args, **kwargs):
         api_client.friends_list(cb=self.on_friends_list_result)
+
+    def on_created(self):
+        api_client.add_model_listener('online_status', listener_cb=self.on_online_status)
+
+    def on_destroying(self):
+        api_client.remove_model_listener('online_status', listener_cb=self.on_online_status)
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_identity_propagate')
@@ -84,3 +108,21 @@ class FriendsScreen(screen.AppScreen):
                 automat_index=automat_index,
                 automat_id=one_friend.get('id') or '',
             ))
+
+    def on_online_status(self, payload):
+        if _Debug:
+            print('FriendsScreen.on_online_status', payload)
+        item_found = None
+        for w in self.ids.friends_list_view.children:
+            if isinstance(w.instance_item, FriendItem):
+                if w.instance_item.global_id == payload['data']['global_id']:
+                    item_found = w
+                    break
+        if item_found:
+            prev_state = item_found.instance_item.contact_state
+            if prev_state != payload['data']['state']:
+                item_found.instance_item.contact_state = payload['data']['state']
+                item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
+                if _Debug:
+                    print('FriendsScreen.on_online_status %r updated : %r -> %r' % (
+                        item_found.instance_item.global_id, prev_state, payload['data']['state'], ))

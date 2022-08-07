@@ -8,7 +8,7 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 # Font Awesome
-# https://fontawesome.com/cheatsheet
+# https://fontawesome.com
 
 def is_fa_icon(name):
     return name in fontawesome_codes
@@ -34,6 +34,8 @@ def fa_icon(name, font_file=None, with_spaces=True, with_font_tag=True):
 
 
 #------------------------------------------------------------------------------
+# ICO Font
+# https://icofont.com
 
 def is_icofont_icon(name):
     return name in icofont_codes
@@ -60,7 +62,7 @@ def icofont_icon(name, font_file=None, with_spaces=True, with_font_tag=True):
 
 #------------------------------------------------------------------------------
 # Material Design Icons
-# https://materialdesignicons.com/
+# https://materialdesignicons.com
 
 def is_md_icon(name):
     return name in materialdesignicons_codes

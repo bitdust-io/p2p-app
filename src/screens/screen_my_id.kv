@@ -42,8 +42,8 @@
 
     DropDownMenu:
         id: drop_down_menu
+        width_mult: 5
         data:
-            {'width_mult': 5,
-            'cellphone-erase': 'Erase my ID',
-            'shield-key': 'Backup my key', }
+            [('shield-key', 'Backup my key', ),
+            ('cellphone-erase', 'Erase my ID', ), ]
         callback: root.on_drop_down_menu_item_clicked

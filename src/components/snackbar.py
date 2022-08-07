@@ -46,7 +46,7 @@ def get_coordinates(text, height=32, padding=10, font_size=15, state_panel_heigh
 
 #------------------------------------------------------------------------------
 
-def success(text, duration=5, height=32, padding=10, font_size=15, state_panel_height=32, bottom=False, align='right', fill=False):
+def success(text, duration=5, height=32, padding=10, font_size=15, state_panel_height=32, bottom=True, align='right', fill=False):
     x, y, size_hint_x, pos_hint, animation_dir = get_coordinates(text, height, padding, font_size, state_panel_height, bottom, align, fill)
     sb = Snackbar(
         height=dp(height),
@@ -67,7 +67,7 @@ def success(text, duration=5, height=32, padding=10, font_size=15, state_panel_h
     sb.open()
 
 
-def error(text, duration=5, height=32, padding=10, font_size=15, state_panel_height=32, bottom=False, align='right', fill=False):
+def error(text, duration=5, height=32, padding=10, font_size=15, state_panel_height=32, bottom=True, align='right', fill=False):
     x, y, size_hint_x, pos_hint, animation_dir = get_coordinates(text, height, padding, font_size, state_panel_height, bottom, align, fill)
     sb = Snackbar(
         height=dp(height),

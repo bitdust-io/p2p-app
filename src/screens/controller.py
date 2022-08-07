@@ -13,7 +13,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -68,6 +68,8 @@ def all_screens():
             'screens/screen_create_share.kv', 'screens.screen_create_share', 'CreateShareScreen', ),
         'shared_location_screen': (
             'screens/screen_shared_location.kv', 'screens.screen_shared_location', 'SharedLocationScreen', ),
+        'shared_location_info_screen': (
+            'screens/screen_shared_location_info.kv', 'screens.screen_shared_location_info', 'SharedLocationInfoScreen', ),
         'single_shared_file_screen': (
             'screens/screen_single_shared_file.kv', 'screens.screen_single_shared_file', 'SingleSharedFileScreen', ),
     }
@@ -293,12 +295,13 @@ class Controller(object):
             self.identity_get_latest = 0
             self.network_connected_latest = 0
             self.verify_process_health()
+        api_client.start_model_streaming('online_status', request_all=True)
         api_client.start_model_streaming('service', request_all=True)
         api_client.start_model_streaming('key', request_all=True)
-        api_client.start_model_streaming('conversation', request_all=True)
-        api_client.start_model_streaming('message', request_all=True)
         api_client.start_model_streaming('correspondent', request_all=True)
-        api_client.start_model_streaming('online_status', request_all=True)
+        api_client.start_model_streaming('message', request_all=True)
+        api_client.start_model_streaming('conversation', request_all=True)
+        api_client.start_model_streaming('shared_location', request_all=True)
         api_client.start_model_streaming('private_file', request_all=True)
         api_client.start_model_streaming('shared_file', request_all=True)
         api_client.start_model_streaming('remote_version', request_all=True)
