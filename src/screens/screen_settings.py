@@ -327,7 +327,7 @@ class SettingsScreen(screen.AppScreen):
                                 is_leaf=True,
                                 option_name=cur_item_data.get('label', '') or sub_path,
                                 option_value='{}'.format(cur_item_data.get('value') or 0),
-                                option_value_default=cur_item_data.get('default'),
+                                option_value_default=str(cur_item_data.get('default')),
                                 option_description=self.build_description(cur_item_data.get('info') or ''),
                                 option_value_min=cur_item_data.get('min'),
                                 option_value_max=cur_item_data.get('max'),

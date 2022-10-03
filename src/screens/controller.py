@@ -410,7 +410,7 @@ class Controller(object):
         if _Debug:
             print('Controller.on_model_update [%s] %s deleted=%r\n    %r' % (model_name, snap_id, deleted, d, ))
         if deleted:
-            self.model_data[model_name].pop(snap_id)
+            self.model_data[model_name].pop(snap_id, None)
             if model_name == 'private_file':
                 _, _, path = d['remote_path'].rpartition(':')
                 self.private_files_index.pop(path, None)
