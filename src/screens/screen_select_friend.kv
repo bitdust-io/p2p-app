@@ -24,16 +24,7 @@
             AutomatShortStatusPanel:
                 id: state_panel
                 size_hint_x: 1
-                statuses:
-                    { None: 'network service is not started',
-                    'ON': 'list of contacts is synchronized',
-                    'OFF': 'network service is switched off',
-                    'NOT_INSTALLED': 'network service is not installed',
-                    'INFLUENCE': 'turning off dependent network services',
-                    'STARTING': 'network service is starting',
-                    'DEPENDS_OFF': 'related network services were not started yet',
-                    'STOPPING': 'network service is stopping',
-                    'CLOSED': 'network service is closed', }
+                statuses: root.get_statuses()
 
             HorizontalContainerLayout:
 

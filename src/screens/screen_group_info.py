@@ -59,6 +59,17 @@ class GroupInfoScreen(screen.AppScreen):
             l = l[:20] + '...'
         return l
 
+    def get_statuses(self):
+        return {
+            None: 'group is currently inactive',
+            'DHT_READ?': 'fetching list of active message brokers',
+            'BROKERS?': 'connecting with message brokers',
+            'QUEUE?': 'group is connected, reading recent messages',
+            'IN_SYNC!': 'group is connected and synchronized',
+            'DISCONNECTED': 'group is disconnected',
+            'CLOSED': 'group is deactivated',
+        }
+
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id=self.automat_id, callback_automat_state_changed=self.on_automat_state_changed)
         self.populate()

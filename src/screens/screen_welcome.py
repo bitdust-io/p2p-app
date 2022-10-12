@@ -21,6 +21,20 @@ class WelcomeScreen(screen.AppScreen):
     def get_title(self):
         return 'BitDust'
 
+    def get_statuses(self):
+        return {
+            None: '',
+            'AT_STARTUP': 'starting',
+            'LOCAL': 'initializing local environment',
+            'MODULES': 'starting sub-modules',
+            'INSTALL': 'installing application',
+            'READY': 'application is ready',
+            'STOPPING': 'application is shutting down',
+            'SERVICES': 'starting network services',
+            'INTERFACES': 'starting application interfaces',
+            'EXIT': 'application is closed',
+        }
+
     def populate(self, create_identity=None, process_health=None, start_engine=None):
         if _Debug:
             print('WelcomeScreen.populate create_identity=%r process_health=%r start_engine=%r' % (create_identity, process_health, start_engine, ))

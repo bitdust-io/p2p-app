@@ -2,7 +2,7 @@
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.utils import get_color_from_hex
-from kivy.properties import ListProperty, StringProperty
+from kivy.properties import ListProperty, StringProperty  # @UnresolvedImport
 
 from kivymd.color_definitions import colors
 from kivymd.uix.tab import MDTabsBase

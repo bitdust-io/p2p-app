@@ -1,16 +1,12 @@
-#:import NoTransition kivy.uix.screenmanager.NoTransition
-#:import SlideTransition kivy.uix.screenmanager.SlideTransition
-
-
-<ContentNavigationDrawer>:
+<CustomContentNavigationDrawer>:
 
     ScrollView:
 
         MDList:
             id: menu_items
-            padding: dp(10)
+            padding: dp(0)
 
-            MDActionTopAppBarButton:
+            CustomActionTopAppBarIconButton:
                 icon: 'arrow-left'
                 md_bg_color: app.color_transparent
                 on_release: app.main_window.nav().set_state("close")
@@ -143,8 +139,7 @@
         size: 1, 1
         pos_hint: {"center_x": .99, "center_y": .98}
 
-    MDToolbar:
-
+    CustomToolbar:
         id: toolbar
         pos_hint: {"top": 1}
         elevation: 0
@@ -171,8 +166,9 @@
             opening_time: 0
             closing_time: 0
             elevation: 0
+            radius: 0
 
-            ContentNavigationDrawer:
+            CustomContentNavigationDrawer:
                 id: nav_drawer_content
 
     CustomBottomAppBar:

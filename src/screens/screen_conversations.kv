@@ -57,16 +57,7 @@
             AutomatShortStatusPanel:
                 id: state_panel
                 size_hint_x: 1
-                statuses:
-                    { None: 'message history is not available at the moment',
-                    'ON': 'message history is synchronized, you are on-line',
-                    'OFF': 'message-history service is not started, you are off-line',
-                    'NOT_INSTALLED': 'message-history service was not installed',
-                    'INFLUENCE': 'verifying related network services',
-                    'DEPENDS_OFF': 'related network services were not started yet',
-                    'STARTING': 'turning on message-history service',
-                    'STOPPING': 'turning off message-history service',
-                    'CLOSED': 'message-history service is stopped', }
+                statuses: root.get_statuses()
 
             VerticalScrollView:
                 id: scroll_view

@@ -9,14 +9,7 @@
             AutomatShortStatusPanel:
                 id: state_panel
                 size_hint_x: 1
-                statuses:
-                    { None: 'shared files are not available at the moment',
-                    'AT_STARTUP': 'shared files are not available at the moment',
-                    'DHT_LOOKUP': 'connecting to the distributed hash table',
-                    'SUPPLIERS?': 'connecting with remote suppliers',
-                    'DISCONNECTED': 'shared location is disconnected',
-                    'CONNECTED': 'shared location is synchronized',
-                    'CLOSED': 'shared location is not active', }
+                statuses: root.get_statuses()
 
             VerticalScrollView:
 

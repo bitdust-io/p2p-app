@@ -1,9 +1,10 @@
-from kivy.uix.textinput import TextInput
-from kivy.properties import NumericProperty  # @UnresolvedImport
 from kivy.clock import Clock
+from kivy.properties import ColorProperty, NumericProperty, StringProperty  # @UnresolvedImport
+from kivy.uix.textinput import TextInput
 
-from kivymd.uix.textfield import MDTextFieldRect, MDTextFieldRound, MDTextField
 from kivymd.theming import ThemableBehavior
+from kivymd.uix.textfield import MDTextFieldRect, MDTextField
+from kivymd.uix.label import MDIcon
 
 from lib import system
 
@@ -154,9 +155,80 @@ class CustomTextField(MDTextField):
         on_text_input_focus(instance, value)
         return r
 
+
+
+class CustomTextFieldRound(ThemableBehavior, TextInput):
+    icon_left = StringProperty()
+    icon_left_color = ColorProperty((0, 0, 0, 1))
+    icon_right = StringProperty()
+    icon_right_color = ColorProperty((0, 0, 0, 1))
+    line_color = ColorProperty(None)
+    normal_color = ColorProperty(None)
+    color_active = ColorProperty(None)
+    _color_active = ColorProperty(None)
+    _icon_left_color_copy = ColorProperty(None)
+    _icon_right_color_copy = ColorProperty(None)
+
+    def __init__(self, **kwargs):
+        self._lbl_icon_left = MDIcon(theme_text_color="Custom")
+        self._lbl_icon_right = MDIcon(theme_text_color="Custom")
+        super().__init__(**kwargs)
+        self.cursor_color = self.theme_cls.primary_color
+        self.icon_left_color = self.theme_cls.text_color
+        self.icon_right_color = self.theme_cls.text_color
+        if not self.normal_color:
+            self.normal_color = self.theme_cls.primary_light
+        if not self.line_color:
+            self.line_color = self.theme_cls.primary_dark
+        if not self.color_active:
+            self._color_active = (0.5, 0.5, 0.5, 0.5)
+
+    def on_focus(self, instance, value):
+        if value:
+            self.icon_left_color = self.theme_cls.primary_color
+            self.icon_right_color = self.theme_cls.primary_color
+        else:
+            self.icon_left_color = (
+                self._icon_left_color_copy or self.theme_cls.text_color
+            )
+            self.icon_right_color = (
+                self._icon_right_color_copy or self.theme_cls.text_color
+            )
+
+    def on_icon_left(self, instance, value):
+        self._lbl_icon_left.icon = value
+
+    def on_icon_left_color(self, instance, value):
+        self._lbl_icon_left.text_color = value
+        if (
+            not self._icon_left_color_copy
+            and value != self.theme_cls.text_color
+            and value != self.theme_cls.primary_color
+        ):
+            self._icon_left_color_copy = value
+
+    def on_icon_right(self, instance, value):
+        self._lbl_icon_right.icon = value
+
+    def on_icon_right_color(self, instance, value):
+        self._lbl_icon_right.text_color = value
+        if (
+            not self._icon_right_color_copy
+            and value != self.theme_cls.text_color
+            and value != self.theme_cls.primary_color
+        ):
+            self._icon_right_color_copy = value
+
+    def on_color_active(self, instance, value):
+        if value != [0, 0, 0, 0.5]:
+            self._color_active = value
+            self._color_active[-1] = 0.5
+        else:
+            self._color_active = value
+
 #------------------------------------------------------------------------------
 
-class RoundedTextInput(MDTextFieldRound):
+class RoundedTextInput(CustomTextFieldRound):
 
     def on_focus(self, instance, value):
         if _Debug:

@@ -70,6 +70,17 @@ class SharedLocationScreen(screen.AppScreen):
     # def get_icon(self):
     #     return 'file-lock'
 
+    def get_statuses(self):
+        return {
+            None: 'shared location is currently inactive',
+            'AT_STARTUP': 'shared location is currently inactive',
+            'DHT_LOOKUP': 'connecting to the distributed hash table',
+            'SUPPLIERS?': 'connecting with remote suppliers',
+            'DISCONNECTED': 'shared location is disconnected',
+            'CONNECTED': 'shared location is synchronized',
+            'CLOSED': 'shared location is not active',
+        }
+
     def populate(self, *args, **kwargs):
         pass
 

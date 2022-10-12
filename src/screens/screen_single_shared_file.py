@@ -48,6 +48,19 @@ class SingleSharedFileScreen(screen.AppScreen):
     def get_title(self):
         return 'shared file'
 
+    def get_statuses(self):
+        return {
+            None: 'files are not available at the moment',
+            'ON': 'distributed storage is ready',
+            'OFF': 'private storage service is not started',
+            'NOT_INSTALLED': 'private storage service was not installed',
+            'INFLUENCE': 'verifying related network services',
+            'DEPENDS_OFF': 'related network services not yet started',
+            'STARTING': 'starting distributed private storage service',
+            'STOPPING': 'turning off distributed private storage service',
+            'CLOSED': 'private storage service is stopped',
+        }
+
     def populate(self, **kwargs):
         ctx = self.details.copy()
         ctx.update(

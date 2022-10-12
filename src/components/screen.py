@@ -73,6 +73,9 @@ class AppScreen(ThemableBehavior, Screen):
     def get_hot_button(self):
         return None
 
+    def get_statuses(self):
+        return {}
+
     def is_closable(self):
         return True
 
