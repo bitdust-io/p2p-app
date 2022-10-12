@@ -24,6 +24,20 @@ class EngineStatusScreen(screen.AppScreen):
     def get_title(self):
         return 'status'
 
+    def get_statuses(self):
+        return {
+            None: 'main process is not started',
+            'AT_STARTUP': 'starting the application',
+            'LOCAL': 'initializing local environment',
+            'MODULES': 'starting sub-modules',
+            'INSTALL': 'installing application',
+            'READY': 'application is ready',
+            'STOPPING': 'application is shutting down',
+            'SERVICES': 'starting network services',
+            'INTERFACES': 'starting application interfaces',
+            'EXIT': 'application is closed',
+        }
+
     def is_closable(self):
         return False
 

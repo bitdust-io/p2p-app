@@ -1,5 +1,9 @@
-
 KV_IMPORT = """
+#:import NoTransition kivy.uix.screenmanager.NoTransition
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
+
+#:import images_path kivymd.images_path
+
 #:import fa_icon components.webfont.fa_icon
 #:import md_icon components.webfont.md_icon
 #:import icofont_icon components.webfont.icofont_icon
@@ -9,6 +13,7 @@ KV_IMPORT = """
 
 #:import get_user_color lib.colorhash.get_user_color
 
+#:import CustomContentNavigationDrawer components.main_win.CustomContentNavigationDrawer
 #:import DynamicHeightTextInput components.text_input.DynamicHeightTextInput
 #:import RaisedIconButton components.buttons.RaisedIconButton
 #:import DropDownMenu components.drop_down_menu.DropDownMenu
@@ -18,9 +23,11 @@ KV_IMPORT = """
 #:import CustomActionBottomAppBarButton components.tool_bar.CustomActionBottomAppBarButton
 #:import CustomBottomAppBar components.tool_bar.CustomBottomAppBar
 #:import CustomBottomToolbar components.tool_bar.CustomBottomToolbar
+#:import CustomToolbar components.tool_bar.CustomToolbar
 #:import CustomSelectionList components.selection.CustomSelectionList
 #:import CustomIconLeftWidget components.buttons.CustomIconLeftWidget
 #:import CustomIconPackLeftWidget components.buttons.CustomIconPackLeftWidget
+#:import CustomActionTopAppBarIconButton components.buttons.CustomActionTopAppBarIconButton
 #:import PrivateDistributedFileSystem components.file_browser.PrivateDistributedFileSystem
 #:import SharedDistributedFileSystem components.file_browser.SharedDistributedFileSystem
 #:import DistributedFileListEntry components.file_browser.DistributedFileListEntry

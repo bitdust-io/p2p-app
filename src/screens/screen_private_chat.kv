@@ -9,12 +9,7 @@
             AutomatShortStatusPanelByIndex:
                 id: state_panel
                 size_hint_x: 1
-                statuses:
-                    { None: 'connection with remote peer is not active',
-                    'PING?': 'waiting acknowledgment from remote peer',
-                    'CONNECTED': 'user is connected',
-                    'OFFLINE': 'user is disconnected',
-                    'CLOSED': 'connection with remote peer was closed', }
+                statuses: root.get_statuses()
 
             VerticalScrollView:
                 id: chat_messages_view

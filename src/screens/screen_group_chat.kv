@@ -9,14 +9,7 @@
             AutomatShortStatusPanel:
                 id: state_panel
                 size_hint_x: 1
-                statuses:
-                    { None: 'group is currently inactive',
-                    'DHT_READ?': 'fetching list of active message brokers',
-                    'BROKERS?': 'connecting with message brokers',
-                    'QUEUE?': 'group is connected, reading recent messages',
-                    'IN_SYNC!': 'group is connected and synchronized',
-                    'DISCONNECTED': 'group is disconnected',
-                    'CLOSED': 'group is deactivated', }
+                statuses: root.get_statuses()
 
             VerticalScrollView:
                 id: chat_messages_view

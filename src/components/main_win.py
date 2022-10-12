@@ -50,7 +50,7 @@ def patch_kivy_core_window():
 
 #------------------------------------------------------------------------------
 
-class ContentNavigationDrawer(BoxLayout):
+class CustomContentNavigationDrawer(BoxLayout):
     pass
 
 #------------------------------------------------------------------------------

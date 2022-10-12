@@ -62,6 +62,19 @@ class MyIDScreen(screen.AppScreen):
     def get_title(self):
         return 'my identity'
 
+    def get_statuses(self):
+        return {
+            None: "identity-propagate service is not started",
+            "ON": "identity file is synchronized",
+            "OFF": "identity-propagate service is switched off",
+            "NOT_INSTALLED": "identity not exist",
+            "INFLUENCE": "turning off dependent network services",
+            "STARTING": "identity-propagate service is starting",
+            "DEPENDS_OFF": "related network services were not started yet",
+            "STOPPING": "identity-propagate service is stopping",
+            "CLOSED": "identity-propagate service is closed",
+        }
+
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_identity_propagate')
         api_client.identity_get(cb=self.on_identity_get_result)

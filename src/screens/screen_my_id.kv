@@ -9,22 +9,13 @@
             AutomatShortStatusPanel:
                 id: state_panel
                 size_hint_x: 1
-                statuses:
-                    { None: 'identity-propagate service is not started',
-                    'ON': 'identity file is synchronized',
-                    'OFF': 'identity-propagate service is switched off',
-                    'NOT_INSTALLED': 'identity not exist',
-                    'INFLUENCE': 'turning off dependent network services',
-                    'STARTING': 'identity-propagate service is starting',
-                    'DEPENDS_OFF': 'related network services were not started yet',
-                    'STOPPING': 'identity-propagate service is stopping',
-                    'CLOSED': 'identity-propagate service is closed', }
+                statuses: root.get_statuses()
 
             VerticalScrollView:
 
                 VerticalWithPaddingLayout:
                     size_hint: None, None
-                    pos_hint: {'top': 1}
+                    pos_hint: {"top": 1}
                     height: self.minimum_height
                     width: root.width - app.scroll_bar_width
 
@@ -34,7 +25,7 @@
                         text_size: self.width, None
                         height: self.texture_size[1]
                         color: app.color_black
-                        text: ''
+                        text: ""
                         on_ref_press: root.on_my_id_details_ref_pressed(*args)
 
         BottomEmptyScreenSpace:
@@ -44,6 +35,6 @@
         id: drop_down_menu
         width_mult: 5
         data:
-            [('shield-key', 'Backup my key', ),
-            ('cellphone-erase', 'Erase my ID', ), ]
+            [("shield-key", "Backup my key", ),
+            ("cellphone-erase", "Erase my ID", ), ]
         callback: root.on_drop_down_menu_item_clicked

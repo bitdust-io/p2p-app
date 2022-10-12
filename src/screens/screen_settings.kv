@@ -26,9 +26,10 @@
 <OptionNameLabel>:
     size_hint_y: None
     fixed_height: app.setting_record_height
+    height: app.setting_record_height
     pos_hint: {'left': 0, 'center_y': .5}
     halign: 'left'
-    valign: 'top'
+    valign: 'center'
     padding: 0, 0
     text_size: self.width, None
     font_size: app.setting_normal_font_size
@@ -66,9 +67,9 @@
 
         CustomIcon:
             size_hint: None, None
-            size: (dp(12), app.setting_record_height)
-            pos_hint: {'right': 1, 'center_y': 0.5}
-            font_size: '11sp'
+            size: (dp(24), app.setting_record_height)
+            pos_hint: {'right': 0.9, 'center_y': 0.5}
+            font_size: '13sp'
             icon: 'circle'
             color: (.7, .7, .7, 1) if root.service_state != 'ON' else (.6, 1, .6, 1)
 
@@ -134,9 +135,9 @@
             text: root.option_name
             on_press: root.item_clicked_callback(root.item_key, root)
 
-		Widget:
-			size_hint: None, 1
-			width: dp(5)
+        Widget:
+            size_hint: None, 1
+            width: dp(5)
 
         SingleLineTextInput:
             id: option_value_input
@@ -158,9 +159,9 @@
     OptionDescriptionLabel:
         text: root.option_description
 
-	Widget:
-		size_hint: 1, None
-		height: dp(5)
+    Widget:
+        size_hint: 1, None
+        height: dp(5)
 
 
 <DiskSpaceElement>:

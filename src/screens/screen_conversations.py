@@ -28,6 +28,19 @@ class ConversationItem(TwoLineIconListItem):
         super().__init__(**kwargs)
         self.height = dp(48) if not self._height else self._height
 
+    def get_statuses(self):
+        return {
+            None: 'message history is not available at the moment',
+            'ON': 'message history is synchronized, you are on-line',
+            'OFF': 'message-history service is not started, you are off-line',
+            'NOT_INSTALLED': 'message-history service was not installed',
+            'INFLUENCE': 'verifying related network services',
+            'DEPENDS_OFF': 'related network services were not started yet',
+            'STARTING': 'turning on message-history service',
+            'STOPPING': 'turning off message-history service',
+            'CLOSED': 'message-history service is stopped',
+        }
+
     def get_secondary_text(self):
         sec_text = 'connecting...'
         sec_color = 'bbbf'

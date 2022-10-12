@@ -1,55 +1,52 @@
-# <BaseFloatingBottomButton>:
-#     theme_text_color: "Custom"
-#     md_bg_color: self.theme_cls.primary_color
-#     canvas.before:
-#         Color:
-#             rgba:
-#                 self.theme_cls.primary_color \
-#                 if not self._bg_color else self._bg_color
-#         RoundedRectangle:
-#             pos:
-#                 (self.x - self._canvas_width + dp(1.5)) + self._padding_right / 2, \
-#                 self.y - self._padding_right / 2 + dp(1.5)
-#             size:
-#                 self.width + self._canvas_width - dp(3), \
-#                 self.height + self._padding_right - dp(3)
-#             radius: [self.height / 2]
+<DropdownRightContent>:
+    adaptive_width: True
 
 
-# <BaseFloatingLabel>:
-#     size_hint: None, None
-#     padding: "8dp", "4dp", "8dp", "4dp"
-#     height: label.texture_size[1] + self.padding[1] * 2
-#     width: label.texture_size[0] + self.padding[0] * 2
-#     elevation: 10
-#     canvas:
-#         Color:
-#             rgba:
-#                 self.theme_cls.primary_color \
-#                 if not root.bg_color else root.bg_color
-#         RoundedRectangle:
-#             pos: self.pos
-#             size: self.size
-#             radius: [5]
-#     Label:
-#         id: label
-#         markup: True
-#         text: root.text
-#         size_hint: None, None
-#         size: self.texture_size
-#         color: root.theme_cls.text_color if not root.text_color else root.text_color
+<DropdownMenuItemIcon>:
+
+    IconLeftWidget:
+        id: icon_widget
+        icon: root.icon
 
 
-# <CustomFloatingBottomButton>:
-#     text_color: app.color_white99
-#     md_bg_color: self.theme_cls.primary_color
-#     _bg_color: self.theme_cls.primary_light
-#     user_font_size: "17sp"
-#     padding: "0dp"
+<DropdownMenu>:
+    size_hint: None, None
+    width: root.width_mult * STD_INC
+    bar_width: 0
+
+    MDGridLayout:
+        id: box
+        cols: 1
+        adaptive_height: True
 
 
-# <CustomFloatingLabel>:
-#     text_color: app.color_white99
+<BaseDropdownMenu>:
+
+    MDCard:
+        id: card
+        elevation: 0
+        size_hint: None, None
+        size: md_menu.size
+        pos: md_menu.pos
+        md_bg_color: 0, 0, 0, 0
+        opacity: md_menu.opacity
+
+        canvas:
+            Clear
+            Color:
+                rgba: root.background_color if root.background_color else root.theme_cls.bg_dark
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: root.radius
+
+        MDMenu:
+            id: md_menu
+            drop_cls: root
+            width_mult: root.width_mult
+            size_hint: None, None
+            size: 0, 0
+            opacity: 0
 
 
 <CustomFloatingRootButton>:
@@ -70,6 +67,3 @@
     md_bg_color: self.theme_cls.primary_dark
     user_font_size: "17sp"
     padding: "0dp"
-
-
-<CustomDropdownMenu>:

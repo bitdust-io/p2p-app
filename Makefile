@@ -89,7 +89,8 @@ update_p4a:
 
 clone_engine_sources:
 	@mkdir -p ./build
-	@if [ ! -d "./build/bitdust" ]; then git clone https://github.com/bitdust-io/devel.git ./build/bitdust; fi
+	# @if [ ! -d "./build/bitdust" ]; then git clone https://github.com/bitdust-io/devel.git ./build/bitdust; fi
+	@if [ ! -d "./build/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./build/bitdust; fi
 	@cd ./build/bitdust; git pull; cd ../..;
 
 clean_android_environment:

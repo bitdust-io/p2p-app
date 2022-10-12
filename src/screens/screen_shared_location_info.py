@@ -55,6 +55,17 @@ class SharedLocationInfoScreen(screen.AppScreen):
             l = l[:20] + '...'
         return l
 
+    def get_statuses(self):
+        return {
+            None: 'shared files are not available at the moment',
+            'AT_STARTUP': 'shared files are not available at the moment',
+            'DHT_LOOKUP': 'connecting to the distributed hash table',
+            'SUPPLIERS?': 'connecting with remote suppliers',
+            'DISCONNECTED': 'shared location is disconnected',
+            'CONNECTED': 'shared location is synchronized',
+            'CLOSED': 'shared location is not active',
+        }
+
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id=self.automat_id, callback_automat_state_changed=self.on_automat_state_changed)
         self.populate()

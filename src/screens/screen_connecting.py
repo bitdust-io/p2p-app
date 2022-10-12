@@ -30,6 +30,18 @@ class ConnectingScreen(screen.AppScreen):
     def get_title(self):
         return 'network services'
 
+    def get_statuses(self):
+        return {
+            None: 'peer-to-peer connection not yet established',
+            'AT_STARTUP': 'starting the application',
+            'NETWORK?': 'checking connection to the Internet',
+            'INCOMMING?': 'waiting initial reply from other nodes',
+            'CONNECTED': 'peer-to-peer network services are started',
+            'DISCONNECTED': 'disconnected',
+            'MY_IDENTITY': 'verifying my identity in the network',
+            'PROPAGATE': 'propagating my identity to other nodes',
+        }
+
     def is_closable(self):
         return False
 

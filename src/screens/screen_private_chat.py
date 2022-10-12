@@ -45,6 +45,15 @@ class PrivateChatScreen(screen.AppScreen):
     def get_hot_button(self):
         return {'icon': 'send', 'color': 'green', }
 
+    def get_statuses(self):
+        return {
+            None: 'connection with remote peer is not active',
+            'PING?': 'waiting acknowledgment from remote peer',
+            'CONNECTED': 'user is connected',
+            'OFFLINE': 'user is disconnected',
+            'CLOSED': 'connection with remote peer was closed',
+        }
+
     def populate(self, **kwargs):
         selected_messages = []
         for snap_info in self.model('message').values():

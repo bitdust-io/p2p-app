@@ -2,6 +2,41 @@
 #:import get_icon_code components.webfont.get_icon_code
 #:import md_icon components.webfont.md_icon
 
+
+<BaseRoundButton>:
+    canvas:
+        Clear
+        Color:
+            rgba:
+                (self.md_bg_color if root.icon in md_icons else (0, 0, 0, 0)) \
+                if not root.disabled else \
+                (root.md_bg_color_disabled if root.md_bg_color_disabled \
+                else root.theme_cls.disabled_hint_text_color)
+        Ellipse:
+            size: self.size
+            pos: self.pos
+            source: self.source if hasattr(self, "source") else ""
+
+    size: "48dp", "48dp"
+    lbl_txt: lbl_txt
+    padding: "12dp" if root.icon in md_icons else (0, 0, 0, 0)
+
+    MDIcon:
+        id: lbl_txt
+        icon: root.icon
+        # font_size: root.user_font_size if root.user_font_size else self.font_size
+        font_name: root.font_name if root.font_name else self.font_name
+        theme_text_color: root.theme_text_color
+        text_color:
+            root.text_color if not root.disabled else \
+            (root.md_bg_color_disabled if root.md_bg_color_disabled \
+            else root.theme_cls.disabled_hint_text_color)
+        disabled: root.disabled
+        valign: "center"
+        halign: "center"
+        opposite_colors: root.opposite_colors
+
+
 <CustomRectangularButton>:
     canvas:
         Clear
@@ -32,7 +67,7 @@
         text_color: root.text_color
         markup: root.markup
         disabled: root.disabled
-        valign: 'middle'
+        valign: 'center'
         halign: root.text_halign
         opposite_colors: root.opposite_colors
 
@@ -67,7 +102,7 @@
         text_color: root.text_color
         markup: root.markup
         disabled: root.disabled
-        valign: 'middle'
+        valign: 'center'
         halign: root.text_halign
         opposite_colors: root.opposite_colors
 
@@ -95,7 +130,7 @@
         font_name: root.font_name if root.font_name else self.font_name
         color: root.text_color if root.text_color is not None else app.color_white
         disabled: root.disabled
-        valign: 'middle'
+        valign: 'center'
         halign: 'center'
         opposite_colors: root.opposite_colors
 
@@ -124,7 +159,7 @@
         font_name: root.font_name if root.font_name else self.font_name
         color: root.text_color if root.text_color is not None else app.color_white
         disabled: root.disabled
-        valign: 'middle'
+        valign: 'center'
         halign: 'center'
         opposite_colors: root.opposite_colors
 
@@ -191,7 +226,7 @@
     size: self.button_width, self.button_height
     pos_hint: {"center_x": .5, "center_y": .5}
     text_size: self.size
-    valign: 'middle'
+    valign: 'center'
     halign: 'center'
     font_style: "Body1"
     text: "[size={}]{}[/size]".format(self.icon_size, make_icon(self.icon, self.icon_pack))
@@ -245,7 +280,7 @@
     size_hint: None, None
     pos_hint: {"center_x": .5, "center_y": .5}
     text_size: self.size
-    valign: 'middle'
+    valign: 'center'
     halign: 'center'
     md_bg_color: app.theme_cls.primary_color if self.selected else app.theme_cls.primary_dark
     theme_text_color: 'Custom'
@@ -253,3 +288,8 @@
     markup: True
     font_style: self.icon_pack
     text: get_icon_code(self.icon, self.icon_pack)
+
+
+<FloatingActionButton>:
+    theme_text_color: "Custom"
+    on_size: root.set_size(0)

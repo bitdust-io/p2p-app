@@ -10,18 +10,23 @@ from kivy.properties import (
 )
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.switch import Switch
-from kivymd.uix.list import IconLeftWidget, ILeftBodyTouch
 from kivymd.theming import ThemableBehavior
+from kivymd.color_definitions import text_colors
 from kivymd.uix.button import (
     BaseButton,
-    BasePressedButton,
     MDFlatButton,
     MDFillRoundFlatButton,
-    MDFloatingActionButton,
+    MDIconButton,
 )
-from kivymd.uix.behaviors import CircularRippleBehavior, RectangularRippleBehavior
-from kivymd.uix.behaviors.elevation import RectangularElevationBehavior, CommonElevationBehavior
-from kivymd.uix.behaviors.backgroundcolor_behavior import SpecificBackgroundColorBehavior
+from kivymd.uix.list import IconLeftWidget, ILeftBodyTouch
+from kivymd.uix.tooltip import MDTooltip
+from kivymd.uix.behaviors import (
+    RectangularElevationBehavior,
+    CommonElevationBehavior,
+    CircularRippleBehavior,
+    SpecificBackgroundColorBehavior,
+    CircularElevationBehavior,
+)
 
 #------------------------------------------------------------------------------
 
@@ -109,7 +114,7 @@ class BaseElevationButton(CommonElevationBehavior, BaseButton):
     def on_touch_up(self, touch):
         if not self.disabled:
             if touch.grab_current is not self:
-                if isinstance(self, MDFloatingActionButton):
+                if isinstance(self, FloatingActionButton):
                     self.stop_elevation_anim()
                 return super().on_touch_up(touch)
             self.stop_elevation_anim()
@@ -127,7 +132,28 @@ class BaseElevationButton(CommonElevationBehavior, BaseButton):
             self._update_shadow(instance, self._elevation)
 
 
-class CustomRectangularButton(RectangularRippleBehavior, BaseButton):
+class BaseRoundButton(CircularRippleBehavior, BaseButton):
+    md_bg_color = ColorProperty([0.0, 0.0, 0.0, 0.0])
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_once(self.set_text)
+        Clock.schedule_once(self.set_text_color)
+
+    def set_text_color(self, interval=None):
+        if not self.text_color:
+            self.text_color = self.theme_cls._get_text_color()
+
+    def set_text(self, interval=None):
+        self.text = ""
+
+
+
+class CustomActionTopAppBarIconButton(MDIconButton, MDTooltip):
+    pass
+
+
+class CustomRectangularButton(BaseButton):
 
     width = BoundedNumericProperty(
         10, min=10, max=None, errorhandler=lambda x: 10
@@ -142,7 +168,7 @@ class CustomRectangularButton(RectangularRippleBehavior, BaseButton):
     text_halign = StringProperty('center')
 
 
-class CustomRectangularFlexButton(RectangularRippleBehavior, BaseButton):
+class CustomRectangularFlexButton(BaseButton):
 
     width = BoundedNumericProperty(
         10, min=10, max=None, errorhandler=lambda x: 10
@@ -166,7 +192,7 @@ class CustomRoundButton(CircularRippleBehavior, BaseButton):
     icon_padding = NumericProperty("12dp")
 
 
-class CustomRectangularIconButton(RectangularRippleBehavior, BaseButton):
+class CustomRectangularIconButton(BaseButton):
 
     increment_width = NumericProperty("0dp")
     _radius = NumericProperty("2dp")
@@ -179,7 +205,6 @@ class CustomFlatButton(MDFlatButton):
     def __init__(self, **kwargs):
         self.fixed_height = kwargs.pop('fixed_height', None)
         super().__init__(**kwargs)
-        self.property('width').set_min(self, None)
 
 
 class CustomRaisedButton(CustomRectangularButton, RectangularElevationBehavior, SpecificBackgroundColorBehavior, BaseElevationButton, BasePressedButton):
@@ -266,7 +291,7 @@ class LabeledIconButton(ButtonBehavior, layouts.VerticalLayout, ThemableBehavior
             self.label_color = self.theme_cls.secondary_text_color
 
 
-class RaisedIconButton(RectangularRippleBehavior, RectangularElevationBehavior, SpecificBackgroundColorBehavior, BaseElevationButton, BasePressedButton):
+class RaisedIconButton(RectangularElevationBehavior, SpecificBackgroundColorBehavior, BaseElevationButton, BasePressedButton):
 
     icon = StringProperty("circle")
     icon_pack = StringProperty("Icon")
@@ -293,3 +318,53 @@ class CustomIconLeftWidget(IconLeftWidget):
 
 class CustomIconPackLeftWidget(ILeftBodyTouch, CustomIconButton):
     pass
+
+#------------------------------------------------------------------------------
+
+class BaseCircularElevationButton(CircularElevationBehavior, BaseElevationButton, BaseButton):
+    pass
+
+#------------------------------------------------------------------------------
+
+class FloatingActionButton(BaseRoundButton, BasePressedButton, BaseCircularElevationButton):
+    icon = StringProperty("android")
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # self.theme_cls.bind(primary_palette=self.update_md_bg_color)
+        Clock.schedule_once(self.set_md_bg_color)
+        Clock.schedule_once(self.set_size)
+        Clock.schedule_once(self.update_text_color)
+
+    def update_text_color(self, *args):
+        if self.text_color in (
+            [0.0, 0.0, 0.0, 0.87],
+            [0.0, 0.0, 0.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0],
+        ):
+            self.text_color = text_colors[self.theme_cls.primary_palette][
+                self.theme_cls.primary_hue
+            ]
+
+    def set_md_bg_color(self, interval):
+        if self.md_bg_color == [0.0, 0.0, 0.0, 0.0]:
+            self.md_bg_color = self.theme_cls.primary_color
+
+    def set_size(self, interval):
+        self.width = "56dp"
+        self.height = "56dp"
+
+    def on_touch_down(self, touch):
+        super(FloatingActionButton, self).on_touch_down(touch)
+        if self.collide_point(touch.x, touch.y):
+            return True
+
+    def on_touch_move(self, touch):
+        super(FloatingActionButton, self).on_touch_move(touch)
+        if self.collide_point(touch.x, touch.y):
+            return True
+
+    def on_touch_up(self, touch):
+        super(FloatingActionButton, self).on_touch_up(touch)
+        if self.collide_point(touch.x, touch.y):
+            return True

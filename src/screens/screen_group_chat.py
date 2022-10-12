@@ -44,6 +44,17 @@ class GroupChatScreen(screen.AppScreen):
     def get_hot_button(self):
         return {'icon': 'send', 'color': 'green', }
 
+    def get_statuses(self):
+        return {
+            None: 'group is currently inactive',
+            'DHT_READ?': 'fetching list of active message brokers',
+            'BROKERS?': 'connecting with message brokers',
+            'QUEUE?': 'group is connected, reading recent messages',
+            'IN_SYNC!': 'group is connected and synchronized',
+            'DISCONNECTED': 'group is disconnected',
+            'CLOSED': 'group is deactivated',
+        }
+
     def populate(self, **kwargs):
         selected_messages = []
         for snap_info in self.model('message').values():

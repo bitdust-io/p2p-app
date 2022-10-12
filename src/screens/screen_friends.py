@@ -70,6 +70,19 @@ class FriendsScreen(screen.AppScreen):
     # def get_icon(self):
     #     return 'account-box-multiple'
 
+    def get_statuses(self):
+        return {
+            None: 'network service is not started',
+            'OFF': 'network service is switched off',
+            'ON': 'list of contacts is synchronized',
+            'NOT_INSTALLED': 'network services is not ready yet',
+            'INFLUENCE': 'turning off dependent network services',
+            'STARTING': 'network service is starting',
+            'DEPENDS_OFF': 'related network services were not started yet',
+            'STOPPING': 'network service is stopping',
+            'CLOSED': 'network service is closed',
+        }
+
     def populate(self, *args, **kwargs):
         api_client.friends_list(cb=self.on_friends_list_result)
 

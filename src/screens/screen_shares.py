@@ -72,6 +72,19 @@ class SharesScreen(screen.AppScreen):
     # def get_icon(self):
     #     return 'account-box-multiple'
 
+    def get_statuses(self):
+        return {
+            None: 'shared files are not available at the moment',
+            'ON': 'shared files are synchronized',
+            'OFF': 'network service is switched off',
+            'NOT_INSTALLED': 'network services is not ready yet',
+            'INFLUENCE': 'turning off dependent network services',
+            'STARTING': 'network service is starting',
+            'DEPENDS_OFF': 'related network services were not started yet',
+            'STOPPING': 'network service is stopping',
+            'CLOSED': 'network service is closed',
+        }
+
     def populate(self, *args, **kwargs):
         api_client.shares_list(cb=self.on_shares_list_result)
 
