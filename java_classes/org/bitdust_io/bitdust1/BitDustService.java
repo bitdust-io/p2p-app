@@ -10,6 +10,9 @@ import android.os.Process;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.libsdl.app.SDL;
+import org.libsdl.app.SDLActivity;
+
 import org.kivy.android.PythonService;
 import org.kivy.android.PythonUtil;
 

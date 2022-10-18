@@ -4,7 +4,7 @@ import json
 
 #------------------------------------------------------------------------------ 
 
-_Debug = False
+_Debug = True
 
 if _Debug:
     print('BitDustService ENTRYPOINT')
@@ -39,6 +39,7 @@ else:
 
 if _Debug:
     print('BitDustService __file__', os.path.dirname(os.path.abspath(__file__)))
+    print('BitDustService __name__', __name__)
     print('BitDustService os.getcwd', os.path.abspath(os.getcwd()))
     print('BitDustService sys.path', sys.path)
     print('BitDustService os.listdir', os.listdir(os.getcwd()))
@@ -139,15 +140,23 @@ def start_bitdust():
     executable_path = os.getcwd()
     if _Debug:
         print('BitDustService.start_bitdust() executable_path=%r' % executable_path)
-    try:
-        os.chdir('bitdust')
-    except Exception as exc:
-        if _Debug:
-            print('BitDustService.start_bitdust() error changing current path to "bitdust" sub-folder:', exc)
+#     try:
+#         os.chdir('bitdust')
+#     except Exception as exc:
+#         if _Debug:
+#             print('BitDustService.start_bitdust() error changing current path to "bitdust" sub-folder:', exc)
+#         return False
+
+    sys.path.insert(0, os.getcwd())
+    sys.path.insert(0, os.path.join(os.getcwd(), 'bitdust'))
+
     if _Debug:
-        print('BitDustService.start_bitdust() executing the entry point     os.getcwd() : %r' % os.getcwd())
-    from main.bpmain import main  # @UnresolvedImport
-    main(executable_path, start_reactor=False)
+        print('BitDustService.start_bitdust() os.listdir', os.listdir(os.getcwd()))
+        print('BitDustService.start_bitdust() sys.path', sys.path)
+    from main_android import bpmain  # @UnresolvedImport
+    if _Debug:
+        print('BitDustService.start_bitdust() bitdust entry point: %r %r' % (bpmain, bpmain.main, ))
+    bpmain.main(executable_path, start_reactor=False)
     if _Debug:
         print('BitDustService.start_bitdust() OK!')
     return True
@@ -159,11 +168,16 @@ def stop_bitdust():
         print('BitDustService.stop_bitdust() executable_path=%r' % executable_path)
     try:
         os.chdir('bitdust')
-    except:
-        pass
+    except Exception as exc:
+        if _Debug:
+            print('BitDustService.stop_bitdust() error changing current path to "bitdust" sub-folder:', exc)
+        return False
+    sys.path.insert(0, os.getcwd())
     if _Debug:
         print('BitDustService.stop_bitdust() executable_path after : %r' % os.getcwd())
-    from main import shutdowner  # @UnresolvedImport
+        print('BitDustService.stop_bitdust() os.listdir', os.listdir(os.getcwd()))
+        print('BitDustService.stop_bitdust() sys.path', sys.path)
+    from main_android import shutdowner  # @UnresolvedImport
     shutdowner.A('stop', 'exit')
     return True
 

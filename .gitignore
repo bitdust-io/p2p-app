@@ -1,6 +1,8 @@
 # this is automatically generated from ./buildozer.spec.template file
 buildozer.spec
 buildozer.spec.building
+buildozer.err
+buildozer.log
 
 # this should be downloaded from google with "make download_google_binaries"
 pepk.jar
