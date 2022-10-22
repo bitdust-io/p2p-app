@@ -155,9 +155,7 @@ class CustomActionTopAppBarIconButton(MDIconButton, MDTooltip):
 
 class CustomRectangularButton(BaseButton):
 
-    width = BoundedNumericProperty(
-        10, min=10, max=None, errorhandler=lambda x: 10
-    )
+    width = NumericProperty("10dp")
     text = StringProperty("")
     increment_width = NumericProperty("16dp")
     increment_height = NumericProperty("16dp")
@@ -170,9 +168,7 @@ class CustomRectangularButton(BaseButton):
 
 class CustomRectangularFlexButton(BaseButton):
 
-    width = BoundedNumericProperty(
-        10, min=10, max=None, errorhandler=lambda x: 10
-    )
+    width = NumericProperty("10dp")
     text = StringProperty("")
     increment_width = NumericProperty("0dp")
     increment_height = NumericProperty("0dp")

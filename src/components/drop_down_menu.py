@@ -21,6 +21,10 @@ from components import webfont
 
 #------------------------------------------------------------------------------
 
+_Debug = True
+
+#------------------------------------------------------------------------------
+
 class DropdownMenuItemBase(HoverBehavior):
 
     def on_enter(self):
@@ -48,7 +52,7 @@ class DropdownRightContent(IRightBodyTouch, MDBoxLayout):
     icon = StringProperty()
 
 
-class DropdownMenu(ScrollView):
+class BaseMenu(ScrollView):
     width_mult = NumericProperty(1)
     drop_cls = ObjectProperty()
 
@@ -81,7 +85,6 @@ class BaseDropdownMenu(ThemableBehavior, FloatLayout):
         self.register_event_type("on_enter")
         self.register_event_type("on_leave")
         self.register_event_type("on_release")
-        self.menu = self.ids.md_menu
         self.target_height = 0
 
     def check_position_caller(self, instance, width, height):
@@ -89,7 +92,7 @@ class BaseDropdownMenu(ThemableBehavior, FloatLayout):
 
     def set_bg_color_items(self, instance_selected_item):
         if self.selected_color:
-            for item in self.menu.ids.box.children:
+            for item in self.ids.md_menu.ids.box.children:
                 if item is not instance_selected_item:
                     item.bg_color = (0, 0, 0, 0)
                 else:
@@ -97,7 +100,9 @@ class BaseDropdownMenu(ThemableBehavior, FloatLayout):
 
     def set_menu_properties(self, interval=0):
         if self.caller:
-            if not self.menu.ids.box.children:
+            if _Debug:
+                print('BaseDropdownMenu.set_menu_properties', self.ids.md_menu, type(self.ids.md_menu))
+            if not self.ids.md_menu.ids.box.children:
                 self.create_menu_items()
             # We need to pick a starting point, see how big we need to be,
             # and where to grow to.
@@ -117,7 +122,7 @@ class BaseDropdownMenu(ThemableBehavior, FloatLayout):
             # Set the target_height of the menu depending on the size of
             # each MDMenuItem or MDMenuItemIcon
             self.target_height = 0
-            for item in self.menu.ids.box.children:
+            for item in self.ids.md_menu.ids.box.children:
                 self.target_height += item.height
 
             # If we're over max_height...
@@ -212,7 +217,7 @@ class BaseDropdownMenu(ThemableBehavior, FloatLayout):
             if not self._calculate_complete:
                 return
             if self.position == "auto":
-                self.menu.pos = self._start_coords
+                self.ids.md_menu.pos = self._start_coords
                 anim = Animation(
                     x=self.tar_x,
                     y=self.tar_y,
@@ -222,15 +227,15 @@ class BaseDropdownMenu(ThemableBehavior, FloatLayout):
                     opacity=1,
                     transition=self.opening_transition,
                 )
-                anim.start(self.menu)
+                anim.start(self.ids.md_menu)
             else:
                 if self.position == "center":
-                    self.menu.pos = (
+                    self.ids.md_menu.pos = (
                         self._start_coords[0] - self.target_width / 2,
                         self._start_coords[1] - self.target_height / 2,
                     )
                 elif self.position == "bottom":
-                    self.menu.pos = (
+                    self.ids.md_menu.pos = (
                         self._start_coords[0] - self.target_width / 2,
                         self.caller.pos[1] - self.target_height,
                     )
@@ -241,7 +246,7 @@ class BaseDropdownMenu(ThemableBehavior, FloatLayout):
                     opacity=1,
                     transition=self.opening_transition,
                 )
-            anim.start(self.menu)
+            anim.start(self.ids.md_menu)
             Window.add_widget(self)
             Clock.unschedule(_open)
             self._calculate_process = False
@@ -252,7 +257,7 @@ class BaseDropdownMenu(ThemableBehavior, FloatLayout):
             Clock.schedule_interval(_open, 0)
 
     def on_touch_down(self, touch):
-        if not self.menu.collide_point(*touch.pos):
+        if not self.ids.md_menu.collide_point(*touch.pos):
             self.dispatch("on_dismiss")
             return True
         super().on_touch_down(touch)
@@ -277,9 +282,9 @@ class BaseDropdownMenu(ThemableBehavior, FloatLayout):
 
     def on_dismiss(self):
         Window.remove_widget(self)
-        self.menu.width = 0
-        self.menu.height = 0
-        self.menu.opacity = 0
+        self.ids.md_menu.width = 0
+        self.ids.md_menu.height = 0
+        self.ids.md_menu.opacity = 0
 
     def dismiss(self):
         self.on_dismiss()
@@ -332,11 +337,11 @@ class BaseDropdownMenu(ThemableBehavior, FloatLayout):
             for c in item.canvas.children:
                 if isinstance(c, Line):
                     item.canvas.remove(c)
-            if data.get('icon_pack') and data.get("icon"):
-                item.ids.icon_widget.ids.lbl_txt.icon = 'ab-testing'  # small hack to overcome canvas rule of the MDIcon
-                item.ids.icon_widget.ids.lbl_txt.text = webfont.make_icon(data.get("icon"), data.get('icon_pack'))
-                item.ids.icon_widget.ids.lbl_txt.font_style = data.get('icon_pack')
-            self.menu.ids.box.add_widget(item)
+            # if data.get('icon_pack') and data.get("icon"):
+            #     item.ids.icon_widget.ids.lbl_txt.icon = 'ab-testing'  # small hack to overcome canvas rule of the MDIcon
+            #     item.ids.icon_widget.ids.lbl_txt.text = webfont.make_icon(data.get("icon"), data.get('icon_pack'))
+            #     item.ids.icon_widget.ids.lbl_txt.font_style = data.get('icon_pack')
+            self.ids.md_menu.ids.box.add_widget(item)
 
 
 class CustomFloatingActionButtonSpeedDial(ThemableBehavior, FloatLayout):

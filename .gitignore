@@ -8,6 +8,8 @@ buildozer.log
 pepk.jar
 support-compat-27.0.0.aar
 
+# those are files and folders generated during release
+bitdust/
 .keystore_password
 venv
 buildozer

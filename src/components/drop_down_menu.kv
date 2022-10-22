@@ -9,7 +9,7 @@
         icon: root.icon
 
 
-<DropdownMenu>:
+<BaseMenu>:
     size_hint: None, None
     width: root.width_mult * STD_INC
     bar_width: 0
@@ -32,7 +32,6 @@
         opacity: md_menu.opacity
 
         canvas:
-            Clear
             Color:
                 rgba: root.background_color if root.background_color else root.theme_cls.bg_dark
             RoundedRectangle:
@@ -40,7 +39,7 @@
                 pos: self.pos
                 radius: root.radius
 
-        MDMenu:
+        BaseMenu:
             id: md_menu
             drop_cls: root
             width_mult: root.width_mult

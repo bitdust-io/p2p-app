@@ -205,28 +205,6 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             return
         self.tbar().right_action_items = [["dots-vertical", self.on_drop_down_menu_clicked, ], ]
 
-#         # self.control.app.dropdown_menu.dismiss()
-#         # self.control.app.dropdown_menu.menu.ids.box.clear_widgets()
-#         itms = []
-#         for itm in new_items:
-#             itm.update({
-#                 "height": "40dp",
-#                 "top_pad": "10dp",
-#                 "bot_pad": "10dp",
-#             })
-#             itms.append(itm)
-#         # self.control.app.dropdown_menu.items = itms
-#         # self.control.app.dropdown_menu.create_menu_items()
-#         self.dropdown_menus[screen_id] = MDDropdownMenu(
-#             caller=self.ids.dropdown_menu_placeholder,
-#             width_mult=3,
-#             items=itms,
-#             # selected_color=self.theme_cls.bg_darkest,
-#             opening_time=0,
-#             # radius=[0, ],
-#         )
-#         self.dropdown_menus[screen_id].bind(on_release=self.on_dropdown_menu_callback)
-
     def populate_hot_button(self, screen_inst=None):
         if not screen_inst:
             self.footer_bar().set_action_button(None)

@@ -60,19 +60,13 @@ prepare_build_location:
 	@rm -rf ./build
 	@mkdir -p ./build
 	@cp -r src/* build/
-	@mkdir -p ./build/bitdust
-	@cp ./bitdust/import ./build/bitdust/
-	@cd ./build/bitdust/; chmod +x ./import; ./import ../../bitdust/ >import.log; cd ../../;
-	@rm -rf ./build/bitdust/release/
-	@rm -rf ./build/bitdust/scripts/
-	@rm -rf ./build/bitdust/requirements/
-	@rm -rf ./build/bitdust/regress/
-	@rm -rf ./build/bitdust/devops/
-	@rm -rf ./build/bitdust/tests/
-	@mkdir -p ./build/bitdust/main_android/
-	@cp ./build/bitdust/main/bpmain.py ./build/bitdust/main_android/
-	@cp ./build/bitdust/main/shutdowner.py ./build/bitdust/main_android/
-	@cp ./build/bitdust/main/__init__.py ./build/bitdust/main_android/
+	@mkdir -p ./build/bitdust_repo
+	@cp ./bitdust/import ./build/bitdust_repo/
+	@cd ./build/bitdust_repo/; chmod +x ./import; ./import ../../bitdust/ >import.log; cd ../../;
+	@mv ./build/bitdust_repo/bitdust ./build/
+	@mv ./build/bitdust_repo/bitdust_forks ./build/
+	@mv ./build/bitdust_repo/default_network.json ./build/
+	@rm -rf ./build/bitdust/bitdust_repo/
 
 download_google_binaries:
 	@curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/27.0.0/support-compat-27.0.0.aar -o support-compat-27.0.0.aar
