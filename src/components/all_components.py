@@ -20,7 +20,7 @@ KV_IMPORT = """
 #:import AutomatStatusPanel components.status_panel.AutomatStatusPanel
 #:import AutomatShortStatusPanel components.status_panel.AutomatShortStatusPanel
 #:import AutomatShortStatusPanelByIndex components.status_panel.AutomatShortStatusPanelByIndex
-#:import CustomActionBottomAppBarButton components.tool_bar.CustomActionBottomAppBarButton
+#:import CustomFloatingActionButton components.tool_bar.CustomFloatingActionButton
 #:import CustomBottomAppBar components.tool_bar.CustomBottomAppBar
 #:import CustomBottomToolbar components.tool_bar.CustomBottomToolbar
 #:import CustomTopToolbar components.tool_bar.CustomTopToolbar

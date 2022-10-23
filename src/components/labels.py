@@ -51,7 +51,7 @@ class VFlexMarkupLabel(ThemableBehavior, Label):
 
 
 def format_chat_message(sender_name, sender_color, json_payload, message_id):
-    return '[i][size=12sp][color={}]{}[/color]  [color=bbbf]{} #{}[/color][/size][/i]\n[font={}]{}[/font]'.format(
+    return '[i][size=12sp][color={}]{}[/color]  [color=bbbf]{} #{}[/color][/size][/i]\n[font={}][size=14sp]{}[/size][/font]'.format(
         sender_color,
         sender_name,
         time.strftime('%d %B at %H:%M:%S', time.localtime(json_payload['time'])),
