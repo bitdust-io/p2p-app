@@ -3,6 +3,10 @@ import time
 
 #------------------------------------------------------------------------------
 
+from collections import OrderedDict
+
+#------------------------------------------------------------------------------
+
 from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
@@ -405,7 +409,7 @@ class Controller(object):
         snap_id = json_data['payload']['id']
         d = json_data['payload']['data']
         if model_name not in self.model_data:
-            self.model_data[model_name] = {}
+            self.model_data[model_name] = OrderedDict()
         deleted = json_data['payload'].get('deleted')
         if _Debug:
             print('Controller.on_model_update [%s] %s deleted=%r\n    %r' % (model_name, snap_id, deleted, d, ))

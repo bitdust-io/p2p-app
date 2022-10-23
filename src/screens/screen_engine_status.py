@@ -1,7 +1,3 @@
-from kivy.clock import Clock
-
-#------------------------------------------------------------------------------
-
 from lib import api_client
 
 from components import screen
@@ -103,6 +99,8 @@ class EngineStatusScreen(screen.AppScreen):
             if snap_info:
                 svc = snap_info['data']
                 st = svc.get('state')
+                if not svc.get('installed'):
+                    continue
                 if not svc.get('enabled'):
                     continue
                 if st not in services_by_state:
