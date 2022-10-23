@@ -159,7 +159,7 @@ class MyIDScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text='identity backup failed: %s' % api_client.response_err(resp))
         else:
-            snackbar.success(text='key file created: %s' % destination_filepath)
+            snackbar.success(text='key file saved to:\n%s' % destination_filepath, height=64, shorten=False)
 
     def on_process_stop_result_start_engine(self, resp):
         if _Debug:
