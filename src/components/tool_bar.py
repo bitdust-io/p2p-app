@@ -466,7 +466,7 @@ class CustomBottomAppBar(FloatLayout):
 
 #------------------------------------------------------------------------------
 
-class CustomToolbar(NotchedBox):
+class CustomTopToolbar(NotchedBox):
     left_action_items = ListProperty()
     right_action_items = ListProperty()
     title = StringProperty()

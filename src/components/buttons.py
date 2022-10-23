@@ -4,7 +4,6 @@ from kivy.properties import (
     BooleanProperty,  # @UnresolvedImport
     StringProperty,  # @UnresolvedImport
     NumericProperty,  # @UnresolvedImport
-    BoundedNumericProperty,  # @UnresolvedImport
     ColorProperty,  # @UnresolvedImport
     ListProperty,  # @UnresolvedImport
 )
@@ -146,7 +145,6 @@ class BaseRoundButton(CircularRippleBehavior, BaseButton):
 
     def set_text(self, interval=None):
         self.text = ""
-
 
 
 class CustomActionTopAppBarIconButton(MDIconButton, MDTooltip):
@@ -327,7 +325,6 @@ class FloatingActionButton(BaseRoundButton, BasePressedButton, BaseCircularEleva
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # self.theme_cls.bind(primary_palette=self.update_md_bg_color)
         Clock.schedule_once(self.set_md_bg_color)
         Clock.schedule_once(self.set_size)
         Clock.schedule_once(self.update_text_color)

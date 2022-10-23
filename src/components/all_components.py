@@ -23,7 +23,7 @@ KV_IMPORT = """
 #:import CustomActionBottomAppBarButton components.tool_bar.CustomActionBottomAppBarButton
 #:import CustomBottomAppBar components.tool_bar.CustomBottomAppBar
 #:import CustomBottomToolbar components.tool_bar.CustomBottomToolbar
-#:import CustomToolbar components.tool_bar.CustomToolbar
+#:import CustomTopToolbar components.tool_bar.CustomTopToolbar
 #:import CustomSelectionList components.selection.CustomSelectionList
 #:import CustomIconLeftWidget components.buttons.CustomIconLeftWidget
 #:import CustomIconPackLeftWidget components.buttons.CustomIconPackLeftWidget

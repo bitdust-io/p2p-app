@@ -3,8 +3,6 @@ import time
 from lib import colorhash
 from lib import api_client
 
-from fonts import all_fonts
-
 from components import screen
 from components import labels
 from components import snackbar
@@ -136,14 +134,20 @@ class PrivateChatScreen(screen.AppScreen):
                 conversation_id=msg['conversation_id'],
                 message_id=msg_id,
                 message_time=msg['payload']['time'],
-                text='[sub][font={}][size=11sp][color={}]{}[/color]  [color=dddf]{}[/color][/size][/font][/sub]\n[font={}]{}[/font]'.format(
-                    all_fonts.font_path('EversonMono.ttf'),
-                    colorhash.get_user_color_hex(msg['sender']['glob_id']),
-                    sender_name,
-                    time.strftime('%Y %d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
-                    all_fonts.font_path('JetBrainsMono-Medium.ttf'),
-                    msg['payload']['data']['message'],
-                ),
+                text=labels.format_chat_message(
+                    sender_name=sender_name,
+                    sender_color=colorhash.get_user_color_hex(msg['sender']['glob_id']),
+                    json_payload=msg['payload'],
+                    message_id=time.strftime('%Y %d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
+                )
+#                 text='[sub][font={}][size=11sp][color={}]{}[/color]  [color=dddf]{}[/color][/size][/font][/sub]\n[font={}]{}[/font]'.format(
+#                     all_fonts.font_path('EversonMono.ttf'),
+#                     colorhash.get_user_color_hex(msg['sender']['glob_id']),
+#                     sender_name,
+#                     time.strftime('%Y %d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
+#                     all_fonts.font_path('JetBrainsMono-Medium.ttf'),
+#                     msg['payload']['data']['message'],
+#                 ),
             ),
             index=new_index,
         )

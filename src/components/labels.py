@@ -1,3 +1,5 @@
+import time
+
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 from kivy.uix.label import Label
 
@@ -7,6 +9,8 @@ from kivymd.theming import ThemableBehavior
 #------------------------------------------------------------------------------
 
 from lib import api_client
+
+from fonts import all_fonts
 
 #------------------------------------------------------------------------------
 
@@ -44,6 +48,17 @@ class HFlexMarkupLabel(ThemableBehavior, Label):
 
 class VFlexMarkupLabel(ThemableBehavior, Label):
     label_width = NumericProperty('100dp')
+
+
+def format_chat_message(sender_name, sender_color, json_payload, message_id):
+    return '[i][size=12sp][color={}]{}[/color]  [color=bbbf]{} #{}[/color][/size][/i]\n[font={}]{}[/font]'.format(
+        sender_color,
+        sender_name,
+        time.strftime('%d %B at %H:%M:%S', time.localtime(json_payload['time'])),
+        message_id,
+        all_fonts.font_path('JetBrainsMono-Medium.ttf'),
+        json_payload['data']['message'].strip(),
+    )
 
 
 class ChatMessageLabel(NormalLabel):

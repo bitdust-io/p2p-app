@@ -24,6 +24,8 @@
     MDIcon:
         id: lbl_txt
         icon: root.icon
+        size_hint_x: None
+        width: root.width
         # font_size: root.user_font_size if root.user_font_size else self.font_size
         font_name: root.font_name if root.font_name else self.font_name
         theme_text_color: root.theme_text_color
@@ -292,4 +294,5 @@
 
 <FloatingActionButton>:
     theme_text_color: "Custom"
+    padding: dp(0)
     on_size: root.set_size(0)

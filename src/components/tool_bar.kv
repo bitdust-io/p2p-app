@@ -4,6 +4,7 @@
 
 <CustomActionBottomAppBarButton>:
     canvas.before:
+        # Clear
         PushMatrix
         Scale:
             origin: self.center
@@ -20,7 +21,6 @@
     size_hint_y: None
     height: root.standard_increment
     padding: [root.horizontal_margins - dp(12), 0, dp(120), 0]
-    # opposite_colors: False
     elevation: root.elevation
 
     canvas:
@@ -51,6 +51,7 @@
 
 
 <CustomBottomToolbar>:
+
     BoxLayout:
         id: left_actions
         orientation: "horizontal"
@@ -91,7 +92,7 @@
         pos_hint: {"center_y": .5}
 
 
-<CustomToolbar>:
+<CustomTopToolbar>:
     height: dp(36)
 
     BoxLayout:

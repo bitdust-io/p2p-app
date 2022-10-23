@@ -1,10 +1,7 @@
 import os
 import time
 
-from weakref import ref
-
 from kivy.clock import Clock
-from kivy.lang import Builder
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.treeview import TreeViewNode
 from kivy.uix.filechooser import FileSystemAbstract, FileChooserController, FileChooserLayout
@@ -16,12 +13,31 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
 class DistributedFileListEntry(FloatLayout, TreeViewNode):
-    pass
+
+    def apply_context(self, ctx):
+        self.path = ctx['path']
+        self.global_id = ctx['global_id']
+        self.remote_path = ctx['remote_path']
+        self.is_leaf = not ctx['isdir'] or ctx['name'].endswith('..' + ctx['sep'])
+        self.ids.filename.text = ctx['name']
+        self.ids.filename.font_name = ctx['font_name']
+        self.ids.file_condition.text = ctx['get_condition']()
+        self.ids.file_condition.font_name = ctx['font_name']
+        self.ids.file_size.text = ctx['get_nice_size']()
+        self.ids.file_size.font_name = ctx['font_name']
+        self._entry_touched = ctx['entry_touched']
+        self._entry_released = ctx['entry_released']
+
+    def _on_touch_down(self, *args):
+        return self.collide_point(*args[1].pos) and self._entry_touched(self, args[1])
+
+    def _on_touch_up(self, *args):
+        return self.collide_point(*args[1].pos) and self._entry_released(self, args[1])
 
 #------------------------------------------------------------------------------
 
@@ -468,10 +484,17 @@ class DistributedFileChooserListView(FileChooserController):
         if not is_root and not have_parent:
             back = '../'
             pardir = self._create_entry_widget(dict(
-                name=back, size='', path=back, controller=ref(self),
-                isdir=True, parent=None, sep='/  ',
+                name=back,
+                size='',
+                path=back,
+                font_name=self.font_name,
+                isdir=True, parent=None,
+                sep='/  ',
                 get_condition=lambda: '',
-                get_nice_size=lambda: ''))
+                get_nice_size=lambda: '',
+                entry_touched=self.entry_touched,
+                entry_released=self.entry_released,
+            ))
             yield 0, 1, pardir
 
         try:
@@ -508,7 +531,6 @@ class DistributedFileChooserListView(FileChooserController):
             files = [x for x in files if not is_hidden(x)]
         self.files[:] = files
         total = len(files)
-        wself = ref(self)
 
         for index, remote_path in enumerate(files):
             _, _, fn = remote_path.rpartition(':')
@@ -523,15 +545,17 @@ class DistributedFileChooserListView(FileChooserController):
             _, _, bname = fn.rpartition('/')
             ctx = {
                 'name': bname,
-                'get_nice_size': get_nice_size,
-                'get_condition': get_condition,
                 'path': fn,
                 'global_id': '',
                 'remote_path': remote_path,
-                'controller': wself,
+                'font_name': self.font_name,
                 'isdir': self.file_system.is_dir(fn),
                 'parent': parent,
                 'sep': '/',
+                'get_nice_size': get_nice_size,
+                'get_condition': get_condition,
+                'entry_touched': self.entry_touched,
+                'entry_released': self.entry_released,
             }
             entry = self._create_entry_widget(ctx)
             yield index, total, entry
@@ -551,10 +575,14 @@ class DistributedFileChooserListView(FileChooserController):
             if _Debug:
                 print('    DistributedFileChooserListView._create_entry_widget updated existing item', ctx['remote_path'], global_id)
         else:
-            if _Debug:
-                print('    DistributedFileChooserListView._create_entry_widget created new item', ctx['remote_path'], global_id)
-            w = Builder.template(template, **ctx)
+            if template == 'DistributedFileListEntry':
+                w = DistributedFileListEntry()
+                w.apply_context(ctx)
+            else:
+                raise Exception('Unknown template: %r' % template)
             self.index_by_remote_path[ctx['remote_path']] = w
+            if _Debug:
+                print('    DistributedFileChooserListView._create_entry_widget created new item', ctx['remote_path'], global_id, template, w)
         if global_id:
             self.index_by_global_id[global_id] = w
         return w
