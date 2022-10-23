@@ -124,7 +124,7 @@ class MyIDScreen(screen.AppScreen):
                 destination_filepath=destination_filepath,
                 cb=lambda resp: self.on_identity_backup_result(resp, destination_filepath),
             )
-        elif btn.icon == 'cellphone-erase':
+        elif btn.icon == 'cellphone-remove':
             dialogs.open_yes_no_dialog(
                 title='Erase my identity and the private key',
                 text='WARNING!\n\nAll your data will become\ncompletely inaccessible\nwithout a private key!\n\nMake sure you already\nhave a backup copy\nof your private key.',

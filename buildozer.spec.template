@@ -75,7 +75,7 @@ osx.kivy_version = 1.11.1
 #
 
 # (str) Android app theme, default is ok for Kivy-based app
-android.apptheme = "@android:style/Theme.Black.NoTitleBar"
+android.apptheme = @android:style/Theme.Black.NoTitleBar
 # android.apptheme = "@android:style/Theme.NoTitleBar"
 
 # (bool) Indicate if the application should be fullscreen or not
@@ -139,7 +139,7 @@ android.service_class_name = org.bitdust_io.bitdust1.BitDustService
 
 # (str) Extra xml to write directly inside the <manifest><application> tag of AndroidManifest.xml
 # use that parameter to provide a filename from where to load your custom XML arguments
-android.extra_manifest_application_arguments = ./etc/extra_manifest_application_arguments.xml
+# android.extra_manifest_application_arguments = ./etc/extra_manifest_application_arguments.xml
 
 # (list) Pattern to whitelist for the whole project
 #android.whitelist =

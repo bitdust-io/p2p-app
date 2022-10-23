@@ -2,8 +2,9 @@
 #:import make_icon components.webfont.make_icon
 
 
-<CustomActionBottomAppBarButton>:
+<CustomFloatingActionButton>:
     canvas.before:
+        # Clear
         PushMatrix
         Scale:
             origin: self.center
@@ -20,7 +21,6 @@
     size_hint_y: None
     height: root.standard_increment
     padding: [root.horizontal_margins - dp(12), 0, dp(120), 0]
-    # opposite_colors: False
     elevation: root.elevation
 
     canvas:
@@ -50,7 +50,39 @@
             radius: [0,] if root.mode=="normal" else [root.notch_radius*root._rounding_percentage,0,0,0]
 
 
+<CustomTopToolbar>:
+    height: dp(36)
+
+    BoxLayout:
+        id: left_actions
+        orientation: "horizontal"
+        size_hint_x: None
+        padding: [0, (self.height - dp(48))/2]
+
+    BoxLayout:
+        padding: dp(12), 0
+
+        MDLabel:
+            id: label_title
+            font_style: "H6"
+            opposite_colors: root.opposite_colors
+            theme_text_color: "Custom" if not root.opposite_colors else "Primary"
+            text_color: root.specific_text_color
+            text: root.title
+            shorten: True
+            shorten_from: "right"
+            halign: root.anchor_title
+            markup: True
+
+    BoxLayout:
+        id: right_actions
+        orientation: "horizontal"
+        size_hint_x: None
+        padding: [0, (self.height - dp(48)) / 2]
+
+
 <CustomBottomToolbar>:
+
     BoxLayout:
         id: left_actions
         orientation: "horizontal"
@@ -89,34 +121,3 @@
         size_hint_y: None
         height: self.minimum_height
         pos_hint: {"center_y": .5}
-
-
-<CustomToolbar>:
-    height: dp(36)
-
-    BoxLayout:
-        id: left_actions
-        orientation: "horizontal"
-        size_hint_x: None
-        padding: [0, (self.height - dp(48))/2]
-
-    BoxLayout:
-        padding: dp(12), 0
-
-        MDLabel:
-            id: label_title
-            font_style: "H6"
-            opposite_colors: root.opposite_colors
-            theme_text_color: "Custom" if not root.opposite_colors else "Primary"
-            text_color: root.specific_text_color
-            text: root.title
-            shorten: True
-            shorten_from: "right"
-            halign: root.anchor_title
-            markup: True
-
-    BoxLayout:
-        id: right_actions
-        orientation: "horizontal"
-        size_hint_x: None
-        padding: [0, (self.height - dp(48)) / 2]

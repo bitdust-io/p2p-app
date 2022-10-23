@@ -12,8 +12,10 @@
 set -e
 
 
-make prepare_build_location
 make clone_engine_sources
+make update_engine_sources
+make prepare_build_location
+
 
 rm -rfv ./bin/BitDustAndroid_*.apk
 
@@ -23,11 +25,11 @@ if [[ "1" == "" ]]; then
 	rm -rf buildozer.spec.building
 	cp -v buildozer.spec buildozer.spec.building
 	echo "__version__ = \"$1\"" > ./src/version.py
-	make refresh_android_environment_full
+	make refresh_android_environment
 	rm -rfv ./bin/BitDustAndroid.apk
 	rm -rfv ./bin/BitDustAndroid_unsigned.apk
 	rm -rfv ./bin/bitdust1-*-release-unsigned.apk
-	(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile x86_64 android release 1>x86_64.out.log 2>x86_64.err.log || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile x86_64 android release 1>x86_64.out.log 2>x86_64.err.log)
+	PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile x86_64 android release 1>x86_64.out.log 2>x86_64.err.log
 	cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 	mv -v -f buildozer.spec.building buildozer.spec
 	pw=$(cat ".keystore_password")
@@ -42,11 +44,11 @@ if [[ "1" == "" ]]; then
 	rm -rf buildozer.spec.building
 	cp -v buildozer.spec buildozer.spec.building
 	echo "__version__ = \"$1\"" > ./src/version.py
-	make refresh_android_environment_full
+	make refresh_android_environment
 	rm -rfv ./bin/BitDustAndroid.apk
 	rm -rfv ./bin/BitDustAndroid_unsigned.apk
 	rm -rfv ./bin/bitdust1-*-release-unsigned.apk
-	(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile armeabi_v7a android release 1>armeabi_v7a.out.log 2>armeabi_v7a.err.log || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile armeabi_v7a android release 1>armeabi_v7a.out.log 2>armeabi_v7a.err.log)
+	PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile armeabi_v7a android release 1>armeabi_v7a.out.log 2>armeabi_v7a.err.log
 	cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
 	mv -v -f buildozer.spec.building buildozer.spec
 	pw=$(cat ".keystore_password")
@@ -60,13 +62,8 @@ fi
 rm -rf buildozer.spec.building
 cp -v buildozer.spec buildozer.spec.building
 echo "__version__ = \"$1\"" > ./src/version.py
-make refresh_android_environment_full
-rm -rfv ./bin/BitDustAndroid.apk
-rm -rfv ./bin/BitDustAndroid_unsigned.apk
-rm -rfv ./bin/bitdust1-*-release-unsigned.apk
-# (PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release 1>arm64_v8a.out.log 2>arm64_v8a.err.log || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release 1>arm64_v8a.out.log 2>arm64_v8a.err.log)
-(PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release || PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release)
-cp -v -f ./bin/bitdust*.apk ./bin/BitDustAndroid_unsigned.apk
+make refresh_android_environment
+make release_android_apk
 mv -v -f buildozer.spec.building buildozer.spec
 pw=$(cat ".keystore_password")
 zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk

@@ -19,13 +19,14 @@ if 'ANDROID_ARGUMENT' not in os.environ:
 
 #------------------------------------------------------------------------------ 
 
-_Debug = True
+_Debug = False
 _DebugProfilingEnabled = False
 
 #------------------------------------------------------------------------------
 
 if _Debug:
     print('BitDustApp __file__', os.path.dirname(os.path.abspath(__file__)))
+    print('BitDustApp __name__', __name__)
     print('BitDustApp os.getcwd', os.path.abspath(os.getcwd()))
     print('BitDustApp sys.path', sys.path)
     print('BitDustApp os.listdir', os.listdir(os.getcwd()))
@@ -45,6 +46,10 @@ if _Debug:
 from kivy.lang import Builder
 from kivy.clock import Clock, mainthread
 from kivy.core.window import Window
+
+if _Debug:
+    print('BitDustApp Window=%r' % Window)
+    print('BitDustApp Window.width=%r Window.height=%r' % (Window.width, Window.height, ))
 
 from kivymd.app import MDApp
 

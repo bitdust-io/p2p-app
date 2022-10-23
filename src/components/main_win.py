@@ -25,7 +25,7 @@ from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -205,43 +205,21 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             return
         self.tbar().right_action_items = [["dots-vertical", self.on_drop_down_menu_clicked, ], ]
 
-#         # self.control.app.dropdown_menu.dismiss()
-#         # self.control.app.dropdown_menu.menu.ids.box.clear_widgets()
-#         itms = []
-#         for itm in new_items:
-#             itm.update({
-#                 "height": "40dp",
-#                 "top_pad": "10dp",
-#                 "bot_pad": "10dp",
-#             })
-#             itms.append(itm)
-#         # self.control.app.dropdown_menu.items = itms
-#         # self.control.app.dropdown_menu.create_menu_items()
-#         self.dropdown_menus[screen_id] = MDDropdownMenu(
-#             caller=self.ids.dropdown_menu_placeholder,
-#             width_mult=3,
-#             items=itms,
-#             # selected_color=self.theme_cls.bg_darkest,
-#             opening_time=0,
-#             # radius=[0, ],
-#         )
-#         self.dropdown_menus[screen_id].bind(on_release=self.on_dropdown_menu_callback)
-
     def populate_hot_button(self, screen_inst=None):
         if not screen_inst:
-            self.footer_bar().set_action_button(None)
+            self.footer_bar().set_bottom_action_button(None)
             return
-        action_button_info = screen_inst.get_hot_button()
-        if not action_button_info:
-            self.footer_bar().set_action_button(None)
+        bottom_action_button_info = screen_inst.get_hot_button()
+        if not bottom_action_button_info:
+            self.footer_bar().set_bottom_action_button(None)
             return
-        self.footer_bar().set_action_button(
-            icon=action_button_info.get('icon'),
-            color=self.color(action_button_info.get('color')),
+        self.footer_bar().set_bottom_action_button(
+            icon=bottom_action_button_info.get('icon'),
+            color=self.color(bottom_action_button_info.get('color')),
         )
 
     def populate_bottom_toolbar_icon(self, icon_name, state):
-        self.footer_bar().update_action_bar_item(icon_name, state)
+        self.footer_bar().update_bottom_action_bar_item(icon_name, state)
 
     #------------------------------------------------------------------------------
 
@@ -405,7 +383,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
 
     def on_init_done(self, *args):
         if _Debug:
-            print('MainWin.on_init_done', self.footer_bar().height, self.footer_bar().action_button.x, self.footer_bar().action_button.y, )
+            print('MainWin.on_init_done', self.footer_bar().height, self.footer_bar().bottom_action_button.x, self.footer_bar().bottom_action_button.y, )
         if self.selected_screen:
             self.populate_hot_button(self.active_screens[self.selected_screen][0])
             self.populate_dropdown_menu(self.active_screens[self.selected_screen][0])

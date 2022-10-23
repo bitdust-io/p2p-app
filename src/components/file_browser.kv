@@ -1,18 +1,18 @@
 <DistributedFileListEntry>:
     locked: False
     entries: []
-    path: ctx.path
-    global_id: ctx.global_id
-    remote_path: ctx.remote_path
+    path: ''
+    global_id: ''
+    remote_path: ''
     is_selected: False
     no_selection: True
 
     orientation: 'horizontal'
     size_hint_y: None
     height: '36dp'
-    is_leaf: not ctx.isdir or ctx.name.endswith('..' + ctx.sep) or self.locked
-    on_touch_down: self.collide_point(*args[1].pos) and ctx.controller().entry_touched(self, args[1])
-    on_touch_up: self.collide_point(*args[1].pos) and ctx.controller().entry_released(self, args[1])
+    is_leaf: False
+    on_touch_down: self._on_touch_down(*args)
+    on_touch_up: self._on_touch_up(*args)
     odd_color: (1,1,1,1)
     even_color: (.98,.98,.98,1)
 
@@ -27,8 +27,8 @@
             halign: 'left'
             shorten: True
             shorten_from: 'left'
-            text: ctx.name
-            font_name: ctx.controller().font_name
+            text: ''
+            font_name: ''
             color: (0, 0, 0, 1)
 
         Label:
@@ -38,8 +38,8 @@
             halign: 'right'
             shorten: False
             max_lines: 1
-            text: '{}'.format(ctx.get_condition())
-            font_name: ctx.controller().font_name
+            text: ''
+            font_name: ''
             color: (0, 0, 0, 1)
 
         Label:
@@ -49,8 +49,8 @@
             halign: 'right'
             shorten: False
             max_lines: 1
-            text: '{}'.format(ctx.get_nice_size())
-            font_name: ctx.controller().font_name
+            text: ''
+            font_name: ''
             color: (0, 0, 0, 1)
 
 

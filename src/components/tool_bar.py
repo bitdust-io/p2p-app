@@ -37,17 +37,7 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-class CustomActionBottomAppBarButton(FloatingActionButton):
-    _scale_x = NumericProperty(1)
-    _scale_y = NumericProperty(1)
-
-    def set_size(self, interval):
-        self.width = "44dp"
-        self.height = "44dp"
-
-#------------------------------------------------------------------------------
-
-class CustomActionTopAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
+class CustomActionAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
     anim = None
 
     def __init__(self, **kwargs):
@@ -74,6 +64,23 @@ class CustomActionTopAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
     def animation_tooltip_show(self, interval):
         super().animation_tooltip_show(interval)
         Clock.schedule_once(self.remove_tooltip, 5)
+
+#------------------------------------------------------------------------------
+
+class CustomFloatingActionButton(FloatingActionButton):
+    _scale_x = NumericProperty(1)
+    _scale_y = NumericProperty(1)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if _Debug:
+            print('CustomFloatingActionButton.__init__')
+
+    def set_size(self, interval):
+        if _Debug:
+            print('CustomFloatingActionButton.set_size')
+        self.width = "44dp"
+        self.height = "44dp"
 
 #------------------------------------------------------------------------------
 
@@ -228,6 +235,211 @@ class CustomNotchedBox(
 
         return points
 
+
+#------------------------------------------------------------------------------
+
+class CustomTopToolbar(NotchedBox):
+    left_action_items = ListProperty()
+    right_action_items = ListProperty()
+    title = StringProperty()
+    anchor_title = OptionProperty("left", options=["left", "center", "right"])
+    mode = OptionProperty(
+        "center", options=["free-end", "free-center", "end", "center"]
+    )
+    round = NumericProperty("10dp")
+    icon = StringProperty("android")
+    icon_color = ColorProperty()
+    type = OptionProperty("top", options=["top", "bottom"])
+    opposite_colors = BooleanProperty(False)
+    _shift = NumericProperty("3.5dp")
+
+    def __init__(self, **kwargs):
+        self.top_action_button = CustomFloatingActionButton()
+        self.latest_left_action_items = []
+        self.latest_right_action_items = []
+        super().__init__(**kwargs)
+        self.register_event_type("on_action_button")
+        self.top_action_button.bind(center_x=self.setter("notch_center_x"))
+        self.top_action_button.bind(
+            on_release=lambda x: self.dispatch("on_action_button")
+        )
+        self.top_action_button.x = Window.width / 2 - self.top_action_button.width / 2
+        self.top_action_button.y = (
+            (self.center[1] - self.height / 2)
+            + self.theme_cls.standard_increment / 2
+            + self._shift
+        )
+        if not self.icon_color:
+            self.icon_color = self.theme_cls.primary_color
+        Window.bind(on_resize=self._on_resize)
+        self.bind(specific_text_color=self.update_top_action_bar_text_colors)
+        # self.bind(opposite_colors=self.update_opposite_colors)
+        self.theme_cls.bind(primary_palette=self.update_md_bg_color)
+        Clock.schedule_once(
+            lambda x: self.on_left_action_items(0, self.left_action_items)
+        )
+        Clock.schedule_once(
+            lambda x: self.on_right_action_items(0, self.right_action_items)
+        )
+        Clock.schedule_once(lambda x: self.set_md_bg_color(0, self.md_bg_color))
+        Clock.schedule_once(lambda x: self.on_mode(None, self.mode))
+
+    def on_action_button(self, *args):
+        pass
+
+    def on_md_bg_color(self, instance, value):
+        if self.type == "bottom":
+            self.md_bg_color = [0, 0, 0, 0]
+
+    def on_left_action_items(self, instance, value):
+        if self.latest_left_action_items != [i[0] for i in value]:
+            self.update_top_action_bar(self.ids["left_actions"], value)
+            self.latest_left_action_items = [i[0] for i in value]
+
+    def on_right_action_items(self, instance, value):
+        if self.latest_right_action_items != [i[0] for i in value]:
+            self.update_top_action_bar(self.ids["right_actions"], value)
+            self.latest_right_action_items = [i[0] for i in value]
+
+    def set_md_bg_color(self, instance, value):
+        if value == [1.0, 1.0, 1.0, 0.0]:
+            self.md_bg_color = self.theme_cls.primary_color
+
+    def update_top_action_bar(self, action_bar, action_bar_items):
+        if _Debug:
+            print('CustomTopToolbar.update_top_action_bar', self.specific_text_color, self.opposite_colors, action_bar, action_bar_items)
+        action_bar.clear_widgets()
+        new_width = 0
+        for item in action_bar_items:
+            new_width += dp(48)
+            if len(item) == 1:
+                item.append(lambda x: None)
+            if len(item) > 1 and not item[1]:
+                item[1] = lambda x: None
+            if len(item) == 2:
+                if type(item[1]) is str:
+                    item.insert(1, lambda x: None)
+                else:
+                    item.append("")
+            b = ActionTopAppBarButton(
+                icon=item[0],
+                on_release=item[1],
+                tooltip_text=item[2],
+                theme_text_color="Custom" if not self.opposite_colors else "Primary",
+                text_color=self.specific_text_color,
+                opposite_colors=self.opposite_colors,
+            )
+            b.theme_icon_color = "Custom"
+            b._icon_color = self.specific_text_color
+            action_bar.add_widget(b)
+        action_bar.width = new_width
+
+    def update_md_bg_color(self, *args):
+        self.md_bg_color = self.theme_cls._get_primary_color()
+        if _Debug:
+            print('CustomTopToolbar.update_md_bg_color', self.md_bg_color)
+
+    def update_opposite_colors(self, instance, value):
+        if value:
+            self.ids.label_title.theme_text_color = ""
+        if _Debug:
+            print('CustomTopToolbar.update_opposite_colors', value)
+
+    def update_top_action_bar_text_colors(self, *args):
+        for child in self.ids["left_actions"].children:
+            child.text_color = self.specific_text_color
+        for child in self.ids["right_actions"].children:
+            child.text_color = self.specific_text_color
+        if _Debug:
+            print('CustomTopToolbar.update_top_action_bar_text_colors', args)
+
+    def on_icon(self, instance, value):
+        self.top_action_button.icon = value
+
+    def on_icon_color(self, instance, value):
+        self.top_action_button.md_bg_color = value
+
+    def on_mode(self, instance, value):
+        def set_button_pos(*args):
+            self.top_action_button.x = x
+            self.top_action_button.y = y - self._rounded_rectangle_height / 2
+            self.top_action_button._hard_shadow_size = (0, 0)
+            self.top_action_button._soft_shadow_size = (0, 0)
+            anim = Animation(_scale_x=1, _scale_y=1, d=0)
+            anim.bind(on_complete=self.set_shadow)
+            anim.start(self.top_action_button)
+            if _Debug:
+                print('CustomTopToolbar.on_mode.set_button_pos', self.top_action_button.x, self.top_action_button.y, self.top_action_button.disabled, self.top_action_button.parent)
+
+        if value == "center":
+            self.set_notch()
+            x = Window.width / 2 - self.top_action_button.width / 2
+            y = (
+                (self.center[1] - self.height / 2)
+                + self.theme_cls.standard_increment / 2
+                + self._shift
+            )
+        elif value == "end":
+
+            self.set_notch()
+            x = Window.width - self.top_action_button.width * 2
+            y = (
+                (self.center[1] - self.height / 2)
+                + self.theme_cls.standard_increment / 2
+                + self._shift
+            )
+            self.right_action_items = []
+        elif value == "free-end":
+            self.remove_notch()
+            x = Window.width - self.top_action_button.width - dp(10)
+            y = self.top_action_button.height + self.top_action_button.height / 2
+        elif value == "free-center":
+            self.remove_notch()
+            x = Window.width / 2 - self.top_action_button.width / 2
+            y = self.top_action_button.height + self.top_action_button.height / 2
+        self.remove_shadow()
+        anim = Animation(_scale_x=0, _scale_y=0, d=0)
+        anim.bind(on_complete=set_button_pos)
+        anim.start(self.top_action_button)
+
+    def remove_notch(self):
+        anim = Animation(d=0.1) + Animation(
+            notch_radius=0,
+            d=0.1,
+        )
+        anim.start(self)
+
+    def set_notch(self):
+        anim = Animation(d=0.1) + Animation(
+            notch_radius=self.top_action_button.width / 2 + dp(8),
+            d=0.1,
+        )
+        anim.start(self)
+
+    def remove_shadow(self):
+        self.top_action_button._hard_shadow_size = (0, 0)
+        self.top_action_button._soft_shadow_size = (0, 0)
+
+    def set_shadow(self, *args):
+        self.top_action_button._hard_shadow_size = (dp(112), dp(112))
+        self.top_action_button._soft_shadow_size = (dp(112), dp(112))
+
+    def _on_resize(self, instance, width, height):
+        if self.mode == "center":
+            self.top_action_button.x = width / 2 - self.top_action_button.width / 2
+        else:
+            self.top_action_button.x = width - self.top_action_button.width * 2
+
+    def _update_specific_text_color(self, instance, value):
+        if self.specific_text_color in (
+            [0.0, 0.0, 0.0, 0.87],
+            [0.0, 0.0, 0.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0],
+        ):
+            self.specific_text_color = text_colors[
+                self.theme_cls.primary_palette
+            ][self.theme_cls.primary_hue]
+
 #------------------------------------------------------------------------------
 
 class CustomBottomToolbar(CustomNotchedBox, AppStyle):
@@ -247,25 +459,25 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
     _shift = NumericProperty("26dp")
 
     def __init__(self, **kwargs):
-        self.action_button = CustomActionBottomAppBarButton()
+        self.bottom_action_button = CustomFloatingActionButton()
         super().__init__(**kwargs)
         self.register_event_type("on_action_button")
-        self.action_button.bind(center_x=self.setter("notch_center_x"))
-        self.action_button.bind(
+        self.bottom_action_button.bind(center_x=self.setter("notch_center_x"))
+        self.bottom_action_button.bind(
             on_release=lambda x: self.dispatch("on_action_button")
         )
-        self.action_button.x = Window.width / 2 - self.action_button.width / 2
-        self.action_button.y = (
+        self.bottom_action_button.x = Window.width / 2 - self.bottom_action_button.width / 2
+        self.bottom_action_button.y = (
             (self.center[1] - self.height / 2)
             + self.theme_cls.standard_increment / 2
             - self._shift
         )
         if system.is_android():
-            self.action_button.y = self.action_button.y + dp(4)
+            self.bottom_action_button.y = self.bottom_action_button.y + dp(4)
         if not self.icon_color:
             self.icon_color = self.theme_cls.primary_color
         Window.bind(on_resize=self._on_resize)
-        self.bind(specific_text_color=self.update_action_bar_text_colors)
+        self.bind(specific_text_color=self.update_bottom_action_bar_text_colors)
         self.theme_cls.bind(primary_palette=self.update_md_bg_color)
         Clock.schedule_once(
             lambda x: self.on_left_action_items(0, self.left_action_items)
@@ -276,17 +488,17 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
         Clock.schedule_once(lambda x: self.set_md_bg_color(0, self.md_bg_color))
         Clock.schedule_once(lambda x: self.on_mode(None, self.mode))
 
-    def set_action_button(self, icon, color=None):
+    def set_bottom_action_button(self, icon, color=None):
         if icon:
-            self.action_button.md_bg_color = color or self.theme_cls.primary_color
-            self.action_button.icon = icon
-            self.action_button.disabled = False
+            self.bottom_action_button.md_bg_color = color or self.theme_cls.primary_color
+            self.bottom_action_button.icon = icon
+            self.bottom_action_button.disabled = False
             self.on_mode(None, 'end')
         else:
-            self.action_button.md_bg_color = [0, 0, 0, 0, ]
-            self.action_button.md_bg_color_disabled = [0, 0, 0, 0, ]
-            self.action_button.icon = ''
-            self.action_button.disabled = True
+            self.bottom_action_button.md_bg_color = [0, 0, 0, 0, ]
+            self.bottom_action_button.md_bg_color_disabled = [0, 0, 0, 0, ]
+            self.bottom_action_button.icon = ''
+            self.bottom_action_button.disabled = True
             self.on_mode(None, 'end')
             self.remove_notch()
 
@@ -298,21 +510,21 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
             self.md_bg_color = [0, 0, 0, 0]
 
     def on_left_action_items(self, instance, value):
-        self.update_action_bar(self.ids["left_actions"], value)
+        self.update_bottom_action_bar(self.ids["left_actions"], value)
 
     def on_right_action_items(self, instance, value):
-        self.update_action_bar(self.ids["right_actions"], value)
+        self.update_bottom_action_bar(self.ids["right_actions"], value)
 
     def set_md_bg_color(self, instance, value):
         if value == [1.0, 1.0, 1.0, 0.0]:
             self.md_bg_color = self.theme_cls.primary_color
 
-    def update_action_bar(self, action_bar, action_bar_items):
+    def update_bottom_action_bar(self, action_bar, action_bar_items):
         action_bar.clear_widgets()
         new_width = 0
         for item in action_bar_items:
             new_width += dp(48)
-            w = CustomActionTopAppBarButton(
+            w = CustomActionAppBarButton(
                 icon=item['icon'],
                 icon_pack=item.get('icon_pack') or 'Icon',
                 icon_size=item.get('size') or '22sp',
@@ -338,7 +550,7 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
                 return w
         return None
 
-    def update_action_bar_item(self, icon_name, state):
+    def update_bottom_action_bar_item(self, icon_name, state):
         itm = self.get_action_bar_item(icon_name)
         if itm:
             if state == 0:
@@ -357,31 +569,33 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
         if value:
             self.ids.label_title.theme_text_color = ""
 
-    def update_action_bar_text_colors(self, *args):
+    def update_bottom_action_bar_text_colors(self, *args):
         for child in self.ids["left_actions"].children:
             child.text_color = self.specific_text_color
         for child in self.ids["right_actions"].children:
             child.text_color = self.specific_text_color
 
     def on_icon(self, instance, value):
-        self.action_button.icon = value
+        self.bottom_action_button.icon = value
 
     def on_icon_color(self, instance, value):
-        self.action_button.md_bg_color = value
+        self.bottom_action_button.md_bg_color = value
 
     def on_mode(self, instance, value):
         def set_button_pos(*args):
-            self.action_button.x = x
-            self.action_button.y = y - self._rounded_rectangle_height / 2
-            self.action_button._hard_shadow_size = (0, 0)
-            self.action_button._soft_shadow_size = (0, 0)
+            self.bottom_action_button.x = x
+            self.bottom_action_button.y = y - self._rounded_rectangle_height / 2
+            self.bottom_action_button._hard_shadow_size = (0, 0)
+            self.bottom_action_button._soft_shadow_size = (0, 0)
             anim = Animation(_scale_x=1, _scale_y=1, d=0)
             anim.bind(on_complete=self.set_shadow)
-            anim.start(self.action_button)
+            anim.start(self.bottom_action_button)
+            if _Debug:
+                print('CustomBottomToolbar.on_mode.set_button_pos', self.bottom_action_button.x, self.bottom_action_button.y, self.bottom_action_button.disabled, self.bottom_action_button.parent)
 
         if value == "center":
             self.set_notch()
-            x = Window.width / 2 - self.action_button.width / 2
+            x = Window.width / 2 - self.bottom_action_button.width / 2
             y = (
                 (self.center[1] - self.height / 2)
                 + self.theme_cls.standard_increment / 2
@@ -390,7 +604,7 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
         elif value == "end":
 
             self.set_notch()
-            x = Window.width - self.action_button.width * 2
+            x = Window.width - self.bottom_action_button.width * 2
             y = (
                 (self.center[1] - self.height / 2)
                 + self.theme_cls.standard_increment / 2
@@ -399,18 +613,18 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
             #self.right_action_items = []
         elif value == "free-end":
             self.remove_notch()
-            x = Window.width - self.action_button.width - dp(10)
-            y = self.action_button.height + self.action_button.height / 2
+            x = Window.width - self.bottom_action_button.width - dp(10)
+            y = self.bottom_action_button.height + self.bottom_action_button.height / 2
         elif value == "free-center":
             self.remove_notch()
-            x = Window.width / 2 - self.action_button.width / 2
-            y = self.action_button.height + self.action_button.height / 2
+            x = Window.width / 2 - self.bottom_action_button.width / 2
+            y = self.bottom_action_button.height + self.bottom_action_button.height / 2
         if system.is_android():
             y = y + dp(4)
         self.remove_shadow()
         anim = Animation(_scale_x=0, _scale_y=0, d=0)
         anim.bind(on_complete=set_button_pos)
-        anim.start(self.action_button)
+        anim.start(self.bottom_action_button)
 
     def remove_notch(self):
         anim = Animation(d=0) + Animation(
@@ -421,24 +635,24 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
 
     def set_notch(self):
         anim = Animation(d=0) + Animation(
-            notch_radius=self.action_button.width / 2 + dp(5),
+            notch_radius=self.bottom_action_button.width / 2 + dp(5),
             d=0,
         )
         anim.start(self)
 
     def remove_shadow(self):
-        self.action_button._hard_shadow_size = (0, 0)
-        self.action_button._soft_shadow_size = (0, 0)
+        self.bottom_action_button._hard_shadow_size = (0, 0)
+        self.bottom_action_button._soft_shadow_size = (0, 0)
 
     def set_shadow(self, *args):
-        self.action_button._hard_shadow_size = (dp(112), dp(112))
-        self.action_button._soft_shadow_size = (dp(112), dp(112))
+        self.bottom_action_button._hard_shadow_size = (dp(112), dp(112))
+        self.bottom_action_button._soft_shadow_size = (dp(112), dp(112))
 
     def _on_resize(self, instance, width, height):
         if self.mode == "center":
-            self.action_button.x = width / 2 - self.action_button.width / 2
+            self.bottom_action_button.x = width / 2 - self.bottom_action_button.width / 2
         else:
-            self.action_button.x = width - self.action_button.width * 2
+            self.bottom_action_button.x = width - self.bottom_action_button.width * 2
 
     def _update_specific_text_color(self, instance, value):
         if self.specific_text_color in (
@@ -462,193 +676,4 @@ class CustomBottomAppBar(FloatLayout):
     def add_widget(self, widget, index=0, canvas=None):
         if isinstance(widget, CustomBottomToolbar):
             super().add_widget(widget)
-            return super().add_widget(widget.action_button)
-
-#------------------------------------------------------------------------------
-
-class CustomToolbar(NotchedBox):
-    left_action_items = ListProperty()
-    right_action_items = ListProperty()
-    title = StringProperty()
-    anchor_title = OptionProperty("left", options=["left", "center", "right"])
-    mode = OptionProperty(
-        "center", options=["free-end", "free-center", "end", "center"]
-    )
-    round = NumericProperty("10dp")
-    icon = StringProperty("android")
-    icon_color = ColorProperty()
-    type = OptionProperty("top", options=["top", "bottom"])
-    opposite_colors = BooleanProperty(False)
-    _shift = NumericProperty("3.5dp")
-
-    def __init__(self, **kwargs):
-        self.action_button = CustomActionBottomAppBarButton()
-        super().__init__(**kwargs)
-        self.register_event_type("on_action_button")
-        self.action_button.bind(center_x=self.setter("notch_center_x"))
-        self.action_button.bind(
-            on_release=lambda x: self.dispatch("on_action_button")
-        )
-        self.action_button.x = Window.width / 2 - self.action_button.width / 2
-        self.action_button.y = (
-            (self.center[1] - self.height / 2)
-            + self.theme_cls.standard_increment / 2
-            + self._shift
-        )
-        if not self.icon_color:
-            self.icon_color = self.theme_cls.primary_color
-        Window.bind(on_resize=self._on_resize)
-        self.bind(specific_text_color=self.update_action_bar_text_colors)
-        # self.bind(opposite_colors=self.update_opposite_colors)
-        self.theme_cls.bind(primary_palette=self.update_md_bg_color)
-        Clock.schedule_once(
-            lambda x: self.on_left_action_items(0, self.left_action_items)
-        )
-        Clock.schedule_once(
-            lambda x: self.on_right_action_items(0, self.right_action_items)
-        )
-        Clock.schedule_once(lambda x: self.set_md_bg_color(0, self.md_bg_color))
-        Clock.schedule_once(lambda x: self.on_mode(None, self.mode))
-
-    def on_action_button(self, *args):
-        pass
-
-    def on_md_bg_color(self, instance, value):
-        if self.type == "bottom":
-            self.md_bg_color = [0, 0, 0, 0]
-
-    def on_left_action_items(self, instance, value):
-        self.update_action_bar(self.ids["left_actions"], value)
-
-    def on_right_action_items(self, instance, value):
-        self.update_action_bar(self.ids["right_actions"], value)
-
-    def set_md_bg_color(self, instance, value):
-        if value == [1.0, 1.0, 1.0, 0.0]:
-            self.md_bg_color = self.theme_cls.primary_color
-
-    def update_action_bar(self, action_bar, action_bar_items):
-        action_bar.clear_widgets()
-        new_width = 0
-        for item in action_bar_items:
-            new_width += dp(48)
-            if len(item) == 1:
-                item.append(lambda x: None)
-            if len(item) > 1 and not item[1]:
-                item[1] = lambda x: None
-            if len(item) == 2:
-                if type(item[1]) is str:
-                    item.insert(1, lambda x: None)
-                else:
-                    item.append("")
-            action_bar.add_widget(
-                ActionTopAppBarButton(
-                    icon=item[0],
-                    on_release=item[1],
-                    tooltip_text=item[2],
-                    theme_text_color="Custom"
-                    if not self.opposite_colors
-                    else "Primary",
-                    text_color=self.specific_text_color,
-                    opposite_colors=self.opposite_colors,
-                )
-            )
-        action_bar.width = new_width
-
-    def update_md_bg_color(self, *args):
-        self.md_bg_color = self.theme_cls._get_primary_color()
-
-    def update_opposite_colors(self, instance, value):
-        if value:
-            self.ids.label_title.theme_text_color = ""
-
-    def update_action_bar_text_colors(self, *args):
-        for child in self.ids["left_actions"].children:
-            child.text_color = self.specific_text_color
-        for child in self.ids["right_actions"].children:
-            child.text_color = self.specific_text_color
-
-    def on_icon(self, instance, value):
-        self.action_button.icon = value
-
-    def on_icon_color(self, instance, value):
-        self.action_button.md_bg_color = value
-
-    def on_mode(self, instance, value):
-        def set_button_pos(*args):
-            self.action_button.x = x
-            self.action_button.y = y - self._rounded_rectangle_height / 2
-            self.action_button._hard_shadow_size = (0, 0)
-            self.action_button._soft_shadow_size = (0, 0)
-            anim = Animation(_scale_x=1, _scale_y=1, d=0.05)
-            anim.bind(on_complete=self.set_shadow)
-            anim.start(self.action_button)
-
-        if value == "center":
-            self.set_notch()
-            x = Window.width / 2 - self.action_button.width / 2
-            y = (
-                (self.center[1] - self.height / 2)
-                + self.theme_cls.standard_increment / 2
-                + self._shift
-            )
-        elif value == "end":
-
-            self.set_notch()
-            x = Window.width - self.action_button.width * 2
-            y = (
-                (self.center[1] - self.height / 2)
-                + self.theme_cls.standard_increment / 2
-                + self._shift
-            )
-            self.right_action_items = []
-        elif value == "free-end":
-            self.remove_notch()
-            x = Window.width - self.action_button.width - dp(10)
-            y = self.action_button.height + self.action_button.height / 2
-        elif value == "free-center":
-            self.remove_notch()
-            x = Window.width / 2 - self.action_button.width / 2
-            y = self.action_button.height + self.action_button.height / 2
-        self.remove_shadow()
-        anim = Animation(_scale_x=0, _scale_y=0, d=0.1)
-        anim.bind(on_complete=set_button_pos)
-        anim.start(self.action_button)
-
-    def remove_notch(self):
-        anim = Animation(d=0.1) + Animation(
-            notch_radius=0,
-            d=0.1,
-        )
-        anim.start(self)
-
-    def set_notch(self):
-        anim = Animation(d=0.1) + Animation(
-            notch_radius=self.action_button.width / 2 + dp(8),
-            d=0.1,
-        )
-        anim.start(self)
-
-    def remove_shadow(self):
-        self.action_button._hard_shadow_size = (0, 0)
-        self.action_button._soft_shadow_size = (0, 0)
-
-    def set_shadow(self, *args):
-        self.action_button._hard_shadow_size = (dp(112), dp(112))
-        self.action_button._soft_shadow_size = (dp(112), dp(112))
-
-    def _on_resize(self, instance, width, height):
-        if self.mode == "center":
-            self.action_button.x = width / 2 - self.action_button.width / 2
-        else:
-            self.action_button.x = width - self.action_button.width * 2
-
-    def _update_specific_text_color(self, instance, value):
-        if self.specific_text_color in (
-            [0.0, 0.0, 0.0, 0.87],
-            [0.0, 0.0, 0.0, 1.0],
-            [1.0, 1.0, 1.0, 1.0],
-        ):
-            self.specific_text_color = text_colors[
-                self.theme_cls.primary_palette
-            ][self.theme_cls.primary_hue]
+            return super().add_widget(widget.bottom_action_button)

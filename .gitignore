@@ -1,11 +1,15 @@
 # this is automatically generated from ./buildozer.spec.template file
 buildozer.spec
 buildozer.spec.building
+buildozer.err
+buildozer.log
 
 # this should be downloaded from google with "make download_google_binaries"
 pepk.jar
 support-compat-27.0.0.aar
 
+# those are files and folders generated during release
+bitdust/
 .keystore_password
 venv
 buildozer

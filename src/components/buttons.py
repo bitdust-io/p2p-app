@@ -4,7 +4,6 @@ from kivy.properties import (
     BooleanProperty,  # @UnresolvedImport
     StringProperty,  # @UnresolvedImport
     NumericProperty,  # @UnresolvedImport
-    BoundedNumericProperty,  # @UnresolvedImport
     ColorProperty,  # @UnresolvedImport
     ListProperty,  # @UnresolvedImport
 )
@@ -148,16 +147,13 @@ class BaseRoundButton(CircularRippleBehavior, BaseButton):
         self.text = ""
 
 
-
 class CustomActionTopAppBarIconButton(MDIconButton, MDTooltip):
     pass
 
 
 class CustomRectangularButton(BaseButton):
 
-    width = BoundedNumericProperty(
-        10, min=10, max=None, errorhandler=lambda x: 10
-    )
+    width = NumericProperty("10dp")
     text = StringProperty("")
     increment_width = NumericProperty("16dp")
     increment_height = NumericProperty("16dp")
@@ -170,9 +166,7 @@ class CustomRectangularButton(BaseButton):
 
 class CustomRectangularFlexButton(BaseButton):
 
-    width = BoundedNumericProperty(
-        10, min=10, max=None, errorhandler=lambda x: 10
-    )
+    width = NumericProperty("10dp")
     text = StringProperty("")
     increment_width = NumericProperty("0dp")
     increment_height = NumericProperty("0dp")
@@ -331,7 +325,6 @@ class FloatingActionButton(BaseRoundButton, BasePressedButton, BaseCircularEleva
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # self.theme_cls.bind(primary_palette=self.update_md_bg_color)
         Clock.schedule_once(self.set_md_bg_color)
         Clock.schedule_once(self.set_size)
         Clock.schedule_once(self.update_text_color)
