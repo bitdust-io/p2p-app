@@ -270,7 +270,7 @@ class DistributedFileChooserListView(FileChooserController):
             api_client.remove_model_listener('shared_file', listener_cb=self.on_shared_file)
         api_client.remove_model_listener('remote_version', listener_cb=self.on_remote_version)
         self.file_clicked_callback = None
-        self.clean_up()
+        self.close()
 
     def open(self):
         self.opened = True
@@ -278,7 +278,7 @@ class DistributedFileChooserListView(FileChooserController):
 
     def close(self):
         if _Debug:
-            print('DistributedFileChooserListView.clean_up')
+            print('DistributedFileChooserListView.close')
         self.opened = False
         self.dispatch('on_entries_cleared')
         self.layout.ids.treeview.clear_widgets()

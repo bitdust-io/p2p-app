@@ -142,9 +142,16 @@ def on_open(ws_inst):
     cb = registered_callbacks().get('on_open')
     if cb:
         cb(ws_inst)
-    for json_data, cb, in _PendingCalls:
-        ws_queue().put_nowait((json_data, cb, ))
-    _PendingCalls.clear()
+    while _PendingCalls:
+        json_data, cb = _PendingCalls.pop(0)
+        try:
+            ws_queue().put_nowait((json_data, cb, ))
+        except Exception as exc:
+            if _Debug:
+                print('websocket was not opened', exc)
+            _PendingCalls.insert(0, (json_data, cb, ))
+            on_error(ws_inst, exc)
+            return
 
 
 @mainthread
@@ -202,7 +209,6 @@ def on_message(ws_inst, message):
 
 @mainthread
 def on_error(ws_inst, error):
-    global _PendingCalls
     if _Debug:
         print('on_error', error)
     cb = registered_callbacks().get('on_error')

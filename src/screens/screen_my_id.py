@@ -47,7 +47,9 @@ identity_details_temlate_text = """
 """
 
 create_new_identity_text = """
-To be able to start using BitDust, please [u][color=#0000ff][ref=new_identity]create new identity[/ref][/color][/u] first
+To be able to start using BitDust,
+please [u][color=#0000ff][ref=new_identity]create new identity[/ref][/color][/u] or
+[u][color=#0000ff][ref=recover_identity]recover from backup copy[/ref][/color][/u] first
 """
 
 #------------------------------------------------------------------------------
@@ -110,6 +112,8 @@ class MyIDScreen(screen.AppScreen):
             print('MyIDScreen.on_my_id_details_ref_pressed', args)
         if args[1] == 'new_identity':
             self.main_win().select_screen('new_identity_screen')
+        elif args[1] == 'recover_identity':
+            self.main_win().select_screen('recover_identity_screen')
 
     def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:

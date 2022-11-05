@@ -62,7 +62,6 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     screens_loaded = set()
     active_screens = {}
     screen_closed_time = {}
-    latest_screen = ''
     screens_stack = []
 
     engine_is_on = BooleanProperty(False)
@@ -343,7 +342,6 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
                 self.active_screens[self.selected_screen][0].close_drop_down_menu()
                 self.active_screens[self.selected_screen][0].on_closed()
         if self.selected_screen and self.selected_screen not in ['startup_screen', ]:
-            self.latest_screen = self.selected_screen
             if _Debug:
                 print('MainWin.select_screen   current screens stack: %r' % self.screens_stack)
             if self.selected_screen not in self.screens_stack:
