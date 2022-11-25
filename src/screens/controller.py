@@ -18,7 +18,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -441,8 +441,8 @@ class Controller(object):
         if model_name not in self.model_data:
             self.model_data[model_name] = OrderedDict()
         deleted = json_data['payload'].get('deleted')
-        if _Debug:
-            print('Controller.on_model_update [%s] %s deleted=%r\n    %r' % (model_name, snap_id, deleted, d, ))
+        # if _Debug:
+        print('Controller.on_model_update [%s] %s deleted:%r %r' % (model_name, snap_id, deleted, d, ))
         if deleted:
             self.model_data[model_name].pop(snap_id, None)
             if model_name == 'private_file':

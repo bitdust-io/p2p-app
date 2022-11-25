@@ -138,7 +138,7 @@ class SharedLocationScreen(screen.AppScreen):
                 on_selection=self.on_upload_file_selected,
             )
         if _Debug:
-            print('raw_path', raw_path)
+            print('    raw_path', raw_path)
 
     def on_upload_file_selected(self, *args, **kwargs):
         file_path = args[0][0]
