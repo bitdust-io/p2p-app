@@ -8,50 +8,68 @@
     no_selection: True
 
     orientation: 'horizontal'
+    spacing: 0
+    padding: 0
     size_hint_y: None
-    height: '36dp'
+    height: '48dp'
     is_leaf: False
     on_touch_down: self._on_touch_down(*args)
     on_touch_up: self._on_touch_up(*args)
     odd_color: (1,1,1,1)
-    even_color: (.98,.98,.98,1)
+    even_color: (1,1,1,1)
 
     BoxLayout:
         pos: root.pos
-        size_hint_x: None
+        size_hint: None, 1
         width: root.width - dp(10)
+        orientation: 'vertical'
+        spacing: 0
+        padding: 0
 
         Label:
             id: filename
-            text_size: self.width, None
+            text_size: self.width, self.height
+            size_hint: 1, None
+            height: dp(32)
             halign: 'left'
+            valign: 'bottom'
             shorten: True
-            shorten_from: 'left'
-            text: ''
-            font_name: ''
-            color: (0, 0, 0, 1)
-
-        Label:
-            id: file_condition
-            text_size: self.width, None
-            size_hint_x: None
-            halign: 'right'
-            shorten: False
+            shorten_from: 'right'
             max_lines: 1
             text: ''
             font_name: ''
             color: (0, 0, 0, 1)
 
-        Label:
-            id: file_size
-            text_size: self.width, None
-            size_hint_x: None
-            halign: 'right'
-            shorten: False
-            max_lines: 1
-            text: ''
-            font_name: ''
-            color: (0, 0, 0, 1)
+        BoxLayout:
+            size_hint: 1, None
+            height: dp(16)
+            orientation: 'horizontal'
+
+            Label:
+                id: file_size
+                text_size: self.width, None
+                size_hint: 0.5, None
+                height: dp(16)
+                halign: 'left'
+                valign: 'top'
+                shorten: False
+                max_lines: 1
+                text: ''
+                markup: True
+                color: (0, 0, 0, 1)
+
+            Label:
+                id: file_condition
+                text_size: self.width, None
+                size_hint: 0.5, None
+                height: dp(16)
+                halign: 'right'
+                valign: 'top'
+                shorten: False
+                max_lines: 1
+                text: ''
+                markup: True
+                color: (0, 0, 0, 1)
 
 
 <DistributedFileChooserListLayout>:

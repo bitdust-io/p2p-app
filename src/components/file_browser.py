@@ -19,6 +19,10 @@ _Debug = True
 
 class DistributedFileListEntry(FloatLayout, TreeViewNode):
 
+    def __init__(self, **kwargs):
+        super(DistributedFileListEntry, self).__init__(**kwargs)
+        self.canvas.after.clear()
+
     def apply_context(self, ctx):
         self.path = ctx['path']
         self.global_id = ctx['global_id']
@@ -26,10 +30,8 @@ class DistributedFileListEntry(FloatLayout, TreeViewNode):
         self.is_leaf = not ctx['isdir'] or ctx['name'].endswith('..' + ctx['sep'])
         self.ids.filename.text = ctx['name']
         self.ids.filename.font_name = ctx['font_name']
-        self.ids.file_condition.text = ctx['get_condition']()
-        self.ids.file_condition.font_name = ctx['font_name']
-        self.ids.file_size.text = ctx['get_nice_size']()
-        self.ids.file_size.font_name = ctx['font_name']
+        self.ids.file_condition.text = '[size=10sp][color=bbbf]%s[/color][/size]' % ctx['get_condition']()
+        self.ids.file_size.text = '[size=10sp][color=bbbf]%s[/color][/size]' % ctx['get_nice_size']()
         self._entry_touched = ctx['entry_touched']
         self._entry_released = ctx['entry_released']
 
@@ -347,12 +349,13 @@ class DistributedFileChooserListView(FileChooserController):
         _, _, path = remote_path.rpartition(':')
         path = '/' + path
         if global_id in self.index_by_global_id:
-            self.index_by_global_id[global_id].ids.file_size.text = self.get_nice_size(path)
-            self.index_by_global_id[global_id].ids.file_condition.text = self.get_condition(path)
+            self.index_by_global_id[global_id].ids.file_size.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_nice_size(path)
+            self.index_by_global_id[global_id].ids.file_condition.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_condition(path)
+
         else:
             if remote_path in self.index_by_remote_path:
-                self.index_by_remote_path[remote_path].ids.file_size.text = self.get_nice_size(path)
-                self.index_by_remote_path[remote_path].ids.file_condition.text = self.get_condition(path)
+                self.index_by_remote_path[remote_path].ids.file_size.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_nice_size(path)
+                self.index_by_remote_path[remote_path].ids.file_condition.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_condition(path)
             else:
                 if _Debug:
                     print('        updating files versions')
@@ -582,8 +585,8 @@ class DistributedFileChooserListView(FileChooserController):
         ctx['global_id'] = global_id
         if ctx['remote_path'] in self.index_by_remote_path:
             w = self.index_by_remote_path[ctx['remote_path']]
-            w.ids.file_size.text = '{}'.format(self.get_nice_size(ctx['path']))
-            w.ids.file_condition.text = '{}'.format(self.get_condition(ctx['path']))
+            w.ids.file_size.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_nice_size(ctx['path'])
+            w.ids.file_condition.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_condition(ctx['path'])
             if _Debug:
                 print('    DistributedFileChooserListView._create_entry_widget updated existing item', ctx['remote_path'], global_id)
         else:
