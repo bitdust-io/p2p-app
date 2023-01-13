@@ -5,12 +5,21 @@
 
 import os
 import sys
+import platform
 import threading
 
 #------------------------------------------------------------------------------
 
-import locale
-locale.setlocale(locale.LC_CTYPE, 'en_US.UTF-8')
+if platform.system() == 'Windows':
+    os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
+    scriptdir, script = os.path.split(os.path.abspath(__file__))
+    pkgdir = os.path.join(scriptdir, 'pkgs')
+    sys.path.insert(0, pkgdir)
+    # here is the assumption for every Windows-based OS : we are running on Python 3.8 or higher
+    os.add_dll_directory(pkgdir)  # @UndefinedVariable
+else:
+    import locale
+    locale.setlocale(locale.LC_CTYPE, 'en_US.UTF-8')
 
 if 'ANDROID_ARGUMENT' not in os.environ:
     import codecs
@@ -34,6 +43,9 @@ if _Debug:
 #------------------------------------------------------------------------------
 
 from kivy.config import Config
+
+if sys.platform in ('win32', 'cygwin'):
+    Config.set('graphics', 'multisamples', '0')
 
 Config.set('kivy', 'window_icon', 'bitdust.png')
 
@@ -163,7 +175,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         from components import all_components
         Builder.load_string(all_components.KV_IMPORT)
         for kv_file in all_components.KV_FILES:
-            Builder.load_file(kv_file)
+            Builder.load_file(all_components.KV_FILES_BASE + kv_file)
 
     def do_start(self, *args, **kwargs):
         if _Debug:

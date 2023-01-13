@@ -260,6 +260,7 @@ class SharedLocationScreen(screen.AppScreen):
             snackbar.success(text='shared location connected')
             self.ids.state_panel.release()
             self.ids.state_panel.attach(automat_id=api_client.result(resp)['id'], callback_start=self.on_state_panel_attach)
+            api_client.request_model_data('shared_file', query_details={'key_id': self.key_id, })
         else:
             snackbar.error(text=api_client.response_err(resp))
 

@@ -4,10 +4,12 @@
     on_release: root.on_pressed()
 
     CustomIconLeftWidget:
+        id: new_share_item_button
         icon: 'folder-plus'
         padding: (0, 0, 0, 0)
         pos_hint: {'center_y': 0.5}
         md_bg_color: app.theme_cls.accent_color
+        disabled: True
         theme_text_color: "Custom"
         text_color: app.color_white
         on_release: root.on_pressed()

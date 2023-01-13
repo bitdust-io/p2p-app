@@ -2,7 +2,7 @@ import time
 
 #------------------------------------------------------------------------------
 
-from lib import websock
+from lib import web_sock
 
 #------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ def run(method, kwargs={}, cb=None):
     if _Debug:
         print('api_client.run %r %r' % (method, time.asctime(), ))
     jd = {'command': 'api_call', 'method': method, 'kwargs': kwargs, }
-    return websock.ws_call(json_data=jd, cb=cb)
+    return web_sock.ws_call(json_data=jd, cb=cb)
 
 #------------------------------------------------------------------------------
 
@@ -85,22 +85,22 @@ def red_err(response):
 #--- API streaming
 
 def add_model_listener(model_name, listener_cb):
-    if listener_cb in (websock.model_update_callbacks().get(model_name) or []):
+    if listener_cb in (web_sock.model_update_callbacks().get(model_name) or []):
         return False
-    if model_name not in websock.model_update_callbacks():
-        websock.model_update_callbacks()[model_name] = []
-    websock.model_update_callbacks()[model_name].append(listener_cb)
+    if model_name not in web_sock.model_update_callbacks():
+        web_sock.model_update_callbacks()[model_name] = []
+    web_sock.model_update_callbacks()[model_name].append(listener_cb)
     return True
 
 
 def remove_model_listener(model_name, listener_cb):
-    if model_name not in websock.model_update_callbacks():
+    if model_name not in web_sock.model_update_callbacks():
         return False
-    if listener_cb not in websock.model_update_callbacks()[model_name]:
+    if listener_cb not in web_sock.model_update_callbacks()[model_name]:
         return False
-    websock.model_update_callbacks()[model_name].remove(listener_cb)
-    if not websock.model_update_callbacks()[model_name]:
-        websock.model_update_callbacks().pop(model_name)
+    web_sock.model_update_callbacks()[model_name].remove(listener_cb)
+    if not web_sock.model_update_callbacks()[model_name]:
+        web_sock.model_update_callbacks().pop(model_name)
     return True
 
 
@@ -114,6 +114,9 @@ def start_model_streaming(model_name, request_all=False):
 def stop_model_streaming(model_name):
     return run('disable_model_listener', kwargs={'model_name': model_name, })
 
+
+def request_model_data(model_name, query_details=None):
+    return run('request_model_data', kwargs={'model_name': model_name, 'query_details': query_details, })
 
 #------------------------------------------------------------------------------
 #--- API methods

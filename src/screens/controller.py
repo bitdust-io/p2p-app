@@ -13,7 +13,7 @@ from kivy.clock import Clock
 #------------------------------------------------------------------------------
 
 from lib import system
-from lib import websock
+from lib import web_sock
 from lib import api_client
 
 #------------------------------------------------------------------------------
@@ -29,54 +29,56 @@ _Debug = False
 # 5. to open screen use: screen.main_window().select_screen(screen_id='xxx_screen')
 #------------------------------------------------------------------------------ 
 
+KV_FILES_BASE = './'
+
 def all_screens():
     return {
         'startup_screen': (
-            'screens/screen_startup.kv', 'screens.screen_startup', 'StartUpScreen', ),
+            f'{KV_FILES_BASE}screens/screen_startup.kv', 'screens.screen_startup', 'StartUpScreen', ),
         'engine_status_screen': (
-            'screens/screen_engine_status.kv', 'screens.screen_engine_status', 'EngineStatusScreen', ),
+            f'{KV_FILES_BASE}screens/screen_engine_status.kv', 'screens.screen_engine_status', 'EngineStatusScreen', ),
         'connecting_screen': (
-            'screens/screen_connecting.kv', 'screens.screen_connecting', 'ConnectingScreen', ),
+            f'{KV_FILES_BASE}screens/screen_connecting.kv', 'screens.screen_connecting', 'ConnectingScreen', ),
         'new_identity_screen': (
-            'screens/screen_new_identity.kv', 'screens.screen_new_identity', 'NewIdentityScreen', ),
+            f'{KV_FILES_BASE}screens/screen_new_identity.kv', 'screens.screen_new_identity', 'NewIdentityScreen', ),
         'recover_identity_screen': (
-            'screens/screen_recover_identity.kv', 'screens.screen_recover_identity', 'RecoverIdentityScreen', ),
+            f'{KV_FILES_BASE}screens/screen_recover_identity.kv', 'screens.screen_recover_identity', 'RecoverIdentityScreen', ),
         'welcome_screen': (
-            'screens/screen_welcome.kv', 'screens.screen_welcome', 'WelcomeScreen', ),
+            f'{KV_FILES_BASE}screens/screen_welcome.kv', 'screens.screen_welcome', 'WelcomeScreen', ),
         'settings_screen': (
-            'screens/screen_settings.kv', 'screens.screen_settings', 'SettingsScreen', ),
+            f'{KV_FILES_BASE}screens/screen_settings.kv', 'screens.screen_settings', 'SettingsScreen', ),
         'my_id_screen': (
-            'screens/screen_my_id.kv', 'screens.screen_my_id', 'MyIDScreen', ),
+            f'{KV_FILES_BASE}screens/screen_my_id.kv', 'screens.screen_my_id', 'MyIDScreen', ),
         'search_people_screen': (
-            'screens/screen_search_people.kv', 'screens.screen_search_people', 'SearchPeopleScreen', ),
+            f'{KV_FILES_BASE}screens/screen_search_people.kv', 'screens.screen_search_people', 'SearchPeopleScreen', ),
         'friends_screen': (
-            'screens/screen_friends.kv', 'screens.screen_friends', 'FriendsScreen', ),
+            f'{KV_FILES_BASE}screens/screen_friends.kv', 'screens.screen_friends', 'FriendsScreen', ),
         'select_friend_screen': (
-            'screens/screen_select_friend.kv', 'screens.screen_select_friend', 'SelectFriendScreen', ),
+            f'{KV_FILES_BASE}screens/screen_select_friend.kv', 'screens.screen_select_friend', 'SelectFriendScreen', ),
         'conversations_screen': (
-            'screens/screen_conversations.kv', 'screens.screen_conversations', 'ConversationsScreen', ),
+            f'{KV_FILES_BASE}screens/screen_conversations.kv', 'screens.screen_conversations', 'ConversationsScreen', ),
         'create_group_screen': (
-            'screens/screen_create_group.kv', 'screens.screen_create_group', 'CreateGroupScreen', ),
+            f'{KV_FILES_BASE}screens/screen_create_group.kv', 'screens.screen_create_group', 'CreateGroupScreen', ),
         'private_chat_screen': (
-            'screens/screen_private_chat.kv', 'screens.screen_private_chat', 'PrivateChatScreen', ),
+            f'{KV_FILES_BASE}screens/screen_private_chat.kv', 'screens.screen_private_chat', 'PrivateChatScreen', ),
         'group_chat_screen': (
-            'screens/screen_group_chat.kv', 'screens.screen_group_chat', 'GroupChatScreen', ),
+            f'{KV_FILES_BASE}screens/screen_group_chat.kv', 'screens.screen_group_chat', 'GroupChatScreen', ),
         'group_info_screen': (
-            'screens/screen_group_info.kv', 'screens.screen_group_info', 'GroupInfoScreen', ),
+            f'{KV_FILES_BASE}screens/screen_group_info.kv', 'screens.screen_group_info', 'GroupInfoScreen', ),
         'private_files_screen': (
-            'screens/screen_private_files.kv', 'screens.screen_private_files', 'PrivateFilesScreen', ),
+            f'{KV_FILES_BASE}screens/screen_private_files.kv', 'screens.screen_private_files', 'PrivateFilesScreen', ),
         'single_private_file_screen': (
-            'screens/screen_single_private_file.kv', 'screens.screen_single_private_file', 'SinglePrivateFileScreen', ),
+            f'{KV_FILES_BASE}screens/screen_single_private_file.kv', 'screens.screen_single_private_file', 'SinglePrivateFileScreen', ),
         'shares_screen': (
-            'screens/screen_shares.kv', 'screens.screen_shares', 'SharesScreen', ),
+            f'{KV_FILES_BASE}screens/screen_shares.kv', 'screens.screen_shares', 'SharesScreen', ),
         'create_share_screen': (
-            'screens/screen_create_share.kv', 'screens.screen_create_share', 'CreateShareScreen', ),
+            f'{KV_FILES_BASE}screens/screen_create_share.kv', 'screens.screen_create_share', 'CreateShareScreen', ),
         'shared_location_screen': (
-            'screens/screen_shared_location.kv', 'screens.screen_shared_location', 'SharedLocationScreen', ),
+            f'{KV_FILES_BASE}screens/screen_shared_location.kv', 'screens.screen_shared_location', 'SharedLocationScreen', ),
         'shared_location_info_screen': (
-            'screens/screen_shared_location_info.kv', 'screens.screen_shared_location_info', 'SharedLocationInfoScreen', ),
+            f'{KV_FILES_BASE}screens/screen_shared_location_info.kv', 'screens.screen_shared_location_info', 'SharedLocationInfoScreen', ),
         'single_shared_file_screen': (
-            'screens/screen_single_shared_file.kv', 'screens.screen_single_shared_file', 'SingleSharedFileScreen', ),
+            f'{KV_FILES_BASE}screens/screen_single_shared_file.kv', 'screens.screen_single_shared_file', 'SingleSharedFileScreen', ),
     }
 
 
@@ -126,7 +128,7 @@ class Controller(object):
         if _Debug:
             print('Controller.start')
         self.enabled = True
-        websock.start(
+        web_sock.start(
             callbacks={
                 'on_open': self.on_websocket_open,
                 'on_error': self.on_websocket_error,
@@ -144,7 +146,7 @@ class Controller(object):
         if _Debug:
             print('Controller.stop')
         self.enabled = False
-        websock.stop()
+        web_sock.stop()
 
     def run(self):
         if _Debug:
