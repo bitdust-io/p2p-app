@@ -7,18 +7,18 @@ import os
 import sys
 import platform
 import threading
+import locale
 
 #------------------------------------------------------------------------------
 
 if platform.system() == 'Windows':
     os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
     scriptdir, script = os.path.split(os.path.abspath(__file__))
-    pkgdir = os.path.join(scriptdir, 'pkgs')
-    sys.path.insert(0, pkgdir)
+    # pkgdir = os.path.join(scriptdir, 'pkgs')
+    sys.path.insert(0, scriptdir)
     # here is the assumption for every Windows-based OS : we are running on Python 3.8 or higher
-    os.add_dll_directory(pkgdir)  # @UndefinedVariable
+    os.add_dll_directory(scriptdir)  # @UndefinedVariable
 else:
-    import locale
     locale.setlocale(locale.LC_CTYPE, 'en_US.UTF-8')
 
 if 'ANDROID_ARGUMENT' not in os.environ:
@@ -44,8 +44,8 @@ if _Debug:
 
 from kivy.config import Config
 
-if sys.platform in ('win32', 'cygwin'):
-    Config.set('graphics', 'multisamples', '0')
+# if sys.platform in ('win32', 'cygwin'):
+#     Config.set('graphics', 'multisamples', '0')
 
 Config.set('kivy', 'window_icon', 'bitdust.png')
 
