@@ -21,7 +21,7 @@ rm -rf buildozer.spec.building
 cp -v buildozer.spec buildozer.spec.building
 echo "__version__ = \"$1\"" > ./src/version.py
 make refresh_android_environment
-make release_android_aab
+make release_android
 mv -v -f buildozer.spec.building buildozer.spec
 
 

@@ -38,16 +38,18 @@ KV_IMPORT = """
 
 
 KV_FILES = [
-    './components/layouts.kv',
-    './components/labels.kv',
-    './components/buttons.kv',
-    './components/text_input.kv',
-    './components/list_view.kv',
-    './components/status_panel.kv',
-    './components/tool_bar.kv',
-    './components/drop_down_menu.kv',
-    './components/dialogs.kv',
-    './components/selection.kv',
-    './components/main_win.kv',
-    './components/file_browser.kv',
+    'components/layouts.kv',
+    'components/labels.kv',
+    'components/buttons.kv',
+    'components/text_input.kv',
+    'components/list_view.kv',
+    'components/status_panel.kv',
+    'components/tool_bar.kv',
+    'components/drop_down_menu.kv',
+    'components/dialogs.kv',
+    'components/selection.kv',
+    'components/main_win.kv',
+    'components/file_browser.kv',
 ]
+
+KV_FILES_BASE = './'

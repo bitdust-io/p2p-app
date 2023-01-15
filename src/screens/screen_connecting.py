@@ -1,7 +1,3 @@
-from kivy.clock import Clock
-
-#------------------------------------------------------------------------------
-
 from lib import api_client
 
 from components import screen
@@ -50,7 +46,7 @@ class ConnectingScreen(screen.AppScreen):
             print('ConnectingScreen.populate')
         if not self.state_panel_attached:
             self.state_panel_attached = self.ids.state_panel.attach(automat_id='p2p_connector')
-        for snap_info in self.model('service').values():
+        for snap_info in reversed(self.model('service').values()):
             if snap_info:
                 self.on_service(snap_info)
 

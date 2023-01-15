@@ -1,6 +1,7 @@
 # BitDust p2p-app
 
-This is BitDust Application written in Python using Kivy framework.
+BitDust p2p-app is an open-source peer-to-peer network application for secure data storage and private on-line communications.
+The application is written in Python using Kivy framework and published under GNU AGPLv3.
 
 
 

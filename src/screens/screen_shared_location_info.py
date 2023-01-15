@@ -22,6 +22,8 @@ shared_location_info_temlate_text = """
 {suppliers}
 
 [color=#909090]ECC map:[/color] {ecc_map}
+
+[color=#909090]revision:[/color] {revision}
 [/size]
 """
 
@@ -91,7 +93,8 @@ class SharedLocationInfoScreen(screen.AppScreen):
             key_id=result.get('key_id', ''),
             creator=result.get('creator', ''),
             state=result.get('state', '') or 'CLOSED',
-            ecc_map=result.get('ecc_map', '') or 'unknown'
+            ecc_map=result.get('ecc_map', '') or 'unknown',
+            revision=result.get('revision', '') or 'unknown',
         )
         self.ids.shared_location_info_details.text = shared_location_info_temlate_text.format(**result)
 

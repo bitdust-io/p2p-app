@@ -13,11 +13,15 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
 class DistributedFileListEntry(FloatLayout, TreeViewNode):
+
+    def __init__(self, **kwargs):
+        super(DistributedFileListEntry, self).__init__(**kwargs)
+        self.canvas.after.clear()
 
     def apply_context(self, ctx):
         self.path = ctx['path']
@@ -26,10 +30,8 @@ class DistributedFileListEntry(FloatLayout, TreeViewNode):
         self.is_leaf = not ctx['isdir'] or ctx['name'].endswith('..' + ctx['sep'])
         self.ids.filename.text = ctx['name']
         self.ids.filename.font_name = ctx['font_name']
-        self.ids.file_condition.text = ctx['get_condition']()
-        self.ids.file_condition.font_name = ctx['font_name']
-        self.ids.file_size.text = ctx['get_nice_size']()
-        self.ids.file_size.font_name = ctx['font_name']
+        self.ids.file_condition.text = '[size=10sp][color=bbbf]%s[/color][/size]' % ctx['get_condition']()
+        self.ids.file_size.text = '[size=10sp][color=bbbf]%s[/color][/size]' % ctx['get_nice_size']()
         self._entry_touched = ctx['entry_touched']
         self._entry_released = ctx['entry_released']
 
@@ -202,7 +204,7 @@ class SharedDistributedFileSystem(DistributedFileSystem):
                     print('SharedDistributedFileSystem.getsize found indexed', self.key_id, remote_path, details['size'])
                 return details['size']
         if _Debug:
-            print('SharedDistributedFileSystem.getsize', self.key_id, remote_path, 'model data was not found')
+            print('SharedDistributedFileSystem.getsize', remote_path, 'model data was not found')
         return 0
 
     def get_condition(self, fn):
@@ -218,7 +220,7 @@ class SharedDistributedFileSystem(DistributedFileSystem):
                     print('SharedDistributedFileSystem.get_condition found indexed', self.key_id, remote_path, details)
                 return system.make_nice_file_condition(details)
         if _Debug:
-            print('SharedDistributedFileSystem.get_condition', self.key_id, remote_path, 'model data was not found')
+            print('SharedDistributedFileSystem.get_condition', remote_path, 'model data was not found')
         return ''
 
 #------------------------------------------------------------------------------
@@ -254,23 +256,23 @@ class DistributedFileChooserListView(FileChooserController):
             print('DistributedFileChooserListView.init file_system_type=%r key_id=%r' % (file_system_type, key_id, ))
         self.file_system_type = file_system_type
         self.file_clicked_callback = file_clicked_callback
+        api_client.add_model_listener('remote_version', listener_cb=self.on_remote_version)
         if self.file_system_type == 'private':
             api_client.add_model_listener('private_file', listener_cb=self.on_private_file)
         elif self.file_system_type == 'shared':
-            api_client.add_model_listener('shared_file', listener_cb=self.on_shared_file)
             self.file_system.key_id = key_id
-        api_client.add_model_listener('remote_version', listener_cb=self.on_remote_version)
+            api_client.add_model_listener('shared_file', listener_cb=self.on_shared_file)
 
     def shutdown(self):
         if _Debug:
             print('DistributedFileChooserListView.shutdown')
+        api_client.remove_model_listener('remote_version', listener_cb=self.on_remote_version)
         if self.file_system_type == 'private':
             api_client.remove_model_listener('private_file', listener_cb=self.on_private_file)
         elif self.file_system_type == 'shared':
             api_client.remove_model_listener('shared_file', listener_cb=self.on_shared_file)
-        api_client.remove_model_listener('remote_version', listener_cb=self.on_remote_version)
         self.file_clicked_callback = None
-        self.clean_up()
+        self.close()
 
     def open(self):
         self.opened = True
@@ -278,18 +280,20 @@ class DistributedFileChooserListView(FileChooserController):
 
     def close(self):
         if _Debug:
-            print('DistributedFileChooserListView.clean_up')
+            print('DistributedFileChooserListView.close')
         self.opened = False
         self.dispatch('on_entries_cleared')
         self.layout.ids.treeview.clear_widgets()
 
     def on_private_file(self, payload):
-        if _Debug:
-            print('DistributedFileChooserListView.on_private_file', payload)
         if not self.opened:
+            if _Debug:
+                print('DistributedFileChooserListView.on_private_file SKIP', payload)
             return
         remote_path = payload['data']['remote_path']
         global_id = payload['data']['global_id']
+        if _Debug:
+            print('DistributedFileChooserListView.on_private_file', global_id, payload)
         if payload.get('deleted'):
             self.index_by_global_id.pop(global_id, None)
             w = self.index_by_remote_path.pop(remote_path, None)
@@ -302,12 +306,14 @@ class DistributedFileChooserListView(FileChooserController):
                 self._update_files()
 
     def on_shared_file(self, payload):
-        if _Debug:
-            print('DistributedFileChooserListView.on_shared_file', self.file_system.key_id, payload)
         if not self.opened:
+            if _Debug:
+                print('DistributedFileChooserListView.on_shared_file SKIP', self.file_system.key_id, payload)
             return
         remote_path = payload['data']['remote_path']
         global_id = payload['data']['global_id']
+        if _Debug:
+            print('DistributedFileChooserListView.on_shared_file', self.file_system.key_id, global_id, payload)
         if self.file_system_type == 'shared':
             if not global_id.startswith(self.file_system.key_id):
                 return
@@ -315,35 +321,44 @@ class DistributedFileChooserListView(FileChooserController):
             self.index_by_global_id.pop(global_id, None)
             w = self.index_by_remote_path.pop(remote_path, None)
             if not w:
+                if _Debug:
+                    print('        deleted item was not found, updating files')
                 self._update_files()
             else:
+                if _Debug:
+                    print('        erasing', w)
                 self.layout.ids.treeview.remove_node(w)
         else:
             if remote_path not in self.index_by_remote_path:
+                if _Debug:
+                    print('        updating files')
                 self._update_files()
 
     def on_remote_version(self, payload):
-        if _Debug:
-            print('DistributedFileChooserListView.on_remote_version', payload)
         if not self.opened:
+            if _Debug:
+                print('DistributedFileChooserListView.on_remote_version SKIP', payload)
             return
         remote_path = payload['data']['remote_path']
         global_id = payload['data']['global_id']
+        if _Debug:
+            print('DistributedFileChooserListView.on_remote_version', global_id, payload)
         if self.file_system_type == 'shared':
             if not global_id.startswith(self.file_system.key_id):
                 return
         _, _, path = remote_path.rpartition(':')
         path = '/' + path
         if global_id in self.index_by_global_id:
-            self.index_by_global_id[global_id].ids.file_size.text = self.get_nice_size(path)
-            self.index_by_global_id[global_id].ids.file_condition.text = self.get_condition(path)
+            self.index_by_global_id[global_id].ids.file_size.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_nice_size(path)
+            self.index_by_global_id[global_id].ids.file_condition.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_condition(path)
+
         else:
             if remote_path in self.index_by_remote_path:
-                self.index_by_remote_path[remote_path].ids.file_size.text = self.get_nice_size(path)
-                self.index_by_remote_path[remote_path].ids.file_condition.text = self.get_condition(path)
+                self.index_by_remote_path[remote_path].ids.file_size.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_nice_size(path)
+                self.index_by_remote_path[remote_path].ids.file_condition.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_condition(path)
             else:
                 if _Debug:
-                    print('        updating files')
+                    print('        updating files versions')
                 self._update_files()
 
     def entry_touched(self, entry, touch):
@@ -570,8 +585,8 @@ class DistributedFileChooserListView(FileChooserController):
         ctx['global_id'] = global_id
         if ctx['remote_path'] in self.index_by_remote_path:
             w = self.index_by_remote_path[ctx['remote_path']]
-            w.ids.file_size.text = '{}'.format(self.get_nice_size(ctx['path']))
-            w.ids.file_condition.text = '{}'.format(self.get_condition(ctx['path']))
+            w.ids.file_size.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_nice_size(ctx['path'])
+            w.ids.file_condition.text = '[size=10sp][color=bbbf]%s[/color][/size]' % self.get_condition(ctx['path'])
             if _Debug:
                 print('    DistributedFileChooserListView._create_entry_widget updated existing item', ctx['remote_path'], global_id)
         else:

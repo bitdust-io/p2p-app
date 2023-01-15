@@ -47,7 +47,9 @@ identity_details_temlate_text = """
 """
 
 create_new_identity_text = """
-To be able to start using BitDust, please [u][color=#0000ff][ref=new_identity]create new identity[/ref][/color][/u] first
+To be able to start using BitDust,
+please [u][color=#0000ff][ref=new_identity]create new identity[/ref][/color][/u] or
+[u][color=#0000ff][ref=recover_identity]recover from backup copy[/ref][/color][/u] first
 """
 
 #------------------------------------------------------------------------------
@@ -110,6 +112,8 @@ class MyIDScreen(screen.AppScreen):
             print('MyIDScreen.on_my_id_details_ref_pressed', args)
         if args[1] == 'new_identity':
             self.main_win().select_screen('new_identity_screen')
+        elif args[1] == 'recover_identity':
+            self.main_win().select_screen('recover_identity_screen')
 
     def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
@@ -159,7 +163,7 @@ class MyIDScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text='identity backup failed: %s' % api_client.response_err(resp))
         else:
-            snackbar.success(text='key file created: %s' % destination_filepath)
+            snackbar.success(text='key file saved to:\n%s' % destination_filepath, height=64, shorten=False)
 
     def on_process_stop_result_start_engine(self, resp):
         if _Debug:
@@ -173,16 +177,20 @@ class MyIDScreen(screen.AppScreen):
         home_folder_path = os.path.join(os.path.expanduser('~'), '.bitdust')
         if system.is_android():
             home_folder_path = os.path.join('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents', '.bitdust')
-        system.rmdir_recursive(os.path.join(home_folder_path, 'metadata'), ignore_errors=False)
-        system.rmdir_recursive(os.path.join(home_folder_path, 'backups'), ignore_errors=True)
-        system.rmdir_recursive(os.path.join(home_folder_path, 'config'), ignore_errors=True)
-        system.rmdir_recursive(os.path.join(home_folder_path, 'identitycache'), ignore_errors=True)
-        system.rmdir_recursive(os.path.join(home_folder_path, 'identityhistory'), ignore_errors=True)
-        system.rmdir_recursive(os.path.join(home_folder_path, 'keys'), ignore_errors=True)
-        system.rmdir_recursive(os.path.join(home_folder_path, 'messages'), ignore_errors=True)
-        system.rmdir_recursive(os.path.join(home_folder_path, 'servicedata'), ignore_errors=True)
-        system.rmdir_recursive(os.path.join(home_folder_path, 'suppliers'), ignore_errors=True)
-        system.rmdir_recursive(os.path.join(home_folder_path, 'customers'), ignore_errors=True)
+        try:
+            current_network = open(os.path.join(home_folder_path, 'current_network'), 'r').read().strip()
+        except:
+            current_network = 'default'
+        system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'metadata'), ignore_errors=False)
+        system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'backups'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'config'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'identitycache'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'identityhistory'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'keys'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'messages'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'servicedata'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'suppliers'), ignore_errors=True)
+        system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'customers'), ignore_errors=True)
         system.rmdir_recursive(os.path.join(home_folder_path, 'temp'), ignore_errors=True)
         snackbar.info(text='private key erased')
         self.app().start_engine()

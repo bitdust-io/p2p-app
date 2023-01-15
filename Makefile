@@ -75,7 +75,7 @@ download_google_binaries:
 install_buildozer:
 	@rm -rf buildozer/
 	@git clone --depth=1 https://github.com/kivy/buildozer buildozer
-	# @git clone --depth=1 https://github.com/vesellov/buildozer buildozer
+	@# @git clone --depth=1 https://github.com/vesellov/buildozer buildozer
 	@cd ./buildozer/; ../venv/bin/python setup.py build; ../venv/bin/pip install -e .; cd ..
 
 install_p4a:
@@ -96,13 +96,14 @@ install_p4a:
 	@# python3 -c "fn='./python-for-android/pythonforandroid/recipes/android/src/android/_android.pyx';s=open(fn).read();s=s.replace('mActivity = python_act.mActivity','mActivity = python_act.mBitDustActivity');open(fn,'w').write(s);"
 
 update_p4a:
-	# @cd ./python-for-android; git fetch --all; git reset --hard origin/master; cd ..;
-	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop; cd ..;
-	# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop_more; cd ..;
+	@# @cd ./python-for-android; git fetch --all; git reset --hard origin/master; cd ..;
+	@# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop; cd ..;
+	@# @cd ./python-for-android; git fetch --all; git reset --hard origin/develop_more; cd ..;
 
 clone_engine_sources:
+	@if [ ! -d "./bitdust" ]; then git clone --depth=1 https://github.com/bitdust-io/public.git ./bitdust; fi
 	@# if [ ! -d "./bitdust" ]; then git clone --depth=1 https://github.com/bitdust-io/devel.git ./bitdust; fi
-	@if [ ! -d "./bitdust" ]; then git clone --depth=1 https://github.com/vesellov/devel.git ./bitdust; fi
+	@# if [ ! -d "./bitdust" ]; then git clone --depth=1 https://github.com/vesellov/devel.git ./bitdust; fi
 
 update_engine_sources:
 	@cd ./bitdust; git pull; cd ..;

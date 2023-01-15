@@ -138,7 +138,7 @@ class SharedLocationScreen(screen.AppScreen):
                 on_selection=self.on_upload_file_selected,
             )
         if _Debug:
-            print('raw_path', raw_path)
+            print('    raw_path', raw_path)
 
     def on_upload_file_selected(self, *args, **kwargs):
         file_path = args[0][0]
@@ -260,6 +260,7 @@ class SharedLocationScreen(screen.AppScreen):
             snackbar.success(text='shared location connected')
             self.ids.state_panel.release()
             self.ids.state_panel.attach(automat_id=api_client.result(resp)['id'], callback_start=self.on_state_panel_attach)
+            api_client.request_model_data('shared_file', query_details={'key_id': self.key_id, })
         else:
             snackbar.error(text=api_client.response_err(resp))
 

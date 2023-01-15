@@ -15,7 +15,7 @@ from kivy.clock import mainthread
 
 #------------------------------------------------------------------------------
 
-from lib import websocket
+from lib import web_socket
 from lib import system
 
 #------------------------------------------------------------------------------
@@ -142,9 +142,16 @@ def on_open(ws_inst):
     cb = registered_callbacks().get('on_open')
     if cb:
         cb(ws_inst)
-    for json_data, cb, in _PendingCalls:
-        ws_queue().put_nowait((json_data, cb, ))
-    _PendingCalls.clear()
+    while _PendingCalls:
+        json_data, cb = _PendingCalls.pop(0)
+        try:
+            ws_queue().put_nowait((json_data, cb, ))
+        except Exception as exc:
+            if _Debug:
+                print('websocket was not opened', exc)
+            _PendingCalls.insert(0, (json_data, cb, ))
+            on_error(ws_inst, exc)
+            return
 
 
 @mainthread
@@ -202,7 +209,6 @@ def on_message(ws_inst, message):
 
 @mainthread
 def on_error(ws_inst, error):
-    global _PendingCalls
     if _Debug:
         print('on_error', error)
     cb = registered_callbacks().get('on_error')
@@ -292,7 +298,7 @@ def websocket_thread():
     global _APISecretFilePath
     global _WebSocketApp
     global _WebSocketClosed
-    websocket.enableTrace(False)
+    web_socket.enableTrace(False)
     if _Debug:
         print('websocket_thread() beginning _APISecretFilePath=%r' % _APISecretFilePath)
     while is_started():
@@ -307,7 +313,7 @@ def websocket_thread():
                     ws_url += '?api_secret=' + api_secret
         if _Debug:
             print('websocket_thread() ws_url=%r' % ws_url)
-        _WebSocketApp = websocket.WebSocketApp(
+        _WebSocketApp = web_socket.WebSocketApp(
             ws_url,
             on_message = on_message,
             on_error = on_error,
