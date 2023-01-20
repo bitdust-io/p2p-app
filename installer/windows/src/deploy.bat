@@ -9,7 +9,6 @@ set BITDUST_APP_GIT_REPO=https://github.com/bitdust-io/p2p-app.git
 set PYTHON_URL=https://www.python.org/ftp/python/3.8.6/python-3.8.6-embed-win32.zip
 set GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py
 
-rem Get the datetime in a format that can go in a filename.
 set _my_datetime=%date%_%time%
 set _my_datetime=%_my_datetime: =_%
 set _my_datetime=%_my_datetime::=%
@@ -19,12 +18,11 @@ set _my_datetime=%_my_datetime:.=_%
 echo ##### Verifying BitDust installation files
 set BITDUST_FULL_HOME=%HOMEDRIVE%%HOMEPATH%\.bitdust
 
-rem echo My Home folder expected to be %BITDUST_FULL_HOME%
 if not exist "%BITDUST_FULL_HOME%" echo Prepare destination folder
 if not exist "%BITDUST_FULL_HOME%" mkdir "%BITDUST_FULL_HOME%"
 
 
-rem TODO : check appdata file also
+rem TODO : to be able to correctly detect existing ".bitdust" folder need to check "appdata" file as well
 
 
 echo ##### Prepare location for BitDust Home folder
@@ -41,18 +39,14 @@ for /l %%a in (1,1,300) do if "!BITDUST_HOME:~-1!"==" " set BITDUST_HOME=!BITDUS
 setlocal disabledelayedexpansion
 del /q /s /f "%SHORT_PATH_SCRIPT%" >nul 2>&1
 del /q /s /f "%SHORT_PATH_OUT%" >nul 2>&1
-rem echo Safe path to BitDust Home folder is %BITDUST_HOME%
 
 
 set BITDUST_NODE=%BITDUST_HOME%\venv\Scripts\BitDustNode.exe
 set BITDUST_NODE_CONSOLE=%BITDUST_HOME%\venv\Scripts\BitDustConsole.exe
 
 
-rem echo BitDust Home location is "%BITDUST_HOME%"
 set PYTHON_EXE=%BITDUST_HOME%\python\python.exe
-rem echo Python process is %PYTHON_EXE%
 set GIT_EXE=%BITDUST_HOME%\git\bin\git.exe
-rem echo GIT process is %GIT_EXE%
 
 
 if /I "%~1"=="stop" goto StopBitDustGo
@@ -64,7 +58,7 @@ if not exist %BITDUST_NODE_CONSOLE% goto KillBitDust
 %BITDUST_NODE_CONSOLE% %BITDUST_HOME%\src\bitdust.py stop
 :KillBitDust
 taskkill /IM BitDustNode.exe /F /T
-rem taskkill /IM BitDustConsole.exe /F /T
+taskkill /IM bitdust-p2p-app.exe /F /T
 :BitDustStopped
 echo DONE
 exit /b %errorlevel%
@@ -104,21 +98,25 @@ if exist %PYTHON_EXE% goto PythonInstalled
 :PythonToBeInstalled
 cd /D "%BITDUST_HOME%"
 echo Downloading Python interpretator
-rem %WGET_EXE% -nv "%PYTHON_URL%" -o %BITDUST_HOME%\python.zip
 cscript /nologo "%CURRENT_PATH%\download_python.js"
-rem rename out.bin %BITDUST_HOME%\python.zip
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 echo Extracting Python binaries
 cd /D "%CURRENT_PATH%"
 unzip.exe -o -q %BITDUST_HOME%\python-3.8.6-embed-win32.zip -d %BITDUST_HOME%\python
-copy /B /Y "%CURRENT_PATH%\python38._pth" %BITDUST_HOME%\python
+copy /B /Y python38._pth %BITDUST_HOME%\python
+copy /B /Y bitdust.ico %BITDUST_HOME%\python\
+copy /B /Y rcedit.exe %BITDUST_HOME%\python\
+cd /D "%BITDUST_HOME%\python"
+copy /B /Y pythonw.exe bitdust-p2p-app.exe
+rcedit.exe bitdust-p2p-app.exe --set-version-string FileDescription "BitDust p2p-app"
+if %errorlevel% neq 0 goto DEPLOY_ERROR
+rcedit.exe bitdust-p2p-app.exe --set-icon bitdust.ico
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 del /q /s /f %BITDUST_HOME%\python-3.8.6-embed-win32.zip >nul 2>&1
+del /q /s /f %BITDUST_HOME%\python\rcedit.exe >nul 2>&1
 echo Installing PIP package manager
 cd /D "%BITDUST_HOME%"
-rem %WGET_EXE% -nv "https://bootstrap.pypa.io/get-pip.py" -o %BITDUST_HOME%\get-pip.py
 cscript /nologo "%CURRENT_PATH%\download_pip.js"
-rem rename out.bin %BITDUST_HOME%\get-pip.py
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 %PYTHON_EXE% %BITDUST_HOME%\get-pip.py
 del /q /s /f %BITDUST_HOME%\get-pip.py >nul 2>&1
@@ -140,7 +138,6 @@ del /q /s /f %BITDUST_HOME%\git.zip >nul 2>&1
 del /q /s /f %BITDUST_HOME%\unzip.exe >nul 2>&1
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 :GitInstalled
-rem echo Git binaries now located in %BITDUST_HOME%\git
 
 
 echo ##### Prepare BitDust UI source files
@@ -149,23 +146,20 @@ if not exist %BITDUST_HOME%\ui mkdir %BITDUST_HOME%\ui
 if exist %BITDUST_HOME%\ui\src goto UISourcesExist
 echo Downloading BitDust UI files from GitHub repository
 cd /D "%BITDUST_HOME%"
-%BITDUST_HOME%\git\bin\git.exe clone -q --single-branch --depth 1 %BITDUST_APP_GIT_REPO% ui
+%BITDUST_HOME%\git\bin\git.exe -c http.sslBackend=schannel clone -q --single-branch --depth 1 %BITDUST_APP_GIT_REPO% ui
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 :UISourcesExist
 
 cd /D "%BITDUST_HOME%\ui\"
-%BITDUST_HOME%\git\bin\git.exe fetch --all
+%BITDUST_HOME%\git\bin\git.exe -c http.sslBackend=schannel fetch --all
 if %errorlevel% neq 0 goto DEPLOY_ERROR
-%BITDUST_HOME%\git\bin\git.exe reset --hard origin/master
+%BITDUST_HOME%\git\bin\git.exe -c http.sslBackend=schannel reset --hard origin/master
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 
 
 echo ##### Prepare environment for User Interface
-rem TODO: this is slow and can fail if user is offline...
-rem this actually must be only executed when requirements.txt was changed
 %PYTHON_EXE% -m pip install -U -r %BITDUST_HOME%\ui\requirements-win.txt
 if %errorlevel% neq 0 goto DEPLOY_ERROR
-
 
 
 echo ##### Prepare BitDust source code files
@@ -175,20 +169,16 @@ if not exist %BITDUST_HOME%\src mkdir %BITDUST_HOME%\src
 if exist %BITDUST_HOME%\src\bitdust.py goto SourcesExist
 echo ##### Downloading BitDust source code from Git repository
 cd /D "%BITDUST_HOME%\src"
-%BITDUST_HOME%\git\bin\git.exe clone -q --depth 1 %BITDUST_GIT_REPO% .
+%BITDUST_HOME%\git\bin\git.exe -c http.sslBackend=schannel clone -q --depth 1 %BITDUST_GIT_REPO% .
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 
 
 :SourcesExist
 echo ##### Updating BitDust source code from Git repository
-rem %BITDUST_HOME%\git\bin\git.exe clean -q -d -f -x .
-rem if %errorlevel% neq 0 goto DEPLOY_ERROR
-rem echo Running command "git fetch" in BitDust repository
 cd /D "%BITDUST_HOME%\src"
-%BITDUST_HOME%\git\bin\git.exe fetch --all
+%BITDUST_HOME%\git\bin\git.exe -c http.sslBackend=schannel fetch --all
 if %errorlevel% neq 0 goto DEPLOY_ERROR
-rem echo Running command "git reset" in BitDust repository
-%BITDUST_HOME%\git\bin\git.exe reset --hard origin/master
+%BITDUST_HOME%\git\bin\git.exe -c http.sslBackend=schannel reset --hard origin/master
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 
 
@@ -196,13 +186,15 @@ echo ##### Prepare Python virtual environment
 if exist %BITDUST_HOME%\venv\Scripts\pip.exe goto VenvUpdate
 echo Creating BitDust virtual environment
 cd /D "%BITDUST_HOME%\src"
+copy /B /Y "%CURRENT_PATH%\requirements.txt" %BITDUST_HOME%\src\
 %PYTHON_EXE% bitdust.py install
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 goto VenvOk
 :VenvUpdate
-rem TODO: this is slow and can fail if user is offline...
-rem this actually must be only executed when requirements.txt was changed
+
+
 echo ##### Update Python virtual environment
+copy /B /Y "%CURRENT_PATH%\requirements.txt" %BITDUST_HOME%\src\
 %BITDUST_HOME%\venv\Scripts\pip.exe install -U -r %BITDUST_HOME%\src\requirements.txt
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 :VenvOk
@@ -214,23 +206,13 @@ cd /D %BITDUST_HOME%
 echo ##### Prepare BitDustNode process
 if exist %BITDUST_NODE% goto BitDustNodeExeExist
 copy /B /Y %BITDUST_HOME%\venv\Scripts\pythonw.exe %BITDUST_NODE%
-rem echo Copied %BITDUST_HOME%\venv\Scripts\pythonw.exe to %BITDUST_NODE% 
 :BitDustNodeExeExist
 
 
 echo ##### Prepare BitDustConsole process
 if exist %BITDUST_NODE_CONSOLE% goto BitDustConsoleExeExist
 copy /B /Y %BITDUST_HOME%\venv\Scripts\python.exe %BITDUST_NODE_CONSOLE%
-rem echo Copied %BITDUST_HOME%\venv\Scripts\python.exe to %BITDUST_NODE_CONSOLE% 
 :BitDustConsoleExeExist
-
-
-
-
-
-
-
-
 
 
 echo ##### SUCCESS
@@ -244,6 +226,7 @@ exit /b %errorlevel%
 
 
 :DEPLOY_SUCCESS
+
 rem  echo ##### Starting BitDust as a daemon process
 rem cd /D "%BITDUST_HOME%"
 rem %BITDUST_NODE% %BITDUST_HOME%\src\bitdust.py daemon

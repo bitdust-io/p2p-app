@@ -8,7 +8,7 @@
   <!-- DO NOT CHANGE THESE AFTER FIRST RELEASE -->
   <?define ProjectDir = ".\"?>
   <?define ProductName = "BitDust p2p-app"?>
-  <?define Manufacturer="BitDust"?>
+  <?define Manufacturer="Veselin Penev"?>
   <?define UpgradeCode="{EE4A7BD1-7149-4963-9D2C-00042A1F242A}"?>
   
   <Product
@@ -29,6 +29,7 @@
     <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
     <Property Id="NEWERPRODUCTFOUND" Secure="yes" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+    <Property Id="UI_SRC_DIR" Value="[%HOMEDRIVE][%HOMEPATH]\.bitdust\ui" />
 
     <MajorUpgrade AllowDowngrades="no" IgnoreRemoveFailure="yes" Schedule="afterInstallInitialize" DowngradeErrorMessage="Can not execute a downgrade"  />
 
@@ -42,9 +43,10 @@
         <Component Id="ShortcutOnDesktop" Guid="{61AE5ABE-9ED2-46B0-91C4-3050A46BF061}">
           <Shortcut Id="ApplicationShortcutOnDesktop"
                     Name="BitDust p2p-app"
-                    Description="BitDust is an open-source peer-to-peer network application for secure data storage and private on-line communications."
-                    Target="[INSTALLLOCATION]bitdust-p2p-app.exe"
-                    WorkingDirectory="INSTALLLOCATION"
+                    Description="BitDust p2p-app is an open-source peer-to-peer network application for secure data storage and private on-line communications."
+                    Target="[%HOMEDRIVE][%HOMEPATH]\.bitdust\python\bitdust-p2p-app.exe"
+                    Arguments="src\main.py"
+                    WorkingDirectory="UI_SRC_DIR"
                     Advertise="no"
                     Icon="AppIcon" />
           <RemoveFolder Id="DesktopFolder" On="uninstall"/>
@@ -56,9 +58,10 @@
         <Component Id="ShortcutInMenu" Guid="{C1DA5070-1F4B-4E92-A674-F85751F545C8}">
           <Shortcut Id="ApplicationShortcut"
                     Name="BitDust p2p-app"
-                    Description="BitDust is an open-source peer-to-peer network application for secure data storage and private on-line communications."
-                    Target="[INSTALLLOCATION]bitdust-p2p-app.exe"
-                    WorkingDirectory="INSTALLLOCATION"
+                    Description="BitDust p2p-app is an open-source peer-to-peer network application for secure data storage and private on-line communications."
+                    Target="[%HOMEDRIVE][%HOMEPATH]\.bitdust\python\bitdust-p2p-app.exe"
+                    Arguments="src\main.py"
+                    WorkingDirectory="UI_SRC_DIR"
                     Advertise="no"
                     Icon="AppIcon" />
           <RegistryValue Root="HKCU" Key="Software\BitDust\BitDust p2p-app" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
@@ -68,11 +71,16 @@
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLLOCATION" Name="BitDust p2p-app">
           <Component Id="ProjectFiles" Guid="{427C0D19-1259-4FBC-B26C-C61C0297519B}">
+            <File Id="file_bitdust_ico" Source="$(var.ProjectDir)bitdust.ico" />
             <File Id="file_unzip_exe" Source="$(var.ProjectDir)unzip.exe" />
+            <File Id="file_rcedit_exe" Source="$(var.ProjectDir)rcedit.exe" />
             <File Id="file_git_zip" Source="$(var.ProjectDir)git.zip" />
             <File Id="file_deploy_bat" Source="$(var.ProjectDir)deploy.bat" />
             <File Id="file_python_pth" Source="$(var.ProjectDir)python38._pth" />
             <File Id="file_license_txt" Source="$(var.ProjectDir)LICENSE.txt" />
+            <File Id="file_download_python_js" Source="$(var.ProjectDir)download_python.js" />
+            <File Id="file_download_pip_js" Source="$(var.ProjectDir)download_pip.js" />
+            <File Id="file_requirements_txt" Source="$(var.ProjectDir)requirements.txt" />
           </Component>
         </Directory>    
       </Directory>
