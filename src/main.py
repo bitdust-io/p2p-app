@@ -147,7 +147,7 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   _activity=%r' % _activity)
                 print('BitDustApp.build   mActivity=%r' % mActivity)
 
-        self.title = 'BitDust'
+        self.title = 'BitDust p2p-app'
         self.icon = './bitdust.png'
 
         self.apply_styles()
@@ -339,7 +339,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             ).run()
         elif system.is_windows():
             system.BackgroundProcess(
-                cmd=['./src/deploy/windows.bat', ] + params,
+                cmd=['src\deploy\windows.bat', ] + params,
                 stdout_callback=self.on_deploy_process_stdout,
                 stderr_callback=self.on_deploy_process_stderr,
                 finishing=self.finishing,
