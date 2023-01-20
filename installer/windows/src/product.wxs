@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <!-- CHANGE THESE EVERY VERSION -->
+  <?define ProductVersion="0.0.1" ?>
+  <?define ProductCode="{B2DEFD49-5467-4A11-0001-BD238154D23D}"?>
+
+  <!-- DO NOT CHANGE THESE AFTER FIRST RELEASE -->
+  <?define ProjectDir = ".\"?>
+  <?define ProductName = "BitDust p2p-app"?>
+  <?define Manufacturer="Veselin Penev"?>
+  <?define UpgradeCode="{EE4A7BD1-7149-4963-9D2C-00042A1F242A}"?>
+  
+  <Product
+    Id="$(var.ProductCode)"
+    Language="1033"
+    Manufacturer="$(var.Manufacturer)"
+    Name="$(var.ProductName)"
+    UpgradeCode="$(var.UpgradeCode)"
+    Version="$(var.ProductVersion)">
+    <Package InstallerVersion="300" Languages="1033" Manufacturer="$(var.Manufacturer)" Platform="x86" Compressed="yes" />
+    <Media Id="1" Cabinet="setup.cab" CompressionLevel="high" EmbedCab="yes"  />
+
+    <Icon Id="AppIcon" SourceFile="$(var.ProjectDir)bitdust.ico"/>
+
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+    <Property Id="ARPCONTACT" Value="$(var.Manufacturer)" />
+    <Property Id="ALLUSERS" Value="2" />
+    <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
+    <Property Id="NEWERPRODUCTFOUND" Secure="yes" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+    <Property Id="UI_SRC_DIR" Value="[%HOMEDRIVE][%HOMEPATH]\.bitdust\ui" />
+
+    <MajorUpgrade AllowDowngrades="no" IgnoreRemoveFailure="yes" Schedule="afterInstallInitialize" DowngradeErrorMessage="Can not execute a downgrade"  />
+
+    <Upgrade Id="$(var.UpgradeCode)">
+      <UpgradeVersion Minimum="0.0.0" IncludeMinimum="yes" Maximum="$(var.ProductVersion)" Property="OLDERVERSIONBEINGUPGRADED" />
+    </Upgrade>
+    
+    <Directory Id="TARGETDIR" Name="SourceDir">
+
+      <Directory Id="DesktopFolder" Name="DesktopFolder">
+        <Component Id="ShortcutOnDesktop" Guid="{61AE5ABE-9ED2-46B0-91C4-3050A46BF061}">
+          <Shortcut Id="ApplicationShortcutOnDesktop"
+                    Name="BitDust p2p-app"
+                    Description="BitDust p2p-app is an open-source peer-to-peer network application for secure data storage and private on-line communications."
+                    Target="[%HOMEDRIVE][%HOMEPATH]\.bitdust\python\bitdust-p2p-app.exe"
+                    Arguments="src\main.py"
+                    WorkingDirectory="UI_SRC_DIR"
+                    Advertise="no"
+                    Icon="AppIcon" />
+          <RemoveFolder Id="DesktopFolder" On="uninstall"/>
+          <RegistryValue Root="HKCU" Key="Software\BitDust\Shortcuts" Name="167CE804-4A37-45B8-B010-EB6B3E73BE54" Type="string" Value="" KeyPath="yes"/>
+        </Component>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Component Id="ShortcutInMenu" Guid="{C1DA5070-1F4B-4E92-A674-F85751F545C8}">
+          <Shortcut Id="ApplicationShortcut"
+                    Name="BitDust p2p-app"
+                    Description="BitDust p2p-app is an open-source peer-to-peer network application for secure data storage and private on-line communications."
+                    Target="[%HOMEDRIVE][%HOMEPATH]\.bitdust\python\bitdust-p2p-app.exe"
+                    Arguments="src\main.py"
+                    WorkingDirectory="UI_SRC_DIR"
+                    Advertise="no"
+                    Icon="AppIcon" />
+          <RegistryValue Root="HKCU" Key="Software\BitDust\BitDust p2p-app" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+        </Component>
+      </Directory>
+
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLLOCATION" Name="BitDust p2p-app">
+          <Component Id="ProjectFiles" Guid="{427C0D19-1259-4FBC-B26C-C61C0297519B}">
+            <File Id="file_bitdust_ico" Source="$(var.ProjectDir)bitdust.ico" />
+            <File Id="file_unzip_exe" Source="$(var.ProjectDir)unzip.exe" />
+            <File Id="file_rcedit_exe" Source="$(var.ProjectDir)rcedit.exe" />
+            <File Id="file_git_zip" Source="$(var.ProjectDir)git.zip" />
+            <File Id="file_deploy_bat" Source="$(var.ProjectDir)deploy.bat" />
+            <File Id="file_python_pth" Source="$(var.ProjectDir)python38._pth" />
+            <File Id="file_license_txt" Source="$(var.ProjectDir)LICENSE.txt" />
+            <File Id="file_download_python_js" Source="$(var.ProjectDir)download_python.js" />
+            <File Id="file_download_pip_js" Source="$(var.ProjectDir)download_pip.js" />
+            <File Id="file_requirements_txt" Source="$(var.ProjectDir)requirements.txt" />
+          </Component>
+        </Directory>    
+      </Directory>
+
+    </Directory>
+
+    <Feature Id="DefaultFeature" ConfigurableDirectory="TARGETDIR" Level="1">
+      <ComponentRef Id="ShortcutOnDesktop"/>
+      <ComponentRef Id="ShortcutInMenu"/>
+      <ComponentRef Id="ProjectFiles"/>
+    </Feature>
+
+    <CustomAction Id="BatchCmd" Property="BatchRun" Value="&quot;[#file_deploy_bat]&quot; &quot;[INSTALLLOCATION]&quot;" Execute="immediate" Impersonate="yes" />
+    <CustomAction Id="BatchRun" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="check" Impersonate="yes" />
+    <InstallExecuteSequence>
+      <Custom Action="BatchCmd" Before="BatchRun">NOT Installed</Custom>
+      <Custom Action="BatchRun" After="InstallFiles">NOT Installed</Custom>
+    </InstallExecuteSequence>
+
+    <UI>
+      <UIRef Id="WixUI_Minimal" />
+    </UI>
+
+  </Product>
+</Wix>

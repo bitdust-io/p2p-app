@@ -5,26 +5,32 @@
 
 import os
 import sys
-import platform
 import threading
 import locale
 
 #------------------------------------------------------------------------------
 
-if platform.system() == 'Windows':
+from lib import system
+
+#------------------------------------------------------------------------------
+
+if system.is_windows() == 'Windows':
     os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
     scriptdir, script = os.path.split(os.path.abspath(__file__))
-    # pkgdir = os.path.join(scriptdir, 'pkgs')
     sys.path.insert(0, scriptdir)
     # here is the assumption for every Windows-based OS : we are running on Python 3.8 or higher
     os.add_dll_directory(scriptdir)  # @UndefinedVariable
 else:
     locale.setlocale(locale.LC_CTYPE, 'en_US.UTF-8')
 
-if 'ANDROID_ARGUMENT' not in os.environ:
-    import codecs
-    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
-    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())
+if system.is_windows():
+    sys.stdout = open(os.path.join(system.get_app_data_path(), 'logs', 'stdout.txt'), 'w')
+    sys.stderr = open(os.path.join(system.get_app_data_path(), 'logs', 'stderr.txt'), 'w')
+else:
+    if 'ANDROID_ARGUMENT' not in os.environ:
+        import codecs
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+        sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())
 
 #------------------------------------------------------------------------------ 
 
@@ -43,9 +49,6 @@ if _Debug:
 #------------------------------------------------------------------------------
 
 from kivy.config import Config
-
-# if sys.platform in ('win32', 'cygwin'):
-#     Config.set('graphics', 'multisamples', '0')
 
 Config.set('kivy', 'window_icon', 'bitdust.png')
 
@@ -66,8 +69,6 @@ if _Debug:
 from kivymd.app import MDApp
 
 #------------------------------------------------------------------------------
-
-from lib import system
 
 from screens import controller
 
@@ -147,7 +148,7 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   _activity=%r' % _activity)
                 print('BitDustApp.build   mActivity=%r' % mActivity)
 
-        self.title = 'BitDust'
+        self.title = 'BitDust p2p-app'
         self.icon = './bitdust.png'
 
         self.apply_styles()
