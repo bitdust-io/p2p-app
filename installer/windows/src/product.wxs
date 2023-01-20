@@ -75,12 +75,11 @@
             <File Id="file_unzip_exe" Source="$(var.ProjectDir)unzip.exe" />
             <File Id="file_rcedit_exe" Source="$(var.ProjectDir)rcedit.exe" />
             <File Id="file_git_zip" Source="$(var.ProjectDir)git.zip" />
-            <File Id="file_deploy_bat" Source="$(var.ProjectDir)deploy.bat" />
+            <File Id="file_install_bat" Source="$(var.ProjectDir)install.bat" />
             <File Id="file_python_pth" Source="$(var.ProjectDir)python38._pth" />
             <File Id="file_license_txt" Source="$(var.ProjectDir)LICENSE.txt" />
             <File Id="file_download_python_js" Source="$(var.ProjectDir)download_python.js" />
             <File Id="file_download_pip_js" Source="$(var.ProjectDir)download_pip.js" />
-            <File Id="file_requirements_txt" Source="$(var.ProjectDir)requirements.txt" />
           </Component>
         </Directory>    
       </Directory>
@@ -93,7 +92,7 @@
       <ComponentRef Id="ProjectFiles"/>
     </Feature>
 
-    <CustomAction Id="BatchCmd" Property="BatchRun" Value="&quot;[#file_deploy_bat]&quot; &quot;[INSTALLLOCATION]&quot;" Execute="immediate" Impersonate="yes" />
+    <CustomAction Id="BatchCmd" Property="BatchRun" Value="&quot;[#file_install_bat]&quot; &quot;[INSTALLLOCATION]&quot;" Execute="immediate" Impersonate="yes" />
     <CustomAction Id="BatchRun" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="check" Impersonate="yes" />
     <InstallExecuteSequence>
       <Custom Action="BatchCmd" Before="BatchRun">NOT Installed</Custom>

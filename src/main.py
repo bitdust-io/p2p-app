@@ -301,7 +301,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         return service
 
     def check_restart_bitdust_process(self, params=[]):
-        if not system.is_linux() and not system.is_osx():
+        if not system.is_linux() and not system.is_osx() and not system.is_windows():
             if _Debug:
                 print('BitDustApp.check_restart_bitdust_process NOT IMPLEMENTED')
             return None
@@ -331,6 +331,15 @@ class BitDustApp(styles.AppStyle, MDApp):
         elif system.is_osx():
             system.BackgroundProcess(
                 cmd=['/bin/bash', './src/deploy/osx.sh', ] + params,
+                stdout_callback=self.on_deploy_process_stdout,
+                stderr_callback=self.on_deploy_process_stderr,
+                finishing=self.finishing,
+                daemon=True,
+                result_callback=self.on_deploy_process_result,
+            ).run()
+        elif system.is_windows():
+            system.BackgroundProcess(
+                cmd=['./src/deploy/windows.bat', ] + params,
                 stdout_callback=self.on_deploy_process_stdout,
                 stderr_callback=self.on_deploy_process_stderr,
                 finishing=self.finishing,
