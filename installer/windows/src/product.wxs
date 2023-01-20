@@ -29,7 +29,7 @@
     <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
     <Property Id="NEWERPRODUCTFOUND" Secure="yes" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
-    <Property Id="UI_SRC_DIR" Value="[%HOMEDRIVE][%HOMEPATH]\.bitdust\ui" />
+    <Property Id="UI_SRC_DIR" Value="%HOMEDRIVE%%HOMEPATH%\.bitdust\ui" />
 
     <MajorUpgrade AllowDowngrades="no" IgnoreRemoveFailure="yes" Schedule="afterInstallInitialize" DowngradeErrorMessage="Can not execute a downgrade"  />
 
