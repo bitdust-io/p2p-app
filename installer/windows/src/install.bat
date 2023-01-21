@@ -1,6 +1,6 @@
 @echo off
 
-set CURRENT_PATH="%1"
+set CURRENT_PATH=%cd%
 echo Starting inside %CURRENT_PATH%
 cd /D "%CURRENT_PATH%"
 

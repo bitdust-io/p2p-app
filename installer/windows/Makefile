@@ -11,4 +11,4 @@ build:
 	cd image && docker build -t wine-wix . && cd ..
 	docker run --workdir /wix --rm -v $(BUILD_PATH)/workspace:/wix wine-wix candle product.wxs
 	docker run --workdir /wix --rm -v $(BUILD_PATH)/workspace:/wix wine-wix light product.wixobj -sval -ext WixUIExtension -ext WixUtilExtension
-	cp -v workspace/*.msi bin/
+	mv -v workspace/product.msi bin/bitdust-p2p-app.msi
