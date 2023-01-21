@@ -92,15 +92,31 @@
       <ComponentRef Id="ProjectFiles"/>
     </Feature>
 
-    <CustomAction Id="BatchCmd" Property="BatchRun" Value="&quot;[#file_install_bat]&quot; &quot;[INSTALLLOCATION]&quot;" Execute="immediate" Impersonate="yes" />
-    <CustomAction Id="BatchRun" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="check" Impersonate="yes" />
+    <CustomAction Id="RunBat" Directory="INSTALLLOCATION" ExeCommand='[SystemFolder]\cmd /c "install.bat"' Execute='deferred' Impersonate='no' Return='ignore'/>
     <InstallExecuteSequence>
-      <Custom Action="BatchCmd" Before="BatchRun">NOT Installed</Custom>
-      <Custom Action="BatchRun" After="InstallFiles">NOT Installed</Custom>
+      <Custom Action="RunBat" After="InstallFiles">
+        NOT (REMOVE~="ALL")
+      </Custom>
     </InstallExecuteSequence>
 
-    <UI>
-      <UIRef Id="WixUI_Minimal" />
+    <UI Id="UserInterface">
+
+      <Property Id="WixUI_Mode" Value="Custom" />
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" Bold="yes" />
+      <TextStyle Id="WixUI_Font_Title"  FaceName="Tahoma" Size="9" Bold="yes" />
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="UserExit" />
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Order="2"></Publish>
+
+      <UIRef Id="WixUI_Common" />
     </UI>
 
   </Product>
