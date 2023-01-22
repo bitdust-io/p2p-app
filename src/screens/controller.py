@@ -136,7 +136,7 @@ class Controller(object):
                 'on_event': self.on_websocket_event,
                 'on_model_update': self.on_model_update,
             },
-            api_secret_filepath=os.path.join(system.get_app_data_path(), 'metadata', 'apisecret'),
+            api_secret_filepath=os.path.join(system.get_app_data_path(), 'apisecret'),
         )
         self.mw().update_menu_items()
         self.mw().select_screen('welcome_screen')
