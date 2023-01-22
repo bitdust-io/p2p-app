@@ -1,6 +1,7 @@
 @echo off
 
-set BITDUST_GIT_REPO=https://github.com/bitdust-io/public.git
+rem set BITDUST_GIT_REPO=https://github.com/bitdust-io/public.git
+set BITDUST_GIT_REPO=https://github.com/vesellov/devel.git
 
 set _my_datetime=%date%_%time%
 set _my_datetime=%_my_datetime: =_%
@@ -30,8 +31,8 @@ del /q /s /f "%SHORT_PATH_SCRIPT%" >nul 2>&1
 del /q /s /f "%SHORT_PATH_OUT%" >nul 2>&1
 
 
-set BITDUST_NODE=%BITDUST_HOME%\venv\Scripts\BitDustNode.exe
-set BITDUST_NODE_CONSOLE=%BITDUST_HOME%\venv\Scripts\BitDustConsole.exe
+set BITDUST_NODE=%BITDUST_HOME%\venv\Scripts\bitdust-node.exe
+set BITDUST_NODE_CONSOLE=%BITDUST_HOME%\venv\Scripts\bitdust-console.exe
 
 
 set PYTHON_EXE=%BITDUST_HOME%\python\python.exe
@@ -41,15 +42,17 @@ set GIT_EXE=%BITDUST_HOME%\git\bin\git.exe
 if /I "%~1"=="stop" goto StopBitDustGo
 goto RestartBitDust
 :StopBitDustGo
-echo ##### Stopping BitDust
+echo ##### Preparing to stop BitDust Node
 cd /D "%BITDUST_HOME%"
 if not exist %BITDUST_NODE_CONSOLE% goto KillBitDust
 %BITDUST_NODE_CONSOLE% %BITDUST_HOME%\src\bitdust.py stop
+if %errorlevel% neq 0 goto KillBitDust
+goto BitDustStopped
 :KillBitDust
 taskkill /IM BitDustNode.exe /F /T
 taskkill /IM BitDustConsole.exe /F /T
 :BitDustStopped
-echo DONE
+echo ##### DONE
 exit /b %errorlevel%
 
 
@@ -57,12 +60,13 @@ exit /b %errorlevel%
 if /I "%~1"=="restart" goto RestartBitDustGo
 goto RedeployBitDust
 :RestartBitDustGo
-echo ##### Restarting BitDust
+echo ##### Preparing to restart BitDust Node
 cd /D "%BITDUST_HOME%"
 if not exist %BITDUST_NODE_CONSOLE% goto BitDustRestarted
 %BITDUST_NODE_CONSOLE% %BITDUST_HOME%\src\bitdust.py restart
+if %errorlevel% neq 0 goto DEPLOY_ERROR
 :BitDustRestarted
-echo DONE
+echo ##### DONE
 exit /b %errorlevel%
 
 
@@ -70,7 +74,7 @@ exit /b %errorlevel%
 if /I "%~1"=="redeploy" goto RedeployBitDustGo
 goto StartBitDust
 :RedeployBitDustGo
-echo ##### Redeploying BitDust
+echo ##### Preparing to redeploy BitDust Node
 rmdir /S /Q %BITDUST_HOME%\venv
 rmdir /S /Q %BITDUST_HOME%\src
 echo ##### Cleanup finished
@@ -111,36 +115,37 @@ if %errorlevel% neq 0 goto DEPLOY_ERROR
 :VenvOk
 
 
-cd /D %BITDUST_HOME%
-
-
 if exist %BITDUST_NODE% goto BitDustNodeExeExist
-echo ##### Prepare BitDustNode process
-copy /B /Y %BITDUST_HOME%\venv\Scripts\pythonw.exe %BITDUST_NODE%
+cd /D %BITDUST_HOME%\venv\Scripts
+copy /B /Y pythonw.exe %BITDUST_NODE%
+copy /B /Y %BITDUST_HOME%\python\bitdust.ico %BITDUST_HOME%\venv\Scripts
+%BITDUST_HOME%\python\rcedit.exe %BITDUST_NODE% --set-icon bitdust.ico --set-version-string FileDescription "BitDust Node"
 :BitDustNodeExeExist
 
 
 if exist %BITDUST_NODE_CONSOLE% goto BitDustConsoleExeExist
-echo ##### Prepare BitDustConsole process
-copy /B /Y %BITDUST_HOME%\venv\Scripts\python.exe %BITDUST_NODE_CONSOLE%
+cd /D %BITDUST_HOME%\venv\Scripts\pythonw.exe
+copy /B /Y python.exe %BITDUST_NODE_CONSOLE%
+copy /B /Y %BITDUST_HOME%\python\bitdust.ico %BITDUST_HOME%\venv\Scripts
+%BITDUST_HOME%\python\rcedit.exe %BITDUST_NODE_CONSOLE% --set-icon bitdust.ico --set-version-string FileDescription "BitDust Console"
 :BitDustConsoleExeExist
 
 
-echo ##### SUCCESS
+echo ##### Environment successfully prepared
 goto DEPLOY_SUCCESS
 
 
 :DEPLOY_ERROR
-echo ##### DEPLOYMENT FAILED
+echo ##### FAILED
 echo.
 exit /b %errorlevel%
 
 
 :DEPLOY_SUCCESS
-
-echo ##### Starting BitDust process
+echo ##### Starting BitDust Node process
 cd /D "%BITDUST_HOME%"
 %BITDUST_NODE% %BITDUST_HOME%\src\bitdust.py daemon
 
-echo DONE
+
+echo ##### Ready
 echo.

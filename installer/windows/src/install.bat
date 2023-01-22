@@ -66,12 +66,9 @@ copy /B /Y bitdust.ico %BITDUST_HOME%\python\
 copy /B /Y rcedit.exe %BITDUST_HOME%\python\
 cd /D "%BITDUST_HOME%\python"
 copy /B /Y pythonw.exe bitdust-p2p-app.exe
-rcedit.exe bitdust-p2p-app.exe --set-version-string FileDescription "BitDust p2p-app"
-if %errorlevel% neq 0 goto DEPLOY_ERROR
-rcedit.exe bitdust-p2p-app.exe --set-icon bitdust.ico
+rcedit.exe bitdust-p2p-app.exe --set-icon bitdust.ico --set-version-string FileDescription "BitDust p2p-app"
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 del /q /s /f %BITDUST_HOME%\python-3.8.6-embed-win32.zip >nul 2>&1
-del /q /s /f %BITDUST_HOME%\python\rcedit.exe >nul 2>&1
 echo ### Installing PIP package manager
 cd /D "%BITDUST_HOME%"
 cscript /nologo "%CURRENT_PATH%\download_pip.js"
