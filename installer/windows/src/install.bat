@@ -39,16 +39,12 @@ del /q /s /f "%SHORT_PATH_SCRIPT%" >nul 2>&1
 del /q /s /f "%SHORT_PATH_OUT%" >nul 2>&1
 
 
-set BITDUST_NODE=%BITDUST_HOME%\venv\Scripts\BitDustNode.exe
-set BITDUST_NODE_CONSOLE=%BITDUST_HOME%\venv\Scripts\BitDustConsole.exe
-
-
 set PYTHON_EXE=%BITDUST_HOME%\python\python.exe
 set GIT_EXE=%BITDUST_HOME%\git\bin\git.exe
 
 
 echo ### Stopping BitDust
-taskkill /IM bitdust-p2p-app.exe /F /T
+taskkill /IM bitdust-p2p-app.exe /F /T 2>nul 1>nul
 
 
 echo ### Prepare Python interpretator files
@@ -118,18 +114,6 @@ if %errorlevel% neq 0 goto DEPLOY_ERROR
 
 
 cd /D %BITDUST_HOME%
-
-
-echo ### Prepare BitDustNode process
-if exist %BITDUST_NODE% goto BitDustNodeExeExist
-copy /B /Y %BITDUST_HOME%\venv\Scripts\pythonw.exe %BITDUST_NODE%
-:BitDustNodeExeExist
-
-
-echo ### Prepare BitDustConsole process
-if exist %BITDUST_NODE_CONSOLE% goto BitDustConsoleExeExist
-copy /B /Y %BITDUST_HOME%\venv\Scripts\python.exe %BITDUST_NODE_CONSOLE%
-:BitDustConsoleExeExist
 
 
 echo ### SUCCESS

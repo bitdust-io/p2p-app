@@ -218,7 +218,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         )
 
     def populate_bottom_toolbar_icon(self, icon_name, state):
-        self.footer_bar().update_bottom_action_bar_item(icon_name, state)
+        Clock.schedule_once(lambda *a: self.footer_bar().update_bottom_action_bar_item(icon_name, state))
 
     #------------------------------------------------------------------------------
 
