@@ -1,7 +1,6 @@
 @echo off
 
-rem set BITDUST_GIT_REPO=https://github.com/bitdust-io/public.git
-set BITDUST_GIT_REPO=https://github.com/vesellov/devel.git
+set BITDUST_GIT_REPO=https://github.com/bitdust-io/public.git
 
 set _my_datetime=%date%_%time%
 set _my_datetime=%_my_datetime: =_%
@@ -49,8 +48,8 @@ if not exist %BITDUST_NODE_CONSOLE% goto KillBitDust
 if %errorlevel% neq 0 goto KillBitDust
 goto BitDustStopped
 :KillBitDust
-taskkill /IM BitDustNode.exe /F /T
-taskkill /IM BitDustConsole.exe /F /T
+taskkill /IM bitdust-node.exe /F /T 2>nul 1>nul
+taskkill /IM bitdust-console.exe /F /T 2>nul 1>nul
 :BitDustStopped
 echo ##### DONE
 exit /b %errorlevel%

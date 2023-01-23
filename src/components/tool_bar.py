@@ -1,3 +1,5 @@
+import time
+
 from math import cos, radians, sin
 
 from kivy.animation import Animation
@@ -46,17 +48,21 @@ class CustomActionAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
         self.duration_long_touch = 0
 
     def start_blinking(self):
+        if _Debug:
+            print('CustomActionAppBarButton.start_blinking %r %r' % (self.icon, time.asctime()))
         if self.anim:
             self.anim.stop(self)
             self.anim = None
         self.anim = (
-            Animation(text_color=self.state2color(-1), duration=.5) +
-            Animation(text_color=self.state2color(1), duration=.5)
+            Animation(text_color=self.state2color(-1), duration=.3) +
+            Animation(text_color=self.state2color(1), duration=.3)
         )
         self.anim.repeat = True
         self.anim.start(self)
 
     def stop_blinking(self):
+        if _Debug:
+            print('CustomActionAppBarButton.stop_blinking %r %r' % (self.icon, time.asctime()))
         if self.anim:
             self.anim.stop(self)
             self.anim = None
