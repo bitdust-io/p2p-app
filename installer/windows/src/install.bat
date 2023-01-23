@@ -129,5 +129,5 @@ exit /b %errorlevel%
 
 :DEPLOY_SUCCESS
 
-echo ### DONE
+echo ### Done
 echo.
