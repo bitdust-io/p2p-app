@@ -49,7 +49,7 @@ def start(callbacks={}, api_secret_filepath=None):
     if is_started():
         raise Exception('already started')
     if _Debug:
-        print('websock.start() api_secret_filepath=%r' % api_secret_filepath)
+        print('web_sock.start() api_secret_filepath=%r' % api_secret_filepath)
     _APISecretFilePath = api_secret_filepath
     _RegisteredCallbacks = callbacks or {}
     _WebSocketConnecting = True
@@ -68,7 +68,7 @@ def stop():
     if not is_started():
         raise Exception('has not been started')
     if _Debug:
-        print('websock.stop()')
+        print('web_sock.stop()')
     _APISecretFilePath = None
     _RegisteredCallbacks = {}
     _WebSocketStarted = False
