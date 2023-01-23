@@ -51,7 +51,7 @@ goto BitDustStopped
 taskkill /IM bitdust-node.exe /F /T 2>nul 1>nul
 taskkill /IM bitdust-console.exe /F /T 2>nul 1>nul
 :BitDustStopped
-echo ##### DONE
+echo ##### Done
 exit /b %errorlevel%
 
 
@@ -65,7 +65,7 @@ if not exist %BITDUST_NODE_CONSOLE% goto BitDustRestarted
 %BITDUST_NODE_CONSOLE% %BITDUST_HOME%\src\bitdust.py restart
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 :BitDustRestarted
-echo ##### DONE
+echo ##### Done
 exit /b %errorlevel%
 
 
