@@ -7,6 +7,7 @@ from kivymd.uix.list import OneLineIconListItem
 from kivymd.uix.list import TwoLineIconListItem
 
 from lib import api_client
+from lib import system
 
 from components import screen
 from components import snackbar
@@ -120,7 +121,6 @@ class SharedLocationScreen(screen.AppScreen):
     def on_upload_file_button_clicked(self, *args):
         if _Debug:
             print('SharedLocationScreen.on_upload_file_button_clicked', args)
-        from lib import system
         if system.is_android():
             from lib import filechooser as lib_filechooser
             raw_path = lib_filechooser.instance().open_file(
@@ -131,6 +131,8 @@ class SharedLocationScreen(screen.AppScreen):
             )
         else:
             from plyer import filechooser
+            if system.is_windows():
+                self._latest_cwd = os.getcwd()
             raw_path = filechooser.open_file(
                 title="Share new file",
                 preview=True,
@@ -141,6 +143,11 @@ class SharedLocationScreen(screen.AppScreen):
             print('    raw_path', raw_path)
 
     def on_upload_file_selected(self, *args, **kwargs):
+        if system.is_windows():
+            try:
+                os.chdir(self._latest_cwd)
+            except:
+                pass
         file_path = args[0][0]
         file_name = os.path.basename(file_path)
         remote_path = '{}:{}'.format(self.key_id, file_name)
