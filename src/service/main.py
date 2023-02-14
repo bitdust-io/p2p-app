@@ -78,7 +78,7 @@ def set_foreground():
     notification_intent.setAction(Intent.ACTION_MAIN)
     notification_intent.addCategory(Intent.CATEGORY_LAUNCHER)
 
-    intent = PendingIntent.getActivity(service, 0, notification_intent, 0)
+    intent = PendingIntent.getActivity(service, 0, notification_intent, PendingIntent.FLAG_IMMUTABLE)
     notification_builder.setContentTitle(title)
     notification_builder.setContentText(message)
     notification_builder.setContentIntent(intent)

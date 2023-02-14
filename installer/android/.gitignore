@@ -1,0 +1,4 @@
+.keystore_password
+workspace
+bin/*
+sdk/*
