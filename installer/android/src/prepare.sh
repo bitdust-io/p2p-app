@@ -44,6 +44,3 @@ rm -rf app/bitdust_copy/
 
 VERSION=`cat version`
 echo "__version__ = \"$VERSION\"" > ./app/version.py
-
-make build_android_environment
-

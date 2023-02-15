@@ -173,12 +173,12 @@ def on_close(ws_inst):
 def on_message(ws_inst, message):
     global _CallbacksQueue
     json_data = json.loads(message)
-    if _Debug:
-        print('        on_message %d bytes' % len(message))
     if 'payload' not in json_data:
         if _Debug:
-            print('        no payload found in the response')
+            print('web_sock.on_message no payload found in the response')
         return False
+    if _Debug:
+        print('web_sock.on_message %d bytes' % len(message))
     payload_type = json_data.get('type')
     if payload_type == 'event':
         return on_event(json_data)
@@ -227,7 +227,7 @@ def on_fail(err, result_callback=None):
 
 def on_event(json_data):
     if _Debug:
-        print('    WS EVENT:', json_data['payload']['event_id'])
+        print('WS EVENT:', json_data['payload']['event_id'])
     cb = registered_callbacks().get('on_event')
     if cb:
         cb(json_data)
@@ -236,7 +236,7 @@ def on_event(json_data):
 
 def on_stream_message(json_data):
     if _Debug:
-        print('    WS STREAM MSG:', json_data['payload']['payload']['message_id'])
+        print('WS STREAM MSG:', json_data['payload']['payload']['message_id'])
     cb = registered_callbacks().get('on_stream_message')
     if cb:
         cb(json_data)
@@ -245,7 +245,7 @@ def on_stream_message(json_data):
 
 def on_model_update(json_data):
     if _Debug:
-        print('    WS MODEL:', json_data['payload']['name'], json_data['payload']['id'])
+        print('WS MODEL:', json_data['payload']['name'], json_data['payload']['id'])
     cb = registered_callbacks().get('on_model_update')
     if cb:
         cb(json_data)
