@@ -20,8 +20,8 @@ from lib import system
 
 #------------------------------------------------------------------------------
 
-_Debug = False
-_DebugAPIResponses = False
+_Debug = True
+_DebugAPIResponses = _Debug
 
 #------------------------------------------------------------------------------
 
