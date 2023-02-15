@@ -14,8 +14,9 @@
 # java -jar pepk.jar --keystore=~/keystores/bitdust.keystore --alias=bitdust --output=output.zip --encryptionkey=xxx --include-cert
 # create a file ".keystore_password" in the same folder and store the keystore password there
 
-.prepare:
-	@rm -rf bin/* && rm -rf workspace && mkdir workspace
+REQUIREMENTS_ANDROID:="kivy==2.1.0,kivymd==1.0.2,PIL,sdl,plyer,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted,python3"
+
+.sdk:
 	@if [ ! -f "./sdk/support-compat-27.0.0.aar" ]; then curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/27.0.0/support-compat-27.0.0.aar -o ./sdk/support-compat-27.0.0.aar; fi
 	@if [ ! -f "./sdk/pepk.jar" ]; then curl https://www.gstatic.com/play-apps-publisher-rapid/signing-tool/prod/pepk-src.jar -o ./sdk/pepk.jar; fi
 	@if [ ! -d "./sdk/buildozer" ]; then git clone --depth=1 https://github.com/kivy/buildozer ./sdk/buildozer; fi
@@ -27,24 +28,42 @@
 	@# cp -r -v ./src/etc/AndroidManifest.tmpl.xml ./sdk/python-for-android/pythonforandroid/bootstraps/sdl2/build/templates/
 	@# cp -r -v ./src/etc/build.tmpl.gradle ./sdk/python-for-android/pythonforandroid/bootstraps/common/build/templates/
 	@# if [ ! -f "./sdk/bundletool.jar" ]; then curl https://github.com/google/bundletool/releases/download/1.13.2/bundletool-all-1.13.2.jar -o sdk/bundletool.jar; fi
+
+.workspace:
+	@rm -rf bin/* && rm -rf workspace && mkdir workspace
 	@cp -r src/* workspace/ && cp -v sdk/pepk.jar workspace/
 	# cp -v sdk/bundletool.jar workspace/
 	@cp -v sdk/support-compat-27.0.0.aar workspace/
-	@cd workspace/ && ./prepare.sh
 
-build: .prepare
-	@cd workspace/ && make aab
-	@cd workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.aab ./bin/BitDustAndroid.aab
-	@cd workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true --min-sdk-version 21 bin/BitDustAndroid.aab
+.venv:
+	@cd ./workspace/ && rm -rf venv &&python3 -m venv venv && ./venv/bin/pip install --upgrade pip && ./venv/bin/pip install -r ../../../requirements.txt
+
+.install_buildozer:
+	@cd ./sdk/buildozer/ && ../../workspace/venv/bin/python setup.py build && ../../workspace/venv/bin/pip install -e .
+
+.prepare: .sdk .workspace
+	@cd ./workspace/ && /bin/sh prepare.sh
+
+.spec: .prepare .venv .install_buildozer
+	@cd ./workspace/ && P_requirements="$(REQUIREMENTS_ANDROID)" ./venv/bin/python3 -c "tpl=open('buildozer.spec.template').read();import os,sys;sys.stdout.write(tpl.format(requirements=os.environ['P_requirements']));" > buildozer.spec
+
+build: .spec
+	@rm -rfv ./workspace/bin/*.aab
+	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release 1>buildozer.log 2>buildozer.err
+	@cp -f -T -v ./workspace/bin/bitdust*arm64-v8a_armeabi-v7a_x86_64-release.aab ./workspace/bin/BitDustAndroid_unsigned.aab
+	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.aab ./bin/BitDustAndroid.aab
+	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true --min-sdk-version 21 bin/BitDustAndroid.aab
 	@rm -rfv ./workspace/bin/BitDustAndroid_unsigned.aab
 	@rm -rfv ./workspace/bin/bitdust1-*-release.aab
 	@mv -v ./workspace/bin/*.aab ./bin/
 	@cp -v ./workspace/version ./src/version && cat ./src/version
 
-debug:
-	@cd workspace/ && make apk
-	@cd workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
-	@cd workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true bin/BitDustAndroid.apk
+debug: .spec
+	@rm -rfv ./workspace/bin/*.apk
+	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release 1>buildozer.log 2>buildozer.err
+	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
+	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
+	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true ./bin/BitDustAndroid.apk
 	@mv -v ./workspace/bin/BitDustAndroid.apk ./workspace/bin/BitDustAndroid_arm64_v8a.apk
 	@cp -v ./workspace/bin/BitDustAndroid_arm64_v8a.apk ./bin/
 	@apktool d -o ./workspace/bin/apk/ -f ./workspace/bin/BitDustAndroid_arm64_v8a.apk
