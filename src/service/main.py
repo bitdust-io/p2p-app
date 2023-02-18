@@ -1,10 +1,11 @@
 import os
 import sys
 import json
+import pprint
 
 #------------------------------------------------------------------------------ 
 
-_Debug = False
+_Debug = True
 
 if _Debug:
     print('BitDustService ENTRYPOINT')
@@ -20,6 +21,7 @@ import encodings.idna  # @UnusedImport
 #------------------------------------------------------------------------------
 
 from android.config import ACTIVITY_CLASS_NAME, SERVICE_CLASS_NAME  # @UnresolvedImport
+from android.storage import app_storage_path  # @UnresolvedImport
 
 PACKAGE_NAME = 'org.bitdust_io.bitdust1'
 
@@ -138,25 +140,31 @@ def set_foreground_api_lower_26():
 
 def start_bitdust():
     executable_path = os.getcwd()
+    appdir = os.path.join(app_storage_path(), '.bitdust')
+    if not os.path.exists(appdir):
+        os.makedirs(appdir, 0o777)
+
     if _Debug:
         print('BitDustService.start_bitdust() executable_path=%r' % executable_path)
-#     try:
-#         os.chdir('bitdust')
-#     except Exception as exc:
-#         if _Debug:
-#             print('BitDustService.start_bitdust() error changing current path to "bitdust" sub-folder:', exc)
-#         return False
-
-    # sys.path.insert(0, os.getcwd())
-    # sys.path.insert(0, os.path.join(os.getcwd(), 'bitdust'))
+        print('BitDustService.start_bitdust() appdir=%r' % appdir)
 
     if _Debug:
         print('BitDustService.start_bitdust() os.listdir', os.listdir(os.getcwd()))
         print('BitDustService.start_bitdust() sys.path', sys.path)
+
     from bitdust.main import bpmain  # @UnresolvedImport
+
     if _Debug:
         print('BitDustService.start_bitdust() bitdust entry point: %r %r' % (bpmain, bpmain.main, ))
-    bpmain.main(executable_path, start_reactor=False)
+        print('BitDustService.start_bitdust() os.environ:')
+        for k,v in os.environ.items():
+            print('        ', k, v)
+
+    bpmain.main(
+        executable_path=executable_path,
+        start_reactor=False,
+        appdir=appdir,
+    )
     if _Debug:
         print('BitDustService.start_bitdust() OK!')
     return True
@@ -166,13 +174,6 @@ def stop_bitdust():
     executable_path = os.getcwd()
     if _Debug:
         print('BitDustService.stop_bitdust() executable_path=%r' % executable_path)
-#     try:
-#         os.chdir('bitdust')
-#     except Exception as exc:
-#         if _Debug:
-#             print('BitDustService.stop_bitdust() error changing current path to "bitdust" sub-folder:', exc)
-#         return False
-    # sys.path.insert(0, os.getcwd())
     if _Debug:
         print('BitDustService.stop_bitdust() executable_path after : %r' % os.getcwd())
         print('BitDustService.stop_bitdust() os.listdir', os.listdir(os.getcwd()))

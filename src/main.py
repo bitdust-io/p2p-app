@@ -33,7 +33,7 @@ from lib import system
 
 #------------------------------------------------------------------------------ 
 
-_Debug = False
+_Debug = True
 _DebugProfilingEnabled = False
 
 #------------------------------------------------------------------------------
@@ -41,9 +41,10 @@ _DebugProfilingEnabled = False
 if _Debug:
     print('BitDustApp __file__', os.path.dirname(os.path.abspath(__file__)))
     print('BitDustApp __name__', __name__)
-    print('BitDustApp os.getcwd', os.path.abspath(os.getcwd()))
     print('BitDustApp sys.path', sys.path)
-    print('BitDustApp os.listdir', os.listdir(os.getcwd()))
+    print('BitDustApp os.getcwd()', os.path.abspath(os.getcwd()))
+    print('BitDustApp os.listdir()', os.listdir(os.getcwd()))
+    print('BitDustApp platform.uname()', platform.uname())
 
 #------------------------------------------------------------------------------
 
@@ -177,6 +178,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         for kv_file in all_components.KV_FILES:
             Builder.load_file(all_components.KV_FILES_BASE + kv_file)
 
+    @mainthread
     def do_start(self, *args, **kwargs):
         if _Debug:
             print('BitDustApp.do_start', args, kwargs)
@@ -259,11 +261,6 @@ class BitDustApp(styles.AppStyle, MDApp):
                 ACTIVITY_CLASS_NAME, SERVICE_NAME, shutdown, ))
         if _Debug:
             print('BitDustApp.start_android_service app data path is %r' % system.get_app_data_path())
-        if os.path.isdir('/storage/emulated/0/.bitdust'):
-            try:
-                os.rename('/storage/emulated/0/.bitdust', '/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust')
-            except Exception as e:
-                print('Failed to move data folder from legacy location:', e)
         if self.main_window.is_screen_active('welcome_screen'):
             welcome_screen = self.main_window.get_active_screen('welcome_screen')
             if welcome_screen:
@@ -428,7 +425,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             if _DebugProfilingEnabled:
                 self.profile.disable()
                 if system.is_android():
-                    self.profile.dump_stats('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/debug.profile')
+                    pass
                 else:
                     self.profile.dump_stats('./debug.profile')
         return True

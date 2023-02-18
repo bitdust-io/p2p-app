@@ -10,7 +10,7 @@ from kivy.utils import platform  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -63,32 +63,18 @@ def get_app_data_path():
     A portable method to get the default data folder location, usually it is: "~/.bitdust/"
     """
     if is_windows():
-        # TODO: move somewhere on Win10 ...
         return os.path.join(os.path.expanduser('~'), '.bitdust')
 
     elif is_linux():
-        # This should be okay : /home/veselin/.bitdust/
         return os.path.join(os.path.expanduser('~'), '.bitdust')
 
     elif is_android():
-        try:
-            from jnius import autoclass  # @UnresolvedImport
-            Context = autoclass("android.content.Context")
-            Environment = autoclass("android.os.Environment")
-            documents_dir = Context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()
-        except Exception as e:
-            if _Debug:
-                print('get_app_data_path() failed', e)
-            documents_dir = "/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents"
-        if _Debug:
-            print('get_app_data_path() documents_dir=%r' % documents_dir)
-        return os.path.join(documents_dir, '.bitdust')
+        from android.storage import app_storage_path  # @UnresolvedImport
+        return os.path.join(app_storage_path(), '.bitdust')
 
     elif is_osx():
-        # This should be okay : /Users/veselin/.bitdust/
         return os.path.join(os.path.expanduser('~'), '.bitdust')
 
-    # otherwise just default : ".bitdust/" in user root folder
     return os.path.join(os.path.expanduser('~'), '.bitdust')
 
 #------------------------------------------------------------------------------
