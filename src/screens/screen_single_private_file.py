@@ -1,13 +1,17 @@
-from components import screen
+import os
+import shutil
+
+#------------------------------------------------------------------------------
 
 from lib import api_client
 from lib import system
 
+from components import screen
 from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -87,9 +91,19 @@ class SinglePrivateFileScreen(screen.AppScreen):
         self.ids.state_panel.release()
 
     def on_download_file_button_clicked(self):
+        destination_path = None
+        if system.is_android():
+            import tempfile
+            from android.storage import app_storage_path  # @UnresolvedImport
+            destination_path = tempfile.mkdtemp(dir=app_storage_path())
         if _Debug:
-            print('SinglePrivateFileScreen.on_download_file_button_clicked')
-        api_client.file_download_start(remote_path=self.remote_path, cb=self.on_file_download_started)
+            print('SinglePrivateFileScreen.on_download_file_button_clicked remote_path=%s destination_path=%s' % (self.remote_path, destination_path, ))
+        api_client.file_download_start(
+            remote_path=self.remote_path,
+            destination_path=destination_path,
+            wait_result=True,
+            cb=lambda resp: self.on_file_download_result(resp, destination_path),
+        )
 
     def on_delete_file_button_clicked(self):
         if _Debug:
@@ -107,13 +121,23 @@ class SinglePrivateFileScreen(screen.AppScreen):
         screen.main_window().screen_back()
         screen.main_window().close_screen(screen_id='private_file_{}'.format(self.global_id))
 
-    def on_file_download_started(self, resp):
+    def on_file_download_result(self, resp, destination_path):
         if _Debug:
-            print('SinglePrivateFileScreen.on_file_download_started', resp)
+            print('SinglePrivateFileScreen.on_file_download_result', resp, destination_path)
+        if system.is_android():
+            from android.storage import primary_external_storage_path  # @UnresolvedImport
+            download_dir = os.path.join(primary_external_storage_path(), 'Download')
+            for filename in os.listdir(destination_path):
+                srcpath = os.path.join(destination_path, filename)
+                destpath = os.path.join(download_dir, filename)
+                shutil.copyfile(srcpath, destpath)
+                if _Debug:
+                    print('SinglePrivateFileScreen.on_file_download_result', srcpath, destpath)
+            system.rmdir_recursive(destination_path, ignore_errors=True)
         if not api_client.is_ok(resp):
-            snackbar.error(text='download file failed: %s' % api_client.response_err(resp))
+            snackbar.error(text='download failed: %s' % api_client.response_err(resp))
         else:
-            snackbar.success(text='file download started')
+            snackbar.success(text='downloading is complete')
         # screen.select_screen('private_files_screen')
         screen.main_window().screen_back()
         screen.main_window().close_screen(screen_id='private_file_{}'.format(self.global_id))

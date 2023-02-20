@@ -195,6 +195,59 @@ def ReadTextFile(filename):
     return u''
 
 
+
+def WriteBinaryFile(filename, data):
+    """
+    A smart way to write data to binary file. Return True if success.
+    """
+    try:
+        f = open(filename, 'wb')
+        f.write(data)
+        f.flush()
+        # from http://docs.python.org/library/os.html on os.fsync
+        os.fsync(f.fileno())
+        f.close()
+    except Exception as e:
+        if _Debug:
+            print('file %r write failed: %r' % (filename, e, ))
+        try:
+            # make sure file gets closed
+            f.close()
+        except:
+            pass
+        return False
+    return True
+
+
+def ReadBinaryFile(filename, decode_encoding=None):
+    """
+    A smart way to read binary file. Return empty string in case of:
+
+    - path not exist
+    - process got no read access to the file
+    - some read error happens
+    - file is really empty
+    """
+    if not filename:
+        return b''
+    if not os.path.isfile(filename):
+        return b''
+    if not os.access(filename, os.R_OK):
+        return b''
+    try:
+        infile = open(filename, mode='rb')
+        data = infile.read()
+        if decode_encoding is not None:
+            data = data.decode(decode_encoding)
+        infile.close()
+        return data
+    except Exception as e:
+        if _Debug:
+            print('file %r read failed: %r' % (filename, e, ))
+    return b''
+
+#------------------------------------------------------------------------------
+
 def rmdir_recursive(dirpath, ignore_errors=False, pre_callback=None):
     """
     Remove a directory, and all its contents if it is not already empty.

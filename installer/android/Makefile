@@ -14,7 +14,7 @@
 # java -jar pepk.jar --keystore=~/keystores/bitdust.keystore --alias=bitdust --output=output.zip --encryptionkey=xxx --include-cert
 # create a file ".keystore_password" in the same folder and store the keystore password there
 
-REQUIREMENTS_ANDROID:="kivy==2.1.0,kivymd==1.0.2,PIL,sdl,plyer,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted,python3"
+REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted"
 
 .cache:
 	@if [ ! -f "./cache/support-compat-27.0.0.aar" ]; then curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/27.0.0/support-compat-27.0.0.aar -o ./cache/support-compat-27.0.0.aar; fi
@@ -80,7 +80,8 @@ build: .spec
 
 debug: .spec
 	@rm -rfv ./workspace/bin/*.apk
-	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android debug 1>buildozer.log 2>buildozer.err
+	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android debug
+	# 1>buildozer.log 2>buildozer.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
 	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true ./bin/BitDustAndroid.apk
@@ -93,6 +94,14 @@ debug: .spec
 	@rm -rfv ./workspace/bin/BitDustAndroid.apk
 	@rm -rfv ./workspace/bin/BitDustAndroid_unsigned.apk
 	@rm -rfv ./workspace/bin/bitdust1-*-release-unsigned.apk
+
+clean:
+	@(cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android clean) || echo "done"
+
+clean_full:
+	@rm -rf ./workspace
+	@rm -rf ./cache/*
+	@rm -rf ./bin/*
 
 system_dependencies:
 	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends openjdk-11-jdk cython3 autoconf automake libtool ccache lld zipalign apksigner
@@ -112,7 +121,7 @@ log_quick:
 	@adb logcat | grep -E "python|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust|bitdust_io|Exception"
 
 log_main:
-	@adb shell tail -f /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/android.log
+	@adb shell "run-as org.bitdust_io.bitdust1; tail -f /data/user/0/org.bitdust_io.bitdust1/files/.bitdust/logs/android.log"
 
 log_states:
 	@adb shell tail -f /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/automats.log
