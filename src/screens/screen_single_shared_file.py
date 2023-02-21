@@ -47,6 +47,7 @@ class SingleSharedFileScreen(screen.AppScreen):
         self.global_id = kw.pop('global_id', '')
         self.remote_path = kw.pop('remote_path', '')
         self.details = kw.pop('details', {})
+        self.local_path = self.details.get('local_path')
         return kw
 
     def get_title(self):
@@ -83,6 +84,7 @@ class SingleSharedFileScreen(screen.AppScreen):
             versions_text += version_info_text.format(**v)
         ctx['versions_text'] = versions_text
         self.ids.shared_file_details.text = shared_file_info_text.format(**ctx)
+        self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_my_data')
@@ -124,21 +126,14 @@ class SingleSharedFileScreen(screen.AppScreen):
     def on_file_download_result(self, resp, destination_path):
         if _Debug:
             print('SingleSharedFileScreen.on_file_download_result', resp, destination_path)
+        self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
         if system.is_android():
             from android.storage import primary_external_storage_path  # @UnresolvedImport
             download_dir = os.path.join(primary_external_storage_path(), 'Download')
-#             from androidstorage4kivy import SharedStorage  # @UnresolvedImport
-#             from android import autoclass  # @UnresolvedImport
-#             Environment = autoclass('android.os.Environment')
-#             ss = SharedStorage()
             for filename in os.listdir(destination_path):
                 srcpath = os.path.join(destination_path, filename)
                 destpath = os.path.join(download_dir, filename)
                 shutil.copyfile(srcpath, destpath)
-#                 result = ss.copy_to_shared(
-#                     filepath,
-#                     collection=Environment.DIRECTORY_ALARMS,
-#                 )
                 if _Debug:
                     print('SingleSharedFileScreen.on_file_download_result', srcpath, destpath)
             system.rmdir_recursive(destination_path, ignore_errors=True)
@@ -146,5 +141,11 @@ class SingleSharedFileScreen(screen.AppScreen):
             snackbar.error(text='download file failed: %s' % api_client.response_err(resp))
         else:
             snackbar.success(text='downloading is complete')
-        screen.main_window().screen_back()
-        screen.main_window().close_screen(screen_id='shared_file_{}'.format(self.global_id))
+        # screen.main_window().screen_back()
+        # screen.main_window().close_screen(screen_id='shared_file_{}'.format(self.global_id))
+
+    def on_open_file_button_clicked(self):
+        if _Debug:
+            print('SingleSharedFileScreen.on_open_file_button_clicked')
+        if self.local_path and os.path.exists(self.local_path):
+            system.open_path_in_os(self.local_path)

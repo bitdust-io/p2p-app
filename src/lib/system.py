@@ -430,3 +430,35 @@ def make_nice_size(sz):
 
 def make_nice_file_condition(file_info):
     return '{}/{}'.format(file_info.get('delivered', '0%'), file_info.get('reliable', '0%'))
+
+#------------------------------------------------------------------------------
+
+def open_path_in_os(filepath):
+    """
+    A portable way to open location or file on local disk with a default OS method.
+    """
+    if is_windows():
+        if os.path.isfile(filepath):
+            subprocess.Popen(['explorer', '/select,', '%s' % (filepath.replace('/', '\\'))])
+            return True
+        subprocess.Popen(['explorer', '%s' % (filepath.replace('/', '\\'))])
+        return True
+
+    elif is_linux():
+        subprocess.Popen(['xdg-open', filepath])
+        return True
+
+    elif is_osx():
+        subprocess.Popen(['open', '-R', filepath])
+        return True
+
+    elif is_android():
+        # TODO: ...
+        return False
+
+    try:
+        import webbrowser
+        webbrowser.open(filepath)
+    except Exception as e:
+        print('file %r failed to open with default OS method: %r' % (filepath, e, ))
+    return False
