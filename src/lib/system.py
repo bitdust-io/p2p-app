@@ -453,8 +453,46 @@ def open_path_in_os(filepath):
         return True
 
     elif is_android():
-        # TODO: ...
-        return False
+        from jnius import autoclass, cast  # @UnresolvedImport
+        from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
+        StrictMode = autoclass('android.os.StrictMode')
+        StrictMode.disableDeathOnFileUriExposure()
+        PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
+        Intent = autoclass('android.content.Intent')
+        Uri = autoclass('android.net.Uri')
+        File = autoclass('java.io.File')
+        theFile = File(filepath)
+        uri = Uri.fromFile(theFile)
+        viewIntent = Intent(Intent.ACTION_VIEW)
+        if filepath.endswith(".doc") or filepath.endswith(".docx"):
+            viewIntent.setDataAndType(uri, "application/msword")
+        elif filepath.endswith(".pdf"):
+            viewIntent.setDataAndType(uri, "application/pdf")
+        elif filepath.endswith(".ppt") or filepath.endswith(".pptx"):
+            viewIntent.setDataAndType(uri, "application/vnd.ms-powerpoint")
+        elif filepath.endswith(".xls") or filepath.endswith(".xlsx"):
+            viewIntent.setDataAndType(uri, "application/vnd.ms-excel")
+        elif filepath.endswith(".zip") or filepath.endswith(".rar"):
+            viewIntent.setDataAndType(uri, "application/x-wav")
+        elif filepath.endswith(".rtf"):
+            viewIntent.setDataAndType(uri, "application/rtf")
+        elif filepath.endswith(".wav") or filepath.endswith(".mp3"):
+            viewIntent.setDataAndType(uri, "audio/x-wav")
+        elif filepath.endswith(".gif"):
+            viewIntent.setDataAndType(uri, "image/gif")
+        elif filepath.endswith(".jpg") or filepath.endswith(".jpeg") or filepath.endswith(".png"):
+            viewIntent.setDataAndType(uri, "image/jpeg")
+        elif filepath.endswith(".txt"):
+            viewIntent.setDataAndType(uri, "text/plain")
+        elif filepath.endswith(".3gp") or filepath.endswith(".mpg") or filepath.endswith(".mpeg") or filepath.endswith(".mpe") or filepath.endswith(".mp4") or filepath.endswith(".avi"):
+            viewIntent.setDataAndType(uri, "video/*")
+        else:
+            viewIntent.setDataAndType(uri, "*/*")
+        parcelable = cast('android.os.Parcelable', uri)
+        viewIntent.putExtra(Intent.EXTRA_STREAM, parcelable)
+        currentActivity = cast('android.app.Activity', PythonActivity.mBitDustActivity)
+        currentActivity.startActivity(viewIntent)
+        return True
 
     try:
         import webbrowser
