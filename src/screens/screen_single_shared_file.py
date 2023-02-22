@@ -48,6 +48,8 @@ class SingleSharedFileScreen(screen.AppScreen):
         self.remote_path = kw.pop('remote_path', '')
         self.details = kw.pop('details', {})
         self.local_path = self.details.get('local_path')
+        if system.is_android():
+            self.local_path = system.android_download_path(self.details.get('path'))
         return kw
 
     def get_title(self):
@@ -126,17 +128,16 @@ class SingleSharedFileScreen(screen.AppScreen):
     def on_file_download_result(self, resp, destination_path):
         if _Debug:
             print('SingleSharedFileScreen.on_file_download_result', resp, destination_path)
-        self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
         if system.is_android():
-            from android.storage import primary_external_storage_path  # @UnresolvedImport
-            download_dir = os.path.join(primary_external_storage_path(), 'Download')
             for filename in os.listdir(destination_path):
                 srcpath = os.path.join(destination_path, filename)
-                destpath = os.path.join(download_dir, filename)
+                destpath = system.android_download_path(filename)
+                # TODO: move the following inside a thread
                 shutil.copyfile(srcpath, destpath)
                 if _Debug:
                     print('SingleSharedFileScreen.on_file_download_result', srcpath, destpath)
             system.rmdir_recursive(destination_path, ignore_errors=True)
+        self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
         if not api_client.is_ok(resp):
             snackbar.error(text='download file failed: %s' % api_client.response_err(resp))
         else:

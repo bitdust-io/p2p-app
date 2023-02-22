@@ -121,8 +121,7 @@ class MyIDScreen(screen.AppScreen):
         if btn.icon == 'shield-key':
             filename = 'BitDust_key_{}.txt'.format(self.my_identity_name) if self.my_identity_name else 'BitDust_key.txt'
             if system.is_android():
-                from android.storage import primary_external_storage_path  # @UnresolvedImport
-                destination_filepath = os.path.join(primary_external_storage_path(), 'Download', filename)
+                destination_filepath = system.android_download_path(filename)
             else:
                 destination_filepath = os.path.join(os.path.expanduser('~'), filename)
             api_client.identity_backup(

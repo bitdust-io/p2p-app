@@ -89,7 +89,6 @@ def android_sdk_version():
     _LatestAndroidSDKVersion = autoclass('android.os.Build$VERSION').SDK_INT
     return _LatestAndroidSDKVersion
 
-#------------------------------------------------------------------------------
 
 def get_android_keyboard_height():
     global _LatestAndroidBitDustActivity
@@ -174,6 +173,16 @@ def set_android_system_ui_visibility():
     if _Debug:
         print('system.set_android_system_ui_visibility', decorView, flags)
 
+
+def android_download_path(file_path=None):
+    from android.storage import primary_external_storage_path  # @UnresolvedImport
+    base_path = primary_external_storage_path()
+    if not os.path.exists(os.path.join(base_path, 'Download', 'BitDust')):
+        os.makedirs(os.path.join(base_path, 'Download', 'BitDust'))
+    if file_path:
+        return os.path.join(base_path, 'Download', 'BitDust', file_path)
+    return os.path.join(base_path, 'Download', 'BitDust')
+
 #------------------------------------------------------------------------------
 
 def ReadTextFile(filename):
@@ -193,7 +202,6 @@ def ReadTextFile(filename):
         if _Debug:
             print('file %r read failed: %r' % (filename, e, ))
     return u''
-
 
 
 def WriteBinaryFile(filename, data):
