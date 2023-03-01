@@ -72,7 +72,7 @@ build: .spec
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release 1>buildozer.log 2>buildozer.err
 	@cp -f -T -v ./workspace/bin/bitdust*arm64-v8a_armeabi-v7a_x86_64-release.aab ./workspace/bin/BitDustAndroid_unsigned.aab
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.aab ./bin/BitDustAndroid.aab
-	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true --min-cache-version 21 bin/BitDustAndroid.aab
+	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true --min-sdk-version 21 bin/BitDustAndroid.aab
 	@rm -rfv ./workspace/bin/BitDustAndroid_unsigned.aab
 	@rm -rfv ./workspace/bin/bitdust1-*-release.aab
 	@mv -v ./workspace/bin/*.aab ./bin/
@@ -80,8 +80,7 @@ build: .spec
 
 debug: .spec
 	@rm -rfv ./workspace/bin/*.apk
-	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android debug
-	# 1>buildozer.log 2>buildozer.err
+	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android debug 1>buildozer.log 2>buildozer.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
 	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true ./bin/BitDustAndroid.apk
@@ -108,7 +107,7 @@ system_dependencies:
 	@python3 -m pip install Cython
 
 test:
-	@adb install -r bin/BitDustAndroid_arm64_v8a.apk
+	@adb install -r -d bin/BitDustAndroid_arm64_v8a.apk
 
 shell:
 	@echo "run-as org.bitdust_io.bitdust1"
