@@ -1,13 +1,17 @@
-from components import screen
+import os
+import shutil
+
+#------------------------------------------------------------------------------
 
 from lib import api_client
 from lib import system
 
+from components import screen
 from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -43,6 +47,9 @@ class SingleSharedFileScreen(screen.AppScreen):
         self.global_id = kw.pop('global_id', '')
         self.remote_path = kw.pop('remote_path', '')
         self.details = kw.pop('details', {})
+        self.local_path = self.details.get('local_path')
+        if system.is_android():
+            self.local_path = system.android_download_path(self.details.get('path'))
         return kw
 
     def get_title(self):
@@ -79,6 +86,7 @@ class SingleSharedFileScreen(screen.AppScreen):
             versions_text += version_info_text.format(**v)
         ctx['versions_text'] = versions_text
         self.ids.shared_file_details.text = shared_file_info_text.format(**ctx)
+        self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_my_data')
@@ -88,9 +96,19 @@ class SingleSharedFileScreen(screen.AppScreen):
         self.ids.state_panel.release()
 
     def on_download_file_button_clicked(self):
+        destination_path = None
+        if system.is_android():
+            import tempfile
+            from android.storage import app_storage_path  # @UnresolvedImport
+            destination_path = tempfile.mkdtemp(dir=app_storage_path())
         if _Debug:
-            print('SingleSharedFileScreen.on_download_file_button_clicked')
-        api_client.file_download_start(remote_path=self.remote_path, cb=self.on_file_download_started)
+            print('SingleSharedFileScreen.on_download_file_button_clicked remote_path=%s destination_path=%s' % (self.remote_path, destination_path, ))
+        api_client.file_download_start(
+            remote_path=self.remote_path,
+            destination_path=destination_path,
+            wait_result=True,
+            cb=lambda resp: self.on_file_download_result(resp, destination_path),
+        )
 
     def on_delete_file_button_clicked(self):
         if _Debug:
@@ -107,12 +125,28 @@ class SingleSharedFileScreen(screen.AppScreen):
         screen.main_window().screen_back()
         screen.main_window().close_screen(screen_id='shared_file_{}'.format(self.global_id))
 
-    def on_file_download_started(self, resp):
+    def on_file_download_result(self, resp, destination_path):
         if _Debug:
-            print('SingleSharedFileScreen.on_file_download_started', resp)
+            print('SingleSharedFileScreen.on_file_download_result', resp, destination_path)
+        if system.is_android():
+            for filename in os.listdir(destination_path):
+                srcpath = os.path.join(destination_path, filename)
+                destpath = system.android_download_path(filename)
+                # TODO: move the following inside a thread
+                shutil.copyfile(srcpath, destpath)
+                if _Debug:
+                    print('SingleSharedFileScreen.on_file_download_result', srcpath, destpath)
+            system.rmdir_recursive(destination_path, ignore_errors=True)
+        self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
         if not api_client.is_ok(resp):
             snackbar.error(text='download file failed: %s' % api_client.response_err(resp))
         else:
-            snackbar.success(text='file download started')
-        screen.main_window().screen_back()
-        screen.main_window().close_screen(screen_id='shared_file_{}'.format(self.global_id))
+            snackbar.success(text='downloading is complete')
+        # screen.main_window().screen_back()
+        # screen.main_window().close_screen(screen_id='shared_file_{}'.format(self.global_id))
+
+    def on_open_file_button_clicked(self):
+        if _Debug:
+            print('SingleSharedFileScreen.on_open_file_button_clicked')
+        if self.local_path and os.path.exists(self.local_path):
+            system.open_path_in_os(self.local_path)

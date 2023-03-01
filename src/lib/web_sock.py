@@ -198,7 +198,8 @@ def on_message(ws_inst, message):
             return
         result_callback = _CallbacksQueue.pop(call_id)
         if _DebugAPIResponses:
-            print('WS API Response {} : {}'.format(call_id, json_data['payload']['response'], ))
+            if json_data['payload'].get('response'):
+                print('WS API Response {} : {}'.format(call_id, json_data['payload']['response'], ))
         if result_callback:
             result_callback(json_data)
         return True

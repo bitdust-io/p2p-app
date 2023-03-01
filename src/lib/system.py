@@ -10,7 +10,7 @@ from kivy.utils import platform  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -63,32 +63,18 @@ def get_app_data_path():
     A portable method to get the default data folder location, usually it is: "~/.bitdust/"
     """
     if is_windows():
-        # TODO: move somewhere on Win10 ...
         return os.path.join(os.path.expanduser('~'), '.bitdust')
 
     elif is_linux():
-        # This should be okay : /home/veselin/.bitdust/
         return os.path.join(os.path.expanduser('~'), '.bitdust')
 
     elif is_android():
-        try:
-            from jnius import autoclass  # @UnresolvedImport
-            Context = autoclass("android.content.Context")
-            Environment = autoclass("android.os.Environment")
-            documents_dir = Context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()
-        except Exception as e:
-            if _Debug:
-                print('get_app_data_path() failed', e)
-            documents_dir = "/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents"
-        if _Debug:
-            print('get_app_data_path() documents_dir=%r' % documents_dir)
-        return os.path.join(documents_dir, '.bitdust')
+        from android.storage import app_storage_path  # @UnresolvedImport
+        return os.path.join(app_storage_path(), '.bitdust')
 
     elif is_osx():
-        # This should be okay : /Users/veselin/.bitdust/
         return os.path.join(os.path.expanduser('~'), '.bitdust')
 
-    # otherwise just default : ".bitdust/" in user root folder
     return os.path.join(os.path.expanduser('~'), '.bitdust')
 
 #------------------------------------------------------------------------------
@@ -103,7 +89,6 @@ def android_sdk_version():
     _LatestAndroidSDKVersion = autoclass('android.os.Build$VERSION').SDK_INT
     return _LatestAndroidSDKVersion
 
-#------------------------------------------------------------------------------
 
 def get_android_keyboard_height():
     global _LatestAndroidBitDustActivity
@@ -188,6 +173,16 @@ def set_android_system_ui_visibility():
     if _Debug:
         print('system.set_android_system_ui_visibility', decorView, flags)
 
+
+def android_download_path(file_path=None):
+    from android.storage import primary_external_storage_path  # @UnresolvedImport
+    base_path = primary_external_storage_path()
+    if not os.path.exists(os.path.join(base_path, 'Download', 'BitDust')):
+        os.makedirs(os.path.join(base_path, 'Download', 'BitDust'))
+    if file_path:
+        return os.path.join(base_path, 'Download', 'BitDust', file_path)
+    return os.path.join(base_path, 'Download', 'BitDust')
+
 #------------------------------------------------------------------------------
 
 def ReadTextFile(filename):
@@ -208,6 +203,58 @@ def ReadTextFile(filename):
             print('file %r read failed: %r' % (filename, e, ))
     return u''
 
+
+def WriteBinaryFile(filename, data):
+    """
+    A smart way to write data to binary file. Return True if success.
+    """
+    try:
+        f = open(filename, 'wb')
+        f.write(data)
+        f.flush()
+        # from http://docs.python.org/library/os.html on os.fsync
+        os.fsync(f.fileno())
+        f.close()
+    except Exception as e:
+        if _Debug:
+            print('file %r write failed: %r' % (filename, e, ))
+        try:
+            # make sure file gets closed
+            f.close()
+        except:
+            pass
+        return False
+    return True
+
+
+def ReadBinaryFile(filename, decode_encoding=None):
+    """
+    A smart way to read binary file. Return empty string in case of:
+
+    - path not exist
+    - process got no read access to the file
+    - some read error happens
+    - file is really empty
+    """
+    if not filename:
+        return b''
+    if not os.path.isfile(filename):
+        return b''
+    if not os.access(filename, os.R_OK):
+        return b''
+    try:
+        infile = open(filename, mode='rb')
+        data = infile.read()
+        if decode_encoding is not None:
+            data = data.decode(decode_encoding)
+        infile.close()
+        return data
+    except Exception as e:
+        if _Debug:
+            print('file %r read failed: %r' % (filename, e, ))
+    return b''
+
+#------------------------------------------------------------------------------
 
 def rmdir_recursive(dirpath, ignore_errors=False, pre_callback=None):
     """
@@ -391,3 +438,73 @@ def make_nice_size(sz):
 
 def make_nice_file_condition(file_info):
     return '{}/{}'.format(file_info.get('delivered', '0%'), file_info.get('reliable', '0%'))
+
+#------------------------------------------------------------------------------
+
+def open_path_in_os(filepath):
+    """
+    A portable way to open location or file on local disk with a default OS method.
+    """
+    if is_windows():
+        if os.path.isfile(filepath):
+            subprocess.Popen(['explorer', '/select,', '%s' % (filepath.replace('/', '\\'))])
+            return True
+        subprocess.Popen(['explorer', '%s' % (filepath.replace('/', '\\'))])
+        return True
+
+    elif is_linux():
+        subprocess.Popen(['xdg-open', filepath])
+        return True
+
+    elif is_osx():
+        subprocess.Popen(['open', '-R', filepath])
+        return True
+
+    elif is_android():
+        from jnius import autoclass, cast  # @UnresolvedImport
+        from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
+        StrictMode = autoclass('android.os.StrictMode')
+        StrictMode.disableDeathOnFileUriExposure()
+        PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
+        Intent = autoclass('android.content.Intent')
+        Uri = autoclass('android.net.Uri')
+        File = autoclass('java.io.File')
+        theFile = File(filepath)
+        uri = Uri.fromFile(theFile)
+        viewIntent = Intent(Intent.ACTION_VIEW)
+        if filepath.endswith(".doc") or filepath.endswith(".docx"):
+            viewIntent.setDataAndType(uri, "application/msword")
+        elif filepath.endswith(".pdf"):
+            viewIntent.setDataAndType(uri, "application/pdf")
+        elif filepath.endswith(".ppt") or filepath.endswith(".pptx"):
+            viewIntent.setDataAndType(uri, "application/vnd.ms-powerpoint")
+        elif filepath.endswith(".xls") or filepath.endswith(".xlsx"):
+            viewIntent.setDataAndType(uri, "application/vnd.ms-excel")
+        elif filepath.endswith(".zip") or filepath.endswith(".rar"):
+            viewIntent.setDataAndType(uri, "application/x-wav")
+        elif filepath.endswith(".rtf"):
+            viewIntent.setDataAndType(uri, "application/rtf")
+        elif filepath.endswith(".wav") or filepath.endswith(".mp3"):
+            viewIntent.setDataAndType(uri, "audio/x-wav")
+        elif filepath.endswith(".gif"):
+            viewIntent.setDataAndType(uri, "image/gif")
+        elif filepath.endswith(".jpg") or filepath.endswith(".jpeg") or filepath.endswith(".png"):
+            viewIntent.setDataAndType(uri, "image/jpeg")
+        elif filepath.endswith(".txt"):
+            viewIntent.setDataAndType(uri, "text/plain")
+        elif filepath.endswith(".3gp") or filepath.endswith(".mpg") or filepath.endswith(".mpeg") or filepath.endswith(".mpe") or filepath.endswith(".mp4") or filepath.endswith(".avi"):
+            viewIntent.setDataAndType(uri, "video/*")
+        else:
+            viewIntent.setDataAndType(uri, "*/*")
+        parcelable = cast('android.os.Parcelable', uri)
+        viewIntent.putExtra(Intent.EXTRA_STREAM, parcelable)
+        currentActivity = cast('android.app.Activity', PythonActivity.mBitDustActivity)
+        currentActivity.startActivity(viewIntent)
+        return True
+
+    try:
+        import webbrowser
+        webbrowser.open(filepath)
+    except Exception as e:
+        print('file %r failed to open with default OS method: %r' % (filepath, e, ))
+    return False

@@ -121,7 +121,7 @@ class MyIDScreen(screen.AppScreen):
         if btn.icon == 'shield-key':
             filename = 'BitDust_key_{}.txt'.format(self.my_identity_name) if self.my_identity_name else 'BitDust_key.txt'
             if system.is_android():
-                destination_filepath = os.path.join('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents', filename)
+                destination_filepath = system.android_download_path(filename)
             else:
                 destination_filepath = os.path.join(os.path.expanduser('~'), filename)
             api_client.identity_backup(
@@ -176,7 +176,8 @@ class MyIDScreen(screen.AppScreen):
             print('MyIDScreen.on_process_stop_result_erase_my_id', args)
         home_folder_path = os.path.join(os.path.expanduser('~'), '.bitdust')
         if system.is_android():
-            home_folder_path = os.path.join('/storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents', '.bitdust')
+            from android.storage import app_storage_path  # @UnresolvedImport
+            home_folder_path = os.path.join(app_storage_path(), '.bitdust')
         try:
             current_network = open(os.path.join(home_folder_path, 'current_network'), 'r').read().strip()
         except:

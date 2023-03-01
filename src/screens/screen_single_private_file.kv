@@ -27,28 +27,34 @@
                         color: app.color_black
                         text: ''
 
-                    HorizontalContainerLayout:
+                    FillRoundFlatButton:
+                        id: download_file_button
+                        text: "[size=18sp]{}[/size] [size=16sp][b]download[/b][/size]".format(md_icon("file-download"))
+                        md_bg_color: app.theme_cls.accent_color
+                        theme_text_color: "Custom"
+                        text_color: app.color_white99
+                        on_release: root.on_download_file_button_clicked()
 
-                        HEmptySpace:
+                    VFixedEmptySpace:
 
-                        FillRoundFlatButton:
-                            id: download_file_button
-                            text: "[size=18sp]{}[/size] [size=16sp][b]download[/b][/size]".format(md_icon("file-download"))
-                            md_bg_color: app.theme_cls.accent_color
-                            theme_text_color: "Custom"
-                            text_color: app.color_white99
-                            on_release: root.on_download_file_button_clicked()
+                    FillRoundFlatButton:
+                        id: open_file_button
+                        text: "[size=18sp]{}[/size] [size=16sp][b]open[/b][/size]".format(md_icon("file-image"))
+                        md_bg_color: app.theme_cls.primary_color
+                        theme_text_color: "Custom"
+                        text_color: app.color_white99
+                        on_release: root.on_open_file_button_clicked()
 
-                        HFixedEmptySpace:
+                    VFixedEmptySpace:
 
-                        FillRoundFlatButton:
-                            id: delete_file_button
-                            text: "[size=18sp]{}[/size] [size=16sp][b]delete[/b][/size]".format(md_icon("file-delete"))
-                            md_bg_color: app.theme_cls.error_color
-                            theme_text_color: "Custom"
-                            text_color: app.color_white99
-                            on_release: root.on_delete_file_button_clicked()
+                    FillRoundFlatButton:
+                        id: delete_file_button
+                        text: "[size=18sp]{}[/size] [size=16sp][b]delete[/b][/size]".format(md_icon("file-delete"))
+                        md_bg_color: app.theme_cls.error_color
+                        theme_text_color: "Custom"
+                        text_color: app.color_white99
+                        on_release: root.on_delete_file_button_clicked()
 
-                        HEmptySpace:
+                    HEmptySpace:
 
         BottomEmptyScreenSpace:
