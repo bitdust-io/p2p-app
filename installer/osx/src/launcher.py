@@ -1,14 +1,21 @@
+import sys
 import time
 import subprocess
 import threading
 import queue
 
 from kivy.app import App
+from kivy.metrics import dp
+from kivy.config import Config
+from kivy.core.window import Window
 from kivy.clock import Clock, mainthread
 from kivy.lang import Builder
 
 
 _Debug = True
+
+
+Config.set('graphics', 'resizable', False)
 
 
 class AsynchronousFileReader(threading.Thread):
@@ -104,39 +111,108 @@ class BitDustP2P_App(App):
     finishing = threading.Event()
 
     def build(self):
-        return Builder.load_string("""
-
+        Window.borderless = True
+        root = Builder.load_string("""
 BoxLayout:
-    id: container
-    spacing: 1
-    padding: 1
+    pos_hint: {'top': 1}
+    spacing: '0dp'
+    padding: '0dp'
     orientation: 'vertical'
+    size_hint: 1, None
+    height: '28dp'
+
+    BoxLayout:
+        spacing: '10dp'
+        padding: '10dp', '0dp', '0dp', '0dp'
+        orientation: 'horizontal'
+        size_hint: 1, None
+        height: '28dp'
+
+        ProgressBar:
+            id: progress
+            max: 100
+            value: 0
+            size_hint_y: None
+            height: '28dp'
+
+        ToggleButton:
+            id: button_expand
+            text: '0%'
+            size_hint: None, None
+            width: '56dp'
+            height: '28dp'
+            on_state: app.on_button_expand_state()
 
     ScrollView:
         id: scroll
-        bar_width: '10dp'
+        bar_width: '12dp'
+        size_hint: 1, None
+        height: 0
+        opacity: 0
+        disabled: True
 
         TextInput:
             id: content
             size_hint: 1, None
             height: max(self.minimum_height, scroll.height)
+            background_color: 0,0,0,1
+            foreground_color: 1,1,1,1
 
     Button:
         id: button_close
-        text: "Close"
+        text: "START"
         pos_hint: {'right': 1}
         size_hint: None, None
-        width: '70dp'
-        height: '28dp'
+        width: '64dp'
+        disabled: True
+        on_release: app.on_button_close()
+        height: 0
+        opacity: 0
         disabled: True
     """)
+        Window.size = (Window.size[0] / dp(1), root.height / dp(1))
+        return root
+
+    def collapse(self):
+        s = self.root.ids.scroll
+        b = self.root.ids.button_close
+        self.root.height = dp(28)
+        s.height = dp(0)
+        s.opacity = 0
+        s.disabled = True
+        b.height = dp(0)
+        b.opacity = 0
+        b.disabled = True
+
+    def expand(self):
+        s = self.root.ids.scroll
+        b = self.root.ids.button_close
+        self.root.height = dp(28+28+300)
+        s.height = dp(300)
+        s.opacity = 1
+        s.disabled = False
+        b.height = dp(28)
+        b.opacity = 1
+        b.disabled = False
+
+    def start_app(self):
+        subprocess.Popen(
+            '/bin/sh install.sh start',
+            shell=True,
+            close_fds=True,
+            universal_newlines=False,
+        )
 
     def on_start(self):
+        if _Debug:
+            print('BitDustP2P_App.on_start sys.executable', sys.executable)
+        self.root.ids.content.text += sys.executable + '\n'
         self.error = None
         BackgroundProcess(
-            cmd=['/bin/sh', './installer/osx/deploy.sh', ],
+            '/bin/sh install.sh ' + sys.executable,
+            shell=True,
             finishing=self.finishing,
-            daemon=True,
+            daemon=False,
             result_callback=self.on_result,
             stdout_callback=self.on_stdout,
             stderr_callback=self.on_stderr,
@@ -147,21 +223,49 @@ BoxLayout:
 
     @mainthread
     def on_stdout(self, line):
-        self.root.ids.content.text += line.decode()
-        self.root.ids.scroll.scroll_y = 0.0
+        ln = line.decode()
+        if ln.startswith('### '):
+            self.root.ids.button_expand.text = ln.strip().replace('### ', '')
+            self.root.ids.progress.value = int(ln.strip().replace('### ', '').replace('%', ''))
+        else:
+            self.root.ids.content.text += ln
+            self.root.ids.scroll.scroll_y = 0.0
 
     @mainthread
     def on_stderr(self, line):
-        self.root.ids.content.text += 'ERR:' + line.decode()
-        self.root.ids.scroll.scroll_y = 0.0
+        ln = line.decode()
+        if ln.startswith('### '):
+            self.root.ids.button_expand.text = ln.strip().replace('### ', '')
+            self.root.ids.progress.value = int(ln.strip().replace('### ', '').replace('%', ''))
+        else:
+            self.root.ids.content.text += ln
+            self.root.ids.scroll.scroll_y = 0.0
 
     @mainthread
     def on_result(self, ret_code):
         if _Debug:
             print('BitDustP2P_App.on_result', ret_code)
-        if ret_code:
-            self.root.ids.button_close.disabled = False
+        if not ret_code:
+            if self.root.ids.button_expand.state != 'down':
+                self.start_app()
+                # self.stop()
+                return
         else:
-            self.stop()
+            self.root.ids.button_close.text = 'EXIT'
+            self.root.ids.button_close.disabled = False
+            self.expand()
+
+    def on_button_expand_state(self):
+        if self.root.ids.button_expand.state == 'down':
+            self.expand()
+        else:
+            self.collapse()
+        Window.size = (Window.size[0] / dp(1), self.root.height / dp(1))
+
+    def on_button_close(self):
+        if self.root.ids.button_close.text != 'EXIT':
+            self.start_app()
+        self.stop()
+
 
 BitDustP2P_App().run()
