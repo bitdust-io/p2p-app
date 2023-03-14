@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 ROOT_DIR="$HOME/.bitdust"
 SOURCE_UI_DIR="${ROOT_DIR}/ui"
 VENV_DIR="${ROOT_DIR}/venv"
@@ -10,8 +12,8 @@ MAIN_PY="${SOURCE_UI_DIR}/src/main.py"
 
 if [[ "$1" == "start" ]]; then
     cd $SOURCE_UI_DIR
-    $PYTHON_BIN $MAIN_PY
-    exit 0;
+    nohup $PYTHON_BIN $MAIN_PY 1>$ROOT_DIR/stdout.txt 2>$ROOT_DIR/stderr.txt &
+    exit 0
 fi
 
 
@@ -48,17 +50,15 @@ echo "### 40%"
 
 if [ ! -e $PIP_BIN ]; then
     echo "building Python virtual environment"
-    $PYTHON -m virtualenv $VENV_DIR
+    $PYTHON -c "import sys,venv; venv.create(sys.argv[1])" $VENV_DIR
 fi
 echo "### 60%"
 
 
 echo "updating Python virtual environment"
-$PIP_BIN --default-timeout=10 install -U -r $SOURCE_UI_DIR/requirements.txt
+$PIP_BIN --default-timeout=10 install -q -U -r $SOURCE_UI_DIR/requirements.txt
 echo "### 80%"
 
 
 echo "### 100%"
 echo 'done, application is ready'
-
-exit 0

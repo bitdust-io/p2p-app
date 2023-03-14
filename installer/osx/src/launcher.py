@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import subprocess
@@ -11,12 +12,9 @@ from kivy.core.window import Window
 from kivy.clock import Clock, mainthread
 from kivy.lang import Builder
 
-
 _Debug = True
 
-
 Config.set('graphics', 'resizable', False)
-
 
 class AsynchronousFileReader(threading.Thread):
 
@@ -157,6 +155,7 @@ BoxLayout:
             height: max(self.minimum_height, scroll.height)
             background_color: 0,0,0,1
             foreground_color: 1,1,1,1
+            readonly: True
 
     Button:
         id: button_close
@@ -165,10 +164,9 @@ BoxLayout:
         size_hint: None, None
         width: '64dp'
         disabled: True
-        on_release: app.on_button_close()
         height: 0
         opacity: 0
-        disabled: True
+        on_release: app.on_button_close()
     """)
         Window.size = (Window.size[0] / dp(1), root.height / dp(1))
         return root
@@ -176,6 +174,7 @@ BoxLayout:
     def collapse(self):
         s = self.root.ids.scroll
         b = self.root.ids.button_close
+        e = self.root.ids.button_expand
         self.root.height = dp(28)
         s.height = dp(0)
         s.opacity = 0
@@ -183,10 +182,13 @@ BoxLayout:
         b.height = dp(0)
         b.opacity = 0
         b.disabled = True
+        e.state = 'normal'
+        Window.size = (Window.size[0] / dp(1), self.root.height / dp(1))
 
     def expand(self):
         s = self.root.ids.scroll
         b = self.root.ids.button_close
+        e = self.root.ids.button_expand
         self.root.height = dp(28+28+300)
         s.height = dp(300)
         s.opacity = 1
@@ -194,11 +196,17 @@ BoxLayout:
         b.height = dp(28)
         b.opacity = 1
         b.disabled = False
+        e.state = 'down'
+        Window.size = (Window.size[0] / dp(1), self.root.height / dp(1))
 
     def start_app(self):
+        if sys.executable.count('.app/Contents/MacOS'):
+            install_sh_full_path = os.path.join(os.path.dirname(sys.executable), '..', 'Resources', 'install.sh')
+        else:
+            install_sh_full_path = os.path.join(os.getcwd(), 'install.sh')
         subprocess.Popen(
-            '/bin/sh install.sh start',
-            shell=True,
+            ['/bin/sh', install_sh_full_path, 'start', ],
+            shell=False,
             close_fds=True,
             universal_newlines=False,
         )
@@ -206,10 +214,17 @@ BoxLayout:
     def on_start(self):
         if _Debug:
             print('BitDustP2P_App.on_start sys.executable', sys.executable)
-        self.root.ids.content.text += sys.executable + '\n'
+        if sys.executable.count('.app/Contents/MacOS'):
+            install_sh_full_path = os.path.join(os.path.dirname(sys.executable), '..', 'Resources', 'install.sh')
+            python_bin_full_path = os.path.join(os.path.dirname(sys.executable), 'python')
+        else:
+            install_sh_full_path = os.path.join(os.getcwd(), 'install.sh')
+            python_bin_full_path = sys.executable
         self.error = None
         BackgroundProcess(
-            '/bin/sh install.sh ' + sys.executable,
+            # python_bin_full_path + ' -m virtualenv venv',
+            '/bin/sh ' + install_sh_full_path + ' ' + python_bin_full_path,
+            # ['/bin/sh', install_sh_full_path, python_bin_full_path, ],
             shell=True,
             finishing=self.finishing,
             daemon=False,
@@ -248,7 +263,7 @@ BoxLayout:
         if not ret_code:
             if self.root.ids.button_expand.state != 'down':
                 self.start_app()
-                # self.stop()
+                self.stop()
                 return
         else:
             self.root.ids.button_close.text = 'EXIT'

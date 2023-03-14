@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><plist version="1.0">
+  <dict>
+    <key>CFBundleExecutable</key>
+    <string>BitDust-p2p-app</string>
+    <key>CFBundleIconFile</key>
+    <string>bitdust-logo-color.icns</string>
+    <key>CFBundleGetInfoString</key>
+    <string>BitDust-p2p-app 1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1.0.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+  </dict>
+</plist>

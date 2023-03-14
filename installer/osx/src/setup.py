@@ -7,13 +7,21 @@ Usage:
 
 from setuptools import setup
 
-APP = ['launcher.py']
-DATA_FILES = ['install.sh']
-OPTIONS = {}
-
 setup(
-    app=APP,
-    data_files=DATA_FILES,
-    options={'py2app': OPTIONS},
-    setup_requires=['py2app'],
+    app=[
+        'launcher.py',
+    ],
+    data_files=[
+        'install.sh',
+    ],
+    options={
+        'py2app': {
+            'includes': [
+                'virtualenv',
+            ],
+        },
+    },
+    setup_requires=[
+        'py2app',
+    ],
 )
