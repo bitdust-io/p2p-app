@@ -1,0 +1,5 @@
+.python-portable
+.openssl
+.cache
+bin/*
+workspace
