@@ -1,4 +1,5 @@
-.python-portable/
+.python-portable
+.openssl
 .cache
 bin/*
-workspace/
+workspace
