@@ -120,6 +120,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         fonts_path = './src/fonts'
         if system.is_android():
             fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
+        elif system.is_osx():
+            fonts_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
         # https://materialdesignicons.com
         LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
         theme_font_styles.append('IconMD')
@@ -175,8 +177,10 @@ class BitDustApp(styles.AppStyle, MDApp):
     def init_components(self):
         from components import all_components
         Builder.load_string(all_components.KV_IMPORT)
+        if system.is_osx():
+            all_components.KV_FILES_BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         for kv_file in all_components.KV_FILES:
-            Builder.load_file(all_components.KV_FILES_BASE + kv_file)
+            Builder.load_file(all_components.KV_FILES_BASE + '/' + kv_file)
 
     @mainthread
     def do_start(self, *args, **kwargs):
@@ -327,7 +331,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             ).run()
         elif system.is_osx():
             system.BackgroundProcess(
-                cmd=['/bin/bash', './src/deploy/osx.sh', ] + params,
+                cmd=['/bin/bash', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'deploy', 'osx.sh'), ] + params,
                 stdout_callback=self.on_deploy_process_stdout,
                 stderr_callback=self.on_deploy_process_stderr,
                 finishing=self.finishing,
@@ -472,3 +476,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+    import threading
+    for thread in threading.enumerate():
+        print(thread.name, thread)

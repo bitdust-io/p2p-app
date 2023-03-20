@@ -21,6 +21,7 @@ from kivymd.theming import ThemableBehavior
 from lib import system
 
 from components import webfont
+from components import all_components
 from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
@@ -237,7 +238,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             if system.is_android():
                 screen_kv_file = os.path.abspath(os.path.join(os.environ['ANDROID_ARGUMENT'], screen_kv_file))
             else:
-                screen_kv_file = os.path.abspath(os.path.join('src', screen_kv_file))
+                screen_kv_file = all_components.KV_FILES_BASE + '/' + screen_kv_file
             if screen_kv_file in self.screens_loaded:
                 if _Debug:
                     print('MainWin.open_screen   KV file already loaded: %r' % screen_kv_file)
