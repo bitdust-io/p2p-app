@@ -10,7 +10,7 @@ if [[ ! -e $ROOT_DIR ]]; then
 fi
 
 PYTHON_DIR="${ROOT_DIR}/python"
-PYTHON_BIN="${PYTHON_DIR}/bin/python3"
+PYTHON_BIN="${PYTHON_DIR}/bin/BitDust-p2p-app"
 PIP_BIN="${PYTHON_DIR}/bin/pip3"
 SOURCE_UI_DIR="${ROOT_DIR}/ui"
 MAIN_PY="${SOURCE_UI_DIR}/src/main.py"
@@ -35,7 +35,7 @@ else
     cd ..
 fi
 
-if [[ ! $(ps axo pid,command | grep "python" | grep "main.py") ]]; then
+if [[ ! $(ps axo pid,command | grep "BitDust-p2p-app" | grep "main.py") ]]; then
     cd $SOURCE_UI_DIR
     $PYTHON_BIN $MAIN_PY 1>"${ROOT_DIR}/stdout.txt" 2>"${ROOT_DIR}/stderr.txt"
 fi
