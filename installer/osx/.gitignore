@@ -1,5 +1,5 @@
 .python-portable
 .openssl
 .cache
-bin/*
+bin/*.dmg
 workspace

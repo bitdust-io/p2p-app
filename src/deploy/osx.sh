@@ -12,7 +12,7 @@ BITDUST_PY="${SOURCE_DIR}/bitdust.py"
 BITDUST_COMMAND_FILE="${ROOT_DIR}/bitdust"
 GLOBAL_COMMAND_LOCATION="/usr/local/bin"
 GLOBAL_COMMAND_FILE="${GLOBAL_COMMAND_LOCATION}/bitdust"
-PYTHON_BIN="${ROOT_DIR}/python/bin/python3.10"
+PYTHON_BIN="${ROOT_DIR}/python/bin/python3"
 PYTHON_VENV_BIN="${ROOT_DIR}/venv/bin/python3"
 PIP_VENV_BIN="${ROOT_DIR}/venv/bin/pip"
 

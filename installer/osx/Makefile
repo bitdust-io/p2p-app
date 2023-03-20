@@ -3,7 +3,8 @@
 # * create-dmg
 #
 
-PYTHON_VERSION="3.10.9"
+PYTHON_VERSION="3.9.16"
+PYTHON_VERSION_SHORT="3.9"
 CURRENT_DIR="${PWD}"
 
 .cache:
@@ -17,9 +18,11 @@ CURRENT_DIR="${PWD}"
 
 .python-portable:
 	@if [ ! -d ".python-portable" ]; then mkdir .python-portable && cd "./.cache/Python-${PYTHON_VERSION}" && ./configure MACOSX_DEPLOYMENT_TARGET=10.9 PY_UNSUPPORTED_OPENSSL_BUILD=static --with-openssl="${CURRENT_DIR}/.openssl" --enable-optimizations --prefix="${CURRENT_DIR}/.python-portable" && make altinstall; fi
-	@rm -rf ./.python-portable/lib/python3.10/test
-	@./.python-portable/bin/pip3.10 install -r ../../requirements.txt
-	@./.python-portable/bin/pip3.10 install pygit2
+	@rm -rf "./.python-portable/lib/python${PYTHON_VERSION_SHORT}/test"
+	@mv -v "./.python-portable/bin/python${PYTHON_VERSION_SHORT}" "./.python-portable/bin/python3"
+	@mv -v "./.python-portable/bin/pip${PYTHON_VERSION_SHORT}" "./.python-portable/bin/pip3"
+	@"./.python-portable/bin/pip3" install -r ../../requirements.txt
+	@"./.python-portable/bin/pip3" install pygit2
 	@cd .python-portable && find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 	@zip -r -X python.zip .python-portable/ && mv -v python.zip .cache/
 
@@ -31,7 +34,7 @@ CURRENT_DIR="${PWD}"
 	@cp -v ./.cache/python.zip workspace/BitDust-p2p-app.app/Contents/Resources/
 
 build: .cache .openssl .python-portable .prepare
-	@rm -rf bin/*.dmg
+	@rm -rf bin && mkdir -p bin
 	@cd workspace && create-dmg --volname "BitDust-p2p-app Installer" --volicon "bitdust-logo-color.icns" --icon-size 100 --icon "BitDust-p2p-app.app" 200 200 --window-pos 200 120 --window-size 800 400 --hide-extension "BitDust-p2p-app" --app-drop-link 600 185 "BitDust-p2p-app.dmg" "${PWD}/workspace/BitDust-p2p-app.app"
 	@mv -v workspace/BitDust-p2p-app.dmg bin/
 	@echo "DONE"

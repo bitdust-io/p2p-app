@@ -9,14 +9,14 @@ if [[ ! -e $ROOT_DIR ]]; then
     mkdir -p $ROOT_DIR
 fi
 
-PYTHON_PORTABLE_DIR="${ROOT_DIR}/python"
-PYTHON_BIN="${PYTHON_PORTABLE_DIR}/bin/python3.10"
-PIP_BIN="${PYTHON_PORTABLE_DIR}/bin/pip3.10"
+PYTHON_DIR="${ROOT_DIR}/python"
+PYTHON_BIN="${PYTHON_DIR}/bin/python3"
+PIP_BIN="${PYTHON_DIR}/bin/pip3"
 SOURCE_UI_DIR="${ROOT_DIR}/ui"
 MAIN_PY="${SOURCE_UI_DIR}/src/main.py"
 
-if [[ ! -d "$PYTHON_PORTABLE_DIR" ]]; then
-    osascript -e "display dialog \"The necessary files will be extracted to the ${ROOT_DIR} folder in the background. The application will launch automatically once this is completed.\" buttons {\"Continue\"} default button \"Continue\" with icon alias \"Macintosh HD:Applications:BitDust-p2p-app.app:Contents:Resources:bitdust-logo-color.icns\""
+if [[ ! -d "$PYTHON_DIR" ]]; then
+    osascript -e "display dialog \"Now the initial setup of the application data files will be performed. The files will be extracted to the folder:\n ${ROOT_DIR}\n\nThe application will start automatically.\" buttons {\"Continue\"} default button \"Continue\" with icon alias \"Macintosh HD:Applications:BitDust-p2p-app.app:Contents:Resources:bitdust-logo-color.icns\""
     unzip "${SCRIPT_PATH}/../Resources/python.zip" -d "${ROOT_DIR}"
     mv "${ROOT_DIR}/.python-portable" "${ROOT_DIR}/python"
 fi
@@ -24,10 +24,14 @@ fi
 cd "$ROOT_DIR"
 
 if [[ ! -d "$SOURCE_UI_DIR/src" ]]; then
-    $PYTHON_BIN -c "import pygit2; pygit2.clone_repository('https://github.com/bitdust-io/p2p-app.git', \"$SOURCE_DIR\")" || (osascript -e "display dialog \"Failed to download source code files from GIT repository. Please check your Internet connection and try again.\" buttons {\"Exit\"} default button \"Exit\" with icon alias \"Macintosh HD:Applications:BitDust-p2p-app.app:Contents:Resources:bitdust-logo-color.icns\"" && exit 0)
+    $PYTHON_BIN -c "import pygit2; pygit2.clone_repository('https://github.com/bitdust-io/p2p-app.git', 'ui')" || ( \
+        osascript -e "display dialog \"Failed to download source code files from GIT repository. Please check your Internet connection and try again.\" buttons {\"Exit\"} default button \"Exit\" with icon alias \"Macintosh HD:Applications:BitDust-p2p-app.app:Contents:Resources:bitdust-logo-color.icns\"" && exit 0 \
+    )
 else
     cd $SOURCE_UI_DIR
-    $PYTHON_BIN -c "import pygit2; repo=pygit2.init_repository(\"$SOURCE_DIR\"); repo.remotes[0].fetch(); top=repo.lookup_reference('refs/remotes/origin/master').target; repo.reset(top, pygit2.GIT_RESET_HARD);" || (osascript -e "display dialog \"Failed to update source code files from GIT repository. Please check your Internet connection and try again.\" buttons {\"Exit\"} default button \"Exit\" with icon alias \"Macintosh HD:Applications:BitDust-p2p-app.app:Contents:Resources:bitdust-logo-color.icns\"" && exit 0)
+    $PYTHON_BIN -c "import pygit2; repo=pygit2.init_repository('.'); repo.remotes[0].fetch(); top=repo.lookup_reference('refs/remotes/origin/master').target; repo.reset(top, pygit2.GIT_RESET_HARD);" || ( \
+        osascript -e "display dialog \"Failed to update source code files from GIT repository. Please check your Internet connection and try again.\" buttons {\"Exit\"} default button \"Exit\" with icon alias \"Macintosh HD:Applications:BitDust-p2p-app.app:Contents:Resources:bitdust-logo-color.icns\"" && exit 0 \
+    )
     cd ..
 fi
 
