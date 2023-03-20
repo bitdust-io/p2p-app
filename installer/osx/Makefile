@@ -20,6 +20,7 @@ CURRENT_DIR="${PWD}"
 	@if [ ! -d ".python-portable" ]; then mkdir .python-portable && cd "./.cache/Python-${PYTHON_VERSION}" && ./configure MACOSX_DEPLOYMENT_TARGET=10.9 PY_UNSUPPORTED_OPENSSL_BUILD=static --with-openssl="${CURRENT_DIR}/.openssl" --enable-optimizations --prefix="${CURRENT_DIR}/.python-portable" && make altinstall; fi
 	@rm -rf "./.python-portable/lib/python${PYTHON_VERSION_SHORT}/test"
 	@cp -v "./.python-portable/bin/python${PYTHON_VERSION_SHORT}" "./.python-portable/bin/BitDust-p2p-app"
+	@cp -v "./.python-portable/bin/python${PYTHON_VERSION_SHORT}" "./.python-portable/bin/python3"
 	@cp -v "./.python-portable/bin/pip${PYTHON_VERSION_SHORT}" "./.python-portable/bin/pip3"
 	@"./.python-portable/bin/pip3" install -r ../../requirements.txt
 	@"./.python-portable/bin/pip3" install pygit2
