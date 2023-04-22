@@ -142,6 +142,8 @@ class GroupChatScreen(screen.AppScreen):
         msg = self.ids.chat_input.text
         if _Debug:
             print('GroupChatScreen.on_hot_button_clicked', self.global_id, msg)
+        if not msg.strip():
+            return
         api_client.message_send_group(
             group_key_id=self.global_id,
             data={'message': msg, },

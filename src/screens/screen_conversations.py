@@ -10,7 +10,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -27,19 +27,6 @@ class ConversationItem(TwoLineIconListItem):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.height = dp(48) if not self._height else self._height
-
-    def get_statuses(self):
-        return {
-            None: 'message history is not available at the moment',
-            'ON': 'message history is synchronized, you are on-line',
-            'OFF': 'message-history service is not started, you are off-line',
-            'NOT_INSTALLED': 'message-history service was not installed',
-            'INFLUENCE': 'verifying related network services',
-            'DEPENDS_OFF': 'related network services were not started yet',
-            'STARTING': 'turning on message-history service',
-            'STOPPING': 'turning off message-history service',
-            'CLOSED': 'message-history service is stopped',
-        }
 
     def get_secondary_text(self):
         sec_text = 'connecting...'
@@ -98,6 +85,19 @@ class ConversationsScreen(screen.AppScreen):
     def get_title(self):
         return 'conversations'
 
+    def get_statuses(self):
+        return {
+            None: 'message history is not available at the moment',
+            'ON': 'message history is synchronized, you are on-line',
+            'OFF': 'message-history service is not started, you are off-line',
+            'NOT_INSTALLED': 'message-history service was not installed',
+            'INFLUENCE': 'verifying related network services',
+            'DEPENDS_OFF': 'related network services were not started yet',
+            'STARTING': 'turning on message-history service',
+            'STOPPING': 'turning off message-history service',
+            'CLOSED': 'message-history service is stopped',
+        }
+
     # def get_icon(self):
     #     return 'comment-text-multiple'
 
@@ -145,7 +145,20 @@ class ConversationsScreen(screen.AppScreen):
     def on_conversation(self, payload):
         if _Debug:
             print('ConversationsScreen.on_conversation', payload)
-        conv = payload['data']
+        conv = payload.get('data')
+        if not conv:
+            if payload.get('deleted'):
+                item_found = None
+                for w in self.ids.conversations_list_view.children:
+                    if isinstance(w.instance_item, ConversationItem):
+                        if w.instance_item.conversation_id == payload['id']:
+                            item_found = w
+                            break
+                if item_found:
+                    if _Debug:
+                        print('ConversationsScreen.on_conversation deleting existing item', payload['id'], item_found)
+                    self.ids.conversations_list_view.remove_widget(item_found)
+            return
         conv['automat_index'] = conv.pop('index', None) or None
         conv['automat_id'] = str(conv.pop('id', '') or '')
         item_found = None

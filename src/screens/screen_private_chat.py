@@ -140,14 +140,6 @@ class PrivateChatScreen(screen.AppScreen):
                     json_payload=msg['payload'],
                     message_id=time.strftime('%Y %d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
                 )
-#                 text='[sub][font={}][size=11sp][color={}]{}[/color]  [color=dddf]{}[/color][/size][/font][/sub]\n[font={}]{}[/font]'.format(
-#                     all_fonts.font_path('EversonMono.ttf'),
-#                     colorhash.get_user_color_hex(msg['sender']['glob_id']),
-#                     sender_name,
-#                     time.strftime('%Y %d %B at %H:%M:%S', time.localtime(msg['payload']['time'])),
-#                     all_fonts.font_path('JetBrainsMono-Medium.ttf'),
-#                     msg['payload']['data']['message'],
-#                 ),
             ),
             index=new_index,
         )
@@ -157,6 +149,8 @@ class PrivateChatScreen(screen.AppScreen):
         msg = self.ids.chat_input.text
         if _Debug:
             print('PrivateChatScreen.on_hot_button_clicked', self.recipient_id, msg)
+        if not msg.strip():
+            return
         api_client.message_send(
             recipient_id=self.recipient_id,
             data={'message': msg, },
@@ -180,7 +174,7 @@ class PrivateChatScreen(screen.AppScreen):
     def on_friend_remove_result(self, resp):
         if _Debug:
             print('PrivateChatScreen.on_friend_remove_result', resp)
-        if not api_client.is_ok(resp):
-            snackbar.error(text='contact was not deleted: %s' % api_client.response_err(resp), bottom=False)
-            return
+        # if not api_client.is_ok(resp):
+        #     snackbar.error(text='contact was not deleted: %s' % api_client.response_err(resp), bottom=False)
+        #     return
         self.main_win().select_screen('friends_screen')
