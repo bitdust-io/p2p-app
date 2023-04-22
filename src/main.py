@@ -453,6 +453,12 @@ class BitDustApp(styles.AppStyle, MDApp):
         if key_code in [27, ]:
             ret = self.main_window.on_system_back_button_clicked()
             return ret
+        if key_code in [13, ] and 'ctrl' in modifier and len(modifier) == 1:
+            if self.main_window.selected_screen.count('private_chat_') or self.main_window.selected_screen.count('group_'):
+                active_scr = self.main_window.get_active_screen(self.main_window.selected_screen)
+                if active_scr:
+                    active_scr.on_hot_button_clicked()
+                    return True
         return False
 
     # def on_height(self, instance, value):

@@ -22,7 +22,7 @@ class EngineStatusScreen(screen.AppScreen):
 
     def get_statuses(self):
         return {
-            None: 'main process is not started',
+            None: 'main process is not started yet',
             'AT_STARTUP': 'starting the application',
             'LOCAL': 'initializing local environment',
             'MODULES': 'starting sub-modules',
