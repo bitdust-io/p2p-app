@@ -307,7 +307,7 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.check_restart_bitdust_process NOT IMPLEMENTED')
             return None
         if _Debug:
-            print('BitDustApp.check_restart_bitdust_process')
+            print('BitDustApp.check_restart_bitdust_process params=%r' % params)
         Clock.schedule_once(lambda *a: self.do_start_deploy_process(params=params))
 
     def do_start_deploy_process(self, params=[]):
@@ -320,6 +320,10 @@ class BitDustApp(styles.AppStyle, MDApp):
             if welcome_screen:
                 welcome_screen.populate(start_engine=True)
         self.main_window.engine_log = '\n'
+        if not params and self.control.is_web_socket_ready():
+            if _Debug:
+                print('BitDustApp.do_start_deploy_process SKIP because web socket already ready')
+            return
         if system.is_linux():
             system.BackgroundProcess(
                 cmd=['/bin/bash', './src/deploy/linux.sh', ] + params,
