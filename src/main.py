@@ -24,8 +24,8 @@ else:
 
 if platform.system() != 'Windows' and 'ANDROID_ARGUMENT' not in os.environ:
     import codecs
-    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
-    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())  # @UndefinedVariable
+    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())  # @UndefinedVariable
 
 #------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ from lib import system
 
 #------------------------------------------------------------------------------ 
 
-_Debug = True
+_Debug = False
 _DebugProfilingEnabled = False
 
 #------------------------------------------------------------------------------

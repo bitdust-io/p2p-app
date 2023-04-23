@@ -4,14 +4,14 @@ import json
 
 #------------------------------------------------------------------------------ 
 
-_Debug = True
+_Debug = False
 
 if _Debug:
     print('BitDustService ENTRYPOINT')
 
 #------------------------------------------------------------------------------ 
 
-from twisted.internet import reactor
+from twisted.internet import reactor  # @UnresolvedImport
 
 from jnius import autoclass  # @UnresolvedImport
 
@@ -26,7 +26,7 @@ PACKAGE_NAME = 'org.bitdust_io.bitdust1'
 
 #------------------------------------------------------------------------------
 
-from twisted.internet.defer import setDebugging
+from twisted.internet.defer import setDebugging  # @UnresolvedImport
 
 if _Debug:
     # logging.basicConfig(level=logging.DEBUG)

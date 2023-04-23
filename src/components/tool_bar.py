@@ -509,7 +509,8 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
             self.remove_notch()
 
     def on_action_button(self, *args):
-        pass
+        if _Debug:
+            print('CustomBottomToolbar.on_action_button', args)
 
     def on_md_bg_color(self, instance, value):
         if self.type == "bottom":
@@ -539,7 +540,7 @@ class CustomBottomToolbar(CustomNotchedBox, AppStyle):
                 theme_text_color="Custom",
                 text_color=self.state2color(-1),
                 tooltip_text=item.get('tooltip') or '',
-                # on_release=item.get('cb') or (lambda x: None),
+                on_release=item.get('cb') or (lambda x: None),
                 # theme_text_color="Custom" if not self.opposite_colors else "Primary",
                 # text_color=self.specific_text_color,
                 # opposite_colors=self.opposite_colors,
