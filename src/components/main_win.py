@@ -304,7 +304,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
                         print('closing inactive screen %r : %d ~ %d' % (screen_id, time.time(), closed_time, ))
                     self.close_screen(screen_id)
 
-    def select_screen(self, screen_id, verify_state=False, screen_type=None, **kwargs):
+    def select_screen(self, screen_id, verify_state=False, screen_type=None, clear_screens_stack=False, **kwargs):
         if screen_type is None:
             screen_type = screen_id
             if screen_type.startswith('private_chat_'):
@@ -357,7 +357,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         self.selected_screen = screen_id
         # if self.selected_screen in ['engine_status_screen', 'connecting_screen', 'startup_screen', ]:
         #     self.screens_stack = []
-        if self.screens_stack:
+        if self.screens_stack and not clear_screens_stack:
             self.tbar().left_action_items = [["arrow-left", self.on_nav_back_button_clicked, ], ]
         else:
             self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
@@ -366,6 +366,9 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         self.ids.screen_manager.current = screen_id
         self.active_screens[screen_id][0].close_drop_down_menu()
         self.active_screens[screen_id][0].on_opened()
+        if clear_screens_stack:
+            self.screens_stack.clear()
+            self.screens_stack.append('welcome_screen')
         return True
 
     def screen_back(self):
