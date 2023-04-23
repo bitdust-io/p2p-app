@@ -22,11 +22,13 @@ class CreateGroupScreen(screen.AppScreen):
         self.clean_view(clear_input_field=True)
 
     def on_create_group_button_clicked(self, *args):
+        if not self.ids.group_label_input.text:
+            return
         self.ids.status_message_label.text = ''
         self.ids.create_group_button.disabled = True
         self.ids.group_label_input.disabled = True
         api_client.group_create(
-            label=self.ids.group_label_input.text or None,
+            label=self.ids.group_label_input.text,
             cb=self.on_group_create_result,
         )
 

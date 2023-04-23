@@ -285,11 +285,18 @@
     valign: 'center'
     halign: 'center'
     md_bg_color: app.theme_cls.primary_color if self.selected else app.theme_cls.primary_dark
-    theme_text_color: 'Custom'
-    text_color: self.specific_text_color if self.selected else self.specific_secondary_text_color
-    markup: True
-    font_style: self.icon_pack
-    text: get_icon_code(self.icon, self.icon_pack)
+
+    CustomIcon:
+        id: btn_icon
+        pos_hint: {"center_x": .5, "center_y": .5}
+        icon_width: root.button_width
+        icon_height: root.button_height
+        theme_text_color: 'Custom'
+        text_color: root.specific_text_color if root.selected else root.specific_secondary_text_color
+        md_bg_color: app.color_transparent
+        font_size: root.icon_size
+        icon_pack: root.icon_pack
+        icon: root.icon
 
 
 <FloatingActionButton>:

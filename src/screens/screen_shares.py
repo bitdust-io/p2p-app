@@ -111,6 +111,7 @@ class SharesScreen(screen.AppScreen):
             self.ids.shares_list_view.clear_widgets()
             self.new_share_item_button = NewShareItem()
             self.ids.shares_list_view.add_widget(self.new_share_item_button)
+            self.new_share_item_button.ids.new_share_item_button.disabled = False
             return
         result = api_client.response_result(resp)
         if not result:
@@ -118,6 +119,7 @@ class SharesScreen(screen.AppScreen):
             self.ids.shares_list_view.clear_widgets()
             self.new_share_item_button = NewShareItem()
             self.ids.shares_list_view.add_widget(self.new_share_item_button)
+            self.new_share_item_button.ids.new_share_item_button.disabled = False
             return
         if not self.new_share_item_button:
             self.new_share_item_button = NewShareItem()
