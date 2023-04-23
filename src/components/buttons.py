@@ -289,6 +289,7 @@ class RaisedIconButton(RectangularElevationBehavior, SpecificBackgroundColorBeha
 
     icon = StringProperty("circle")
     icon_pack = StringProperty("Icon")
+    icon_size = NumericProperty("20sp")
     selected = BooleanProperty(False)
     button_width = NumericProperty(styles.app.btn_icon_normal_width)
     button_height = NumericProperty(styles.app.btn_icon_normal_height)

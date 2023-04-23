@@ -22,11 +22,13 @@ class CreateShareScreen(screen.AppScreen):
         self.clean_view(clear_input_field=True)
 
     def on_create_share_button_clicked(self, *args):
+        if not self.ids.share_label_input.text:
+            return
         self.ids.status_message_label.text = ''
         self.ids.create_share_button.disabled = True
         self.ids.share_label_input.disabled = True
         api_client.share_create(
-            label=self.ids.share_label_input.text or None,
+            label=self.ids.share_label_input.text,
             cb=self.on_share_create_result,
         )
 
