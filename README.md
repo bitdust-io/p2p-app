@@ -32,7 +32,7 @@ Then you should be able to start the application inside the development environm
 
 ##### Prepare application folders
 
-First, you must clone the BitDust Engine repository to your local. BitDust p2p-app APK bundle will include files from both repositories:
+First, you should clone the BitDust Engine repository to your local. BitDust p2p-app APK bundle will include files from both repositories:
 
         make prepare_build_location
         make clone_engine_sources
