@@ -14,10 +14,10 @@
 # java -jar pepk.jar --keystore=~/keystores/bitdust.keystore --alias=bitdust --output=output.zip --encryptionkey=xxx --include-cert
 # create a file ".keystore_password" in the same folder and store the keystore password there
 
-REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted"
+REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer==2.1.0,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted"
 
 .cache:
-	@if [ ! -f "./cache/support-compat-27.0.0.aar" ]; then curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/27.0.0/support-compat-27.0.0.aar -o ./cache/support-compat-27.0.0.aar; fi
+	@# if [ ! -f "./cache/support-compat-28.0.0.aar" ]; then curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/28.0.0/support-compat-28.0.0.aar -o ./cache/support-compat-28.0.0.aar; fi
 	@if [ ! -f "./cache/pepk.jar" ]; then curl https://www.gstatic.com/play-apps-publisher-rapid/signing-tool/prod/pepk-src.jar -o ./cache/pepk.jar; fi
 	@if [ ! -d "./cache/buildozer" ]; then git clone --depth=1 https://github.com/kivy/buildozer ./cache/buildozer; fi
 	@cd ./cache/buildozer && git fetch --all && git reset --hard origin/master
@@ -28,14 +28,14 @@ REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer,py
 	@# cp -r -v ./src/etc/AndroidManifest.tmpl.xml ./cache/python-for-android/pythonforandroid/bootstraps/sdl2/build/templates/
 	@# cp -r -v ./src/etc/build.tmpl.gradle ./cache/python-for-android/pythonforandroid/bootstraps/common/build/templates/
 	@# if [ ! -f "./cache/bundletool.jar" ]; then curl https://github.com/google/bundletool/releases/download/1.13.2/bundletool-all-1.13.2.jar -o cache/bundletool.jar; fi
-	@if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./cache/bitdust; fi
-	@# if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./cache/bitdust; fi
-	@cd ./cache/bitdust && git pull && git rev-list --count HEAD >../revnum
+	@# if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./cache/bitdust; fi
+	@if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./cache/bitdust; fi
+	@cd ./cache/bitdust && git pull && git log --graph --oneline --decorate -1 && git rev-list --count HEAD >../revnum
 
 .workspace:
 	@rm -rf ./bin/* && rm -rf workspace && mkdir workspace
 	@cp -r ./src/* workspace/ && cp -v ./cache/pepk.jar ./workspace/
-	@cp -v ./cache/support-compat-27.0.0.aar workspace/
+	@# cp -v ./cache/support-compat-28.0.0.aar workspace/
 
 .venv:
 	@cd ./workspace/ && rm -rf venv && python3 -m venv venv && ./venv/bin/pip install --upgrade pip >pip.log && ./venv/bin/pip install -r ../../../requirements.txt >>pip.log
@@ -70,6 +70,7 @@ REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer,py
 build: .spec
 	@rm -rfv ./workspace/bin/*.aab
 	@rm -rfv ./workspace/bin/*.apk
+	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release 1>buildozer.log 2>buildozer.err
 	@cp -f -T -v ./workspace/bin/bitdust*arm64-v8a_armeabi-v7a_x86_64-release.aab ./workspace/bin/BitDustAndroid_unsigned.aab
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.aab ./bin/BitDustAndroid.aab
@@ -102,6 +103,7 @@ build: .spec
 
 debug: .spec
 	@rm -rfv ./workspace/bin/*.apk
+	@cd ./workspace/app/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = False/_Debug = True/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android debug 1>buildozer.log 2>buildozer.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
@@ -137,6 +139,9 @@ shell:
 
 log:
 	@adb logcat | grep -E "python|Bitdustnode|Exception"
+
+log_full:
+	@adb logcat
 
 log_quick:
 	@adb logcat | grep -E "python|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust|bitdust_io|Exception"

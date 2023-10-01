@@ -89,10 +89,10 @@ fullscreen = 0
 android.presplash_color = #81A6FF
 
 # (list) Permissions
-android.permissions = INTERNET, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, FOREGROUND_SERVICE, DOWNLOAD_WITHOUT_NOTIFICATION
+android.permissions = INTERNET, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, FOREGROUND_SERVICE, DOWNLOAD_WITHOUT_NOTIFICATION, POST_NOTIFICATIONS
 
 # (int) Target Android API, should be as high as possible.
-android.api = 31
+android.api = 33
 
 # (int) Minimum API your APK will support.
 # android.minapi = 21
@@ -165,9 +165,22 @@ android.add_src = java_classes/
 
 # (list) Android AAR archives to add (currently works only with sdl2_gradle
 # bootstrap)
-android.add_aars = support-compat-27.0.0.aar
+# android.add_aars = support-compat-28.0.0.aar
 
 #android.bootstrap = webview
+
+# (list) Put these files or directories in the apk res directory.
+# The option may be used in three ways, the value may contain one or zero ':'
+# Some examples:
+# 1) A file to add to resources, legal resource names contain ['a-z','0-9','_']
+# android.add_resources = my_icons/all-inclusive.png:drawable/all_inclusive.png
+# 2) A directory, here  'legal_icons' must contain resources of one kind
+# android.add_resources = legal_icons:drawable
+# 3) A directory, here 'legal_resources' must contain one or more directories, 
+# each of a resource kind:  drawable, xml, etc...
+# android.add_resources = legal_resources
+android.add_resources =
+    bitdust.png:drawable/bitdust.png
 
 # (list) Gradle dependencies to add (currently works only with sdl2_gradle
 # bootstrap)

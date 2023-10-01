@@ -15,6 +15,7 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
+Environment = autoclass("android.os.Environment")
 String = autoclass('java.lang.String')
 Intent = autoclass('android.content.Intent')
 Activity = autoclass('android.app.Activity')
@@ -25,6 +26,8 @@ Long = autoclass('java.lang.Long')
 IMedia = autoclass('android.provider.MediaStore$Images$Media')
 VMedia = autoclass('android.provider.MediaStore$Video$Media')
 AMedia = autoclass('android.provider.MediaStore$Audio$Media')
+Files = autoclass('android.provider.MediaStore$Files')
+FileOutputStream = autoclass('java.io.FileOutputStream')
 
 
 mActivity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
@@ -32,15 +35,36 @@ mActivity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
 
 class AndroidFileChooser(FileChooser):
 
-    # filechooser activity <-> result pair identification
     select_code = None
-
-    # default selection value
+    save_code = None
     selection = None
+    multiple = False
+
+    mime_type = {
+        "doc": "application/msword",
+        "docx": "application/vnd.openxmlformats-officedocument." +
+                "wordprocessingml.document",
+        "ppt": "application/vnd.ms-powerpoint",
+        "pptx": "application/vnd.openxmlformats-officedocument." +
+                "presentationml.presentation",
+        "xls": "application/vnd.ms-excel",
+        "xlsx": "application/vnd.openxmlformats-officedocument." +
+                "spreadsheetml.sheet",
+        "text": "text/*",
+        "pdf": "application/pdf",
+        "zip": "application/zip",
+        "image": "image/*",
+        "video": "video/*",
+        "audio": "audio/*",
+        "application": "application/*",
+    }
+
+    selected_mime_type = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.select_code = randint(123456, 654321)
+        self.save_code = randint(123456, 654321)
         self.selection = None
 
         # bind a function for a response from filechooser activity
@@ -60,13 +84,20 @@ class AndroidFileChooser(FileChooser):
         self._handle_selection = kwargs.pop(
             'on_selection', self._handle_selection
         )
+        self.selected_mime_type = kwargs.pop("filters")[0] if "filters" in kwargs else ""
 
         # create Intent for opening
         file_intent = Intent(Intent.ACTION_GET_CONTENT)
-        file_intent.setType('*/*')
+        if not self.selected_mime_type or type(self.selected_mime_type) != str or self.selected_mime_type not in self.mime_type:
+            file_intent.setType("*/*")
+        else:
+            file_intent.setType(self.mime_type[self.selected_mime_type])
         file_intent.addCategory(
             Intent.CATEGORY_OPENABLE
         )
+
+        if kwargs.get('multiple', self.multiple):
+            file_intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, True)
 
         # start a new activity from PythonActivity
         # which creates a filechooser via intent
@@ -78,47 +109,80 @@ class AndroidFileChooser(FileChooser):
             self.select_code
         )
 
+    def _save_file(self, **kwargs):
+        if _Debug:
+            print('AndroidFileChooser._save_file', kwargs)
+
+        self._save_callback = kwargs.pop("callback")
+
+        title = kwargs.pop("title", None)
+
+        self.selected_mime_type = \
+            kwargs.pop("filters")[0] if "filters" in kwargs else ""
+
+        file_intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+        if not self.selected_mime_type or \
+            type(self.selected_mime_type) != str or \
+                self.selected_mime_type not in self.mime_type:
+            file_intent.setType("*/*")
+        else:
+            file_intent.setType(self.mime_type[self.selected_mime_type])
+        file_intent.addCategory(
+            Intent.CATEGORY_OPENABLE
+        )
+
+        if title:
+            file_intent.putExtra(Intent.EXTRA_TITLE, title)
+
+        mActivity.startActivityForResult(
+            Intent.createChooser(file_intent, cast(
+                'java.lang.CharSequence',
+                String("FileChooser")
+            )),
+            self.save_code
+        )
+
     def _on_activity_result(self, request_code, result_code, data):
         if _Debug:
-            print('AndroidFileChooser._on_activity_result', request_code, result_code, data)
+            print('AndroidFileChooser._on_activity_result', request_code, self.select_code, result_code, data)
 
-        # not our response
-        if request_code != self.select_code:
+        if data is None:
             return
 
         if result_code != Activity.RESULT_OK:
-            # The action had been cancelled.
             return
 
-        selection = self._resolve_uri(data.getData()) or []
+        if request_code == self.select_code:
+            selection = []
+            try:
+                for count in range(data.getClipData().getItemCount()):
+                    ele = self._resolve_uri(data.getClipData().getItemAt(count).getUri()) or []
+                    selection.append(ele)
+            except Exception:
+                selection = [self._resolve_uri(data.getData()), ]
+            self.selection = selection
+            self._handle_selection(selection)
 
-        # return value to object
-        self.selection = [selection]
-        # return value via callback
-        self._handle_selection([selection])
+        elif request_code == self.save_code:
+            uri = data.getData()
+            with mActivity.getContentResolver().openFileDescriptor(uri, "w") as pfd:
+                with FileOutputStream(pfd.getFileDescriptor()) as fileOutputStream:
+                    self._save_callback(fileOutputStream)
 
     @staticmethod
     def _handle_external_documents(uri):
         file_id = DocumentsContract.getDocumentId(uri)
         file_type, file_name = file_id.split(':')
-
-        # internal SD card mostly mounted as a files storage in phone
-        internal = storagepath.get_external_storage_dir()
-
-        # external (removable) SD card i.e. microSD
-        external = storagepath.get_sdcard_dir()
-        external_base = basename(external)
-
-        # resolve sdcard path
-        sdcard = internal
-
-        # because external might have /storage/.../1 or other suffix
-        # and file_type might be only a part of the real folder in /storage
-        if file_type in external_base or external_base in file_type:
-            sdcard = external
-
-        path = join(sdcard, file_name)
-        return path
+        primary_storage = storagepath.get_external_storage_dir()
+        sdcard_storage = storagepath.get_sdcard_dir()
+        directory = primary_storage
+        if file_type == "primary":
+            directory = primary_storage
+        elif file_type == "home":
+            directory = join(primary_storage, Environment.DIRECTORY_DOCUMENTS)
+        elif sdcard_storage and file_type in sdcard_storage:
+            directory = sdcard_storage
+        return join(directory, file_name)
 
     @staticmethod
     def _handle_media_documents(uri):
@@ -132,16 +196,15 @@ class AndroidFileChooser(FileChooser):
             uri = VMedia.EXTERNAL_CONTENT_URI
         elif file_type == 'audio':
             uri = AMedia.EXTERNAL_CONTENT_URI
+        else:
+            uri = Files.getContentUri("external")
         return file_name, selection, uri
 
     @staticmethod
     def _handle_downloads_documents(uri):
-        # known locations, differ between machines
         downloads = [
             'content://downloads/public_downloads',
             'content://downloads/my_downloads',
-            # all_downloads requires separate permission
-            # android.permission.ACCESS_ALL_DOWNLOADS
             'content://downloads/all_downloads'
         ]
 
@@ -153,9 +216,6 @@ class AndroidFileChooser(FileChooser):
             for down in downloads
         ]
 
-        # try all known Download folder uris
-        # and handle JavaExceptions due to different locations
-        # for content:// downloads or missing permission
         path = None
         for down in try_uris:
             try:
@@ -170,12 +230,9 @@ class AndroidFileChooser(FileChooser):
                 import traceback
                 traceback.print_exc()
 
-            # we got a path, ignore the rest
             if path:
                 break
 
-        # alternative approach to Downloads by joining
-        # all data items from Activity result
         if not path:
             for down in try_uris:
                 try:
@@ -191,47 +248,43 @@ class AndroidFileChooser(FileChooser):
                     import traceback
                     traceback.print_exc()
 
-                # we got a path, ignore the rest
                 if path:
                     break
         return path
 
     def _resolve_uri(self, uri):
-        if _Debug:
-            print('AndroidFileChooser._resolve_uri', uri)
-
         uri_authority = uri.getAuthority()
         uri_scheme = uri.getScheme().lower()
+
+        if _Debug:
+            print('AndroidFileChooser._resolve_uri', uri_authority, uri_scheme)
 
         path = None
         file_name = None
         selection = None
         downloads = None
 
-        # not a document URI, nothing to convert from
-        if not DocumentsContract.isDocumentUri(mActivity, uri):
-            return path
-
         if uri_authority == 'com.android.externalstorage.documents':
             return self._handle_external_documents(uri)
 
-        # in case a user selects a file from 'Downloads' section
-        # note: this won't be triggered if a user selects a path directly
-        #       e.g.: Phone -> Download -> <some file>
         elif uri_authority == 'com.android.providers.downloads.documents':
             path = downloads = self._handle_downloads_documents(uri)
 
         elif uri_authority == 'com.android.providers.media.documents':
             file_name, selection, uri = self._handle_media_documents(uri)
 
-        # parse content:// scheme to path
         if uri_scheme == 'content' and not downloads:
-            path = self._parse_content(
-                uri=uri, projection=['_data'], selection=selection,
-                selection_args=[file_name], sort_order=None
-            )
+            try:
+                path = self._parse_content(
+                    uri=uri, projection=['_data'], selection=selection,
+                    selection_args=file_name, sort_order=None
+                )
+            except JavaException:  # handles array error for selection_args
+                path = self._parse_content(
+                    uri=uri, projection=['_data'], selection=selection,
+                    selection_args=[file_name], sort_order=None
+                )
 
-        # nothing to parse, file:// will return a proper path
         elif uri_scheme == 'file':
             path = uri.getPath()
 
@@ -280,6 +333,8 @@ class AndroidFileChooser(FileChooser):
         mode = kwargs.pop('mode', None)
         if mode == 'open':
             self._open_file(**kwargs)
+        elif mode == 'save':
+            self._save_file(**kwargs)
 
 
 def instance():
