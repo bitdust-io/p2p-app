@@ -8,6 +8,8 @@ from plyer import storagepath
 
 from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
 
+from androidstorage4kivy import SharedStorage, Chooser  # @UnresolvedImport
+
 from lib import activity  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
@@ -76,6 +78,17 @@ class AndroidFileChooser(FileChooser):
         return selection
 
     def _open_file(self, **kwargs):
+        self.chooser = Chooser(self.chooser_callback)
+        temp = SharedStorage().get_cache_dir()
+        if _Debug:
+            print('AndroidFileChooser._open_file', temp)
+        self.chooser.choose_content("image/*")
+
+    def chooser_callback(self, uri_list):
+        if _Debug:
+            print('AndroidFileChooser.chooser_callback', uri_list)
+
+    def _open_file2(self, **kwargs):
         if _Debug:
             print('AndroidFileChooser._open_file', mActivity, kwargs)
 
@@ -222,6 +235,8 @@ class AndroidFileChooser(FileChooser):
             uri = AMedia.EXTERNAL_CONTENT_URI
         else:
             uri = Files.getContentUri("external")
+        if _Debug:
+            print('AndroidFileChooser._handle_media_documents result', file_name, selection, uri)
         return file_name, selection, uri
 
     @staticmethod
@@ -298,7 +313,7 @@ class AndroidFileChooser(FileChooser):
             file_name, selection, uri = self._handle_media_documents(uri)
 
         if _Debug:
-            print('AndroidFileChooser._resolve_uri', uri_scheme)
+            print('AndroidFileChooser._resolve_uri', uri_scheme, uri, selection, file_name)
         
         if uri_scheme == 'content' and not downloads:
             try:

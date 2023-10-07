@@ -406,10 +406,11 @@ class BitDustApp(styles.AppStyle, MDApp):
             return self.do_start()
         required_permissions = [
             'android.permission.INTERNET',
-            'android.permission.READ_EXTERNAL_STORAGE',
-            'android.permission.WRITE_EXTERNAL_STORAGE',
         ]
-        if system.android_sdk_version() >= 28:
+        if system.android_sdk_version() < 29:
+            required_permissions.append('android.permission.WRITE_EXTERNAL_STORAGE')
+        else:
+            required_permissions.append('android.permission.READ_EXTERNAL_STORAGE')
             required_permissions.append('android.permission.FOREGROUND_SERVICE')
         if _Debug:
             print('BitDustApp.on_start required_permissions=%r' % required_permissions)

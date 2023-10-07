@@ -14,7 +14,7 @@
 # java -jar pepk.jar --keystore=~/keystores/bitdust.keystore --alias=bitdust --output=output.zip --encryptionkey=xxx --include-cert
 # create a file ".keystore_password" in the same folder and store the keystore password there
 
-REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer==2.1.0,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted"
+REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer==2.1.0,pyjnius,androidstorage4kivy,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted"
 
 .cache:
 	@mkdir -p -v cache
