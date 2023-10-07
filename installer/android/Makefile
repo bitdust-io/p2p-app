@@ -17,6 +17,7 @@
 REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer==2.1.0,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted"
 
 .cache:
+	@mkdir -p -v cache
 	@# if [ ! -f "./cache/support-compat-28.0.0.aar" ]; then curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/28.0.0/support-compat-28.0.0.aar -o ./cache/support-compat-28.0.0.aar; fi
 	@if [ ! -f "./cache/pepk.jar" ]; then curl https://www.gstatic.com/play-apps-publisher-rapid/signing-tool/prod/pepk-src.jar -o ./cache/pepk.jar; fi
 	@if [ ! -d "./cache/buildozer" ]; then git clone --depth=1 https://github.com/kivy/buildozer ./cache/buildozer; fi
@@ -28,12 +29,12 @@ REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer==2
 	@# cp -r -v ./src/etc/AndroidManifest.tmpl.xml ./cache/python-for-android/pythonforandroid/bootstraps/sdl2/build/templates/
 	@# cp -r -v ./src/etc/build.tmpl.gradle ./cache/python-for-android/pythonforandroid/bootstraps/common/build/templates/
 	@# if [ ! -f "./cache/bundletool.jar" ]; then curl https://github.com/google/bundletool/releases/download/1.13.2/bundletool-all-1.13.2.jar -o cache/bundletool.jar; fi
-	@# if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./cache/bitdust; fi
-	@if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./cache/bitdust; fi
+	@if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./cache/bitdust; fi
+	@# if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./cache/bitdust; fi
 	@cd ./cache/bitdust && git pull && git log --graph --oneline --decorate -1 && git rev-list --count HEAD >../revnum
 
 .workspace:
-	@rm -rf ./bin/* && rm -rf workspace && mkdir workspace
+	@rm -rf ./bin/* && rm -rf workspace && mkdir -p -v workspace
 	@cp -r ./src/* workspace/ && cp -v ./cache/pepk.jar ./workspace/
 	@# cp -v ./cache/support-compat-28.0.0.aar workspace/
 
@@ -50,7 +51,7 @@ REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer==2
 	@echo "revision number based on total amount of commits in the Git repository is:" && cat ./cache/revnum
 	@cd ./workspace/ && python3 -c "cv=open('core_version').read().strip().split('.');v=list(open('version').read().strip().split('.'));v[0]=cv[0];v[-2]=str(int(v[-2])+1);v[-1]=open('../cache/revnum').read().strip();open('version','w').write(('.'.join(v)).strip())"
 	@echo "new version will be:" && cat ./workspace/version && echo ""
-	@rm -rf ./workspace/app && mkdir -p ./workspace/app && cp -r ../../src/* ./workspace/app/ && mkdir -p ./workspace/app/bitdust_copy
+	@rm -rf ./workspace/app && mkdir -p -v ./workspace/app && cp -r ../../src/* ./workspace/app/ && mkdir -p -v ./workspace/app/bitdust_copy
 	@cd ./cache/bitdust && git checkout-index -a -f --prefix="../../workspace/app/bitdust_copy/"
 	@mv ./workspace/app/bitdust_copy/bitdust ./workspace/app/
 	@mv ./workspace/app/bitdust_copy/bitdust_forks ./workspace/app/
@@ -70,7 +71,7 @@ REQUIREMENTS_ANDROID:="python3,kivy==2.1.0,kivymd==1.0.2,libbz2,PIL,sdl,plyer==2
 build: .spec
 	@rm -rfv ./workspace/bin/*.aab
 	@rm -rfv ./workspace/bin/*.apk
-	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
+	@# cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release 1>buildozer.log 2>buildozer.err
 	@cp -f -T -v ./workspace/bin/bitdust*arm64-v8a_armeabi-v7a_x86_64-release.aab ./workspace/bin/BitDustAndroid_unsigned.aab
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.aab ./bin/BitDustAndroid.aab
@@ -103,7 +104,7 @@ build: .spec
 
 debug: .spec
 	@rm -rfv ./workspace/bin/*.apk
-	@cd ./workspace/app/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = False/_Debug = True/g' {} +
+	@# cd ./workspace/app/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = False/_Debug = True/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android debug 1>buildozer.log 2>buildozer.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
@@ -111,7 +112,7 @@ debug: .spec
 	@mv -v ./workspace/bin/BitDustAndroid.apk ./workspace/bin/BitDustAndroid_arm64_v8a.apk
 	@cp -v ./workspace/bin/BitDustAndroid_arm64_v8a.apk ./bin/
 	@apktool d -o ./workspace/bin/apk/ -f ./workspace/bin/BitDustAndroid_arm64_v8a.apk
-	@mkdir -p ./workspace/bin/apk/private_mp3/
+	@mkdir -p -v ./workspace/bin/apk/private_mp3/
 	@cp -v ./workspace/bin/apk/assets/private.tar ./workspace/bin/apk/private_mp3/private_mp3.tar.gz
 	@cd ./workspace/bin/apk/private_mp3/ && tar -p -xf private_mp3.tar.gz && find . -type d -exec chmod +x {} \;
 	@rm -rfv ./workspace/bin/BitDustAndroid.apk

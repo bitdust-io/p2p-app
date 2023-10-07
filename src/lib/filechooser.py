@@ -1,3 +1,4 @@
+import traceback
 from os.path import join, basename
 from random import randint
 
@@ -11,7 +12,7 @@ from lib import activity  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -154,12 +155,33 @@ class AndroidFileChooser(FileChooser):
 
         if request_code == self.select_code:
             selection = []
+
             try:
-                for count in range(data.getClipData().getItemCount()):
-                    ele = self._resolve_uri(data.getClipData().getItemAt(count).getUri()) or []
-                    selection.append(ele)
-            except Exception:
-                selection = [self._resolve_uri(data.getData()), ]
+                clip_data = data.getClipData()
+            except:
+                if _Debug:
+                    traceback.print_exc()
+                clip_data = None
+            if _Debug:
+                print('AndroidFileChooser._on_activity_result clip_data is', clip_data)
+            if clip_data:
+                try:
+                    for count in range(clip_data.getItemCount()):
+                        ele = self._resolve_uri(clip_data.getItemAt(count).getUri()) or []
+                        selection.append(ele)
+                except Exception as e:
+                    if _Debug:
+                        traceback.print_exc()
+            else:
+                try:
+                    get_data = data.getData()
+                except:
+                    if _Debug:
+                        traceback.print_exc()
+                    get_data = None
+                if _Debug:
+                    print('AndroidFileChooser._on_activity_result get_data is', get_data)
+                selection = [self._resolve_uri(get_data), ]
             self.selection = selection
             self._handle_selection(selection)
 
@@ -188,6 +210,8 @@ class AndroidFileChooser(FileChooser):
     def _handle_media_documents(uri):
         file_id = DocumentsContract.getDocumentId(uri)
         file_type, file_name = file_id.split(':')
+        if _Debug:
+            print('AndroidFileChooser._handle_media_documents', file_id)
         selection = '_id=?'
 
         if file_type == 'image':
@@ -227,8 +251,8 @@ class AndroidFileChooser(FileChooser):
                 )
 
             except JavaException:
-                import traceback
-                traceback.print_exc()
+                if _Debug:
+                    traceback.print_exc()
 
             if path:
                 break
@@ -245,8 +269,8 @@ class AndroidFileChooser(FileChooser):
                     )
 
                 except JavaException:
-                    import traceback
-                    traceback.print_exc()
+                    if _Debug:
+                        traceback.print_exc()
 
                 if path:
                     break
@@ -273,20 +297,33 @@ class AndroidFileChooser(FileChooser):
         elif uri_authority == 'com.android.providers.media.documents':
             file_name, selection, uri = self._handle_media_documents(uri)
 
+        if _Debug:
+            print('AndroidFileChooser._resolve_uri', uri_scheme)
+        
         if uri_scheme == 'content' and not downloads:
             try:
                 path = self._parse_content(
                     uri=uri, projection=['_data'], selection=selection,
                     selection_args=file_name, sort_order=None
                 )
-            except JavaException:  # handles array error for selection_args
-                path = self._parse_content(
-                    uri=uri, projection=['_data'], selection=selection,
-                    selection_args=[file_name], sort_order=None
-                )
+            except Exception as e:  # handles array error for selection_args
+                if _Debug:
+                    traceback.print_exc()
+                try:
+                    path = self._parse_content(
+                        uri=uri, projection=['_data'], selection=selection,
+                        selection_args=[file_name], sort_order=None
+                    )
+                except Exception as e:
+                    if _Debug:
+                        traceback.print_exc()
+                    return None
 
         elif uri_scheme == 'file':
             path = uri.getPath()
+
+        if _Debug:
+            print('AndroidFileChooser._resolve_uri path is', path)
 
         return path
 
@@ -297,11 +334,12 @@ class AndroidFileChooser(FileChooser):
     ):
         result = None
         resolver = mActivity.getContentResolver()
+        if _Debug:
+            print('AndroidFileChooser._parse_content', resolver, uri)
         read = Intent.FLAG_GRANT_READ_URI_PERMISSION
         write = Intent.FLAG_GRANT_READ_URI_PERMISSION
         persist = Intent.FLAG_GRANT_READ_URI_PERMISSION
 
-        # grant permission for our activity
         mActivity.grantUriPermission(
             mActivity.getPackageName(),
             uri,
@@ -327,6 +365,8 @@ class AndroidFileChooser(FileChooser):
                 for idx in range(cursor.getColumnCount()):
                     result.append(cursor.getString(idx))
             result = '/'.join(result)
+        if _Debug:
+            print('AndroidFileChooser._parse_content result is', result)
         return result
 
     def _file_selection_dialog(self, **kwargs):

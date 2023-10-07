@@ -9,6 +9,16 @@ import platform
 import threading
 import locale
 
+#------------------------------------------------------------------------------ 
+
+_Debug = False
+_DebugProfilingEnabled = False
+
+#------------------------------------------------------------------------------
+
+if not _Debug:
+    os.environ["KIVY_NO_CONSOLELOG"] = "1"
+
 #------------------------------------------------------------------------------
 
 if platform.system() == 'Windows':
@@ -30,11 +40,6 @@ if platform.system() != 'Windows' and 'ANDROID_ARGUMENT' not in os.environ:
 #------------------------------------------------------------------------------
 
 from lib import system
-
-#------------------------------------------------------------------------------ 
-
-_Debug = True
-_DebugProfilingEnabled = False
 
 #------------------------------------------------------------------------------
 
