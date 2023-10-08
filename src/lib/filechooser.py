@@ -2,13 +2,17 @@ import traceback
 from os.path import join, basename
 from random import randint
 
+from kivy.clock import mainthread
+from kivy.core.window import Window
+from kivy.app import App
+
 from jnius import autoclass, cast, JavaException  # @UnresolvedImport
 from plyer.facades import FileChooser
 from plyer import storagepath
 
 from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
 
-from androidstorage4kivy import SharedStorage, Chooser  # @UnresolvedImport
+# from androidstorage4kivy import SharedStorage, Chooser  # @UnresolvedImport
 
 from lib import activity  # @UnresolvedImport
 
@@ -67,30 +71,38 @@ class AndroidFileChooser(FileChooser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.select_code = randint(123456, 654321)
-        self.save_code = randint(123456, 654321)
+        self.save_code = randint(1123456, 1654321)
         self.selection = None
 
-        # bind a function for a response from filechooser activity
-        activity.bind(on_activity_result=self._on_activity_result)
+    @mainthread
+    def begone_you_black_screen(self, arg):
+        App.get_running_app().unbind(on_resume = self.begone_you_black_screen)
+        Window.update_viewport()
 
     @staticmethod
     def _handle_selection(selection):
+        if _Debug:
+            print('AndroidFileChooser._handle_selection', selection)
         return selection
 
+    # def _open_file(self, **kwargs):
+    #     self.chooser = Chooser(self.chooser_callback)
+    #     temp = SharedStorage().get_cache_dir()
+    #     if _Debug:
+    #         print('AndroidFileChooser._open_file', temp)
+    #     self.chooser.choose_content("image/*")
+
+    # def chooser_callback(self, uri_list):
+    #     if _Debug:
+    #         print('AndroidFileChooser.chooser_callback', uri_list)
+
     def _open_file(self, **kwargs):
-        self.chooser = Chooser(self.chooser_callback)
-        temp = SharedStorage().get_cache_dir()
-        if _Debug:
-            print('AndroidFileChooser._open_file', temp)
-        self.chooser.choose_content("image/*")
-
-    def chooser_callback(self, uri_list):
-        if _Debug:
-            print('AndroidFileChooser.chooser_callback', uri_list)
-
-    def _open_file2(self, **kwargs):
         if _Debug:
             print('AndroidFileChooser._open_file', mActivity, kwargs)
+
+        # bind a function for a response from filechooser activity
+        activity.bind(on_activity_result=self._on_activity_result)
+        App.get_running_app().bind(on_resume = self.begone_you_black_screen)
 
         # set up selection handler
         # startActivityForResult is async
@@ -127,6 +139,9 @@ class AndroidFileChooser(FileChooser):
         if _Debug:
             print('AndroidFileChooser._save_file', kwargs)
 
+        activity.bind(on_activity_result=self._on_activity_result)
+        App.get_running_app().bind(on_resume = self.begone_you_black_screen)
+
         self._save_callback = kwargs.pop("callback")
 
         title = kwargs.pop("title", None)
@@ -158,7 +173,8 @@ class AndroidFileChooser(FileChooser):
 
     def _on_activity_result(self, request_code, result_code, data):
         if _Debug:
-            print('AndroidFileChooser._on_activity_result', request_code, self.select_code, result_code, data)
+            print('AndroidFileChooser._on_activity_result', self.select_code, request_code, result_code, data)
+        activity.unbind(on_activity_result=self._on_activity_result)
 
         if data is None:
             return
@@ -181,6 +197,8 @@ class AndroidFileChooser(FileChooser):
                 try:
                     for count in range(clip_data.getItemCount()):
                         ele = self._resolve_uri(clip_data.getItemAt(count).getUri()) or []
+                        if _Debug:
+                            print('element', count, ele)
                         selection.append(ele)
                 except Exception as e:
                     if _Debug:
@@ -292,6 +310,9 @@ class AndroidFileChooser(FileChooser):
         return path
 
     def _resolve_uri(self, uri):
+        if _Debug:
+            print('AndroidFileChooser._resolve_uri', uri)
+
         uri_authority = uri.getAuthority()
         uri_scheme = uri.getScheme().lower()
 
@@ -387,9 +408,9 @@ class AndroidFileChooser(FileChooser):
     def _file_selection_dialog(self, **kwargs):
         mode = kwargs.pop('mode', None)
         if mode == 'open':
-            self._open_file(**kwargs)
+            return self._open_file(**kwargs)
         elif mode == 'save':
-            self._save_file(**kwargs)
+            return self._save_file(**kwargs)
 
 
 def instance():

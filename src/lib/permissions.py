@@ -6,7 +6,7 @@ from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE  # @Unr
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -26,6 +26,8 @@ class _onRequestCustomPermissionsCallback(PythonJavaClass):
 
     @java_method('(I[Ljava/lang/String;[I)V')
     def onRequestCustomPermissionsResult(self, requestCode, permissions, grantResults):
+        if _Debug:
+            print('_RequestPermissionsManager.onRequestCustomPermissionsResult', requestCode, permissions, grantResults)
         self.func(requestCode, permissions, grantResults)
 
 

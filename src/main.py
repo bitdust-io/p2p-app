@@ -11,12 +11,16 @@ import locale
 
 #------------------------------------------------------------------------------ 
 
-_Debug = False
+_Debug = True
 _DebugProfilingEnabled = False
+_DebugKivyOutputEnabled = False
 
 #------------------------------------------------------------------------------
 
-if not _Debug:
+if _Debug and _DebugKivyOutputEnabled:
+    # os.environ["KIVY_NO_CONSOLELOG"] = "0"
+    pass
+else:
     os.environ["KIVY_NO_CONSOLELOG"] = "1"
 
 #------------------------------------------------------------------------------
@@ -93,7 +97,7 @@ if system.is_android():
 
     from android.storage import primary_external_storage_path, app_storage_path  # @UnresolvedImport
 
-    from lib.permissions import check_permission, request_permissions  # @UnresolvedImport
+    # from lib.permissions import check_permission, request_permissions  # @UnresolvedImport
 
     PACKAGE_NAME = u'org.bitdust_io.bitdust1'
     SERVICE_NAME = u'{packagename}.Service{servicename}'.format(
@@ -191,6 +195,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     def do_start(self, *args, **kwargs):
         if _Debug:
             print('BitDustApp.do_start', args, kwargs)
+        self.dont_gc = None
 
         if system.is_android():
             if args:
@@ -361,6 +366,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     def do_android_check_app_permission(self, permission):
         if not system.is_android():
             return True
+        from android.permissions import check_permission  # @UnresolvedImport
         ret = check_permission(permission)
         if _Debug:
             print('BitDustApp.do_android_check_app_permission', permission, ret)
@@ -371,7 +377,9 @@ class BitDustApp(styles.AppStyle, MDApp):
             return True
         if _Debug:
             print('BitDustApp.do_android_request_app_permissions', permissions, callback)
-        request_permissions(permissions, callback)
+        from lib.android_permissions import AndroidPermissions
+        self.dont_gc = AndroidPermissions(permissions, callback)
+        # request_permissions(permissions, callback)
         return True
 
     @mainthread
@@ -404,14 +412,17 @@ class BitDustApp(styles.AppStyle, MDApp):
                 self.profile.enable()
         if not system.is_android():
             return self.do_start()
+        from android.permissions import Permission  # @UnresolvedImport
         required_permissions = [
-            'android.permission.INTERNET',
+            Permission.INTERNET,
+            Permission.DOWNLOAD_WITHOUT_NOTIFICATION,
+            Permission.POST_NOTIFICATIONS,
+            Permission.FOREGROUND_SERVICE,
         ]
         if system.android_sdk_version() < 29:
-            required_permissions.append('android.permission.WRITE_EXTERNAL_STORAGE')
+            required_permissions.append(Permission.WRITE_EXTERNAL_STORAGE)
         else:
-            required_permissions.append('android.permission.READ_EXTERNAL_STORAGE')
-            required_permissions.append('android.permission.FOREGROUND_SERVICE')
+            required_permissions.append(Permission.READ_EXTERNAL_STORAGE)
         if _Debug:
             print('BitDustApp.on_start required_permissions=%r' % required_permissions)
         missed_permissions = []
