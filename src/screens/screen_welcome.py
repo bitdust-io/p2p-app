@@ -121,3 +121,7 @@ class WelcomeScreen(screen.AppScreen):
             self.populate(create_identity=True)
         else:
             self.populate()
+
+    def on_upload_file_button_clicked(self, *args):
+        if _Debug:
+            print('WelcomeScreen.on_upload_file_button_clicked', args)

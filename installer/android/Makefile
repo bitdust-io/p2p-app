@@ -18,26 +18,26 @@ REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.tx
 
 .cache:
 	@mkdir -p -v cache
-	@if [ ! -f "./cache/support-compat-28.0.0.aar" ]; then curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/28.0.0/support-compat-28.0.0.aar -o ./cache/support-compat-28.0.0.aar; fi
+	@# if [ ! -f "./cache/support-compat-28.0.0.aar" ]; then curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/28.0.0/support-compat-28.0.0.aar -o ./cache/support-compat-28.0.0.aar; fi
 	@if [ ! -f "./cache/pepk.jar" ]; then curl https://www.gstatic.com/play-apps-publisher-rapid/signing-tool/prod/pepk-src.jar -o ./cache/pepk.jar; fi
 	@if [ ! -d "./cache/buildozer" ]; then git clone --depth=1 https://github.com/kivy/buildozer ./cache/buildozer; fi
 	@cd ./cache/buildozer && git fetch --all && git reset --hard origin/master
-	@if [ ! -d "./cache/python-for-android" ]; then git clone --single-branch --branch master --depth=1 https://github.com/kivy/python-for-android.git ./cache/python-for-android; fi
-	@cd ./cache/python-for-android && git fetch --all && git reset --hard origin/master
+	@# if [ ! -d "./cache/python-for-android" ]; then git clone --single-branch --branch master --depth=1 https://github.com/kivy/python-for-android.git ./cache/python-for-android; fi
+	@# cd ./cache/python-for-android && git fetch --all && git reset --hard origin/master
 	@# mkdir -p ./cache/python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 	@# cp -r -v ./src/etc/res/xml/network_security_config.xml ./cache/python-for-android/pythonforandroid/bootstraps/sdl2/build/src/main/res/xml/
 	@# cp -r -v ./src/etc/AndroidManifest.tmpl.xml ./cache/python-for-android/pythonforandroid/bootstraps/sdl2/build/templates/
-	@cp -r -v ./src/etc/build.tmpl.gradle ./cache/python-for-android/pythonforandroid/bootstraps/common/build/templates/
-	@cp -r -v ./src/etc/gradle-wrapper.properties ./cache/python-for-android/pythonforandroid/bootstraps/common/build/gradle/wrapper/
+	@# cp -r -v ./src/etc/build.tmpl.gradle ./cache/python-for-android/pythonforandroid/bootstraps/common/build/templates/
+	@# cp -r -v ./src/etc/gradle-wrapper.properties ./cache/python-for-android/pythonforandroid/bootstraps/common/build/gradle/wrapper/
 	@# if [ ! -f "./cache/bundletool.jar" ]; then curl https://github.com/google/bundletool/releases/download/1.13.2/bundletool-all-1.13.2.jar -o cache/bundletool.jar; fi
-	@if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./cache/bitdust; fi
-	@# if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./cache/bitdust; fi
+	@# if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./cache/bitdust; fi
+	@if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./cache/bitdust; fi
 	@cd ./cache/bitdust && git pull && git log --graph --oneline --decorate -1 && git rev-list --count HEAD >../revnum
 
 .workspace:
 	@rm -rf ./bin/* && rm -rf workspace && mkdir -p -v workspace
 	@cp -r ./src/* workspace/ && cp -v ./cache/pepk.jar ./workspace/
-	@cp -v ./cache/support-compat-28.0.0.aar workspace/
+	@# cp -v ./cache/support-compat-28.0.0.aar workspace/
 
 .venv:
 	@cd ./workspace/ && rm -rf venv && python3 -m venv venv && ./venv/bin/pip install --upgrade pip >pip.log && ./venv/bin/pip install -r ../../../requirements.txt >>pip.log
@@ -64,6 +64,7 @@ REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.tx
 	@rm -rf ./workspace/app/bitdust/regression
 	@rm -rf ./workspace/app/bitdust/tests
 	@rm -rf ./workspace/app/bitdust/icons
+	@rm -rf ./workspace/app/bitdust_forks/Bismuth/wallet
 	@python3 -c "v=open('./workspace/version').read().strip();open('./workspace/app/version.py','w').write('__version__ = \"%s\"' % v);"
 
 .spec: .prepare .venv .install_buildozer
@@ -72,7 +73,7 @@ REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.tx
 build: .spec
 	@rm -rfv ./workspace/bin/*.aab
 	@rm -rfv ./workspace/bin/*.apk
-	@# cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
+	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release 1>buildozer.log 2>buildozer.err
 	@cp -f -T -v ./workspace/bin/bitdust*arm64-v8a_armeabi-v7a_x86_64-release.aab ./workspace/bin/BitDustAndroid_unsigned.aab
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.aab ./bin/BitDustAndroid.aab
@@ -101,7 +102,7 @@ apk: .spec
 
 debug: .spec
 	@rm -rfv ./workspace/bin/*.apk
-	@# cd ./workspace/app/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = False/_Debug = True/g' {} +
+	@# cd ./workspace/app/ && find . -type f -name "bpmain.py" -exec sed -i -e 's/_Debug = False/_Debug = True/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android debug 1>buildozer.log 2>buildozer.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
@@ -164,10 +165,10 @@ test:
 
 shell:
 	@echo "run-as org.bitdust_io.bitdust1"
-	@adb shell
+	@adb shell "run-as org.bitdust_io.bitdust1; bash"
 
 log:
-	@adb logcat *:S python:V BitDustActivity:V
+	@cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android logcat
 
 log_full:
 	@adb logcat *:V python:V
@@ -176,13 +177,13 @@ log_quick:
 	@adb logcat | grep -E "python|Bitdustnode|PythonActivity|BitDust|SDL|PythonService|crush|bitdust|bitdust_io|Exception"
 
 log_main:
-	@adb shell "run-as org.bitdust_io.bitdust1; tail -f /data/user/0/org.bitdust_io.bitdust1/files/.bitdust/logs/android.log"
+	@adb exec-out run-as org.bitdust_io.bitdust1 tail -f /data/user/0/org.bitdust_io.bitdust1/files/.bitdust/logs/android.log
 
 log_states:
-	@adb shell tail -f /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/automats.log
+	@adb exec-out run-as org.bitdust_io.bitdust1 tail -f /data/user/0/org.bitdust_io.bitdust1/files/.bitdust/logs/automats.log
 
 cat_log_main:
-	@adb shell cat /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/android.log
+	@adb exec-out run-as org.bitdust_io.bitdust1 cat /data/user/0/org.bitdust_io.bitdust1/files/.bitdust/logs/android.log
 
 cat_log_automat:
-	@adb shell cat /storage/emulated/0/Android/data/org.bitdust_io.bitdust1/files/Documents/.bitdust/logs/automats.log
+	@adb exec-out run-as org.bitdust_io.bitdust1 cat /data/user/0/org.bitdust_io.bitdust1/files/.bitdust/logs/automats.log

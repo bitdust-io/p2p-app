@@ -98,7 +98,7 @@ class PrivateFilesScreen(screen.AppScreen):
             print('PrivateFilesScreen.on_upload_file_button_clicked', args)
         if system.is_android():
             from lib import filechooser as lib_filechooser
-            raw_path = lib_filechooser.instance().open_file(
+            raw_path = lib_filechooser.open_file(
                 title="Upload new file",
                 preview=True,
                 show_hidden=False,

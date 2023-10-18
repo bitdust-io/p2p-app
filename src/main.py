@@ -8,6 +8,7 @@ import sys
 import platform
 import threading
 import locale
+import traceback
 
 #------------------------------------------------------------------------------ 
 
@@ -87,15 +88,21 @@ from components import snackbar
 #------------------------------------------------------------------------------
 
 if system.is_android():
-    from jnius import autoclass  # @UnresolvedImport
+    from jnius import autoclass, cast  # @UnresolvedImport
     import encodings.idna  # @UnusedImport
 
+    from android import mActivity  # @UnresolvedImport
     from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE  # @UnresolvedImport
 
-    from android import activity  # @UnresolvedImport
-    activity._activity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
+    if _Debug:
+        print('BitDustApp ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
+        print('BitDustApp ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
 
     from android.storage import primary_external_storage_path, app_storage_path  # @UnresolvedImport
+
+    if _Debug:
+        print('BitDustApp primary_external_storage_path=%r' % primary_external_storage_path())
+        print('BitDustApp app_storage_path=%r' % app_storage_path())
 
     # from lib.permissions import check_permission, request_permissions  # @UnresolvedImport
 
@@ -154,13 +161,11 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   android_sdk_version() : %r' % system.android_sdk_version())
                 print('BitDustApp.build   ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
                 print('BitDustApp.build   ACTIVITY_CLASS_NAMESPACE=%r' % ACTIVITY_CLASS_NAMESPACE)
-                from android.activity import _activity  # @UnresolvedImport
-                from android import mActivity  # @UnresolvedImport
-                print('BitDustApp.build   _activity=%r' % _activity)
                 print('BitDustApp.build   mActivity=%r' % mActivity)
 
         self.title = 'BitDust p2p-app'
         self.icon = './bitdust.png'
+        self.granted = False
 
         self.apply_styles()
         self.init_components()
@@ -196,23 +201,62 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.do_start', args, kwargs)
         self.dont_gc = None
-
-        if system.is_android():
-            if args:
-                if len(args) >= 2:
-                    if args[1] and isinstance(args[1], list):
-                        if False in args[1]:
-                            if _Debug:
-                                print('BitDustApp.do_start   FAILED : some of the requested permissions was not granted', args)
-                            return False
+        if not system.is_android():
+            self.control.start()
+            self.start_engine()
+            return True
+        self.granted = args[0]
+        if not self.granted:
+            mActivity.finishAndRemoveTask()
+            return False
+        try:
+            self.control.start()
+            self.start_engine()
+        except:
             if _Debug:
-                print('BitDustApp.do_start   is okay to start now')
-                print('    primary_external_storage_path is %r' % primary_external_storage_path())
-                print('    app_storage_path is %r' % app_storage_path())
-
-        self.control.start()
-        self.start_engine()
+                traceback.print_exc()
+            mActivity.finishAndRemoveTask()
+            return False
         return True
+
+    def get_service_name(self):
+        context =  mActivity.getApplicationContext()
+        return str(context.getPackageName()) + '.Service' + 'Bitdustnode'
+
+    def service_is_running(self):
+        service_name = self.get_service_name()
+        if _Debug:
+            print('BitDustApp.service_is_running', service_name)
+        try:
+            context =  mActivity.getApplicationContext()
+        except:
+            if _Debug:
+                traceback.print_exc()
+        sys_service = mActivity.getSystemService(context.ACTIVITY_SERVICE)
+        manager = cast('android.app.ActivityManager', sys_service)
+        try:
+            lst = manager.getRunningServices(100)
+        except:
+            if _Debug:
+                traceback.print_exc()
+        for service in lst:
+            if service.service.getClassName() == service_name:
+                if _Debug:
+                    print('BitDustApp.service_is_running is True')
+                return True
+        if _Debug:
+            print('BitDustApp.service_is_running is False')
+        return False
+
+    def start_service_if_not_running(self):
+        if _Debug:
+            print('BitDustApp.start_service_if_not_running', self.get_service_name())
+        if self.service_is_running():
+            return
+        svc = autoclass(self.get_service_name())
+        if _Debug:
+            print('BitDustApp.start_service_if_not_running service', svc)
+        svc.start(mActivity, 'bitdust.png', 'BitDust Service', 'Started', '')
 
     def start_engine(self, after_restart=False):
         if self.main_window.engine_is_on:
@@ -269,47 +313,32 @@ class BitDustApp(styles.AppStyle, MDApp):
 
     def start_android_service(self, shutdown=False):
         if not system.is_android():
-            return None
-        if _Debug:
-            print('BitDustApp.start_android_service ACTIVITY_CLASS_NAME=%r SERVICE_NAME=%r shutdown=%r' % (
-                ACTIVITY_CLASS_NAME, SERVICE_NAME, shutdown, ))
+            return False
         if _Debug:
             print('BitDustApp.start_android_service app data path is %r' % system.get_app_data_path())
-        if self.main_window.is_screen_active('welcome_screen'):
-            welcome_screen = self.main_window.get_active_screen('welcome_screen')
-            if welcome_screen:
-                welcome_screen.populate(start_engine=True)
-        self.main_window.engine_log = '\n'
-        service = autoclass(SERVICE_NAME)
-        if _Debug:
-            print('BitDustApp.start_android_service service=%r' % service)
-        activity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
-        if _Debug:
-            print('BitDustApp.start_android_service activity=%r' % activity)
-        argument = ''
-        if shutdown:
-            argument = '{"stop_service": 1}'
-        service.start(activity, argument)
-        if shutdown:
+        try:
+            if self.main_window.is_screen_active('welcome_screen'):
+                welcome_screen = self.main_window.get_active_screen('welcome_screen')
+                if welcome_screen:
+                    welcome_screen.populate(start_engine=True)
+            self.main_window.engine_log = '\n'
+            self.start_service_if_not_running()
+        except:
             if _Debug:
-                print('BitDustApp.start_android_service service expect to be STOPPED now')
-        else:
-            if _Debug:
-                print('BitDustApp.start_android_service service STARTED : %r' % service)
-        return service
+                traceback.print_exc()
+            return False
+        return True
 
     def stop_android_service(self):
         if not system.is_android():
-            return None
+            return False
         if _Debug:
             print('BitDustApp.stop_service')
-        service = autoclass(SERVICE_NAME)
-        activity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
-        service.stop(activity)
         self.main_window.engine_log = '\n'
+        self.control.send_process_stop()
         if _Debug:
-            print('BitDustApp.stop_service STOPPED')
-        return service
+            print('BitDustApp.stop_service about to STOP')
+        return True
 
     def check_restart_bitdust_process(self, params=[]):
         if not system.is_linux() and not system.is_osx() and not system.is_windows():
@@ -318,11 +347,11 @@ class BitDustApp(styles.AppStyle, MDApp):
             return None
         if _Debug:
             print('BitDustApp.check_restart_bitdust_process params=%r' % params)
-        Clock.schedule_once(lambda *a: self.do_start_deploy_process(params=params))
+        Clock.schedule_once(lambda *a: self.do_begin_deploy_process(params=params))
 
-    def do_start_deploy_process(self, params=[]):
+    def do_begin_deploy_process(self, params=[]):
         if _Debug:
-            print('BitDustApp.do_start_deploy_process params=%r finishing=%r' % (params, self.finishing.is_set(), ))
+            print('BitDustApp.do_begin_deploy_process params=%r finishing=%r' % (params, self.finishing.is_set(), ))
         if self.finishing.is_set():
             return
         if self.main_window.is_screen_active('welcome_screen'):
@@ -332,7 +361,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.main_window.engine_log = '\n'
         if not params and self.control.is_web_socket_ready():
             if _Debug:
-                print('BitDustApp.do_start_deploy_process SKIP because web socket already ready')
+                print('BitDustApp.do_begin_deploy_process SKIP because web socket already ready')
             return
         if system.is_linux():
             system.BackgroundProcess(
@@ -363,31 +392,11 @@ class BitDustApp(styles.AppStyle, MDApp):
                 result_callback=self.on_deploy_process_result,
             ).run()
 
-    def do_android_check_app_permission(self, permission):
-        if not system.is_android():
-            return True
-        from android.permissions import check_permission  # @UnresolvedImport
-        ret = check_permission(permission)
-        if _Debug:
-            print('BitDustApp.do_android_check_app_permission', permission, ret)
-        return ret
-
-    def do_android_request_app_permissions(self, permissions, callback=None):
-        if not system.is_android():
-            return True
-        if _Debug:
-            print('BitDustApp.do_android_request_app_permissions', permissions, callback)
-        from lib.android_permissions import AndroidPermissions
-        self.dont_gc = AndroidPermissions(permissions, callback)
-        # request_permissions(permissions, callback)
-        return True
-
     @mainthread
     def on_deploy_process_stdout(self, line):
         if _Debug:
             print('DEPLOY OUT:', line.decode().rstrip())
         if line.decode().startswith('#####'):
-            # self.main_window.engine_log += '[%s] %s' % (time.strftime('%H:%M:%S'), line.decode()[6:])
             self.main_window.engine_log += line.decode()[6:]
 
     @mainthread
@@ -411,29 +420,11 @@ class BitDustApp(styles.AppStyle, MDApp):
                 self.profile = cProfile.Profile()
                 self.profile.enable()
         if not system.is_android():
-            return self.do_start()
-        from android.permissions import Permission  # @UnresolvedImport
-        required_permissions = [
-            Permission.INTERNET,
-            Permission.DOWNLOAD_WITHOUT_NOTIFICATION,
-            Permission.POST_NOTIFICATIONS,
-            Permission.FOREGROUND_SERVICE,
-        ]
-        if system.android_sdk_version() < 29:
-            required_permissions.append(Permission.WRITE_EXTERNAL_STORAGE)
-        else:
-            required_permissions.append(Permission.READ_EXTERNAL_STORAGE)
+            return self.do_start(True)
         if _Debug:
-            print('BitDustApp.on_start required_permissions=%r' % required_permissions)
-        missed_permissions = []
-        for perm in required_permissions:
-            if not self.do_android_check_app_permission(perm):
-                missed_permissions.append(perm)
-        if _Debug:
-            print('BitDustApp.on_start missed_permissions=%r' % missed_permissions)
-        if not missed_permissions:
-            return self.do_start()
-        self.do_android_request_app_permissions(permissions=missed_permissions, callback=self.do_start)
+            print('BitDustApp.on_start about to verify android permissions')
+        from lib.android_permissions import AndroidPermissions
+        self.dont_gc = AndroidPermissions(self.do_start)
         return True
 
     def on_stop(self):
@@ -458,6 +449,10 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_resume(self):
         if _Debug:
             print('BitDustApp.on_resume')
+        self.control.verify_process_health()
+        self.control.verify_identity_get()
+        self.control.verify_network_connected()
+        self.control.send_request_model_data('service')
 
 #     def on_dropdown_menu_callback(self, instance_menu, instance_menu_item):
 #         if _Debug:
@@ -503,6 +498,7 @@ def main():
 
 if __name__ == '__main__':
     main()
-    import threading
-    for thread in threading.enumerate():
-        print(thread.name, thread)
+    if _Debug:
+        import threading
+        for thread in threading.enumerate():
+            print(thread.name, thread)

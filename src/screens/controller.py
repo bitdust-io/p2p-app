@@ -18,7 +18,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -147,6 +147,13 @@ class Controller(object):
             print('Controller.stop')
         self.enabled = False
         web_sock.stop()
+
+    def send_process_stop(self, callback=None):
+        self.mw().state_process_health = 0
+        return api_client.process_stop(cb=callback)
+
+    def send_request_model_data(self, model_name, query_details=None):
+        return api_client.request_model_data(model_name, query_details=query_details)
 
     def is_web_socket_ready(self):
         return web_sock.is_ready()

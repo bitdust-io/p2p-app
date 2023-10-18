@@ -10,7 +10,7 @@ from kivy.utils import platform  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -103,7 +103,7 @@ def get_android_keyboard_height():
     from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
     from jnius import autoclass  # @UnresolvedImport
     if _LatestAndroidBitDustActivity is None:
-        _LatestAndroidBitDustActivity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
+        _LatestAndroidBitDustActivity = autoclass(ACTIVITY_CLASS_NAME).mActivity
         _LatestAndroidRectClass = autoclass(u'android.graphics.Rect')
     if _LatestAndroidDisplayRealHeight is None:
         if android_sdk_version() >= 17:
@@ -160,7 +160,7 @@ def set_android_system_ui_visibility():
     from jnius import autoclass  # @UnresolvedImport
     from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
     if _LatestAndroidBitDustActivity is None:
-        _LatestAndroidBitDustActivity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
+        _LatestAndroidBitDustActivity = autoclass(ACTIVITY_CLASS_NAME).mActivity
     View = autoclass('android.view.View')
     decorView = _LatestAndroidBitDustActivity.getWindow().getDecorView()
     flags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY \
@@ -172,16 +172,6 @@ def set_android_system_ui_visibility():
     decorView.setSystemUiVisibility(flags)
     if _Debug:
         print('system.set_android_system_ui_visibility', decorView, flags)
-
-
-def android_download_path(file_path=None):
-    from android.storage import primary_external_storage_path  # @UnresolvedImport
-    base_path = primary_external_storage_path()
-    if not os.path.exists(os.path.join(base_path, 'Download', 'BitDust')):
-        os.makedirs(os.path.join(base_path, 'Download', 'BitDust'))
-    if file_path:
-        return os.path.join(base_path, 'Download', 'BitDust', file_path)
-    return os.path.join(base_path, 'Download', 'BitDust')
 
 #------------------------------------------------------------------------------
 
@@ -445,6 +435,8 @@ def open_path_in_os(filepath):
     """
     A portable way to open location or file on local disk with a default OS method.
     """
+    if _Debug:
+        print('system.open_path_in_os', filepath)
     if is_windows():
         if os.path.isfile(filepath):
             subprocess.Popen(['explorer', '/select,', '%s' % (filepath.replace('/', '\\'))])
@@ -461,47 +453,14 @@ def open_path_in_os(filepath):
         return True
 
     elif is_android():
-        from jnius import autoclass, cast  # @UnresolvedImport
-        from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
-        StrictMode = autoclass('android.os.StrictMode')
-        StrictMode.disableDeathOnFileUriExposure()
-        PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
-        Intent = autoclass('android.content.Intent')
-        Uri = autoclass('android.net.Uri')
-        File = autoclass('java.io.File')
-        theFile = File(filepath)
-        uri = Uri.fromFile(theFile)
-        viewIntent = Intent(Intent.ACTION_VIEW)
-        if filepath.endswith(".doc") or filepath.endswith(".docx"):
-            viewIntent.setDataAndType(uri, "application/msword")
-        elif filepath.endswith(".pdf"):
-            viewIntent.setDataAndType(uri, "application/pdf")
-        elif filepath.endswith(".ppt") or filepath.endswith(".pptx"):
-            viewIntent.setDataAndType(uri, "application/vnd.ms-powerpoint")
-        elif filepath.endswith(".xls") or filepath.endswith(".xlsx"):
-            viewIntent.setDataAndType(uri, "application/vnd.ms-excel")
-        elif filepath.endswith(".zip") or filepath.endswith(".rar"):
-            viewIntent.setDataAndType(uri, "application/x-wav")
-        elif filepath.endswith(".rtf"):
-            viewIntent.setDataAndType(uri, "application/rtf")
-        elif filepath.endswith(".wav") or filepath.endswith(".mp3"):
-            viewIntent.setDataAndType(uri, "audio/x-wav")
-        elif filepath.endswith(".gif"):
-            viewIntent.setDataAndType(uri, "image/gif")
-        elif filepath.endswith(".jpg") or filepath.endswith(".jpeg") or filepath.endswith(".png"):
-            viewIntent.setDataAndType(uri, "image/jpeg")
-        elif filepath.endswith(".txt"):
-            viewIntent.setDataAndType(uri, "text/plain")
-        elif filepath.endswith(".3gp") or filepath.endswith(".mpg") or filepath.endswith(".mpeg") or filepath.endswith(".mpe") or filepath.endswith(".mp4") or filepath.endswith(".avi"):
-            viewIntent.setDataAndType(uri, "video/*")
-        else:
-            viewIntent.setDataAndType(uri, "*/*")
-        parcelable = cast('android.os.Parcelable', uri)
-        viewIntent.putExtra(Intent.EXTRA_STREAM, parcelable)
-        currentActivity = cast('android.app.Activity', PythonActivity.mBitDustActivity)
-        currentActivity.startActivity(viewIntent)
+        try:
+            from lib.sharesheet import ShareSheet
+            ShareSheet().view_file(filepath)
+        except Exception as exc:
+            if _Debug:
+                print('system.open_path_in_os', exc)
+            return False
         return True
-
     try:
         import webbrowser
         webbrowser.open(filepath)

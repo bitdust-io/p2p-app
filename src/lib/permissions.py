@@ -1,7 +1,7 @@
 import threading
 
-from jnius import autoclass, PythonJavaClass, java_method  # @UnresolvedImport
-
+from jnius import autoclass, cast, PythonJavaClass, java_method  # @UnresolvedImport
+from android import mActivity, api_version  # @UnresolvedImport
 from android.config import ACTIVITY_CLASS_NAME, ACTIVITY_CLASS_NAMESPACE  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ class _RequestPermissionsManager(object):
         if _Debug:
             print('_RequestPermissionsManager.register_callback ACTIVITY_CLASS_NAME=%r' % ACTIVITY_CLASS_NAME)
         cls._java_callback = _onRequestCustomPermissionsCallback(cls.python_callback)
-        mActivity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
+        mActivity = autoclass(ACTIVITY_CLASS_NAME).mActivity
         mActivity.addCustomPermissionsCallback(cls._java_callback)
 
     @classmethod
@@ -68,7 +68,7 @@ class _RequestPermissionsManager(object):
         with cls._lock:
             if not cls._java_callback:
                 cls.register_callback()
-            mActivity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
+            mActivity = autoclass(ACTIVITY_CLASS_NAME).mActivity
             if not callback:
                 mActivity.requestCustomPermissions(permissions)
             else:
@@ -94,8 +94,40 @@ def request_permission(permission, callback=None):
 
 
 def check_permission(permission):
-    mActivity = autoclass(ACTIVITY_CLASS_NAME).mBitDustActivity
+    mActivity = autoclass(ACTIVITY_CLASS_NAME).mActivity
     if _Debug:
         print('check_permission permission=%r ACTIVITY_CLASS_NAME=%r mActivity=%r' % (permission, ACTIVITY_CLASS_NAME, mActivity, ))
     result = bool(mActivity.checkCurrentCustomPermission(permission))
     return result
+
+def permissions_external_storage(*args):
+    if _Debug:
+        print('permissions_external_storage', args, api_version)
+    PythonActivity = autoclass("org.kivy.android.PythonActivity")
+    Environment = autoclass("android.os.Environment")
+    Intent = autoclass("android.content.Intent")
+    Settings = autoclass("android.provider.Settings")
+    Uri = autoclass("android.net.Uri")
+    if api_version > 29:
+        if Environment.isExternalStorageManager():
+            # If you have access to the external storage, do whatever you need
+            if _Debug:
+                print('permissions_external_storage Environment.isExternalStorageManager() returns True')
+        else:
+            if _Debug:
+                print('permissions_external_storage Environment.isExternalStorageManager() returns False')
+            # If you don't have access, launch a new activity to show the user the system's dialog
+            # to allow access to the external storage
+            try:
+                activity = mActivity.getApplicationContext()
+                uri = Uri.parse("package:" + activity.getPackageName())
+                intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri)
+                currentActivity = cast("android.app.Activity", PythonActivity.mActivity)
+                currentActivity.startActivityForResult(intent, 101)
+            except Exception as exc:
+                if _Debug:
+                    print(exc)
+                intent = Intent()
+                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                currentActivity = cast("android.app.Activity", PythonActivity.mActivity)
+                currentActivity.startActivityForResult(intent, 101)

@@ -1,8 +1,10 @@
 from jnius import PythonJavaClass, java_method, autoclass  # @UnresolvedImport
 
+from android.config import ACTIVITY_CLASS_NAME  # @UnresolvedImport
+
 #------------------------------------------------------------------------------
 
-PythonActivity = autoclass('org.bitdust_io.bitdust1.BitDustActivity')
+PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
 #------------------------------------------------------------------------------
 
@@ -19,7 +21,7 @@ class Runnable(PythonJavaClass):
         self.args = args
         self.kwargs = kwargs
         Runnable.__runnables__.append(self)
-        activity = PythonActivity.mBitDustActivity
+        activity = PythonActivity.mActivity
         activity.runOnUiThread(self)
 
     @java_method('()V')
