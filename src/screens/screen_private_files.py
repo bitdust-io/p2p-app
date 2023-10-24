@@ -99,7 +99,7 @@ class PrivateFilesScreen(screen.AppScreen):
         if system.is_android():
             from lib import filechooser as lib_filechooser
             raw_path = lib_filechooser.open_file(
-                title="Upload new file",
+                title="Upload a file",
                 preview=True,
                 show_hidden=False,
                 on_selection=self.on_upload_file_selected,
@@ -109,7 +109,7 @@ class PrivateFilesScreen(screen.AppScreen):
             if system.is_windows():
                 self._latest_cwd = os.getcwd()
             raw_path = filechooser.open_file(
-                title="Upload new file",
+                title="Upload a file",
                 preview=True,
                 show_hidden=False,
                 on_selection=self.on_upload_file_selected,
@@ -137,6 +137,9 @@ class PrivateFilesScreen(screen.AppScreen):
     def on_file_created(self, resp, file_path):
         if _Debug:
             print('PrivateFilesScreen.on_file_created', file_path, resp)
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
+            return
         file_name = os.path.basename(file_path)
         api_client.file_upload_start(
             local_path=file_path,
