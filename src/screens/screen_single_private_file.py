@@ -1,5 +1,5 @@
 import os
-import shutil
+import tempfile
 
 #------------------------------------------------------------------------------
 
@@ -21,6 +21,7 @@ private_file_info_text = """
 [color=#909090]remote path:[/color] {remote_path}
 [color=#909090]global ID:[/color] {global_id}
 [color=#909090]size:[/color] {size_text}
+[color=#909090]local path:[/color] {local_path}
 {versions_text}
 [/size]
 """
@@ -47,9 +48,11 @@ class SinglePrivateFileScreen(screen.AppScreen):
         self.global_id = kw.pop('global_id', '')
         self.remote_path = kw.pop('remote_path', '')
         self.details = kw.pop('details', {})
-        self.local_path = self.details.get('local_path')
         if system.is_android():
-            self.local_path = system.android_download_path(self.details.get('path'))
+            self.local_path = ''
+            self.local_uri = None
+        else:
+            self.local_path = self.details.get('local_path')
         return kw
 
     def get_title(self):
@@ -74,6 +77,7 @@ class SinglePrivateFileScreen(screen.AppScreen):
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             header_text_size='{}sp'.format(self.app().font_size_large_absolute),
             remote_path=self.remote_path,
+            local_path=self.local_path or '',
             global_id=self.global_id,
             size_text=system.get_nice_size(self.details.get('size', 0)),
         )
@@ -85,7 +89,10 @@ class SinglePrivateFileScreen(screen.AppScreen):
             versions_text += version_info_text.format(**v)
         ctx['versions_text'] = versions_text
         self.ids.private_file_details.text = private_file_info_text.format(**ctx)
-        self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
+        if system.is_android():
+            self.ids.open_file_button.disabled = not self.local_uri
+        else:
+            self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_my_data')
@@ -97,9 +104,10 @@ class SinglePrivateFileScreen(screen.AppScreen):
     def on_download_file_button_clicked(self):
         destination_path = None
         if system.is_android():
-            import tempfile
             from android.storage import app_storage_path  # @UnresolvedImport
             destination_path = tempfile.mkdtemp(dir=app_storage_path())
+            if not os.path.exists(destination_path):
+                os.makedirs(destination_path)
         if _Debug:
             print('SinglePrivateFileScreen.on_download_file_button_clicked remote_path=%s destination_path=%s' % (self.remote_path, destination_path, ))
         api_client.file_download_start(
@@ -121,7 +129,6 @@ class SinglePrivateFileScreen(screen.AppScreen):
             snackbar.error(text='file delete failed: %s' % api_client.response_err(resp))
         else:
             snackbar.success(text='private file deleted')
-        # screen.select_screen('private_files_screen')
         screen.main_window().screen_back()
         screen.main_window().close_screen(screen_id='private_file_{}'.format(self.global_id))
 
@@ -129,24 +136,27 @@ class SinglePrivateFileScreen(screen.AppScreen):
         if _Debug:
             print('SinglePrivateFileScreen.on_file_download_result', resp, destination_path)
         if system.is_android():
+            # TODO: move the following inside a thread
             for filename in os.listdir(destination_path):
-                srcpath = os.path.join(destination_path, filename)
-                destpath = system.android_download_path(filename)
-                # TODO: move the following inside a thread
-                shutil.copyfile(srcpath, destpath)
-                if _Debug:
-                    print('SinglePrivateFileScreen.on_file_download_result', srcpath, destpath)
+                from androidstorage4kivy import SharedStorage  # @UnresolvedImport
+                self.local_uri = SharedStorage().copy_to_shared(
+                    private_file=os.path.join(destination_path, filename),
+                )
             system.rmdir_recursive(destination_path, ignore_errors=True)
-        self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
+            self.ids.open_file_button.disabled = not self.local_uri
+        else:
+            self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
         if not api_client.is_ok(resp):
             snackbar.error(text='download failed: %s' % api_client.response_err(resp))
         else:
             snackbar.success(text='downloading is complete')
-        # screen.main_window().screen_back()
-        # screen.main_window().close_screen(screen_id='private_file_{}'.format(self.global_id))
 
     def on_open_file_button_clicked(self):
         if _Debug:
             print('SinglePrivateFileScreen.on_open_file_button_clicked')
-        if self.local_path and os.path.exists(self.local_path):
-            system.open_path_in_os(self.local_path)
+        if system.is_android():
+            if self.local_uri:
+                system.open_path_in_os(self.local_uri)
+        else:
+            if self.local_path and os.path.exists(self.local_path):
+                system.open_path_in_os(self.local_path)

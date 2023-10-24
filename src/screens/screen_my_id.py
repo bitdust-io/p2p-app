@@ -119,9 +119,10 @@ class MyIDScreen(screen.AppScreen):
         if _Debug:
             print('MyIDScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'shield-key':
-            filename = 'BitDust_key_{}.txt'.format(self.my_identity_name) if self.my_identity_name else 'BitDust_key.txt'
+            filename = 'BitDust_master_key_{}.txt'.format(self.my_identity_name) if self.my_identity_name else 'BitDust_key.txt'
             if system.is_android():
-                destination_filepath = system.android_download_path(filename)
+                from android.storage import app_storage_path  # @UnresolvedImport
+                destination_filepath = os.path.join(app_storage_path(), filename)
             else:
                 destination_filepath = os.path.join(os.path.expanduser('~'), filename)
             api_client.identity_backup(
@@ -160,10 +161,19 @@ class MyIDScreen(screen.AppScreen):
     def on_identity_backup_result(self, resp, destination_filepath):
         if _Debug:
             print('MyIDScreen.on_identity_backup_result', destination_filepath, resp)
+        if system.is_android():
+            from androidstorage4kivy import SharedStorage  # @UnresolvedImport
+            shared_path = SharedStorage().copy_to_shared(destination_filepath)
+            try:
+                os.remove(destination_filepath)
+            except Exception as e:
+                if _Debug:
+                    print(e)
+            destination_filepath = shared_path
         if not api_client.is_ok(resp):
             snackbar.error(text='identity backup failed: %s' % api_client.response_err(resp))
         else:
-            snackbar.success(text='key file saved to:\n%s' % destination_filepath, height=64, shorten=False)
+            system.open_path_in_os(destination_filepath)
 
     def on_process_stop_result_start_engine(self, resp):
         if _Debug:

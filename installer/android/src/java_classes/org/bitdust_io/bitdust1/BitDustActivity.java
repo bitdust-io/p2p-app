@@ -82,34 +82,34 @@ public class BitDustActivity extends PythonActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mBitDustActivity = this;
-        Log.v(TAG, "onCreate()");
+        Log.i(TAG, "onCreate()");
     }
 
     @Override
     protected void onStop() {
-        Log.v(TAG, "onStop()   about to call super onStop");
+        Log.i(TAG, "onStop()   about to call super onStop");
         super.onStop();
-        Log.v(TAG, "onStop()  super onStop finished");
+        Log.i(TAG, "onStop()  super onStop finished");
     }
 
     @Override
     protected void onDestroy() {
-        Log.v(TAG, "onDestroy() going to call /process/stop/v1 API");
+        Log.i(TAG, "onDestroy() going to call /process/stop/v1 API");
         String process_stop_result = "";
         process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
-        Log.v(TAG, "onDestroy() process_stop_result first call from the Activity : " + process_stop_result);
+        Log.i(TAG, "onDestroy() process_stop_result first call from the Activity : " + process_stop_result);
         int attempts = 0;
         while ((process_stop_result.indexOf("Failed to connect") < 0) && (process_stop_result.indexOf("Connection refused") < 0)) {
             process_stop_result = requestGetURL("http://localhost:8180/process/stop/v1");
-            Log.v(TAG, "onDestroy() process_stop_result retry from the Activity : " + process_stop_result);
+            Log.i(TAG, "onDestroy() process_stop_result retry from the Activity : " + process_stop_result);
             attempts++;
             if (attempts > 5) break;
         }
-        Log.v(TAG, "onDestroy() going to kill the process: " + Process.myPid());
+        Log.i(TAG, "onDestroy() going to kill the process: " + Process.myPid());
         Process.killProcess(Process.myPid());
-        Log.v(TAG, "onDestroy()   about to call super onDestroy");
+        Log.i(TAG, "onDestroy()   about to call super onDestroy");
         super.onDestroy();
-        Log.v(TAG, "onDestroy()  is finishing");
+        Log.i(TAG, "onDestroy()  is finishing");
     }
 
     private class HttpRequestGET extends AsyncTask<String, Void, String> {
@@ -209,16 +209,17 @@ public class BitDustActivity extends PythonActivity {
     public void addCustomPermissionsCallback(CustomPermissionsCallback callback) {
         permissionCallbackCustom = callback;
         haveCustomPermissionsCallback = true;
-        Log.v(TAG, "addCustomPermissionsCallback(): Added callback for onRequestPermissionsResult");
+        Log.i(TAG, "addCustomPermissionsCallback(): Added callback for onRequestPermissionsResult");
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        Log.v(TAG, "onRequestPermissionsResult()");
+        Log.i(TAG, "onRequestPermissionsResult()");
         if (haveCustomPermissionsCallback) {
-            Log.v(TAG, "onRequestPermissionsResult passed to callback");
+            Log.i(TAG, "onRequestPermissionsResult passed to callback");
             permissionCallbackCustom.onRequestCustomPermissionsResult(requestCode, permissions, grantResults);
         }
+        Log.i(TAG, "onRequestPermissionsResult() now calling to the super method");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
@@ -240,6 +241,7 @@ public class BitDustActivity extends PythonActivity {
     public void requestCustomPermissionsWithRequestCode(String[] permissions, int requestCode) {
         if (android.os.Build.VERSION.SDK_INT < 23)
             return;
+        Log.i(TAG, "requestCustomPermissionsWithRequestCode");
         try {
             java.lang.reflect.Method methodRequestPermission = Activity.class.getMethod("requestPermissions", String[].class, int.class);
             methodRequestPermission.invoke(this, permissions, requestCode);
@@ -264,14 +266,14 @@ public class BitDustActivity extends PythonActivity {
     private List<CustomNewIntentListener> newCustomIntentListeners = null;
 
     public void registerCustomNewIntentListener(CustomNewIntentListener listener) {
-        Log.v(TAG, "registerCustomNewIntentListener()");
+        Log.i(TAG, "registerCustomNewIntentListener()");
         if ( this.newCustomIntentListeners == null )
             this.newCustomIntentListeners = Collections.synchronizedList(new ArrayList<CustomNewIntentListener>());
         this.newCustomIntentListeners.add(listener);
     }
 
     public void unregisterCustomNewIntentListener(CustomNewIntentListener listener) {
-        Log.v(TAG, "unregisterCustomNewIntentListener()");
+        Log.i(TAG, "unregisterCustomNewIntentListener()");
         if ( this.newCustomIntentListeners == null )
             return;
         this.newCustomIntentListeners.remove(listener);
@@ -279,7 +281,7 @@ public class BitDustActivity extends PythonActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        Log.v(TAG, "onNewIntent()");
+        Log.i(TAG, "onNewIntent()");
         if ( this.newCustomIntentListeners == null )
             return;
         this.onResume();
@@ -304,14 +306,14 @@ public class BitDustActivity extends PythonActivity {
     private List<CustomActivityResultListener> activityResultListenersCustom = null;
 
     public void registerCustomActivityResultListener(CustomActivityResultListener listener) {
-        Log.v(TAG, "registerCustomActivityResultListener()");
+        Log.i(TAG, "registerCustomActivityResultListener()");
         if ( this.activityResultListenersCustom == null )
             this.activityResultListenersCustom = Collections.synchronizedList(new ArrayList<CustomActivityResultListener>());
         this.activityResultListenersCustom.add(listener);
     }
 
     public void unregisterCustomActivityResultListener(CustomActivityResultListener listener) {
-        Log.v(TAG, "unregisterCustomActivityResultListener()");
+        Log.i(TAG, "unregisterCustomActivityResultListener()");
         if ( this.activityResultListenersCustom == null )
             return;
         this.activityResultListenersCustom.remove(listener);
@@ -319,7 +321,7 @@ public class BitDustActivity extends PythonActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        Log.v(TAG, "onActivityResult()");
+        Log.i(TAG, "onActivityResult()");
         if ( this.activityResultListenersCustom == null )
             return;
         this.onResume();

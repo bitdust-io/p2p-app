@@ -4,7 +4,7 @@ import json
 
 #------------------------------------------------------------------------------ 
 
-_Debug = False
+_Debug = True
 
 if _Debug:
     print('BitDustService ENTRYPOINT')
@@ -50,21 +50,26 @@ if _Debug:
 def set_foreground():
     if _Debug:
         print('BitDustService.set_foreground()')
+
     channel_id = f'{PACKAGE_NAME}.Bitdustnode'
     Context = autoclass(u'android.content.Context')
+    Color = autoclass(u'android.graphics.Color')
     Intent = autoclass(u'android.content.Intent')
     PendingIntent = autoclass(u'android.app.PendingIntent')
     AndroidString = autoclass(u'java.lang.String')
     NotificationBuilder = autoclass(u'android.app.Notification$Builder')
     NotificationManager = autoclass(u'android.app.NotificationManager')
     NotificationChannel = autoclass(u'android.app.NotificationChannel')
+    Notification = autoclass(u'android.app.Notification')
+    PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
 
     notification_channel = NotificationChannel(channel_id, AndroidString('BitDust Channel'.encode('utf-8')), NotificationManager.IMPORTANCE_LOW)
+    notification_channel.setLightColor(Color.BLUE)
+    notification_channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE)
 
-    Notification = autoclass(u'android.app.Notification')
     service = autoclass(SERVICE_CLASS_NAME).mService
-    notification_service = service.getSystemService(Context.NOTIFICATION_SERVICE)
 
+    notification_service = service.getSystemService(Context.NOTIFICATION_SERVICE)
     notification_service.createNotificationChannel(notification_channel)
 
     app_context = service.getApplication().getApplicationContext()
@@ -73,7 +78,6 @@ def set_foreground():
     title = AndroidString("BitDust".encode('utf-8'))
     message = AndroidString("BitDust is running in background".encode('utf-8'))
 
-    PythonActivity = autoclass(ACTIVITY_CLASS_NAME)
     notification_intent = Intent(app_context, PythonActivity)
     notification_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
     notification_intent.setAction(Intent.ACTION_MAIN)
@@ -86,8 +90,8 @@ def set_foreground():
     notification_builder.setOngoing(True)
     notification_builder.setPriority(NotificationManager.IMPORTANCE_MIN)
 
-    # Drawable = autoclass(u"{}.R$drawable".format(service.getPackageName()))
-    # notification_builder.setSmallIcon(getattr(Drawable, 'notification_icon_background'))
+    Drawable = autoclass(u"{}.R$drawable".format(service.getPackageName()))
+    notification_builder.setSmallIcon(getattr(Drawable, 'bitdust'))
     notification_builder.setAutoCancel(True)
     notification_builder.setCategory(Notification.CATEGORY_SERVICE)
 
