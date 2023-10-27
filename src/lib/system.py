@@ -85,8 +85,8 @@ def android_sdk_version():
         return None
     if _LatestAndroidSDKVersion is not None:
         return _LatestAndroidSDKVersion
-    from jnius import autoclass  # @UnresolvedImport
-    _LatestAndroidSDKVersion = autoclass('android.os.Build$VERSION').SDK_INT
+    from android import api_version  # @UnresolvedImport
+    _LatestAndroidSDKVersion = api_version
     return _LatestAndroidSDKVersion
 
 

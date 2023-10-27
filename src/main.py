@@ -424,7 +424,19 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.on_start about to verify android permissions')
         from lib.android_permissions import AndroidPermissions
-        self.dont_gc = AndroidPermissions(self.do_start)
+        from android.permissions import Permission  # @UnresolvedImport
+        permissions = []
+        if system.android_sdk_version() >= 33:
+            permissions = [
+                Permission.POST_NOTIFICATIONS,
+                Permission.READ_MEDIA_AUDIO,
+                Permission.READ_MEDIA_IMAGES,
+                Permission.READ_MEDIA_VIDEO,
+            ]
+        self.dont_gc = AndroidPermissions(
+            callback=self.do_start,
+            permissions=permissions,
+        )
         return True
 
     def on_stop(self):
