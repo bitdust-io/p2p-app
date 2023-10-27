@@ -30,8 +30,8 @@ REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.tx
 	@# cp -r -v ./src/etc/build.tmpl.gradle ./cache/python-for-android/pythonforandroid/bootstraps/common/build/templates/
 	@# cp -r -v ./src/etc/gradle-wrapper.properties ./cache/python-for-android/pythonforandroid/bootstraps/common/build/gradle/wrapper/
 	@# if [ ! -f "./cache/bundletool.jar" ]; then curl https://github.com/google/bundletool/releases/download/1.13.2/bundletool-all-1.13.2.jar -o cache/bundletool.jar; fi
-	@# if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./cache/bitdust; fi
-	@if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./cache/bitdust; fi
+	@if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./cache/bitdust; fi
+	@# if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./cache/bitdust; fi
 	@cd ./cache/bitdust && git pull && git log --graph --oneline --decorate -1 && git rev-list --count HEAD >../revnum
 
 .workspace:
