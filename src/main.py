@@ -14,7 +14,7 @@ import traceback
 
 _Debug = True
 _DebugProfilingEnabled = False
-_DebugKivyOutputEnabled = False
+_DebugKivyOutputEnabled = True
 
 #------------------------------------------------------------------------------
 
@@ -137,6 +137,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         if system.is_android():
             fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
         elif system.is_osx():
+            fonts_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
+        elif system.is_ios():
             fonts_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
         # https://materialdesignicons.com
         LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
