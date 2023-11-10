@@ -6,7 +6,7 @@ from components import labels
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -73,11 +73,10 @@ class SearchPeopleScreen(screen.AppScreen):
         self.clean_view(clear_input_field=True)
         self.ids.search_button.disabled = False
 
-    def on_search_input_focus_changed(self):
+    def on_search_input_key_enter_pressed(self, *args):
         if _Debug:
-            print('SearchPeopleScreen.on_search_input_focus_changed', self.ids.search_input.focus)
-        if not self.ids.search_input.focus:
-            self.start_search()
+            print('SearchPeopleScreen.on_search_input_key_enter_pressed')
+        self.start_search()
 
     def on_search_button_clicked(self):
         self.start_search()
