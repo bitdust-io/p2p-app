@@ -133,7 +133,7 @@ class SharesScreen(screen.AppScreen):
                         break
             if item_found:
                 prev_state = item_found.instance_item.share_state
-                if prev_state != one_share['state']:
+                if one_share['state'] and prev_state != one_share['state']:
                     item_found.instance_item.share_state = one_share['state']
                     item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
                     if _Debug:
