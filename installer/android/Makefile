@@ -85,7 +85,7 @@ build: .spec
 
 apk: .spec
 	@rm -rfv ./workspace/bin/*.apk
-	@# cd ./workspace/app/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = False/_Debug = True/g' {} +
+	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release 1>buildozer.log 2>buildozer.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk

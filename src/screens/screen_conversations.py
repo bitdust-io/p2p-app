@@ -103,7 +103,7 @@ class ConversationsScreen(screen.AppScreen):
 
     def populate(self, *args, **kwargs):
         self.ids.conversations_list_view.clear_widgets()
-        self.ids.conversations_list_view.add_widget(NewGroupChat())
+        # self.ids.conversations_list_view.add_widget(NewGroupChat())
         self.ids.conversations_list_view.add_widget(NewPrivateChat())
         for snap_info in self.model('conversation').values():
             if snap_info:
