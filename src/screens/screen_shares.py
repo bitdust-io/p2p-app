@@ -10,7 +10,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -133,7 +133,7 @@ class SharesScreen(screen.AppScreen):
                         break
             if item_found:
                 prev_state = item_found.instance_item.share_state
-                if prev_state != one_share['state']:
+                if one_share['state'] and prev_state != one_share['state']:
                     item_found.instance_item.share_state = one_share['state']
                     item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
                     if _Debug:
@@ -166,6 +166,7 @@ class SharesScreen(screen.AppScreen):
         if _Debug:
             print('SharesScreen.on_shared_location', payload, self.ids.shares_list_view.children)
         item_found = None
+        prev_state = None
         for w in self.ids.shares_list_view.children:
             if isinstance(w.instance_item, ShareItem):
                 if w.instance_item.key_id == payload['data']['key_id']:
@@ -192,4 +193,4 @@ class SharesScreen(screen.AppScreen):
             ))
             if _Debug:
                 print('SharesScreen.on_shared_location %r auto-created : %r -> %r' % (
-                    item_found.instance_item.key_id, prev_state, payload['data']['state'], ))
+                    item_found.instance_item.key_id if item_found else '?', prev_state, payload['data']['state'], ))

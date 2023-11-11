@@ -14,7 +14,7 @@ from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -230,7 +230,7 @@ class SharedLocationScreen(screen.AppScreen):
         if _Debug:
             print('SharedLocationScreen.on_grant_access_result', resp)
         if api_client.is_ok(resp):
-            snackbar.success(text='access granted for user %s' % user_global_id)
+            snackbar.success(text='access granted')
         else:
             snackbar.error(text=api_client.response_err(resp))
 

@@ -223,7 +223,7 @@ class GroupChatScreen(screen.AppScreen):
         if _Debug:
             print('GroupChatScreen.on_group_share_result', resp)
         if api_client.is_ok(resp):
-            snackbar.success(text='group key shared with %s' % user_global_id, bottom=False)
+            snackbar.success(text='group key shared', bottom=False)
         else:
             snackbar.error(text=api_client.response_err(resp), bottom=False)
 

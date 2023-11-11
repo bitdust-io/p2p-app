@@ -5,6 +5,10 @@ from components import snackbar
 
 #------------------------------------------------------------------------------
 
+_Debug = True
+
+#------------------------------------------------------------------------------
+
 class CreateShareScreen(screen.AppScreen):
 
     # def get_icon(self):
@@ -20,6 +24,19 @@ class CreateShareScreen(screen.AppScreen):
 
     def on_enter(self):
         self.clean_view(clear_input_field=True)
+
+    def on_share_label_input_key_enter_pressed(self, *args):
+        if _Debug:
+            print('CreateShareScreen.on_share_label_input_key_enter_pressed', self.ids.share_label_input.text)
+        if not self.ids.share_label_input.text:
+            return
+        self.ids.status_message_label.text = ''
+        self.ids.create_share_button.disabled = True
+        self.ids.share_label_input.disabled = True
+        api_client.share_create(
+            label=self.ids.share_label_input.text,
+            cb=self.on_share_create_result,
+        )
 
     def on_create_share_button_clicked(self, *args):
         if not self.ids.share_label_input.text:

@@ -148,6 +148,21 @@ class DynamicHeightTextInput(ThemableBehavior, TextInput):
 
 class CustomTextField(MDTextField):
 
+    def __init__(self, **kwargs):
+        self.register_event_type('on_key_enter_pressed')
+        super().__init__(**kwargs)
+
+    def _key_down(self, key, repeat=False):
+        displayed_str, internal_str, internal_action, scale = key
+        if _Debug:
+            print('CustomTextField._key_down', internal_action)
+        if internal_action == 'enter':
+            self.dispatch('on_key_enter_pressed', None)
+        return MDTextField._key_down(self, key, repeat=repeat)
+
+    def on_key_enter_pressed(self, *args):
+        pass
+
     def on_focus(self, instance, value):
         if _Debug:
             print('CustomTextField.on_focus', instance, value)
@@ -155,7 +170,7 @@ class CustomTextField(MDTextField):
         on_text_input_focus(instance, value)
         return r
 
-
+#------------------------------------------------------------------------------
 
 class CustomTextFieldRound(ThemableBehavior, TextInput):
     icon_left = StringProperty()

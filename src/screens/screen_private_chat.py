@@ -9,7 +9,7 @@ from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -168,8 +168,21 @@ class PrivateChatScreen(screen.AppScreen):
     def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
             print('PrivateChatScreen.on_drop_down_menu_item_clicked', btn.icon)
-        if btn.icon == 'trash-can-outline':
-            api_client.friend_remove(global_user_id=self.recipient_id, cb=self.on_friend_remove_result)
+        if btn.icon == 'account-plus':
+            api_client.friend_add(
+                global_user_id=self.recipient_id,
+                cb=self.on_friend_add_result,
+            )
+        elif btn.icon == 'trash-can-outline':
+            api_client.friend_remove(
+                global_user_id=self.recipient_id,
+                cb=self.on_friend_remove_result,
+            )
+
+    def on_friend_add_result(self, resp):
+        if _Debug:
+            print('PrivateChatScreen.on_friend_add_result', resp)
+        snackbar.success('new contact added', bottom=False)
 
     def on_friend_remove_result(self, resp):
         if _Debug:
@@ -177,4 +190,6 @@ class PrivateChatScreen(screen.AppScreen):
         # if not api_client.is_ok(resp):
         #     snackbar.error(text='contact was not deleted: %s' % api_client.response_err(resp), bottom=False)
         #     return
-        self.main_win().select_screen('friends_screen')
+        screen.main_window().select_screen('friends_screen')
+        screen.main_window().screens_stack.clear()
+        screen.main_window().screens_stack.append('welcome_screen')

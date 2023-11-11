@@ -43,7 +43,8 @@
                     width: dp(220)
                     hint_text: 'Enter user name to search'
                     text: ''
-                    on_focus: root.on_search_input_focus_changed()
+                    # on_focus: root.on_search_input_focus_changed()
+                    on_key_enter_pressed: root.on_search_input_key_enter_pressed()
 
                 VerticalLayout:
                     size_hint: None, None
