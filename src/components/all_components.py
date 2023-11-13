@@ -33,7 +33,7 @@ KV_IMPORT = """
 #:import DistributedFileListEntry components.file_browser.DistributedFileListEntry
 #:import DistributedFileChooserListView components.file_browser.DistributedFileChooserListView
 #:import DistributedFileChooserListLayout components.file_browser.DistributedFileChooserListLayout
-
+#:import CircularProgressBar components.spinner.CircularProgressBar
 """
 
 

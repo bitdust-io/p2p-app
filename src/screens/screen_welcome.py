@@ -1,4 +1,5 @@
-from kivy.clock import Clock  # @UnresolvedImport
+# from kivy.clock import Clock  # @UnresolvedImport
+from kivy.metrics import dp
 
 #------------------------------------------------------------------------------
 
@@ -6,7 +7,8 @@ from lib import api_client
 
 from components import screen
 from components import buttons
-from components import labels
+# from components import labels
+from components import spinner
 
 #------------------------------------------------------------------------------
 
@@ -39,11 +41,7 @@ class WelcomeScreen(screen.AppScreen):
         if _Debug:
             print('WelcomeScreen.populate create_identity=%r process_health=%r start_engine=%r' % (create_identity, process_health, start_engine, ))
         if create_identity:
-            for w in self.ids.central_widget.children:
-                if isinstance(w, labels.HFlexMarkupLabel):
-                    if w.text == 'starting...':
-                        self.ids.central_widget.remove_widget(w)
-                        break
+            self.ids.spinner.stop()
             exists = False
             for w in self.ids.central_widget.children:
                 if isinstance(w, buttons.FillRoundFlatButton):
@@ -64,52 +62,19 @@ class WelcomeScreen(screen.AppScreen):
                     self.ids.central_widget.remove_widget(w)
                     break
         if (process_health in [0, -1, ] or start_engine) and not create_identity:
-            exists = False
-            for w in self.ids.central_widget.children:
-                if isinstance(w, labels.HFlexMarkupLabel):
-                    if w.text == 'starting...':
-                        exists = True
-                        break
-            if not exists:
-                lbl = labels.HFlexMarkupLabel(
-                    text='starting...',
-                    pos_hint={'center_x': .5},
-                    halign='center',
-                )
-                self.ids.central_widget.add_widget(lbl)
+            self.ids.spinner.start()
         else:
-            for w in self.ids.central_widget.children:
-                if isinstance(w, labels.HFlexMarkupLabel):
-                    if w.text == 'starting...':
-                        self.ids.central_widget.remove_widget(w)
-                        break
+            self.ids.spinner.stop()
 
     def on_enter(self, *args):
-        # self.ids.action_button.close_stack()
         self.ids.state_panel.attach(automat_id='initializer')
-        # if not self.verify_network_connected_task:
-        #     self.verify_network_connected_task = Clock.schedule_interval(self.control().verify_network_connected, 20)
         api_client.identity_get(cb=self.on_identity_get_result)
 
     def on_leave(self, *args):
-        # self.ids.action_button.close_stack()
         self.ids.state_panel.release()
-        # if self.verify_network_connected_task:
-        #     Clock.unschedule(self.verify_network_connected_task)
-        #     self.verify_network_connected_task = None
-
-#     def on_action_button_clicked(self, btn):
-#         if _Debug:
-#             print('WelcomeScreen.on_action_button_clicked', btn.icon)
-#         self.ids.action_button.close_stack()
-#         if btn.icon == 'chat-plus-outline':
-#             self.main_win().select_screen('create_group_screen')
-#         elif btn.icon == 'account-key-outline':
-#             self.main_win().select_screen('friends_screen')
 
     def on_nav_button_clicked(self):
         pass
-        # self.ids.action_button.close_stack()
 
     def on_create_identity_button_clicked(self, *args):
         self.main_win().select_screen('new_identity_screen')
