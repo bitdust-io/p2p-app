@@ -11,11 +11,7 @@ _Debug = False
 
 class EngineStatusScreen(screen.AppScreen):
 
-    # verify_process_health_task = None
     state_panel_attached = False
-
-    # def get_icon(self):
-    #     return 'heart-pulse'
 
     def get_title(self):
         return 'status'
@@ -34,9 +30,6 @@ class EngineStatusScreen(screen.AppScreen):
             'EXIT': 'application is closed',
         }
 
-    def is_closable(self):
-        return False
-
     def populate(self):
         if _Debug:
             print('EngineStatusScreen.populate state_panel_attached=%r' % self.state_panel_attached)
@@ -49,17 +42,11 @@ class EngineStatusScreen(screen.AppScreen):
             if not self.state_panel_attached:
                 self.state_panel_attached = self.ids.state_panel.attach(automat_id='initializer')
         api_client.add_model_listener('service', listener_cb=self.on_service)
-        # Clock.schedule_once(self.control().verify_process_health)
-        # if not self.verify_process_health_task:
-        #     self.verify_process_health_task = Clock.schedule_interval(self.control().verify_process_health, 5)
         self.populate()
 
     def on_leave(self, *args):
         if _Debug:
             print('EngineStatusScreen.on_leave')
-        # if self.verify_process_health_task:
-        #     Clock.unschedule(self.verify_process_health_task)
-        #     self.verify_process_health_task = None
         api_client.remove_model_listener('service', listener_cb=self.on_service)
         if self.state_panel_attached:
             self.ids.state_panel.release()

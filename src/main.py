@@ -322,7 +322,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             if self.main_window.is_screen_active('welcome_screen'):
                 welcome_screen = self.main_window.get_active_screen('welcome_screen')
                 if welcome_screen:
-                    welcome_screen.populate(start_engine=True)
+                    Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
             self.main_window.engine_log = '\n'
             self.start_service_if_not_running()
         except:
@@ -356,15 +356,19 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.do_begin_deploy_process params=%r finishing=%r' % (params, self.finishing.is_set(), ))
         if self.finishing.is_set():
             return
-        if self.main_window.is_screen_active('welcome_screen'):
-            welcome_screen = self.main_window.get_active_screen('welcome_screen')
-            if welcome_screen:
-                welcome_screen.populate(start_engine=True)
         self.main_window.engine_log = '\n'
         if not params and self.control.is_web_socket_ready():
             if _Debug:
                 print('BitDustApp.do_begin_deploy_process SKIP because web socket already ready')
+            if self.main_window.is_screen_active('welcome_screen'):
+                welcome_screen = self.main_window.get_active_screen('welcome_screen')
+                if welcome_screen:
+                    Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
             return
+        if self.main_window.is_screen_active('welcome_screen'):
+            welcome_screen = self.main_window.get_active_screen('welcome_screen')
+            if welcome_screen:
+                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
         if system.is_linux():
             system.BackgroundProcess(
                 cmd=['/bin/bash', './src/deploy/linux.sh', ] + params,

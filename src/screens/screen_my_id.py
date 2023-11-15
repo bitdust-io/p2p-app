@@ -204,8 +204,16 @@ class MyIDScreen(screen.AppScreen):
         system.rmdir_recursive(os.path.join(home_folder_path, current_network, 'customers'), ignore_errors=True)
         system.rmdir_recursive(os.path.join(home_folder_path, 'temp'), ignore_errors=True)
         snackbar.info(text='private key erased')
-        self.app().start_engine()
+        self.app().control.stop()
+        Clock.schedule_once(self.do_start_again, 1)
+
+    def do_start_again(self, *args):
+        self.app().control.start()
+        self.app().start_engine(after_restart=True)
         self.main_win().select_screen('welcome_screen')
         self.main_win().close_screen('new_identity_screen')
         self.main_win().close_screen('recover_identity_screen')
         self.main_win().screens_stack.clear()
+        welcome_screen = self.main_win().get_active_screen('welcome_screen')
+        if welcome_screen:
+            Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)

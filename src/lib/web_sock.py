@@ -64,6 +64,7 @@ def stop():
     global _WebSocketStarted
     global _WebSocketQueue
     global _WebSocketConnecting
+    global _WebSocketReady
     global _RegisteredCallbacks
     if not is_started():
         raise Exception('has not been started')
@@ -73,6 +74,7 @@ def stop():
     _RegisteredCallbacks = {}
     _WebSocketStarted = False
     _WebSocketConnecting = False
+    _WebSocketReady = False
     while True:
         try:
             json_data, _ = ws_queue().get_nowait()

@@ -1,5 +1,5 @@
 from kivy.uix.progressbar import ProgressBar
-from kivy.core.text import Label as CoreLabel
+from kivy.core.text import Label
 from kivy.metrics import sp
 from kivy.graphics import Color, Ellipse, Rectangle
 from kivy.clock import Clock
@@ -11,8 +11,9 @@ class CircularProgressBar(ProgressBar):
         super(CircularProgressBar, self).__init__(**kwargs)
         self._task = None
         self._shown = False
-        self.thickness = 20
-        self.label = CoreLabel(text='starting', font_size=sp(14))
+        self.thickness = 5
+        self.text_label = 'starting'
+        self.label = Label(text=self.text_label, font_size=sp(12), font_name='RobotoMono-Regular')
         self.texture_size = None
         self.refresh_text()
         self.draw()
@@ -41,13 +42,17 @@ class CircularProgressBar(ProgressBar):
 
     def set_value(self, value):
         self.value = value
-        self.label.text = 'starting\n' + '.' * int(12 * value / self.max)
+        self.label.text = '  ' + self.text_label + '  \n  ' + '.' * int(len(self.text_label) * value / self.max)
         self.refresh_text()
         self.draw()
 
-    def start(self):
+    def start(self, label='starting'):
+        self.text_label = label
         self._shown = True
-        self._task = Clock.schedule_interval(self._animate, 0.05)
+        if self._task:
+            self._task.cancel()
+        self._task = None
+        self._task = Clock.schedule_interval(self._animate, 0.02)
 
     def stop(self):
         if self._task:
