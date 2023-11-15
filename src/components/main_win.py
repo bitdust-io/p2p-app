@@ -26,7 +26,7 @@ from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -178,20 +178,20 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
 
     def populate_toolbar_content(self, screen_inst=None):
         if not screen_inst:
-            self.ids.toolbar.title = 'BitDust'
+            self.ids.toolbar.title = ''
             return
         title = screen_inst.get_title()
-        if system.is_android():
+        if title and system.is_android():
             if len(title) > 20:
                 title = title[:20] + '...'
         icn = screen_inst.get_icon()
         if icn:
             icn_pack = screen_inst.get_icon_pack()
-            title = '[size=28sp]{}[/size]  {}'.format(webfont.make_icon(icn, icon_pack=icn_pack), title)
+            title = '[size=24sp]{}[/size] {}'.format(webfont.make_icon(icn, icon_pack=icn_pack), title)
         if title:
             self.ids.toolbar.title = title
         else:
-            self.ids.toolbar.title = 'BitDust'
+            self.ids.toolbar.title = ''
 
     def populate_dropdown_menu(self, screen_inst=None):
         if _Debug:
@@ -457,7 +457,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                welcome_screen.populate(process_health=value)
+                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
 
     def on_state_identity_get(self, instance, value):
         if _Debug:
@@ -467,13 +467,17 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                welcome_screen.populate(create_identity=(False if value != -1 else True))
+                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
 
     def on_state_network_connected(self, instance, value):
-        # if _Debug:
-        #     print('MainWin.on_state_network_connected', value)
+        if _Debug:
+            print('MainWin.on_state_network_connected', value)
         self.populate_bottom_toolbar_icon('lan-connect', value)
         self.control.on_state_network_connected(instance, value)
+        if self.is_screen_active('welcome_screen'):
+            welcome_screen = self.get_active_screen('welcome_screen')
+            if welcome_screen:
+                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
 
     def on_state_entangled_dht(self, instance, value):
         if _Debug:

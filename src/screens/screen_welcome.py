@@ -1,25 +1,25 @@
-from kivy.clock import Clock  # @UnresolvedImport
+# from kivy.clock import Clock  # @UnresolvedImport
+# from kivy.metrics import dp
 
 #------------------------------------------------------------------------------
 
 from lib import api_client
 
+from components import webfont
 from components import screen
 from components import buttons
 from components import labels
+# from components import spinner
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
 class WelcomeScreen(screen.AppScreen):
 
     verify_network_connected_task = None
-
-    def get_title(self):
-        return 'BitDust'
 
     def get_statuses(self):
         return {
@@ -35,81 +35,73 @@ class WelcomeScreen(screen.AppScreen):
             'EXIT': 'application is closed',
         }
 
-    def populate(self, create_identity=None, process_health=None, start_engine=None):
+    def populate(self):
+        process_health = self.main_win().state_process_health
+        identity_get = self.main_win().state_identity_get
+        network_connected = self.main_win().state_network_connected
         if _Debug:
-            print('WelcomeScreen.populate create_identity=%r process_health=%r start_engine=%r' % (create_identity, process_health, start_engine, ))
-        if create_identity:
-            for w in self.ids.central_widget.children:
-                if isinstance(w, labels.HFlexMarkupLabel):
-                    if w.text == 'starting...':
-                        self.ids.central_widget.remove_widget(w)
-                        break
-            exists = False
-            for w in self.ids.central_widget.children:
-                if isinstance(w, buttons.FillRoundFlatButton):
-                    exists = True
-                    break
-            if not exists:
-                btn = buttons.FillRoundFlatButton(
-                    text='create new identity',
-                    pos_hint={'center_x': .5},
-                    md_bg_color=self.app().color_success_green,
-                    text_color=self.app().color_white99,
-                    on_release=self.on_create_identity_button_clicked,
-                )
-                self.ids.central_widget.add_widget(btn)
-        else:
+            print('WelcomeScreen.populate process_health=%r identity_get=%r network_connected=%r' % (
+                process_health, identity_get, network_connected, ))
+        if process_health != 1:
+            self.ids.spinner.start(label='starting')
             for w in self.ids.central_widget.children:
                 if isinstance(w, buttons.FillRoundFlatButton):
                     self.ids.central_widget.remove_widget(w)
-                    break
-        if (process_health in [0, -1, ] or start_engine) and not create_identity:
-            exists = False
-            for w in self.ids.central_widget.children:
                 if isinstance(w, labels.HFlexMarkupLabel):
-                    if w.text == 'starting...':
-                        exists = True
-                        break
-            if not exists:
-                lbl = labels.HFlexMarkupLabel(
-                    text='starting...',
-                    pos_hint={'center_x': .5},
-                    halign='center',
-                )
-                self.ids.central_widget.add_widget(lbl)
+                    self.ids.central_widget.remove_widget(w)
         else:
-            for w in self.ids.central_widget.children:
-                if isinstance(w, labels.HFlexMarkupLabel):
-                    if w.text == 'starting...':
-                        self.ids.central_widget.remove_widget(w)
+            if identity_get != 1:
+                self.ids.spinner.stop()
+                btn_exists = False
+                for w in self.ids.central_widget.children:
+                    if isinstance(w, buttons.FillRoundFlatButton):
+                        btn_exists = True
                         break
+                if not btn_exists:
+                    btn = buttons.FillRoundFlatButton(
+                        text="[size=22sp]{}[/size]  [size=16sp][b]create new identity[/b][/size]".format(webfont.md_icon("account-plus")),
+                        pos_hint={'center_x': .5},
+                        md_bg_color=self.app().color_success_green,
+                        text_color=self.app().color_white99,
+                        on_release=self.on_create_identity_button_clicked,
+                    )
+                    lbl = labels.HFlexMarkupLabel(
+                        pos_hint={'center_x': .5},
+                        markup=True,
+                        text="[u][color=#0000ff][ref=link]restore existing identity[/ref][/color][/u]",
+                    )
+                    lbl.bind(on_ref_press=self.on_restore_existing_identity_pressed)
+                    self.ids.central_widget.add_widget(btn)
+                    self.ids.central_widget.add_widget(lbl)
+            else:
+                for w in self.ids.central_widget.children:
+                    if isinstance(w, buttons.FillRoundFlatButton):
+                        self.ids.central_widget.remove_widget(w)
+                    if isinstance(w, labels.HFlexMarkupLabel):
+                        self.ids.central_widget.remove_widget(w)
+                if network_connected != 1:
+                    self.ids.spinner.start(label='connecting')
+                else:
+                    self.ids.spinner.stop()
+                    if identity_get == 1:
+                        lbl = labels.HFlexMarkupLabel(
+                            pos_hint={'center_x': .5},
+                            markup=True,
+                            text="[b][color=#000000]Welcome to BitDust![/color][/b]",
+                        )
+                        self.ids.central_widget.add_widget(lbl)
 
-    def on_enter(self, *args):
-        # self.ids.action_button.close_stack()
-        self.ids.state_panel.attach(automat_id='initializer')
-        # if not self.verify_network_connected_task:
-        #     self.verify_network_connected_task = Clock.schedule_interval(self.control().verify_network_connected, 20)
+    def call_identity_get(self):
         api_client.identity_get(cb=self.on_identity_get_result)
 
+    def on_enter(self, *args):
+        self.ids.state_panel.attach(automat_id='initializer')
+    
     def on_leave(self, *args):
-        # self.ids.action_button.close_stack()
         self.ids.state_panel.release()
-        # if self.verify_network_connected_task:
-        #     Clock.unschedule(self.verify_network_connected_task)
-        #     self.verify_network_connected_task = None
-
-#     def on_action_button_clicked(self, btn):
-#         if _Debug:
-#             print('WelcomeScreen.on_action_button_clicked', btn.icon)
-#         self.ids.action_button.close_stack()
-#         if btn.icon == 'chat-plus-outline':
-#             self.main_win().select_screen('create_group_screen')
-#         elif btn.icon == 'account-key-outline':
-#             self.main_win().select_screen('friends_screen')
 
     def on_nav_button_clicked(self):
         pass
-        # self.ids.action_button.close_stack()
 
     def on_create_identity_button_clicked(self, *args):
         self.main_win().select_screen('new_identity_screen')
@@ -118,10 +110,16 @@ class WelcomeScreen(screen.AppScreen):
         if _Debug:
             print('WelcomeScreen.on_identity_get_result', self.main_win().state_process_health, self.main_win().state_identity_get, resp)
         if self.main_win().state_process_health == 1 and self.main_win().state_identity_get != 1 and not api_client.is_ok(resp):
-            self.populate(create_identity=True)
-        else:
             self.populate()
+        else:
+            if self.main_win().state_process_health != 1:
+                self.populate()
+            else:
+                self.populate()
 
     def on_upload_file_button_clicked(self, *args):
         if _Debug:
             print('WelcomeScreen.on_upload_file_button_clicked', args)
+
+    def on_restore_existing_identity_pressed(self, instance, value):
+        self.main_win().select_screen('recover_identity_screen')

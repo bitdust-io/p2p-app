@@ -24,15 +24,15 @@
                     id: central_widget
                     size_hint: None, .01
                     width: self.minimum_width
+                    spacing: dp(30)
 
-                    HFlexMarkupLabel:
+					CircularProgressBar:
+						id: spinner
+						size_hint: (None, None)
+						size: dp(100), dp(100)
                         halign: 'center'
-                        text: '[size=26sp]Welcome to BitDust[/size]'
                         pos_hint: {'center_x': .5}
-
-                    VEmptySpace:
-                        size_hint_y: None
-                        height: dp(20)
+                        max: 360
 
                 HEmptySpace:
                     size_hint_x: 0.5

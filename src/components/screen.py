@@ -76,9 +76,6 @@ class AppScreen(ThemableBehavior, Screen):
     def get_statuses(self):
         return {}
 
-    def is_closable(self):
-        return True
-
     def app(self):
         return my_app()
 

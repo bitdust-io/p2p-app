@@ -4,33 +4,48 @@
 
         TopEmptyScreenSpace:
 
-        BoxLayout:
-            orientation: 'horizontal'
-            spacing: 10
+        AppScreenLayout:
 
-            Widget:
-                size_hint: 0.01, 1
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses: root.get_statuses()
 
-            BoxLayout:
-                orientation: 'vertical'
-                size_hint: 1, 1
-                spacing: 10
+            VEmptySpace:
+                size_hint_y: 0.4
 
-                Widget:
-                    size_hint: 1, 0.01
+	        HLayout:
 
-                MarkupLabel:
-                    valign: 'bottom'
-                    halign: 'right'
-                    text: "private key:"
-                    text_size: self.size
-                    height: dp(20)
-                    size_hint: 1, None
-                    pos_hint: {'center_x': .5}
+                HEmptySpace:
+                    size_hint_x: 0.1
 
-                BoxLayout:
-                    size_hint: 1, 1
-                    pos_hint: {'center_x': .5}
+                VLayout:
+	                size_hint: 1, 1
+
+	                MarkupLabel:
+	                    size_hint_y: None
+	                    text_size: self.width, None
+	                    height: self.texture_size[1]
+	                    color: app.color_gray
+	                    multiline: True
+	                    text: "To recover your BitDust identity, you will need a backup copy of your private key and one of your IDURL addresses."
+
+					VFixedEmptySpace:
+
+	                MarkupLabel:
+	                    size_hint_y: None
+	                    text_size: self.width, None
+	                    height: self.texture_size[1]
+	                    color: app.color_gray
+	                    multiline: True
+	                    text: "Paste the IDURL address and the private key below or load a backup copy from a text file."
+
+					VFixedEmptySpace:
+
+                    HFlexMarkupLabel:
+	                    pos_hint: {'center_x': 0.5}
+                        text: '[u][color=#0000ff][ref=link]load private key[/ref][/color][/u]'
+                        on_ref_press: root.on_load_private_key_pressed()
 
                     TextInput:
                         id: private_key_input
@@ -38,29 +53,40 @@
                         text: ''
                         halign: 'left'
                         text_size: self.size
-                        height: self.minimum_height
-                        size_hint: 1, 1
+	                    width: dp(320)
+                        height: dp(160)
+                        size_hint: 1, None
+					    font_name: 'RobotoMono-Regular'
+					    font_size: '12sp'
 
-                RoundedFlexButton:
-                    id: recover_identity_button
-                    text: 'recover'
-                    pos_hint: {'center_x': .5}
-                    on_release: root.on_start_recover_identity_button_clicked()
+					VFixedEmptySpace:
 
-                StatusLabel:
-                    id: recover_identity_result_message
-                    valign: 'bottom'
-                    halign: 'right'
-                    text: ""
-                    height: dp(20)
-                    size_hint: None, None
-                    pos_hint: {'center_x': .5}
+	                FillRoundFlatButton:
+	                    id: recover_identity_button
+	                    text: "[size=18sp]{}[/size]  [size=16sp][b]recover identity[/b][/size]".format(md_icon("lock-open-variant"))
+	                    md_bg_color: app.theme_cls.accent_color
+	                    theme_text_color: "Custom"
+	                    text_color: app.color_white99
+	                    pos_hint: {'center_x': .5}
+	                    on_release: root.on_start_recover_identity_button_clicked()
 
-                Widget:
-                    size_hint: 1, 0.01
+					VFixedEmptySpace:
 
-            Widget:
-                size_hint: 0.01, 1
+	                StatusLabel:
+	                    id: recover_identity_result_message
+	                    halign: 'center'
+	                    text: ""
+	                    color: app.color_gray
+	                    pos_hint: {'center_x': .5}
+
+		            VEmptySpace:
+		                size_hint_y: 0.5
+
+                HEmptySpace:
+                    size_hint_x: 0.1
+
+            VEmptySpace:
+                size_hint_y: 0.5
 
         BottomEmptyScreenSpace:
 

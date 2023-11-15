@@ -20,9 +20,6 @@ class ConnectingScreen(screen.AppScreen):
     known_services = {}
     state_panel_attached = False
 
-    # def get_icon(self):
-    #     return 'lan-pending'
-
     def get_title(self):
         return 'network services'
 
@@ -37,9 +34,6 @@ class ConnectingScreen(screen.AppScreen):
             'MY_IDENTITY': 'verifying my identity in the network',
             'PROPAGATE': 'propagating my identity to other nodes',
         }
-
-    def is_closable(self):
-        return False
 
     def populate(self, *args, **kwargs):
         if _Debug:
