@@ -12,7 +12,7 @@
                 statuses: root.get_statuses()
 
             VEmptySpace:
-                size_hint_y: 0.4
+                size_hint_y: 0.5
 
 	        HLayout:
 
@@ -27,7 +27,6 @@
 	                    text_size: self.width, None
 	                    height: self.texture_size[1]
 	                    color: app.color_gray
-	                    multiline: True
 	                    text: "To recover your BitDust identity, you will need a backup copy of your private key and one of your IDURL addresses."
 
 					VFixedEmptySpace:
@@ -37,7 +36,6 @@
 	                    text_size: self.width, None
 	                    height: self.texture_size[1]
 	                    color: app.color_gray
-	                    multiline: True
 	                    text: "Paste the IDURL address and the private key below or load a backup copy from a text file."
 
 					VFixedEmptySpace:

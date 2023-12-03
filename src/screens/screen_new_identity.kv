@@ -15,7 +15,6 @@
                 size_hint_y: 0.5
 
             HLayout:
-                size_hint: 1, .01
 
                 HEmptySpace:
                     size_hint_x: 0.5
@@ -29,17 +28,22 @@
 	                    text_size: self.size
 	                    valign: "top"
 	                    halign: "left"
-	                    size_hint_y: None
+	                    size_hint: None, None
 	                    text_size: self.width, None
 	                    height: self.texture_size[1]
 	                    pos_hint: {'center_x': .5}
+	                    width: dp(260)
 	                    color: app.color_gray
 	                    multiline: True
 	                    text:
 	                    	"""* lowercase letters: [b]a-z[/b]
 	                    	* digits: [b]0-9[/b]
 	                    	* minus sign: [b]-[/b]
-	                    	* underscore character: [b]_[/b]"""
+	                    	* underscore character: [b]_[/b]
+	                    	* minimum length is: [b]3[/b] characters
+	                    	* maximum length is: [b]20[/b] characters"""
+
+					VFixedEmptySpace:
 
 	                CustomTextField:
 	                    id: username_input
@@ -50,6 +54,8 @@
 	                    size_hint_x: None
 	                    width: dp(220)
 	                    on_key_enter_pressed: root.on_username_input_key_enter_pressed()
+
+					VFixedEmptySpace:
 
 	                FillRoundFlatButton:
 	                    id: create_identity_button
