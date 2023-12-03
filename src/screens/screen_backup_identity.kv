@@ -1,0 +1,98 @@
+<BackupIdentityScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses: root.get_statuses()
+
+            VEmptySpace:
+                size_hint_y: 0.5
+
+	        HLayout:
+
+                HEmptySpace:
+                    size_hint_x: 0.1
+
+                VLayout:
+	                size_hint: 1, 1
+
+	                MarkupLabel:
+	                    size_hint_y: None
+	                    text_size: self.width, None
+	                    height: self.texture_size[1]
+	                    color: app.color_gray
+	                    text: "It is [b][color=#ff0000]highly recommended[/color][/b] to make two or three copies of your private key on reliable and compact media just after the program set up and hide them in a secure place."
+
+					VFixedEmptySpace:
+
+	                MarkupLabel:
+	                    size_hint_y: None
+	                    text_size: self.width, None
+	                    height: self.texture_size[1]
+	                    color: app.color_gray
+	                    text: "Losing the secret key means that you [b][color=#ff0000]lose all of your data[/color][/b] and you will never be able to access it!"
+
+					VFixedEmptySpace:
+
+	                MarkupLabel:
+	                    size_hint_y: None
+	                    text_size: self.width, None
+	                    height: self.texture_size[1]
+	                    color: app.color_gray
+	                    text: "Never reveal your secret key in open or untrusted channels!"
+
+					VFixedEmptySpace:
+
+	                MarkupLabel:
+	                    size_hint_y: None
+	                    text_size: self.width, None
+	                    height: self.texture_size[1]
+	                    color: app.color_gray
+	                    text: "The reliability of your personal information security is completely dependent on the safety of your private key and [b][color=#ff0000]physical control[/color][/b] of this device."
+
+					VFixedEmptySpace:
+
+	                FillRoundFlatButton:
+	                    id: backup_identity_button
+	                    text: "[size=22sp]{}[/size]  [size=16sp][b]save private key[/b][/size]".format(md_icon("home-lock"))
+	                    md_bg_color: app.theme_cls.accent_color
+	                    theme_text_color: "Custom"
+	                    text_color: app.color_white99
+	                    pos_hint: {'center_x': .5}
+	                    on_release: root.on_save_private_key_pressed()
+
+					VFixedEmptySpace:
+
+	                StatusLabel:
+	                    id: recover_identity_result_message
+	                    halign: 'center'
+	                    text: ""
+	                    color: app.color_gray
+	                    pos_hint: {'center_x': .5}
+
+					VFixedEmptySpace:
+
+	                FillRoundFlatButton:
+	                    id: continue_button
+	                    text: "[size=16sp][b]continue[/b][/size]"
+	                    md_bg_color: app.theme_cls.accent_color
+	                    theme_text_color: "Custom"
+	                    text_color: app.color_white99
+	                    pos_hint: {'center_x': .5}
+	                    disabled: True
+	                    on_release: root.on_continue_pressed()
+
+                HEmptySpace:
+                    size_hint_x: 0.1
+
+            VEmptySpace:
+                size_hint_y: 0.5
+
+        BottomEmptyScreenSpace:
+

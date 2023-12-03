@@ -168,11 +168,11 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             self.menu().ids.menu_item_shares.disabled = True
             return
         self.menu().ids.menu_item_my_identity.disabled = False
-        self.menu().ids.menu_item_chat.disabled = False
+        self.menu().ids.menu_item_chat.disabled = self.state_message_history != 1
         self.menu().ids.menu_item_friends.disabled = False
         self.menu().ids.menu_item_settings.disabled = False
-        self.menu().ids.menu_item_private_files.disabled = False
-        self.menu().ids.menu_item_shares.disabled = False
+        self.menu().ids.menu_item_private_files.disabled = self.state_my_data != 1
+        self.menu().ids.menu_item_shares.disabled = self.state_my_data != 1
 
     #------------------------------------------------------------------------------
 
@@ -457,7 +457,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
+                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
 
     def on_state_identity_get(self, instance, value):
         if _Debug:
@@ -467,7 +467,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
+                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
 
     def on_state_network_connected(self, instance, value):
         if _Debug:
@@ -477,24 +477,28 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
+                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
 
     def on_state_entangled_dht(self, instance, value):
         if _Debug:
             print('MainWin.on_state_entangled_dht', value)
         self.populate_bottom_toolbar_icon('family-tree', value)
+        self.control.on_state_entangled_dht(instance, value)
 
     def on_state_proxy_transport(self, instance, value):
         if _Debug:
             print('MainWin.on_state_proxy_transport', value)
         self.populate_bottom_toolbar_icon('transit-connection-variant', value)
+        self.control.on_state_proxy_transport(instance, value)
 
     def on_state_my_data(self, instance, value):
         if _Debug:
             print('MainWin.on_state_my_data', value)
         self.populate_bottom_toolbar_icon('database', value)
+        self.control.on_state_my_data(instance, value)
 
     def on_state_message_history(self, instance, value):
         if _Debug:
             print('MainWin.on_state_message_history', value)
         self.populate_bottom_toolbar_icon('comments', value)
+        self.control.on_state_message_history(instance, value)

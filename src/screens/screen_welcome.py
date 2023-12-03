@@ -50,7 +50,7 @@ class WelcomeScreen(screen.AppScreen):
                 if isinstance(w, labels.HFlexMarkupLabel):
                     self.ids.central_widget.remove_widget(w)
         else:
-            if identity_get != 1:
+            if identity_get == 0:
                 self.ids.spinner.stop()
                 btn_exists = False
                 for w in self.ids.central_widget.children:
@@ -84,12 +84,42 @@ class WelcomeScreen(screen.AppScreen):
                 else:
                     self.ids.spinner.stop()
                     if identity_get == 1:
-                        lbl = labels.HFlexMarkupLabel(
-                            pos_hint={'center_x': .5},
-                            markup=True,
-                            text="[b][color=#000000]Welcome to BitDust![/color][/b]",
+                        link_search_people = labels.HFlexMarkupLabel(
+                            pos_hint={'center_x': .5}, markup=True,
+                            text="[u][color=#0000ff][ref=link]search people[/ref][/color][/u]",
                         )
-                        self.ids.central_widget.add_widget(lbl)
+                        link_search_people.bind(on_ref_press=self.on_search_people_link_pressed)
+                        self.ids.central_widget.add_widget(link_search_people)
+                        link_chat = labels.HFlexMarkupLabel(
+                            pos_hint={'center_x': .5}, markup=True,
+                            text="[u][color=#0000ff][ref=link]chat with friends[/ref][/color][/u]",
+                        )
+                        link_chat.bind(on_ref_press=self.on_chat_with_friends_link_pressed)
+                        self.ids.central_widget.add_widget(link_chat)
+                        link_upload_file = labels.HFlexMarkupLabel(
+                            pos_hint={'center_x': .5}, markup=True,
+                            text="[u][color=#0000ff][ref=link]upload a file[/ref][/color][/u]",
+                        )
+                        link_upload_file.bind(on_ref_press=self.on_upload_file_link_pressed)
+                        self.ids.central_widget.add_widget(link_upload_file)
+                        link_share_file = labels.HFlexMarkupLabel(
+                            pos_hint={'center_x': .5}, markup=True,
+                            text="[u][color=#0000ff][ref=link]share a file[/ref][/color][/u]",
+                        )
+                        link_share_file.bind(on_ref_press=self.on_share_file_link_pressed)
+                        self.ids.central_widget.add_widget(link_share_file)
+
+    def on_search_people_link_pressed(self, instance, value):
+        self.main_win().select_screen('search_people_screen')
+
+    def on_chat_with_friends_link_pressed(self, instance, value):
+        self.main_win().select_screen('conversations_screen')
+
+    def on_upload_file_link_pressed(self, instance, value):
+        self.main_win().select_screen('private_files_screen')
+
+    def on_share_file_link_pressed(self, instance, value):
+        self.main_win().select_screen('shares_screen')
 
     def call_identity_get(self):
         api_client.identity_get(cb=self.on_identity_get_result)

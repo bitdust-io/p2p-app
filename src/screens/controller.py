@@ -43,6 +43,8 @@ def all_screens():
             f'{KV_FILES_BASE}screens/screen_new_identity.kv', 'screens.screen_new_identity', 'NewIdentityScreen', ),
         'recover_identity_screen': (
             f'{KV_FILES_BASE}screens/screen_recover_identity.kv', 'screens.screen_recover_identity', 'RecoverIdentityScreen', ),
+        'backup_identity_screen': (
+            f'{KV_FILES_BASE}screens/screen_backup_identity.kv', 'screens.screen_backup_identity', 'BackupIdentityScreen', ),
         'welcome_screen': (
             f'{KV_FILES_BASE}screens/screen_welcome.kv', 'screens.screen_welcome', 'WelcomeScreen', ),
         'settings_screen': (
@@ -593,6 +595,26 @@ class Controller(object):
             self.run()
             return
         raise Exception('unexpected network_connected state: %r' % value)
+
+    def on_state_entangled_dht(self, instance, value):
+        if _Debug:
+            print('Controller.on_state_entangled_dht', value)
+        self.mw().update_menu_items()
+
+    def on_state_proxy_transport(self, instance, value):
+        if _Debug:
+            print('Controller.on_state_proxy_transport', value)
+        self.mw().update_menu_items()
+
+    def on_state_my_data(self, instance, value):
+        if _Debug:
+            print('Controller.on_state_my_data', value)
+        self.mw().update_menu_items()
+
+    def on_state_message_history(self, instance, value):
+        if _Debug:
+            print('Controller.on_state_message_history', value)
+        self.mw().update_menu_items()
 
     def on_state_success(self):
         if _Debug:
