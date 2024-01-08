@@ -85,7 +85,7 @@ class OptionElement(TreeElement):
     def __init__(self, **kwargs):
         self.option_name = kwargs.pop('option_name')
         self.option_value = kwargs.pop('option_value')
-        self.option_value_default = kwargs.pop('option_value_default', None)
+        self.option_value_default = str(kwargs.pop('option_value_default', '') or '')
         self.option_value_recent = self.option_value
         self.option_description = kwargs.pop('option_description', '')
         self.option_readonly = bool(kwargs.pop('option_readonly', False))

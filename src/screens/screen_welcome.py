@@ -84,30 +84,37 @@ class WelcomeScreen(screen.AppScreen):
                 else:
                     self.ids.spinner.stop()
                     if identity_get == 1:
-                        link_search_people = labels.HFlexMarkupLabel(
-                            pos_hint={'center_x': .5}, markup=True,
-                            text="[u][color=#0000ff][ref=link]search people[/ref][/color][/u]",
-                        )
-                        link_search_people.bind(on_ref_press=self.on_search_people_link_pressed)
-                        self.ids.central_widget.add_widget(link_search_people)
-                        link_chat = labels.HFlexMarkupLabel(
-                            pos_hint={'center_x': .5}, markup=True,
-                            text="[u][color=#0000ff][ref=link]chat with friends[/ref][/color][/u]",
-                        )
-                        link_chat.bind(on_ref_press=self.on_chat_with_friends_link_pressed)
-                        self.ids.central_widget.add_widget(link_chat)
-                        link_upload_file = labels.HFlexMarkupLabel(
-                            pos_hint={'center_x': .5}, markup=True,
-                            text="[u][color=#0000ff][ref=link]upload a file[/ref][/color][/u]",
-                        )
-                        link_upload_file.bind(on_ref_press=self.on_upload_file_link_pressed)
-                        self.ids.central_widget.add_widget(link_upload_file)
-                        link_share_file = labels.HFlexMarkupLabel(
-                            pos_hint={'center_x': .5}, markup=True,
-                            text="[u][color=#0000ff][ref=link]share a file[/ref][/color][/u]",
-                        )
-                        link_share_file.bind(on_ref_press=self.on_share_file_link_pressed)
-                        self.ids.central_widget.add_widget(link_share_file)
+                        link_exists = False
+                        for w in self.ids.central_widget.children:
+                            if isinstance(w, labels.HFlexMarkupLabel):
+                                if w.text.count('search people'):
+                                    link_exists = True
+                                    break
+                        if not link_exists:
+                            link_search_people = labels.HFlexMarkupLabel(
+                                pos_hint={'center_x': .5}, markup=True,
+                                text="[u][color=#0000ff][ref=link]search people[/ref][/color][/u]",
+                            )
+                            link_search_people.bind(on_ref_press=self.on_search_people_link_pressed)
+                            self.ids.central_widget.add_widget(link_search_people)
+                            link_chat = labels.HFlexMarkupLabel(
+                                pos_hint={'center_x': .5}, markup=True,
+                                text="[u][color=#0000ff][ref=link]chat with friends[/ref][/color][/u]",
+                            )
+                            link_chat.bind(on_ref_press=self.on_chat_with_friends_link_pressed)
+                            self.ids.central_widget.add_widget(link_chat)
+                            link_upload_file = labels.HFlexMarkupLabel(
+                                pos_hint={'center_x': .5}, markup=True,
+                                text="[u][color=#0000ff][ref=link]upload a file[/ref][/color][/u]",
+                            )
+                            link_upload_file.bind(on_ref_press=self.on_upload_file_link_pressed)
+                            self.ids.central_widget.add_widget(link_upload_file)
+                            link_share_file = labels.HFlexMarkupLabel(
+                                pos_hint={'center_x': .5}, markup=True,
+                                text="[u][color=#0000ff][ref=link]share a file[/ref][/color][/u]",
+                            )
+                            link_share_file.bind(on_ref_press=self.on_share_file_link_pressed)
+                            self.ids.central_widget.add_widget(link_share_file)
 
     def on_search_people_link_pressed(self, instance, value):
         self.main_win().select_screen('search_people_screen')
