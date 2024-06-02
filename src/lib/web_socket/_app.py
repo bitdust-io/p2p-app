@@ -229,8 +229,14 @@ class WebSocketApp(object):
             statusCode and reason from there.
             """
             if thread and thread.isAlive():
-                event.set()
-                thread.join()
+                isAlive = False
+                if hasattr(thread, 'isAlive'):
+                    isAlive = thread.isAlive()
+                elif hasattr(thread, 'is_alive'):
+                    isAlive = thread.is_alive()
+                if isAlive:
+                    event.set()
+                    thread.join()
             self.keep_running = False
             if self.sock:
                 self.sock.close()

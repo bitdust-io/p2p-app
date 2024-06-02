@@ -7,7 +7,7 @@ from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -43,10 +43,9 @@ class GroupChatScreen(screen.AppScreen):
     def get_statuses(self):
         return {
             None: 'group is currently inactive',
-            'DHT_READ?': 'fetching list of active message brokers',
-            'BROKERS?': 'connecting with message brokers',
-            'QUEUE?': 'group is connected, reading recent messages',
-            'IN_SYNC!': 'group is connected and synchronized',
+            'SUPPLIERS?': 'fetching list of suppliers',
+            'SUBSCRIBE!': 'connecting with suppliers',
+            'CONNECTED': 'group is connected and synchronized',
             'DISCONNECTED': 'group is disconnected',
             'CLOSED': 'group is deactivated',
         }

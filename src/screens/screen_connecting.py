@@ -12,7 +12,32 @@ _Debug = False
 
 
 class NetworkServiceElement(buttons.CustomRaisedFlexButton):
-    pass
+
+    def __init__(self, **kwargs):
+        self._is_pressed = False
+        self._depends = kwargs.pop('depends', [])
+        self._last_md_bg_color = None
+        super().__init__(**kwargs)
+
+    def on_press(self):
+        parent = self.parent.parent.parent.parent.parent.parent
+        if _Debug:
+            print('NetworkServiceElement.on_press', self._depends, parent)
+        for dep_name in self._depends:
+            dep_svc = parent.known_services.get(dep_name, None)
+            if dep_svc:
+                dep_svc._last_md_bg_color = dep_svc.md_bg_color
+                dep_svc.md_bg_color = parent.get_service_color('HIGHLIGHT')
+
+    def on_release(self):
+        parent = self.parent.parent.parent.parent.parent.parent
+        if _Debug:
+            print('NetworkServiceElement.on_release', self._depends, parent)
+        for dep_name in self._depends:
+            dep_svc = parent.known_services.get(dep_name, None)
+            if dep_svc:
+                dep_svc.md_bg_color = dep_svc._last_md_bg_color
+                dep_svc._last_md_bg_color = None
 
 
 class ConnectingScreen(screen.AppScreen):
@@ -75,8 +100,10 @@ class ConnectingScreen(screen.AppScreen):
                         clr = self.get_service_color(svc.get('state'))
                     else:
                         clr = styles.app.color_btn_disabled
-                    lbl = self.get_service_label(svc)
-                    service_label = NetworkServiceElement(text=lbl)
+                    service_label = NetworkServiceElement(
+                        text=self.get_service_label(svc),
+                        depends=svc['depends'],
+                    )
                     service_label.md_bg_color = clr
                     self.ids.services_list.add_widget(service_label)
                     self.known_services[svc['name']] = service_label
@@ -89,8 +116,10 @@ class ConnectingScreen(screen.AppScreen):
                     clr = styles.app.color_btn_disabled
                 service_label = self.known_services.get(svc['name'])
                 if not service_label:
-                    lbl = self.get_service_label(svc)
-                    service_label = NetworkServiceElement(text=lbl)
+                    service_label = NetworkServiceElement(
+                        text=self.get_service_label(svc),
+                        depends=svc['depends'],
+                    )
                     service_label.md_bg_color = clr
                     self.ids.services_list.add_widget(service_label)
                     self.known_services[svc['name']] = service_label
@@ -106,6 +135,8 @@ class ConnectingScreen(screen.AppScreen):
             for d in svc['depends']:
                 txt += '\n[color=#555555] + {}[/color]'.format(d.replace('service_', ''))
             txt += '[/size]'
+        else:
+            txt += '[size=10sp]\n\n[/size]'
         return txt
 
     def get_service_color(self, st):
@@ -118,6 +149,8 @@ class ConnectingScreen(screen.AppScreen):
             clr = self.theme_cls.primary_light
         elif st in ['STARTING', 'STOPPING', ]:
             clr = styles.app.color_btn_pending_yellow_1
+        elif st == 'HIGHLIGHT':
+            clr = styles.app.color_btn_pending_yellow_2
         else:
             clr = self.theme_cls.accent_light if st == 'ON' else self.theme_cls.primary_light
         return clr
