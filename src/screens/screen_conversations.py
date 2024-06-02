@@ -31,7 +31,7 @@ class ConversationItem(TwoLineIconListItem):
     def get_secondary_text(self):
         sec_text = 'connecting...'
         sec_color = 'bbbf'
-        if self.state in ['IN_SYNC!', 'CONNECTED', ]:
+        if self.state in ['CONNECTED', ]:
             sec_text = 'on-line'
             sec_color = 'adaf'
         elif self.state in ['OFFLINE', 'DISCONNECTED', ]:
@@ -103,7 +103,7 @@ class ConversationsScreen(screen.AppScreen):
 
     def populate(self, *args, **kwargs):
         self.ids.conversations_list_view.clear_widgets()
-        # self.ids.conversations_list_view.add_widget(NewGroupChat())
+        self.ids.conversations_list_view.add_widget(NewGroupChat())
         self.ids.conversations_list_view.add_widget(NewPrivateChat())
         for snap_info in self.model('conversation').values():
             if snap_info:

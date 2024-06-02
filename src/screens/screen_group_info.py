@@ -10,20 +10,24 @@ _Debug = False
 #------------------------------------------------------------------------------
 
 group_info_temlate_text = """
-[size={text_size}][color=#909090]label:[/color] {label}
+[size={text_size}][color=#909090]label:[/color]
+{label}
 
-[color=#909090]group ID:[/color] {group_key_id}
+[color=#909090]group ID:[/color]
+{group_key_id}
 
-[color=#909090]active broker id:[/color] {active_broker_id}
+[color=#909090]stream ID:[/color]
+{active_queue_id}
 
-[color=#909090]connected brokers:[/color]
-{connected_brokers}
+[color=#909090]postman:[/color] {active_supplier_id}
 
 [color=#909090]creator:[/color] {creator}
 
-[color=#909090]archive folder path:[/color] {archive_folder_path}
+[color=#909090]participant:[/color] {participant_id}
 
-[color=#909090]sequence ID:[/color] {last_sequence_id}
+[color=#909090]sequence head:[/color] {sequence_head}
+[color=#909090]sequence tail:[/color] {sequence_tail}
+[color=#909090]sequence count:[/color] {sequence_count}
 
 [color=#909090]state:[/color] {state}
 [/size]
@@ -91,13 +95,17 @@ class GroupInfoScreen(screen.AppScreen):
         result.update(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             small_text_size='{}sp'.format(self.app().font_size_small_absolute),
-            connected_brokers=('\n'.join(result.get('connected_brokers', {}).values())),
+            label=result.get('label', ''),
             group_key_id=result.get('group_key_id', ''),
-            active_broker_id=result.get('active_broker_id', ''),
+            active_supplier_id=result.get('active_supplier_id', ''),
+            active_queue_id=result.get('active_queue_id', ''),
             creator=result.get('creator', ''),
-            archive_folder_path=result.get('archive_folder_path', ''),
-            last_sequence_id=result.get('last_sequence_id', ''),
+            participant_id=result.get('participant_id', ''),
             state=result.get('state', ''),
+            last_sequence_id=result.get('last_sequence_id', ''),
+            sequence_head=result.get('sequence_head', '') or '',
+            sequence_tail=result.get('sequence_tail', '') or '',
+            sequence_count=result.get('sequence_count', '') or '',
         )
         self.ids.group_info_details.text = group_info_temlate_text.format(**result)
 
