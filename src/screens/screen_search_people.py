@@ -1,4 +1,5 @@
 from lib import api_client
+from lib import util
 
 from components import layouts
 from components import screen
@@ -6,7 +7,7 @@ from components import labels
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -67,6 +68,17 @@ class SearchPeopleScreen(screen.AppScreen):
             cb=self.on_user_observe_result,
         )
 
+    def randomized_lookup(self):
+        if self.search_started:
+            return
+        self.clean_view()
+        self.ids.search_button.disabled = True
+        self.search_started = True
+        api_client.dht_user_random(
+            count=3,
+            cb=self.on_randomized_lookup_result,
+        )
+
     def on_enter(self):
         if self.search_started:
             return
@@ -80,6 +92,9 @@ class SearchPeopleScreen(screen.AppScreen):
 
     def on_search_button_clicked(self):
         self.start_search()
+
+    def on_random_button_clicked(self):
+        self.randomized_lookup()
 
     def on_user_observe_result(self, resp):
         self.search_started = False
@@ -101,4 +116,26 @@ class SearchPeopleScreen(screen.AppScreen):
         for r in result:
             self.ids.search_results.add_widget(SearchPeopleResult(
                 label_text=str(r['global_id']),
+            ))
+
+    def on_randomized_lookup_result(self, resp):
+        self.search_started = False
+        self.clean_view()
+        self.ids.search_button.disabled = False
+        if _Debug:
+            print('SearchPeopleScreen.on_randomized_lookup_result', resp)
+        if not isinstance(resp, dict):
+            self.ids.search_results.add_widget(NoUsersFound(
+                text=str(resp),
+            ))
+            return
+        result = resp.get('payload', {}).get('response' , {}).get('result', [])
+        if not result:
+            self.ids.search_results.add_widget(NoUsersFound(
+                text='no users found'
+            ))
+            return
+        for idurl in result:
+            self.ids.search_results.add_widget(SearchPeopleResult(
+                label_text=util.IDUrlToGlobalID(idurl),
             ))
