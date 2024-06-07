@@ -105,9 +105,16 @@ class ConversationsScreen(screen.AppScreen):
         self.ids.conversations_list_view.clear_widgets()
         self.ids.conversations_list_view.add_widget(NewGroupChat())
         self.ids.conversations_list_view.add_widget(NewPrivateChat())
+        count = 0
         for snap_info in self.model('conversation').values():
             if snap_info:
                 self.on_conversation(snap_info)
+                count += 1
+        if _Debug:
+            print('ConversationsScreen.populate', count)
+
+    def on_opened(self):
+        self.control().send_request_model_data('conversation')
 
     def on_created(self):
         api_client.add_model_listener('conversation', listener_cb=self.on_conversation)

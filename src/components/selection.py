@@ -44,6 +44,7 @@ class SelectionItem(ThemableBehavior, MDRelativeLayout, TouchBehavior):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.duration_long_touch = 0.01
         Clock.schedule_once(self.set_progress_round)
 
     def set_progress_round(self, interval: Union[int, float]) -> NoReturn:
