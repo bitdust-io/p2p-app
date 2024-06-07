@@ -18,6 +18,7 @@ class NetworkServiceElement(buttons.CustomRaisedFlexButton):
         self._depends = kwargs.pop('depends', [])
         self._last_md_bg_color = None
         super().__init__(**kwargs)
+        self.always_release = True
 
     def on_press(self):
         parent = self.parent.parent.parent.parent.parent.parent

@@ -24,10 +24,10 @@ identity_details_temlate_text = """
 
 [color=#909090]global ID:[/color] [b]{global_id}[/b]
 
-[color=#909090]network interfaces:[/color]
+[color=#909090]contacts:[/color]
 {contacts}
 
-[color=#909090]identity servers:[/color]
+[color=#909090]sources:[/color]
 {sources}
 
 [color=#909090]created:[/color] {date}

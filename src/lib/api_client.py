@@ -339,6 +339,10 @@ def group_reconnect(group_key_id, cb=None):
     return run('group_reconnect', kwargs={'group_key_id': group_key_id, }, cb=cb)
 
 
+def dht_user_random(layer_id=0, count=1, cb=None):
+    return run('dht_user_random', kwargs={'layer_id': layer_id, 'count': count, }, cb=cb)
+
+
 def automat_events_start(index=None, automat_id=None, cb=None):
     return run('automat_events_start', kwargs={'index': index, 'automat_id': automat_id, }, cb=cb)
 
