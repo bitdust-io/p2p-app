@@ -122,8 +122,16 @@ class SharedLocationScreen(screen.AppScreen):
         if _Debug:
             print('SharedLocationScreen.on_upload_file_button_clicked', args)
         if system.is_android():
-            from lib import filechooser as lib_filechooser
-            raw_path = lib_filechooser.open_file(
+            from lib import filechooser_android
+            raw_path = filechooser_android.open_file(
+                title="Share a file",
+                preview=True,
+                show_hidden=False,
+                on_selection=self.on_upload_file_selected,
+            )
+        elif system.is_osx():
+            from lib import filechooser_macosx
+            raw_path = filechooser_macosx.MacOSXFileChooser().open_file(
                 title="Share a file",
                 preview=True,
                 show_hidden=False,

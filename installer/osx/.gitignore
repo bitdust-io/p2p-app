@@ -1,5 +1,6 @@
 .python-portable
 .openssl
 .cache
+.git_scm
 bin/*.dmg
 workspace
