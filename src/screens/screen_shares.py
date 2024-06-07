@@ -127,18 +127,18 @@ class SharesScreen(screen.AppScreen):
         for one_share in result:
             item_found = None
             for w in self.ids.shares_list_view.children:
-                if isinstance(w.instance_item, ShareItem):
-                    if w.instance_item.key_id == one_share['key_id']:
+                if isinstance(w, ShareItem):
+                    if w.key_id == one_share['key_id']:
                         item_found = w
                         break
             if item_found:
-                prev_state = item_found.instance_item.share_state
+                prev_state = item_found.share_state
                 if one_share['state'] and prev_state != one_share['state']:
-                    item_found.instance_item.share_state = one_share['state']
-                    item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
+                    item_found.share_state = one_share['state']
+                    item_found.secondary_text = item_found.get_secondary_text()
                     if _Debug:
                         print('SharesScreen.on_shares_list_result %r updated : %r -> %r' % (
-                            item_found.instance_item.key_id, prev_state, one_share['state'], ))
+                            item_found.key_id, prev_state, one_share['state'], ))
                 continue
             automat_index = one_share.get('index')
             automat_index = int(automat_index) if automat_index not in ['None', None, '', ] else None
@@ -151,10 +151,10 @@ class SharesScreen(screen.AppScreen):
                 automat_id=one_share.get('id') or '',
             ))
         for w in self.ids.shares_list_view.children:
-            if isinstance(w.instance_item, ShareItem):
+            if isinstance(w, ShareItem):
                 item_found = None
                 for one_share in result:
-                    if w.instance_item.key_id == one_share['key_id']:
+                    if w.key_id == one_share['key_id']:
                         item_found = w
                         break
                 if not item_found:
@@ -168,18 +168,18 @@ class SharesScreen(screen.AppScreen):
         item_found = None
         prev_state = None
         for w in self.ids.shares_list_view.children:
-            if isinstance(w.instance_item, ShareItem):
-                if w.instance_item.key_id == payload['data']['key_id']:
+            if isinstance(w, ShareItem):
+                if w.key_id == payload['data']['key_id']:
                     item_found = w
                     break
         if item_found:
-            prev_state = item_found.instance_item.share_state
+            prev_state = item_found.share_state
             if prev_state != payload['data']['state']:
-                item_found.instance_item.share_state = payload['data']['state']
-                item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
+                item_found.share_state = payload['data']['state']
+                item_found.secondary_text = item_found.get_secondary_text()
                 if _Debug:
                     print('SharesScreen.on_shared_location %r updated : %r -> %r' % (
-                        item_found.instance_item.key_id, prev_state, payload['data']['state'], ))
+                        item_found.key_id, prev_state, payload['data']['state'], ))
         else:
             automat_index = payload['data'].get('index')
             automat_index = int(automat_index) if automat_index not in ['None', None, '', ] else None
@@ -193,4 +193,4 @@ class SharesScreen(screen.AppScreen):
             ))
             if _Debug:
                 print('SharesScreen.on_shared_location %r auto-created : %r -> %r' % (
-                    item_found.instance_item.key_id if item_found else '?', prev_state, payload['data']['state'], ))
+                    item_found.key_id if item_found else '?', prev_state, payload['data']['state'], ))

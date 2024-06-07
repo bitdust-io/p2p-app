@@ -235,6 +235,8 @@ class DistributedFileChooserListLayout(FileChooserLayout):
         self.fbind('on_entries_cleared', self.scroll_to_top)
 
     def scroll_to_top(self, *args):
+        if _Debug:
+            print('DistributedFileChooserListLayout.scroll_to_top', args)
         self.ids.scrollview.scroll_y = 1.0
 
 #------------------------------------------------------------------------------
