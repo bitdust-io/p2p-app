@@ -147,7 +147,7 @@ class SingleSharedFileScreen(screen.AppScreen):
         else:
             self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
         if not api_client.is_ok(resp):
-            snackbar.error(text='download file failed: %s' % api_client.response_err(resp))
+            snackbar.error(text='download file failed:\n%s' % api_client.response_err(resp), height=64, shorten=False)
         else:
             snackbar.success(text='downloading is complete')
 

@@ -136,18 +136,18 @@ class ConversationsScreen(screen.AppScreen):
             print('ConversationsScreen.on_online_status', payload)
         item_found = None
         for w in self.ids.conversations_list_view.children:
-            if isinstance(w.instance_item, ConversationItem):
-                if w.instance_item.key_id == payload['data']['global_id']:
+            if isinstance(w, ConversationItem):
+                if w.key_id == payload['data']['global_id']:
                     item_found = w
                     break
         if item_found:
-            prev_state = item_found.instance_item.state
+            prev_state = item_found.state
             if prev_state != payload['data']['state']:
-                item_found.instance_item.state = payload['data']['state']
-                item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
+                item_found.state = payload['data']['state']
+                item_found.secondary_text = item_found.get_secondary_text()
                 if _Debug:
                     print('ConversationsScreen.on_online_status %r updated : %r -> %r' % (
-                        item_found.instance_item.key_id, prev_state, payload['data']['state'], ))
+                        item_found.key_id, prev_state, payload['data']['state'], ))
 
     def on_conversation(self, payload):
         if _Debug:
@@ -157,8 +157,8 @@ class ConversationsScreen(screen.AppScreen):
             if payload.get('deleted'):
                 item_found = None
                 for w in self.ids.conversations_list_view.children:
-                    if isinstance(w.instance_item, ConversationItem):
-                        if w.instance_item.conversation_id == payload['id']:
+                    if isinstance(w, ConversationItem):
+                        if w.conversation_id == payload['id']:
                             item_found = w
                             break
                 if item_found:
@@ -170,24 +170,24 @@ class ConversationsScreen(screen.AppScreen):
         conv['automat_id'] = str(conv.pop('id', '') or '')
         item_found = None
         for w in self.ids.conversations_list_view.children:
-            if isinstance(w.instance_item, ConversationItem):
-                if w.instance_item.key_id == conv['key_id']:
+            if isinstance(w, ConversationItem):
+                if w.key_id == conv['key_id']:
                     item_found = w
                     break
         if item_found:
-            item_found.instance_item.type = conv['type']
-            item_found.instance_item.conversation_id = conv['conversation_id']
-            item_found.instance_item.key_id = conv['key_id']
-            item_found.instance_item.state = conv['state']
-            item_found.instance_item.label = conv['label']
+            item_found.type = conv['type']
+            item_found.conversation_id = conv['conversation_id']
+            item_found.key_id = conv['key_id']
+            item_found.state = conv['state']
+            item_found.label = conv['label']
             if conv['automat_index']:
-                item_found.instance_item.automat_index = conv['automat_index']
+                item_found.automat_index = conv['automat_index']
             if conv['automat_id']:
-                item_found.instance_item.automat_id = conv['automat_id']
-            item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
+                item_found.automat_id = conv['automat_id']
+            item_found.secondary_text = item_found.get_secondary_text()
             if _Debug:
                 print('ConversationsScreen.on_conversation updated existing item',
-                      conv['key_id'], item_found.instance_item.automat_id, item_found.instance_item.automat_index)
+                      conv['key_id'], item_found.automat_id, item_found.automat_index)
             return
         self.ids.conversations_list_view.add_widget(ConversationItem(
             type=conv['type'],
@@ -206,13 +206,13 @@ class ConversationsScreen(screen.AppScreen):
             print('ConversationsScreen.on_group_state_changed', event_id, group_key_id)
         item_found = None
         for w in self.ids.conversations_list_view.children:
-            if isinstance(w.instance_item, ConversationItem):
-                if w.instance_item.key_id == group_key_id:
+            if isinstance(w, ConversationItem):
+                if w.key_id == group_key_id:
                     item_found = w
                     break
         if item_found:
-            prev_state = item_found.instance_item.state
-            item_found.instance_item.state = new_state
-            item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
+            prev_state = item_found.state
+            item_found.state = new_state
+            item_found.secondary_text = item_found.get_secondary_text()
             if _Debug:
                 print('ConversationsScreen.on_group_state_changed %r updated : %r -> %r' % (group_key_id, prev_state, new_state, ))

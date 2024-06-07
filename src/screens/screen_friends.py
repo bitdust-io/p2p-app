@@ -127,15 +127,15 @@ class FriendsScreen(screen.AppScreen):
             print('FriendsScreen.on_online_status', payload)
         item_found = None
         for w in self.ids.friends_list_view.children:
-            if isinstance(w.instance_item, FriendItem):
-                if w.instance_item.global_id == payload['data']['global_id']:
+            if isinstance(w, FriendItem):
+                if w.global_id == payload['data']['global_id']:
                     item_found = w
                     break
         if item_found:
-            prev_state = item_found.instance_item.contact_state
+            prev_state = item_found.contact_state
             if prev_state != payload['data']['state']:
-                item_found.instance_item.contact_state = payload['data']['state']
-                item_found.instance_item.secondary_text = item_found.instance_item.get_secondary_text()
+                item_found.contact_state = payload['data']['state']
+                item_found.secondary_text = item_found.get_secondary_text()
                 if _Debug:
                     print('FriendsScreen.on_online_status %r updated : %r -> %r' % (
-                        item_found.instance_item.global_id, prev_state, payload['data']['state'], ))
+                        item_found.global_id, prev_state, payload['data']['state'], ))

@@ -9,7 +9,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -26,8 +26,8 @@ class SelectFriendItem(OneLineIconListItem):
     def on_pressed(self):
         if _Debug:
             print('SelectFriendItem.on_pressed', self)
-        if self.parent.parent.parent.parent.parent.parent.result_callback:
-            self.parent.parent.parent.parent.parent.parent.result_callback(self.global_id)
+        if self.parent.parent.parent.parent.parent.result_callback:
+            self.parent.parent.parent.parent.parent.result_callback(self.global_id)
 
 #------------------------------------------------------------------------------
 

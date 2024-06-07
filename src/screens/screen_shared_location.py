@@ -131,12 +131,13 @@ class SharedLocationScreen(screen.AppScreen):
             )
         elif system.is_osx():
             from lib import filechooser_macosx
-            raw_path = filechooser_macosx.MacOSXFileChooser().open_file(
+            fc = filechooser_macosx.MacFileChooser(
                 title="Share a file",
                 preview=True,
                 show_hidden=False,
                 on_selection=self.on_upload_file_selected,
             )
+            raw_path = fc.run()
         else:
             from plyer import filechooser
             if system.is_windows():

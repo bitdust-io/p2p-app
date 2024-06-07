@@ -18,6 +18,8 @@ PYTHON_BIN="${ROOT_DIR}/python/bin/BitDust-p2p-app"
 PYTHON_VENV_BIN="${ROOT_DIR}/venv/bin/BitDust-node"
 PIP_VENV_BIN="${ROOT_DIR}/venv/bin/pip"
 
+GIT_BIN="${ROOT_DIR}/git_scm/bin/git"
+
 
 if [[ ! -f $PYTHON_BIN ]]; then
     PYTHON_BIN="python3"
@@ -83,7 +85,7 @@ if [[ ! -e $SOURCE_DIR ]]; then
             $PIP_VENV_BIN install -q --upgrade pip || (echo "pip upgrade failed" && exit 1)
         fi
 
-        $PYTHON_BIN -c "import pygit2; pygit2.clone_repository('https://github.com/bitdust-io/public.git', '$SOURCE_DIR')" || (echo "git clone failed" && exit 1)
+        $GIT_BIN clone git@github.com:bitdust-io/public.git src 1>"${ROOT_DIR}/git_scm_out.txt" 2>"${ROOT_DIR}/git_scm_err.txt" || (echo "git clone failed" && exit 1)
     fi
 
 else
@@ -98,7 +100,9 @@ else
         $PIP_VENV_BIN install -q --upgrade pip || (echo "pip upgrade failed" && exit 1)
     fi
 
-    $PYTHON_BIN -c "import pygit2; repo=pygit2.init_repository('$SOURCE_DIR'); repo.remotes[0].fetch(); top=repo.lookup_reference('refs/remotes/origin/master').target; repo.reset(top, pygit2.GIT_RESET_HARD);" || (echo "git fetch & reset failed" && exit 1)
+    cd src
+    ($GIT_BIN fetch --all 1>"${ROOT_DIR}/git_scm_out.txt" 2>"${ROOT_DIR}/git_scm_err.txt" && $GIT_BIN reset --hard origin/master 1>>"${ROOT_DIR}/git_scm_out.txt" 2>>"${ROOT_DIR}/git_scm_err.txt") || (echo "git fetch & reset failed" && exit 1)
+    cd ..
 fi
 
 

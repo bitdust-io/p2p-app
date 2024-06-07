@@ -28,7 +28,7 @@ CURRENT_DIR="${PWD}"
 	@cp -v "./.python-portable/bin/python${PYTHON_VERSION_SHORT}" "./.python-portable/bin/python3"
 	@cp -v "./.python-portable/bin/pip${PYTHON_VERSION_SHORT}" "./.python-portable/bin/pip3"
 	@"./.python-portable/bin/pip3" install -r ../../requirements.txt
-	@"./.python-portable/bin/pip3" install pygit2
+	@"./.python-portable/bin/pip3" install pyobjus
 	@cd .python-portable && find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 	@zip -r -X python.zip .python-portable/ && mv -v python.zip .cache/
 

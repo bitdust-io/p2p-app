@@ -3,15 +3,23 @@ Mac OS X file chooser
 ---------------------
 '''
 
-from plyer.facades import FileChooser
-from pyobjus import autoclass, objc_arr, objc_str
-from pyobjus.dylib_manager import load_framework, INCLUDE
+try:
+    from plyer.facades import FileChooser
+    from pyobjus import autoclass, objc_arr, objc_str
+    from pyobjus.dylib_manager import load_framework, INCLUDE
+except Exception as e:
+    print(e)
+    raise
 
-load_framework(INCLUDE.AppKit)
-NSURL = autoclass('NSURL')
-NSOpenPanel = autoclass('NSOpenPanel')
-NSSavePanel = autoclass('NSSavePanel')
-NSOKButton = 1
+try:
+    load_framework(INCLUDE.AppKit)
+    NSURL = autoclass('NSURL')
+    NSOpenPanel = autoclass('NSOpenPanel')
+    NSSavePanel = autoclass('NSSavePanel')
+    NSOKButton = 1
+except:
+    print(e)
+    raise
 
 
 class MacFileChooser:
@@ -41,7 +49,6 @@ class MacFileChooser:
         self._handle_selection = kwargs.pop(
             'on_selection', self._handle_selection
         )
-
         # Simulate Kivy's behavior
         for i in kwargs:
             setattr(self, i, kwargs[i])
