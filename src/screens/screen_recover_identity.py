@@ -69,19 +69,28 @@ class RecoverIdentityScreen(screen.AppScreen):
         if _Debug:
             print('RecoverIdentityScreen.on_load_private_key_pressed', args)
         if system.is_android():
-            from lib import filechooser as lib_filechooser
-            raw_path = lib_filechooser.open_file(
-                title="Load private key",
+            from lib import filechooser_android
+            raw_path = filechooser_android.open_file(
+                title="Load private key file",
                 preview=True,
                 show_hidden=False,
                 on_selection=self.on_load_private_key_selected,
             )
+        elif system.is_osx():
+            from lib import filechooser_macosx
+            fc = filechooser_macosx.MacFileChooser(
+                title="Load private key file",
+                preview=True,
+                show_hidden=False,
+                on_selection=self.on_upload_file_selected,
+            )
+            raw_path = fc.run()
         else:
             from plyer import filechooser
             if system.is_windows():
                 self._latest_cwd = os.getcwd()
             raw_path = filechooser.open_file(
-                title="Load private key",
+                title="Load private key file",
                 preview=True,
                 show_hidden=False,
                 on_selection=self.on_load_private_key_selected,
