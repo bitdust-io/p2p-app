@@ -130,21 +130,14 @@ class SharedLocationScreen(screen.AppScreen):
                 on_selection=self.on_upload_file_selected,
             )
         elif system.is_osx():
-            print(123)
-            try:
-                from lib import filechooser_macosx
-                print(4)
-                fc = filechooser_macosx.MacFileChooser(
-                    title="Share a file",
-                    preview=True,
-                    show_hidden=False,
-                    on_selection=self.on_upload_file_selected,
-                )
-                print(5)
-                raw_path = fc.run()
-            except:
-                import traceback
-                traceback.print_exc()
+            from lib import filechooser_macosx
+            fc = filechooser_macosx.MacFileChooser(
+                title="Share a file",
+                preview=True,
+                show_hidden=False,
+                on_selection=self.on_upload_file_selected,
+            )
+            raw_path = fc.run()
         else:
             from plyer import filechooser
             if system.is_windows():
