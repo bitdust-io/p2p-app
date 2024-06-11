@@ -107,7 +107,7 @@ class PrivateFilesScreen(screen.AppScreen):
         elif system.is_osx():
             from lib import filechooser_macosx
             fc = filechooser_macosx.MacFileChooser(
-                title="Share a file",
+                title="Upload a file",
                 preview=True,
                 show_hidden=False,
                 on_selection=self.on_upload_file_selected,
