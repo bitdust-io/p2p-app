@@ -12,7 +12,7 @@ import traceback
 
 #------------------------------------------------------------------------------ 
 
-_Debug = False
+_Debug = True
 _DebugProfilingEnabled = False
 _DebugKivyOutputEnabled = True
 
@@ -51,6 +51,8 @@ from lib import system
 if _Debug:
     print('BitDustApp __file__', os.path.dirname(os.path.abspath(__file__)))
     print('BitDustApp __name__', __name__)
+    print('BitDustApp sys.argv', sys.argv)
+    print('BitDustApp sys.executable', sys.executable)
     print('BitDustApp sys.path', sys.path)
     print('BitDustApp os.getcwd()', os.path.abspath(os.getcwd()))
     print('BitDustApp os.listdir()', os.listdir(os.getcwd()))

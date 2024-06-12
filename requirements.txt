@@ -19,7 +19,7 @@ docutils==0.19
 filelock==3.8.0
 idna==3.4
 Jinja2==3.1.2
-Kivy==2.1.0
+Kivy==2.3.0
 Kivy-Garden==0.1.5
 kivymd==1.0.2
 MarkupSafe==2.1.1
