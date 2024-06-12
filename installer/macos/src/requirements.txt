@@ -1,0 +1,4 @@
+kivy==2.3.0
+Cython
+docopt
+sh

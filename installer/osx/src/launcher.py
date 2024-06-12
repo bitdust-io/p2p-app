@@ -1,3 +1,5 @@
+# NEW VER
+
 import os
 import sys
 import time
@@ -62,7 +64,7 @@ class BackgroundProcess(object):
             stderr_reader.start()
             empty_line = False
             if _Debug:
-                print('BackgroundProcess.run.target start')
+                print('BackgroundProcess.run.target start', flush=True)
             while not stdout_reader.eof() or not stderr_reader.eof():
                 if self.finishing and self.finishing.is_set():
                     break
@@ -84,10 +86,10 @@ class BackgroundProcess(object):
                     break
                 time.sleep(.1)
             if _Debug:
-                print('BackgroundProcess.run.target EOF reached finishing=%r' % self.finishing)
+                print('BackgroundProcess.run.target EOF reached finishing=%r' % self.finishing, flush=True)
             if self.finishing and self.finishing.is_set():
                 if _Debug:
-                    print('BackgroundProcess.run.target terminating the process because finishing flag is set')
+                    print('BackgroundProcess.run.target terminating the process because finishing flag is set', flush=True)
                 self.process.terminate()
             else:
                 stdout_reader.join()
@@ -96,7 +98,7 @@ class BackgroundProcess(object):
                 self.process.stderr.close()
             rc = self.process.wait()
             if _Debug:
-                print('BackgroundProcess.run.target finished rc=%r' % rc)
+                print('BackgroundProcess.run.target finished rc=%r' % rc, flush=True)
             if self.result_callback:
                 self.result_callback(rc)
 
@@ -200,10 +202,9 @@ BoxLayout:
         Window.size = (Window.size[0] / dp(1), self.root.height / dp(1))
 
     def start_app(self):
-        if sys.executable.count('.app/Contents/MacOS'):
-            install_sh_full_path = os.path.join(os.path.dirname(sys.executable), '..', 'Resources', 'install.sh')
-        else:
-            install_sh_full_path = os.path.join(os.getcwd(), 'install.sh')
+        if _Debug:
+            print('BitDustP2P_App.start_app sys.executable', sys.executable, flush=True)
+        install_sh_full_path = os.path.join(os.getcwd(), 'install.sh')
         subprocess.Popen(
             ['/bin/sh', install_sh_full_path, 'start', ],
             shell=False,
@@ -213,18 +214,15 @@ BoxLayout:
 
     def on_start(self):
         if _Debug:
-            print('BitDustP2P_App.on_start sys.executable', sys.executable)
-        if sys.executable.count('.app/Contents/MacOS'):
-            install_sh_full_path = os.path.join(os.path.dirname(sys.executable), '..', 'Resources', 'install.sh')
-            python_bin_full_path = os.path.join(os.path.dirname(sys.executable), 'python')
-        else:
-            install_sh_full_path = os.path.join(os.getcwd(), 'install.sh')
-            python_bin_full_path = sys.executable
+            print('BitDustP2P_App.on_start sys.executable', sys.executable, flush=True)
+        install_sh_full_path = os.path.join(os.getcwd(), 'install.sh')
+        python_bin_full_path = os.path.join(os.getcwd(), '..', 'python3', 'bin', 'python3')
+        git_scm_full_path = os.path.join(os.getcwd(), 'git_scm', 'bin', 'git')
         self.error = None
         BackgroundProcess(
             # python_bin_full_path + ' -m virtualenv venv',
-            '/bin/sh ' + install_sh_full_path + ' ' + python_bin_full_path,
-            # ['/bin/sh', install_sh_full_path, python_bin_full_path, ],
+            # '/bin/sh ' + install_sh_full_path + ' ' + python_bin_full_path,
+            ['/bin/sh', install_sh_full_path, python_bin_full_path, git_scm_full_path, ],
             shell=True,
             finishing=self.finishing,
             daemon=False,
@@ -234,11 +232,15 @@ BoxLayout:
         ).run()
 
     def on_stop(self):
+        if _Debug:
+            print('BitDustP2P_App.on_stop', flush=True)
         self.finishing.set()
 
     @mainthread
     def on_stdout(self, line):
         ln = line.decode()
+        if _Debug:
+            print('BitDustP2P_App.on_stdout', ln, flush=True)
         if ln.startswith('### '):
             self.root.ids.button_expand.text = ln.strip().replace('### ', '')
             self.root.ids.progress.value = int(ln.strip().replace('### ', '').replace('%', ''))
@@ -249,6 +251,8 @@ BoxLayout:
     @mainthread
     def on_stderr(self, line):
         ln = line.decode()
+        if _Debug:
+            print('BitDustP2P_App.on_stderr', ln, flush=True)
         if ln.startswith('### '):
             self.root.ids.button_expand.text = ln.strip().replace('### ', '')
             self.root.ids.progress.value = int(ln.strip().replace('### ', '').replace('%', ''))
@@ -259,7 +263,7 @@ BoxLayout:
     @mainthread
     def on_result(self, ret_code):
         if _Debug:
-            print('BitDustP2P_App.on_result', ret_code)
+            print('BitDustP2P_App.on_result', ret_code, flush=True)
         if not ret_code:
             if self.root.ids.button_expand.state != 'down':
                 self.start_app()

@@ -18,8 +18,11 @@ PYTHON_BIN="${ROOT_DIR}/python/bin/BitDust-p2p-app"
 PYTHON_VENV_BIN="${ROOT_DIR}/venv/bin/BitDust-node"
 PIP_VENV_BIN="${ROOT_DIR}/venv/bin/pip"
 
-GIT_BIN="${ROOT_DIR}/git_scm/bin/git"
+GIT_BIN="${ROOT_DIR}/git_scm/git/bin/git"
 
+export GIT_EXEC_PATH="${ROOT_DIR}/git_scm/git/libexec/git-core"
+export GIT_TEMPLATE_DIR="${ROOT_DIR}/git_scm/git/share/git-core/templates"
+export GIT_CONFIG_NOSYSTEM=1
 
 if [[ ! -f $PYTHON_BIN ]]; then
     PYTHON_BIN="python3"
@@ -85,7 +88,7 @@ if [[ ! -e $SOURCE_DIR ]]; then
             $PIP_VENV_BIN install -q --upgrade pip || (echo "pip upgrade failed" && exit 1)
         fi
 
-        $GIT_BIN clone git@github.com:bitdust-io/public.git src 1>"${ROOT_DIR}/git_scm_out.txt" 2>"${ROOT_DIR}/git_scm_err.txt" || (echo "git clone failed" && exit 1)
+        $GIT_BIN clone --single-branch --branch master --depth=1 https://github.com/bitdust-io/public.git src 1>"${ROOT_DIR}/git_scm_out.txt" 2>"${ROOT_DIR}/git_scm_err.txt" || (echo "git clone failed" && exit 1)
     fi
 
 else
