@@ -49,6 +49,10 @@ build: .spec
 	@mv -v ./workspace/bitdust-logo-color.icns ./workspace/BitDust-p2p.app/Contents/Resources/AppIcon.icns
 	@mv -v ./workspace/launcher.sh ./workspace/BitDust-p2p.app/Contents/Resources/script
 	@mv -v ./workspace/BitDust-p2p.app/Contents/MacOS/Kivy ./workspace/BitDust-p2p.app/Contents/MacOS/BitDust-p2p-app
+	@cp ./create-osx-dmg.sh ./workspace
+	@mkdir -p ./workspace/data && cp -v ./background.png ./workspace/data
+	@cd ./workspace && sh -x create-osx-dmg.sh BitDust-p2p.app BitDust-p2p
+	@mv -v ./workspace/BitDust-p2p.dmg ./bin
 
 clean:
 	@(cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v osx clean) || echo "done"

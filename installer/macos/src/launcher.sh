@@ -14,6 +14,11 @@ GIT_PATH="${ABS_SCRIPT_PATH}/git_scm"
 GIT_BIN="${GIT_PATH}/git/bin/git"
 
 ROOT_DIR_RELATIVE="$HOME/.bitdust"
+
+if [ ! -e "${ROOT_DIR_RELATIVE}" ]; then
+  mkdir -p $ROOT_DIR_RELATIVE
+fi
+
 ROOT_DIR=$(cd "${ROOT_DIR_RELATIVE}" && pwd)
 UI_MAIN_PY_PATH="${ROOT_DIR}/ui/src/main.py"
 ENGINE_DIR="${ROOT_DIR}/src"
@@ -25,10 +30,6 @@ ENGINE_PY_PATH="${ENGINE_DIR}/bitdust.py"
 export GIT_EXEC_PATH="${GIT_PATH}/git/libexec/git-core"
 export GIT_TEMPLATE_DIR="${GIT_PATH}/git/share/git-core/templates"
 export GIT_CONFIG_NOSYSTEM=1
-
-if [ ! -e "${ROOT_DIR}" ]; then
-  mkdir -p $ROOT_DIR
-fi
 
 if [ ! -f "${UI_MAIN_PY_PATH}" ]; then
   ${GIT_BIN} clone --single-branch --branch master --depth=1 https://github.com/bitdust-io/p2p-app.git "${ROOT_DIR}/ui" 1>"${ROOT_DIR}/git_scm_out.txt" 2>"${ROOT_DIR}/git_scm_err.txt"
