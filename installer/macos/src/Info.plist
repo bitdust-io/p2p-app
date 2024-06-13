@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Bundle display name</key>
+	<string>BitDust-p2p-app</string>
+	<key>Bundle identifier</key>
+	<string>org.bitdust_io</string>
+	<key>Bundle name</key>
+	<string>BitDust-p2p-app</string>
+	<key>Bundle version</key>
+	<string>1.0.0</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>BitDust-p2p-app</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>*</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.item</string>
+				<string>public.folder</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>BitDust-p2p-app</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.kivy.osxlauncher</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>BitDust-p2p-app</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.3.0</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.11.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSHumanReadableCopyright</key>
+	<string>© 2019 BitDust</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+</dict>
+</plist>

@@ -4,7 +4,7 @@
 title = BitDust-p2p
 
 # (str) Package name
-package.name = bitdust-p2p
+package.name = BitDust-p2p
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.bitdust_io
