@@ -19,7 +19,7 @@ GIT_SCM_VERSION="2.23.0"
 	@if [ ! -d "./cache/.git_scm" ]; then python3 extract_dmg.py "${CURRENT_DIR}/cache/git.dmg" "${CURRENT_DIR}/cache/.git_scm" && python3 extract_pkg.py "${CURRENT_DIR}/cache/.git_scm/git-${GIT_SCM_VERSION}-intel-universal-mavericks.pkg" && mv -v ./cache/.git_scm/git-${GIT_SCM_VERSION}-intel-universal-mavericks ./cache/.git_scm/git_scm && cd ./cache/.git_scm && zip --symlinks -r -X git_scm.zip git_scm && cd ../..; fi
 
 .workspace:
-	@rm -rf ./bin/* && mkdir -p -v ./workspace && rm -rf ./workspace/bitdust-p2p.app
+	@rm -rf ./bin/* && mkdir -p -v ./workspace && rm -rf ./workspace/BitDust-p2p.app
 
 .venv:
 	@if [ ! -d "./workspace/venv" ]; then cd ./workspace/ && rm -rf venv && python3.11 -m venv venv && ./venv/bin/pip install --upgrade pip >pip.log && ./venv/bin/pip install -r requirements.txt >>pip.log; fi
@@ -37,15 +37,18 @@ GIT_SCM_VERSION="2.23.0"
 build: .spec
 	@mkdir -p ./bin/
 	@rm -rf ./bin/*.app
-	@if [ ! -d "./cache/bitdust-p2p.app" ]; then cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v osx release && cd .. && mv ./cache/.buildozer/osx/platform/kivy-sdk-packager-master/osx/bitdust-p2p.app ./cache/ && mv -v ./workspace/bitdust-logo-color.icns ./cache/bitdust-p2p.app/Contents/Resources/AppIcon.icns; fi
-	@rm -rf ./workspace/bitdust-p2p.app
-	@cp -R ./cache/bitdust-p2p.app ./workspace/
-	@cp -R ./cache/.git_scm/git_scm ./workspace/bitdust-p2p.app/Contents/Resources
-	@rm -rfv ./workspace/bitdust-p2p.app/Contents/Resources/yourapp
+	@if [ ! -d "./cache/BitDust-p2p.app" ]; then cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v osx release && cd .. && mv ./cache/.buildozer/osx/platform/kivy-sdk-packager-master/osx/BitDust-p2p.app ./cache/ && mv -v ./workspace/bitdust-logo-color.icns ./cache/BitDust-p2p.app/Contents/Resources/AppIcon.icns; fi
+	@rm -rf ./workspace/BitDust-p2p.app
+	@cp -R ./cache/BitDust-p2p.app ./workspace/
+	@cp -R ./cache/.git_scm/git_scm ./workspace/BitDust-p2p.app/Contents/Resources
+	@rm -rfv ./workspace/BitDust-p2p.app/Contents/Resources/yourapp
 	@cp -v ./../../requirements.txt "$(CURRENT_DIR)/"
-	@./workspace/bitdust-p2p.app/Contents/MacOS/Kivy -m pip install -r "$(CURRENT_DIR)/requirements.txt"
+	@./workspace/BitDust-p2p.app/Contents/MacOS/Kivy -m pip install -r "$(CURRENT_DIR)/requirements.txt"
 	@rm -rf "$(CURRENT_DIR)/requirements.txt"
-	@mv -v ./workspace/launcher.sh ./workspace/bitdust-p2p.app/Contents/Resources/script
+	@mv -v ./workspace/Info.plist ./workspace/BitDust-p2p.app/Contents/Info.plist
+	@mv -v ./workspace/bitdust-logo-color.icns ./workspace/BitDust-p2p.app/Contents/Resources/AppIcon.icns
+	@mv -v ./workspace/launcher.sh ./workspace/BitDust-p2p.app/Contents/Resources/script
+	@mv -v ./workspace/BitDust-p2p.app/Contents/MacOS/Kivy ./workspace/BitDust-p2p.app/Contents/MacOS/BitDust-p2p-app
 
 clean:
 	@(cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v osx clean) || echo "done"
