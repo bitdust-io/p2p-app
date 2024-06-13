@@ -37,7 +37,7 @@ GIT_SCM_VERSION="2.23.0"
 build: .spec
 	@mkdir -p ./bin/
 	@rm -rf ./bin/*.app
-	@if [ ! -d "./cache/BitDust-p2p.app" ]; then cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v osx release && cd .. && mv ./cache/.buildozer/osx/platform/kivy-sdk-packager-master/osx/BitDust-p2p.app ./cache/ && mv -v ./workspace/bitdust-logo-color.icns ./cache/BitDust-p2p.app/Contents/Resources/AppIcon.icns; fi
+	@if [ ! -d "./cache/BitDust-p2p.app" ]; then cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v osx release && cd .. && mv ./cache/.buildozer/osx/platform/kivy-sdk-packager-master/osx/BitDust-p2p.app ./cache/; fi
 	@rm -rf ./workspace/BitDust-p2p.app
 	@cp -R ./cache/BitDust-p2p.app ./workspace/
 	@cp -R ./cache/.git_scm/git_scm ./workspace/BitDust-p2p.app/Contents/Resources
@@ -56,4 +56,6 @@ clean:
 clean_full:
 	@rm -rf ./workspace
 	@rm -rf ./cache/*
+	@rm -rf ./cache/.git_scm
+	@rm -rf ./cache/.buildozer
 	@rm -rf ./bin/*
