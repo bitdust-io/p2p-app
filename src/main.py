@@ -383,17 +383,20 @@ class BitDustApp(styles.AppStyle, MDApp):
             ).run()
         elif system.is_osx():
             cmd = ['/bin/bash', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'deploy', 'osx.sh'), ] + params
+            cwd_path = None
             if sys.executable.endswith('/Contents/Resources/venv/bin/python'):
+                cwd_path = os.path.abspath(str(sys.executable).replace('/Contents/Resources/venv/bin/python', '/Contents/Resources/venv/bin'))
                 bin_path = str(sys.executable).replace('/Contents/Resources/venv/bin/python', '/Contents/MacOS/BitDust-p2p-app')
                 if not params:
                     params = ['deploy', ]
-                cmd = ['/bin/bash', bin_path, ] + params
+                cmd = [bin_path, ] + params
             system.BackgroundProcess(
                 cmd=cmd,
                 stdout_callback=self.on_deploy_process_stdout,
                 stderr_callback=self.on_deploy_process_stderr,
                 finishing=self.finishing,
                 daemon=True,
+                cwd=cwd_path,
                 result_callback=self.on_deploy_process_result,
             ).run()
         elif system.is_windows():

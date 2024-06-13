@@ -322,7 +322,7 @@ class AsynchronousFileReader(threading.Thread):
 
 class BackgroundProcess(object):
 
-    def __init__(self, cmd, stdout_callback=None, stderr_callback=None, finishing=None, daemon=False, shell=False, result_callback=None):
+    def __init__(self, cmd, stdout_callback=None, stderr_callback=None, finishing=None, daemon=False, shell=False, cwd=None, result_callback=None):
         self.cmd = cmd
         self.process = None
         self.stdout_callback = stdout_callback
@@ -330,12 +330,13 @@ class BackgroundProcess(object):
         self.finishing = finishing
         self.daemon = daemon
         self.shell = shell
+        self.cwd = cwd
         self.result_callback = result_callback
 
     def run(self, **kwargs):
 
         def target(**kwargs):
-            self.process = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=self.shell)
+            self.process = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=self.shell, cwd=self.cwd)
             stdout_queue = Queue()
             stdout_reader = AsynchronousFileReader(self.process.stdout, stdout_queue, self.finishing)
             stdout_reader.start()
