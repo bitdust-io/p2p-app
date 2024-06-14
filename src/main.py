@@ -19,8 +19,7 @@ _DebugKivyOutputEnabled = True
 #------------------------------------------------------------------------------
 
 if _Debug and _DebugKivyOutputEnabled:
-    # os.environ["KIVY_NO_CONSOLELOG"] = "0"
-    pass
+    os.environ["KIVY_NO_CONSOLELOG"] = "0"
 else:
     os.environ["KIVY_NO_CONSOLELOG"] = "1"
 
@@ -48,6 +47,12 @@ from lib import system
 
 #------------------------------------------------------------------------------
 
+if platform.system() != 'Windows' and 'ANDROID_ARGUMENT' not in os.environ:
+    sys.stdout = system.UnbufferedStream(sys.stdout)
+    sys.stderr = system.UnbufferedStream(sys.stderr)
+
+#------------------------------------------------------------------------------
+
 if _Debug:
     print('BitDustApp __file__', os.path.dirname(os.path.abspath(__file__)))
     print('BitDustApp __name__', __name__)
@@ -62,7 +67,10 @@ if _Debug:
 
 from kivy.config import Config
 
-Config.set('kivy', 'window_icon', 'bitdust.png')
+if system.is_osx():
+    Config.set('kivy', 'window_icon', './images/bitdust.png')
+else:
+    Config.set('kivy', 'window_icon', 'bitdust.png')
 
 if 'ANDROID_ARGUMENT' not in os.environ:
     Config.set('input', 'mouse', 'mouse,disable_multitouch')
@@ -168,7 +176,10 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   mActivity=%r' % mActivity)
 
         self.title = 'BitDust p2p-app'
-        self.icon = './bitdust.png'
+        if system.is_osx():
+            self.icon = './images/bitdust.png'
+        else:
+            self.icon = './bitdust.png'
         self.granted = False
 
         self.apply_styles()
@@ -386,10 +397,10 @@ class BitDustApp(styles.AppStyle, MDApp):
             cwd_path = None
             if sys.executable.endswith('/Contents/Resources/venv/bin/python'):
                 cwd_path = os.path.abspath(str(sys.executable).replace('/Contents/Resources/venv/bin/python', '/Contents/Resources/venv/bin'))
-                bin_path = str(sys.executable).replace('/Contents/Resources/venv/bin/python', '/Contents/MacOS/BitDust-p2p-app')
+                bin_path = str(sys.executable).replace('/Contents/Resources/venv/bin/python', '/Contents/Resources/script')
                 if not params:
                     params = ['deploy', ]
-                cmd = [bin_path, ] + params
+                cmd = ['/bin/bash', bin_path, ] + params
             system.BackgroundProcess(
                 cmd=cmd,
                 stdout_callback=self.on_deploy_process_stdout,
