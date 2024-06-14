@@ -468,3 +468,27 @@ def open_path_in_os(filepath):
     except Exception as e:
         print('file %r failed to open with default OS method: %r' % (filepath, e, ))
     return False
+
+#------------------------------------------------------------------------------
+
+class UnbufferedStream(object):
+
+    def __init__(self, stream):
+        self.stream = stream
+
+    def write(self, data):
+        try:
+            self.stream.write(data)
+        except:
+            pass
+        self.stream.flush()
+
+    def writelines(self, datas):
+        try:
+            self.stream.writelines(datas)
+        except:
+            pass
+        self.stream.flush()
+
+    def __getattr__(self, attr):
+        return getattr(self.stream, attr)
