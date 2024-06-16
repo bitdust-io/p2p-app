@@ -2,7 +2,7 @@ from androidstorage4kivy import SharedStorage, Chooser  # @UnresolvedImport
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
