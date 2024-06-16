@@ -1,0 +1,19 @@
+name: BitDust p2p-app quality checks
+
+on:
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  quality_checks:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: clean venv
+      run: make clean venv
+
+    - name: check_no_debug
+      run: make check_no_debug

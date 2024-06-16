@@ -62,3 +62,14 @@ update:
 
 run:
 	@$(PYTHON) -u src/main.py
+
+check_no_debug:
+	@grep --include=\*.py -rnw 'src' -e "_Debug = True" | tee /tmp/no_debug_report.txt
+	@if [ -s /tmp/no_debug_report.txt ]; then rm -rf /tmp/no_debug_report.txt; echo "CODE CHECK FAILED: at least one time '_Debug = True' is present in the source code"; exit 1; fi
+	@rm -rf /tmp/no_debug_report.txt;
+
+debug_on:
+	@find ./src -type f -name "*.py" -exec python3 -c 'import sys; inp=open(sys.argv[1]).read();outp=inp.replace("_Debug = False", "_Debug = True"); open(sys.argv[1],"w").write(outp); print(sys.argv[1], len(outp), "CHANGED" if inp != outp else "");' '{}' \;
+
+debug_off:
+	@find ./src -type f -name "*.py" -exec python3 -c 'import sys; inp=open(sys.argv[1]).read();outp=inp.replace("_Debug = True", "_Debug = False"); open(sys.argv[1],"w").write(outp); print(sys.argv[1], len(outp), "CHANGED" if inp != outp else "");' '{}' \;
