@@ -1,0 +1,42 @@
+<AboutScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses: root.get_statuses()
+
+            VerticalScrollView:
+
+                VerticalWithPaddingLayout:
+                    size_hint: None, None
+                    pos_hint: {"top": 1}
+                    height: self.minimum_height
+                    width: root.width - app.scroll_bar_width
+
+                    VFixedEmptySpace:
+
+                    Image:
+                        size_hint: None, None
+                        width: dp(300)
+                        height: dp(72)
+                        pos_hint: {"left": 1, "top": 1}
+                        allow_stretch: True
+                        keep_ratio: True
+                        source: "./src/images/bitdust_logo.png"
+
+                    MarkupLabel:
+                        id: about_text
+                        size_hint_y: None
+                        text_size: self.width, None
+                        height: self.texture_size[1]
+                        color: app.color_black
+                        text: ""
+                        on_ref_press: root.on_about_text_ref_pressed(*args)
+
+        BottomEmptyScreenSpace:

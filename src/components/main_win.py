@@ -129,14 +129,14 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if not self.control:
             return False
         if self.state_process_health != 1:
-            return screen_id in ['engine_status_screen', 'startup_screen', 'welcome_screen', ]
+            return screen_id in ['engine_status_screen', 'startup_screen', 'welcome_screen', 'about_screen', ]
         if self.state_identity_get != 1:
             return screen_id in ['engine_status_screen', 'startup_screen', 'welcome_screen', 'settings_screen',
-                                 'my_id_screen', 'new_identity_screen', 'recover_identity_screen', ]
+                                 'my_id_screen', 'new_identity_screen', 'recover_identity_screen', 'about_screen', ]
         if self.state_network_connected != 1:
             return screen_id in ['engine_status_screen', 'startup_screen', 'welcome_screen',
                                  'connecting_screen', 'settings_screen',
-                                 'my_id_screen', 'new_identity_screen', 'recover_identity_screen', ]
+                                 'my_id_screen', 'new_identity_screen', 'recover_identity_screen', 'about_screen', ]
         return True
 
     def update_menu_items(self):
