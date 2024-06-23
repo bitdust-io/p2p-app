@@ -51,6 +51,8 @@ def all_screens():
             f'{KV_FILES_BASE}screens/screen_settings.kv', 'screens.screen_settings', 'SettingsScreen', ),
         'my_id_screen': (
             f'{KV_FILES_BASE}screens/screen_my_id.kv', 'screens.screen_my_id', 'MyIDScreen', ),
+        'about_screen': (
+            f'{KV_FILES_BASE}screens/screen_about.kv', 'screens.screen_about', 'AboutScreen', ),
         'search_people_screen': (
             f'{KV_FILES_BASE}screens/screen_search_people.kv', 'screens.screen_search_people', 'SearchPeopleScreen', ),
         'friends_screen': (
@@ -99,6 +101,7 @@ def identity_missing_screens_list():
         'recover_identity_screen',
         'settings_screen',
         'my_id_screen',
+        'about_screen',
     ]
 
 #------------------------------------------------------------------------------

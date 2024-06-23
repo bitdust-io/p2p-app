@@ -121,6 +121,21 @@
                         app.main_window.nav().set_state("close")
                         app.main_window.select_screen('settings_screen', verify_state=True)
 
+            OneLineIconListItem:
+                id: menu_item_about
+                text: "about"
+                on_release:
+                    app.main_window.nav().set_state("close")
+                    app.main_window.select_screen('about_screen', verify_state=True)
+                CustomIconPackLeftWidget:
+                    icon: "information-outline"
+                    icon_size: "32sp"
+                    md_bg_color: app.color_transparent
+                    md_bg_color_disabled: app.color_transparent
+                    on_release:
+                        app.main_window.nav().set_state("close")
+                        app.main_window.select_screen('about_screen', verify_state=True)
+
 
 <MainWin>:
     id: main_win
