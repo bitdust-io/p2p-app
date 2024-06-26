@@ -29,60 +29,58 @@ _Debug = False
 # 5. to open screen use: screen.main_window().select_screen(screen_id='xxx_screen')
 #------------------------------------------------------------------------------ 
 
-KV_FILES_BASE = './'
-
 def all_screens():
     return {
         'startup_screen': (
-            f'{KV_FILES_BASE}screens/screen_startup.kv', 'screens.screen_startup', 'StartUpScreen', ),
+            'screens/screen_startup.kv', 'screens.screen_startup', 'StartUpScreen', ),
         'engine_status_screen': (
-            f'{KV_FILES_BASE}screens/screen_engine_status.kv', 'screens.screen_engine_status', 'EngineStatusScreen', ),
+            'screens/screen_engine_status.kv', 'screens.screen_engine_status', 'EngineStatusScreen', ),
         'connecting_screen': (
-            f'{KV_FILES_BASE}screens/screen_connecting.kv', 'screens.screen_connecting', 'ConnectingScreen', ),
+            'screens/screen_connecting.kv', 'screens.screen_connecting', 'ConnectingScreen', ),
         'new_identity_screen': (
-            f'{KV_FILES_BASE}screens/screen_new_identity.kv', 'screens.screen_new_identity', 'NewIdentityScreen', ),
+            'screens/screen_new_identity.kv', 'screens.screen_new_identity', 'NewIdentityScreen', ),
         'recover_identity_screen': (
-            f'{KV_FILES_BASE}screens/screen_recover_identity.kv', 'screens.screen_recover_identity', 'RecoverIdentityScreen', ),
+            'screens/screen_recover_identity.kv', 'screens.screen_recover_identity', 'RecoverIdentityScreen', ),
         'backup_identity_screen': (
-            f'{KV_FILES_BASE}screens/screen_backup_identity.kv', 'screens.screen_backup_identity', 'BackupIdentityScreen', ),
+            'screens/screen_backup_identity.kv', 'screens.screen_backup_identity', 'BackupIdentityScreen', ),
         'welcome_screen': (
-            f'{KV_FILES_BASE}screens/screen_welcome.kv', 'screens.screen_welcome', 'WelcomeScreen', ),
+            'screens/screen_welcome.kv', 'screens.screen_welcome', 'WelcomeScreen', ),
         'settings_screen': (
-            f'{KV_FILES_BASE}screens/screen_settings.kv', 'screens.screen_settings', 'SettingsScreen', ),
+            'screens/screen_settings.kv', 'screens.screen_settings', 'SettingsScreen', ),
         'my_id_screen': (
-            f'{KV_FILES_BASE}screens/screen_my_id.kv', 'screens.screen_my_id', 'MyIDScreen', ),
+            'screens/screen_my_id.kv', 'screens.screen_my_id', 'MyIDScreen', ),
         'about_screen': (
-            f'{KV_FILES_BASE}screens/screen_about.kv', 'screens.screen_about', 'AboutScreen', ),
+            'screens/screen_about.kv', 'screens.screen_about', 'AboutScreen', ),
         'search_people_screen': (
-            f'{KV_FILES_BASE}screens/screen_search_people.kv', 'screens.screen_search_people', 'SearchPeopleScreen', ),
+            'screens/screen_search_people.kv', 'screens.screen_search_people', 'SearchPeopleScreen', ),
         'friends_screen': (
-            f'{KV_FILES_BASE}screens/screen_friends.kv', 'screens.screen_friends', 'FriendsScreen', ),
+            'screens/screen_friends.kv', 'screens.screen_friends', 'FriendsScreen', ),
         'select_friend_screen': (
-            f'{KV_FILES_BASE}screens/screen_select_friend.kv', 'screens.screen_select_friend', 'SelectFriendScreen', ),
+            'screens/screen_select_friend.kv', 'screens.screen_select_friend', 'SelectFriendScreen', ),
         'conversations_screen': (
-            f'{KV_FILES_BASE}screens/screen_conversations.kv', 'screens.screen_conversations', 'ConversationsScreen', ),
+            'screens/screen_conversations.kv', 'screens.screen_conversations', 'ConversationsScreen', ),
         'create_group_screen': (
-            f'{KV_FILES_BASE}screens/screen_create_group.kv', 'screens.screen_create_group', 'CreateGroupScreen', ),
+            'screens/screen_create_group.kv', 'screens.screen_create_group', 'CreateGroupScreen', ),
         'private_chat_screen': (
-            f'{KV_FILES_BASE}screens/screen_private_chat.kv', 'screens.screen_private_chat', 'PrivateChatScreen', ),
+            'screens/screen_private_chat.kv', 'screens.screen_private_chat', 'PrivateChatScreen', ),
         'group_chat_screen': (
-            f'{KV_FILES_BASE}screens/screen_group_chat.kv', 'screens.screen_group_chat', 'GroupChatScreen', ),
+            'screens/screen_group_chat.kv', 'screens.screen_group_chat', 'GroupChatScreen', ),
         'group_info_screen': (
-            f'{KV_FILES_BASE}screens/screen_group_info.kv', 'screens.screen_group_info', 'GroupInfoScreen', ),
+            'screens/screen_group_info.kv', 'screens.screen_group_info', 'GroupInfoScreen', ),
         'private_files_screen': (
-            f'{KV_FILES_BASE}screens/screen_private_files.kv', 'screens.screen_private_files', 'PrivateFilesScreen', ),
+            'screens/screen_private_files.kv', 'screens.screen_private_files', 'PrivateFilesScreen', ),
         'single_private_file_screen': (
-            f'{KV_FILES_BASE}screens/screen_single_private_file.kv', 'screens.screen_single_private_file', 'SinglePrivateFileScreen', ),
+            'screens/screen_single_private_file.kv', 'screens.screen_single_private_file', 'SinglePrivateFileScreen', ),
         'shares_screen': (
-            f'{KV_FILES_BASE}screens/screen_shares.kv', 'screens.screen_shares', 'SharesScreen', ),
+            'screens/screen_shares.kv', 'screens.screen_shares', 'SharesScreen', ),
         'create_share_screen': (
-            f'{KV_FILES_BASE}screens/screen_create_share.kv', 'screens.screen_create_share', 'CreateShareScreen', ),
+            'screens/screen_create_share.kv', 'screens.screen_create_share', 'CreateShareScreen', ),
         'shared_location_screen': (
-            f'{KV_FILES_BASE}screens/screen_shared_location.kv', 'screens.screen_shared_location', 'SharedLocationScreen', ),
+            'screens/screen_shared_location.kv', 'screens.screen_shared_location', 'SharedLocationScreen', ),
         'shared_location_info_screen': (
-            f'{KV_FILES_BASE}screens/screen_shared_location_info.kv', 'screens.screen_shared_location_info', 'SharedLocationInfoScreen', ),
+            'screens/screen_shared_location_info.kv', 'screens.screen_shared_location_info', 'SharedLocationInfoScreen', ),
         'single_shared_file_screen': (
-            f'{KV_FILES_BASE}screens/screen_single_shared_file.kv', 'screens.screen_single_shared_file', 'SingleSharedFileScreen', ),
+            'screens/screen_single_shared_file.kv', 'screens.screen_single_shared_file', 'SingleSharedFileScreen', ),
     }
 
 
