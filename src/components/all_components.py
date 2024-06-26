@@ -1,4 +1,11 @@
+
+_Debug = False
+
+#------------------------------------------------------------------------------
+
 KV_IMPORT = """
+#:import root_path components.all_components.root_path
+
 #:import NoTransition kivy.uix.screenmanager.NoTransition
 #:import SlideTransition kivy.uix.screenmanager.SlideTransition
 
@@ -52,4 +59,29 @@ KV_FILES = [
     'components/file_browser.kv',
 ]
 
-KV_FILES_BASE = './'
+
+ROOT_APP_PATH = '.'
+
+
+def root_path(sub_dir=None, filename=None):
+    global ROOT_APP_PATH
+    import os
+    if sub_dir:
+        if filename:
+            ret = os.path.join(ROOT_APP_PATH, sub_dir, filename)
+            if _Debug:
+                print('all_components.root_path', ret)
+            return ret
+        ret = os.path.join(ROOT_APP_PATH, sub_dir)
+        if _Debug:
+            print('all_components.root_path', ret)
+        return ret
+    if filename:
+        ret = os.path.join(ROOT_APP_PATH, filename)
+        if _Debug:
+            print('all_components.root_path', ret)
+        return ret
+    ret = ROOT_APP_PATH
+    if _Debug:
+        print('all_components.root_path', ret)
+    return ret

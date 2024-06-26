@@ -53,6 +53,19 @@ if platform.system() != 'Windows' and 'ANDROID_ARGUMENT' not in os.environ:
 
 #------------------------------------------------------------------------------
 
+ROOT_PATH = ''
+
+if system.is_android():
+    ROOT_PATH = os.path.abspath(os.environ['ANDROID_ARGUMENT'])
+elif system.is_osx():
+    ROOT_PATH = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+elif system.is_ios():
+    ROOT_PATH = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+else:
+    ROOT_PATH = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+
+#------------------------------------------------------------------------------
+
 if _Debug:
     print('BitDustApp __file__', os.path.dirname(os.path.abspath(__file__)))
     print('BitDustApp __name__', __name__)
@@ -62,15 +75,13 @@ if _Debug:
     print('BitDustApp os.getcwd()', os.path.abspath(os.getcwd()))
     print('BitDustApp os.listdir()', os.listdir(os.getcwd()))
     print('BitDustApp platform.uname()', platform.uname())
+    print('BitDustApp ROOT_PATH', ROOT_PATH)
 
 #------------------------------------------------------------------------------
 
 from kivy.config import Config
 
-if system.is_osx():
-    Config.set('kivy', 'window_icon', './images/bitdust.png')
-else:
-    Config.set('kivy', 'window_icon', 'bitdust.png')
+Config.set('kivy', 'window_icon', os.path.join(ROOT_PATH, 'images', 'bitdust.png'))
 
 if 'ANDROID_ARGUMENT' not in os.environ:
     Config.set('input', 'mouse', 'mouse,disable_multitouch')
@@ -130,6 +141,11 @@ class BitDustApp(styles.AppStyle, MDApp):
     main_window = None
     finishing = threading.Event()
 
+    def __init__(self, **kwargs):
+        global ROOT_PATH
+        self.ROOT_PATH = ROOT_PATH
+        super().__init__(**kwargs)
+
     def apply_styles(self):
         from kivy.app import App
         from kivy.core.text import LabelBase
@@ -143,13 +159,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.theme_cls.primary_hue = "400"
         self.theme_cls.accent_palette = 'Green'
 
-        fonts_path = './src/fonts'
-        if system.is_android():
-            fonts_path = os.path.join(os.environ['ANDROID_ARGUMENT'], 'fonts')
-        elif system.is_osx():
-            fonts_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
-        elif system.is_ios():
-            fonts_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
+        fonts_path = os.path.join(self.ROOT_PATH, 'fonts')
         # https://materialdesignicons.com
         LabelBase.register(name="IconMD", fn_regular=os.path.join(fonts_path, "md.ttf"))
         theme_font_styles.append('IconMD')
@@ -176,10 +186,7 @@ class BitDustApp(styles.AppStyle, MDApp):
                 print('BitDustApp.build   mActivity=%r' % mActivity)
 
         self.title = 'BitDust p2p-app'
-        if system.is_osx():
-            self.icon = './images/bitdust.png'
-        else:
-            self.icon = './bitdust.png'
+        self.icon = os.path.join(self.ROOT_PATH, 'images', 'bitdust.png')
         self.granted = False
 
         self.apply_styles()
@@ -205,11 +212,10 @@ class BitDustApp(styles.AppStyle, MDApp):
 
     def init_components(self):
         from components import all_components
+        all_components.ROOT_APP_PATH = self.ROOT_PATH
         Builder.load_string(all_components.KV_IMPORT)
-        if system.is_osx():
-            all_components.KV_FILES_BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         for kv_file in all_components.KV_FILES:
-            Builder.load_file(all_components.KV_FILES_BASE + '/' + kv_file)
+            Builder.load_file(os.path.join(all_components.ROOT_APP_PATH, kv_file))
 
     @mainthread
     def do_start(self, *args, **kwargs):
