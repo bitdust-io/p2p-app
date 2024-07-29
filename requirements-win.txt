@@ -14,7 +14,7 @@ kivy-deps.sdl2==0.4.5
 Kivy-Garden==0.1.5
 kivymd==1.0.2
 MarkupSafe==2.1.1
-packaging==21.3
+packaging==24.1
 pep517==0.13.0
 pexpect==4.8.0
 Pillow==9.4.0
