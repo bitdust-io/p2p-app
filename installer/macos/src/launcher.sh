@@ -50,7 +50,7 @@ if [ "$1" == "deploy" ]; then
 
   echo "updating Python packages ..."
   ${ENGINE_PIP_BIN} --default-timeout=10 install -q -U -r "${ENGINE_DIR}/requirements.txt" || echo "pip requirements install failed"
-
+ 
   echo 'starting engine process in background ...'
   ${ENGINE_PYTHON_BIN} "${ENGINE_PY_PATH}" daemon
   exit 0;
@@ -98,6 +98,7 @@ fi
 
 echo "updating Python packages ..."
 python -m pip --default-timeout=10 install -q -U -r "${ROOT_DIR}/ui/requirements.txt"
+python -m pip --default-timeout=10 install -q -U "pyobjus==1.2.3"
 
 if [ -d "${ROOT_DIR}/ui/src" ]; then
   echo "starting the application ..."
