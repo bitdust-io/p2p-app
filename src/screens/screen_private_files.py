@@ -14,7 +14,7 @@ from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ class PrivateFilesScreen(screen.AppScreen):
         }
 
     def populate(self, *args, **kwargs):
-        pass
+        api_client.request_model_data('private_file')
 
     def on_created(self):
         self.ids.files_list_view.init(
