@@ -123,6 +123,8 @@ class Controller(object):
         self.shared_files_index = {}
         self.remote_versions_index = {}
         self.remote_files_details = {}
+        self.my_global_id = None
+        self.my_idurl = None
 
     def mw(self):
         return self.app.main_window
@@ -303,6 +305,8 @@ class Controller(object):
                 self.mw().state_identity_get = -1
             return
         self.identity_get_latest = time.time()
+        self.my_global_id = api_client.result(resp).get('global_id')
+        self.my_idurl = api_client.result(resp).get('idurl')
         self.mw().state_identity_get = 1 if api_client.is_ok(resp) else -1
         self.run()
 

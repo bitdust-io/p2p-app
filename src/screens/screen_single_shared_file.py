@@ -27,7 +27,9 @@ shared_file_info_text = """
 """
 
 version_info_text = """
-[size={header_text_size}]{label}[/size]
+[size={header_text_size}]{label}   [u][color=#0000ff][ref=download_{backup_id}]download[/ref][/color][/u][/size]
+[color=#909090]    ID:[/color] {backup_id}
+[color=#909090]    size:[/color] {size}
 [color=#909090]    fragments:[/color] {fragments}
 [color=#909090]    delivered:[/color] {delivered}
 [color=#909090]    reliable:[/color] {reliable}
@@ -77,6 +79,7 @@ class SingleSharedFileScreen(screen.AppScreen):
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             header_text_size='{}sp'.format(self.app().font_size_large_absolute),
             remote_path=self.remote_path,
+            local_path=self.local_path or '',
             global_id=self.global_id,
             size_text=system.get_nice_size(self.details.get('size', 0)),
         )
@@ -85,7 +88,7 @@ class SingleSharedFileScreen(screen.AppScreen):
         versions_text = ''
         for v in ctx['versions']:
             v['header_text_size'] = '{}sp'.format(self.app().font_size_medium_absolute)
-            v['fragments'] = v.get('fragments') or []
+            v['size'] = system.get_nice_size(v.get('size', 0))
             versions_text += version_info_text.format(**v)
         ctx['versions_text'] = versions_text
         self.ids.shared_file_details.text = shared_file_info_text.format(**ctx)
@@ -160,3 +163,41 @@ class SingleSharedFileScreen(screen.AppScreen):
         else:
             if self.local_path and os.path.exists(self.local_path):
                 system.open_path_in_os(self.local_path)
+
+    def on_remote_version(self, payload):
+        if _Debug:
+            print('SingleSharedFileScreen.on_remote_version', payload)
+        remote_path = payload['data']['remote_path']
+        global_id = payload['data']['global_id']
+        if remote_path == self.remote_path and global_id == self.global_id:
+            api_client.file_info(
+                remote_path=remote_path,
+                cb=lambda resp: self.on_shared_file_info_result(resp, remote_path, global_id),
+            )
+
+    def on_shared_file_info_result(self, resp, remote_path, global_id):
+        if _Debug:
+            print('SingleSharedFileScreen.on_shared_file_info_result', remote_path, global_id)
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
+            return
+        self.details = api_client.response_result(resp)
+        self.populate()
+
+    def on_shared_file_details_ref_pressed(self, *args):
+        if _Debug:
+            print('SingleSharedFileScreen.on_shared_file_details_ref_pressed', args)
+        if args[1].startswith('download_'):
+            backup_id = args[1][9:]
+            destination_path = None
+            if system.is_android():
+                from android.storage import app_storage_path  # @UnresolvedImport
+                destination_path = tempfile.mkdtemp(dir=app_storage_path())
+                if not os.path.exists(destination_path):
+                    os.makedirs(destination_path)
+            api_client.file_download_start(
+                remote_path=backup_id,
+                destination_path=destination_path,
+                wait_result=True,
+                cb=lambda resp: self.on_file_download_result(resp, destination_path),
+            )

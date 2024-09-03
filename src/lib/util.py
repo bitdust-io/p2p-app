@@ -23,3 +23,12 @@ def IDUrlToGlobalID(idurl):
     if port:
         host = '%s_%s' % (host, port)
     return '%s@%s' % (username, host)
+
+
+def clean_remote_path(file_path):
+    """
+    Full remote path have such format: group_abc$alice@first-machine.com:myfiles/animals/cat.png
+    The last part of the remote_path (myfiles/animals/cat.png) must not have any special characters in order to support such format.
+    That method replaces special chararts of the file_path.
+    """
+    return file_path.replace('$', '%24').replace('@', '%40').replace(':', '%3a')

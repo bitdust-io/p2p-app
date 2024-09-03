@@ -258,11 +258,11 @@ class DistributedFileChooserListView(FileChooserController):
             print('DistributedFileChooserListView.init file_system_type=%r key_id=%r' % (file_system_type, key_id, ))
         self.file_system_type = file_system_type
         self.file_clicked_callback = file_clicked_callback
+        self.file_system.key_id = key_id
         api_client.add_model_listener('remote_version', listener_cb=self.on_remote_version)
         if self.file_system_type == 'private':
             api_client.add_model_listener('private_file', listener_cb=self.on_private_file)
         elif self.file_system_type == 'shared':
-            self.file_system.key_id = key_id
             api_client.add_model_listener('shared_file', listener_cb=self.on_shared_file)
 
     def shutdown(self):
@@ -277,8 +277,15 @@ class DistributedFileChooserListView(FileChooserController):
         self.close()
 
     def open(self):
+        if _Debug:
+            print('DistributedFileChooserListView.open')
         self.opened = True
         self._trigger_update()
+        if self.file_system_type == 'private':
+            api_client.request_model_data('private_file')
+        elif self.file_system_type == 'shared':
+            api_client.request_model_data('shared_file', query_details={'key_id': self.file_system.key_id, })
+        api_client.request_model_data('remote_version', query_details={'key_id': self.file_system.key_id, })
 
     def close(self):
         if _Debug:
