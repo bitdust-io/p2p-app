@@ -13,7 +13,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -349,10 +349,15 @@ class DistributedFileChooserListView(FileChooserController):
             if _Debug:
                 print('DistributedFileChooserListView.on_remote_version SKIP', payload)
             return
-        remote_path = payload['data']['remote_path']
         global_id = payload['data']['global_id']
         if _Debug:
             print('DistributedFileChooserListView.on_remote_version', global_id, payload)
+        if payload.get('deleted'):
+            if _Debug:
+                print('        updating files versions')
+            self._update_files()
+            return
+        remote_path = payload['data'].get('remote_path')
         if self.file_system_type == 'shared':
             if not global_id.startswith(self.file_system.key_id):
                 return
