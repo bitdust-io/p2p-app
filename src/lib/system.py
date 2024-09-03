@@ -428,7 +428,12 @@ def make_nice_size(sz):
 
 
 def make_nice_file_condition(file_info):
-    return '{}/{}'.format(file_info.get('delivered', '0%'), file_info.get('reliable', '0%'))
+    versions = file_info.get('versions', 1)
+    return '{}{}/{}'.format(
+        '' if versions <= 1 else 'X{} '.format(versions),
+        file_info.get('delivered', '0%'),
+        file_info.get('reliable', '0%'),
+    )
 
 #------------------------------------------------------------------------------
 

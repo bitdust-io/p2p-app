@@ -18,7 +18,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -518,6 +518,7 @@ class Controller(object):
                         delivered=system.percent2string(delivered / total_file_versions),
                         reliable=system.percent2string(reliable / total_file_versions),
                         count=total_file_versions,
+                        versions=total_file_versions,
                     )
                 else:
                     self.remote_files_details.pop(global_id, None)

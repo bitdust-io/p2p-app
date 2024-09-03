@@ -252,6 +252,7 @@ class DistributedFileChooserListView(FileChooserController):
         self.index_by_global_id = {}
         self.file_clicked_callback = None
         self.file_system_type = None
+        self.filesize_units = ('B', 'KB', 'MB', 'GB', 'TB')
 
     def init(self, file_system_type, key_id=None, file_clicked_callback=None):
         if _Debug:
@@ -411,6 +412,20 @@ class DistributedFileChooserListView(FileChooserController):
         if self.file_system.is_dir(fn):
             return ''
         return self.file_system.get_condition(fn)
+
+    def get_nice_size(self, fn):
+        if self.file_system.is_dir(fn):
+            return ''
+        try:
+            size = self.file_system.getsize(fn)
+        except OSError:
+            return '--'
+        if not size:
+            return ''
+        for unit in self.filesize_units:
+            if size < 1024.0:
+                return '%1.0f %s' % (size, unit)
+            size /= 1024.0
 
     def _trigger_update(self, *args):
         if not self.opened:
