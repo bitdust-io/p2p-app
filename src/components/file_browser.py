@@ -252,17 +252,18 @@ class DistributedFileChooserListView(FileChooserController):
         self.index_by_global_id = {}
         self.file_clicked_callback = None
         self.file_system_type = None
+        self.filesize_units = ('B', 'KB', 'MB', 'GB', 'TB')
 
     def init(self, file_system_type, key_id=None, file_clicked_callback=None):
         if _Debug:
             print('DistributedFileChooserListView.init file_system_type=%r key_id=%r' % (file_system_type, key_id, ))
         self.file_system_type = file_system_type
         self.file_clicked_callback = file_clicked_callback
+        self.file_system.key_id = key_id
         api_client.add_model_listener('remote_version', listener_cb=self.on_remote_version)
         if self.file_system_type == 'private':
             api_client.add_model_listener('private_file', listener_cb=self.on_private_file)
         elif self.file_system_type == 'shared':
-            self.file_system.key_id = key_id
             api_client.add_model_listener('shared_file', listener_cb=self.on_shared_file)
 
     def shutdown(self):
@@ -277,8 +278,15 @@ class DistributedFileChooserListView(FileChooserController):
         self.close()
 
     def open(self):
+        if _Debug:
+            print('DistributedFileChooserListView.open')
         self.opened = True
         self._trigger_update()
+        if self.file_system_type == 'private':
+            api_client.request_model_data('private_file')
+        elif self.file_system_type == 'shared':
+            api_client.request_model_data('shared_file', query_details={'key_id': self.file_system.key_id, })
+        api_client.request_model_data('remote_version', query_details={'key_id': self.file_system.key_id, })
 
     def close(self):
         if _Debug:
@@ -341,10 +349,15 @@ class DistributedFileChooserListView(FileChooserController):
             if _Debug:
                 print('DistributedFileChooserListView.on_remote_version SKIP', payload)
             return
-        remote_path = payload['data']['remote_path']
         global_id = payload['data']['global_id']
         if _Debug:
             print('DistributedFileChooserListView.on_remote_version', global_id, payload)
+        if payload.get('deleted'):
+            if _Debug:
+                print('        updating files versions')
+            self._update_files()
+            return
+        remote_path = payload['data'].get('remote_path')
         if self.file_system_type == 'shared':
             if not global_id.startswith(self.file_system.key_id):
                 return
@@ -404,6 +417,20 @@ class DistributedFileChooserListView(FileChooserController):
         if self.file_system.is_dir(fn):
             return ''
         return self.file_system.get_condition(fn)
+
+    def get_nice_size(self, fn):
+        if self.file_system.is_dir(fn):
+            return ''
+        try:
+            size = self.file_system.getsize(fn)
+        except OSError:
+            return '--'
+        if not size:
+            return ''
+        for unit in self.filesize_units:
+            if size < 1024.0:
+                return '%1.0f %s' % (size, unit)
+            size /= 1024.0
 
     def _trigger_update(self, *args):
         if not self.opened:

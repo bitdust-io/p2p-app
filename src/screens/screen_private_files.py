@@ -8,6 +8,7 @@ from kivymd.uix.list import TwoLineIconListItem
 
 from lib import api_client
 from lib import system
+from lib import util
 
 from components import screen
 from components import snackbar
@@ -68,10 +69,14 @@ class PrivateFilesScreen(screen.AppScreen):
 
     def populate(self, *args, **kwargs):
         pass
+        # api_client.request_model_data('private_file')
+        # if self.control().my_global_id:
+        #     api_client.request_model_data('remote_version', query_details={'key_id': 'master${}'.format(self.control().my_global_id), })
 
     def on_created(self):
         self.ids.files_list_view.init(
             file_system_type='private',
+            key_id='master${}'.format(self.control().my_global_id) if self.control().my_global_id else None,
             file_clicked_callback=self.on_file_clicked,
         )
 
@@ -80,6 +85,7 @@ class PrivateFilesScreen(screen.AppScreen):
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_my_data', callback_start=self.on_state_panel_attach)
+        self.populate()
 
     def on_leave(self, *args):
         self.ids.files_list_view.close()
@@ -136,29 +142,37 @@ class PrivateFilesScreen(screen.AppScreen):
                 pass
         file_path = args[0][0]
         file_name = os.path.basename(file_path)
+        remote_path = util.clean_remote_path(file_name)
+        if not system.is_android():
+            if not os.path.isfile(file_path):
+                if _Debug:
+                    print('PrivateFilesScreen.on_upload_file_selected file do not exist', file_path)
+                snackbar.error(text='file path not found: %r' % file_path)
+                return
         api_client.file_create(
-            remote_path=file_name,
+            remote_path=remote_path,
             as_folder=False,
             exist_ok=True,
-            cb=lambda resp: self.on_file_created(resp, file_path),
+            cb=lambda resp: self.on_file_created(resp, file_path, remote_path),
         )
 
-    def on_file_created(self, resp, file_path):
+    def on_file_created(self, resp, file_path, remote_path):
         if _Debug:
-            print('PrivateFilesScreen.on_file_created', file_path, resp)
+            print('PrivateFilesScreen.on_file_created', file_path, remote_path, resp)
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
             return
-        file_name = os.path.basename(file_path)
         api_client.file_upload_start(
             local_path=file_path,
-            remote_path=file_name,
+            remote_path=remote_path,
             cb=self.on_upload_file_started,
         )
 
     def on_upload_file_started(self, resp):
         if _Debug:
             print('PrivateFilesScreen.on_upload_file_started', resp)
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
 
     def on_file_clicked(self, *args, **kwargs):
         if _Debug:

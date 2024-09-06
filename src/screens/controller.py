@@ -123,6 +123,8 @@ class Controller(object):
         self.shared_files_index = {}
         self.remote_versions_index = {}
         self.remote_files_details = {}
+        self.my_global_id = None
+        self.my_idurl = None
 
     def mw(self):
         return self.app.main_window
@@ -303,6 +305,8 @@ class Controller(object):
                 self.mw().state_identity_get = -1
             return
         self.identity_get_latest = time.time()
+        self.my_global_id = api_client.result(resp).get('global_id')
+        self.my_idurl = api_client.result(resp).get('idurl')
         self.mw().state_identity_get = 1 if api_client.is_ok(resp) else -1
         self.run()
 
@@ -466,8 +470,32 @@ class Controller(object):
             elif model_name == 'shared_file':
                 self.shared_files_index.pop(d['remote_path'], None)
             elif model_name == 'remote_version':
-                self.remote_versions_index.pop(d['global_id'], None)
+                global_id = d['global_id']
+                _, _, version_id = d['backup_id'].rpartition('/')
+                if global_id in self.remote_versions_index:
+                    self.remote_versions_index[global_id].pop(version_id, None)
                 self.remote_files_details.pop(d['global_id'], None)
+                sz = 0
+                delivered = 0.0
+                reliable = 0.0
+                total_file_versions = 0
+                for one_snap_id in self.remote_versions_index[global_id].values():
+                    version_details = self.model_data['remote_version'].get(one_snap_id)
+                    if version_details:
+                        sz += version_details['data']['size']
+                        delivered += float(version_details['data']['delivered'].replace('%', ''))
+                        reliable += float(version_details['data']['reliable'].replace('%', ''))
+                        total_file_versions += 1
+                if total_file_versions:
+                    self.remote_files_details[global_id] = dict(
+                        size=sz,
+                        delivered=system.percent2string(delivered / total_file_versions),
+                        reliable=system.percent2string(reliable / total_file_versions),
+                        count=total_file_versions,
+                        versions=total_file_versions,
+                    )
+                else:
+                    self.remote_files_details.pop(global_id, None)
         else:
             if snap_id not in self.model_data[model_name]:
                 self.model_data[model_name][snap_id] = {}
@@ -514,6 +542,7 @@ class Controller(object):
                         delivered=system.percent2string(delivered / total_file_versions),
                         reliable=system.percent2string(reliable / total_file_versions),
                         count=total_file_versions,
+                        versions=total_file_versions,
                     )
                 else:
                     self.remote_files_details.pop(global_id, None)

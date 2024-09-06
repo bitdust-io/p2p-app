@@ -8,6 +8,7 @@ from kivymd.uix.list import TwoLineIconListItem
 
 from lib import api_client
 from lib import system
+from lib import util
 
 from components import screen
 from components import snackbar
@@ -97,6 +98,7 @@ class SharedLocationScreen(screen.AppScreen):
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id=self.automat_id, callback_start=self.on_state_panel_attach)
+        self.populate()
 
     def on_leave(self, *args):
         self.ids.files_list_view.close()
@@ -161,7 +163,13 @@ class SharedLocationScreen(screen.AppScreen):
                 pass
         file_path = args[0][0]
         file_name = os.path.basename(file_path)
-        remote_path = '{}:{}'.format(self.key_id, file_name)
+        if not system.is_android():
+            if not os.path.isfile(file_path):
+                if _Debug:
+                    print('SharedLocationScreen.on_upload_file_selected file do not exist', file_path)
+                snackbar.error(text='file path not found: %r' % file_path)
+                return
+        remote_path = '{}:{}'.format(self.key_id, util.clean_remote_path(file_name))
         if _Debug:
             print('SharedLocationScreen.on_upload_file_selected', args, kwargs, remote_path)
         api_client.file_create(
