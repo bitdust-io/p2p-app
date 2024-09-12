@@ -210,7 +210,7 @@
                 {"icon": "transit-connection-variant", "icon_pack": "Icon", "tooltip": "safe packets re-routing",
                 "cb": lambda x: None},
                 {"icon": "database", "icon_pack": "IconFA", "tooltip": "distributed storage", "size": "18sp",
-                "cb": lambda x: [app.main_window.nav().set_state("close"), app.main_window.select_screen('shares_screen', clear_screens_stack=False, verify_state=True)]},
+                "cb": lambda x: [app.main_window.nav().set_state("close"), app.main_window.select_screen('my_storage_info_screen', clear_screens_stack=False, verify_state=True)]},
                 {"icon": "comments", "icon_pack": "IconFA", "tooltip": "chat messages",
                 "cb": lambda x: [app.main_window.nav().set_state("close"), app.main_window.select_screen('conversations_screen', clear_screens_stack=False, verify_state=True)]},]
             on_action_button: root.on_hot_button_clicked()

@@ -1,3 +1,9 @@
+"""
+All of the available BitDust engine API methods can be found here:
+https://github.com/bitdust-io/public/blob/master/bitdust/interface/api.py
+
+"""
+
 import time
 
 #------------------------------------------------------------------------------
@@ -175,6 +181,18 @@ def config_get(key, include_info=False, cb=None):
 
 def config_set(key, value, cb=None):
     return run('config_set', kwargs={'key': key, 'value': value, }, cb=cb)
+
+
+def space_donated(cb=None):
+    return run('space_donated', cb=cb)
+
+
+def space_consumed(cb=None):
+    return run('space_consumed', cb=cb)
+
+
+def space_local(cb=None):
+    return run('space_local', cb=cb)
 
 
 def services_list(with_configs=False, cb=None):
