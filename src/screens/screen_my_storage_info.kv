@@ -20,15 +20,6 @@
                     width: root.width - app.scroll_bar_width
 
                     MarkupLabel:
-                        id: my_donated_storage_details
-                        size_hint_y: None
-                        text_size: self.width, None
-                        height: self.texture_size[1]
-                        color: app.color_black
-                        text: ""
-                        # on_ref_press: root.on_my_donated_storage_details_ref_pressed(*args)
-
-                    MarkupLabel:
                         id: my_consumed_storage_details
                         size_hint_y: None
                         text_size: self.width, None
@@ -36,6 +27,15 @@
                         color: app.color_black
                         text: ""
                         # on_ref_press: root.on_my_consumed_storage_details_ref_pressed(*args)
+
+                    MarkupLabel:
+                        id: my_donated_storage_details
+                        size_hint_y: None
+                        text_size: self.width, None
+                        height: self.texture_size[1]
+                        color: app.color_black
+                        text: ""
+                        # on_ref_press: root.on_my_donated_storage_details_ref_pressed(*args)
 
                     MarkupLabel:
                         id: my_local_storage_details
@@ -53,6 +53,6 @@
         id: drop_down_menu
         width_mult: 5
         data:
-            [("database-refresh", "Refresh", "IconMD", ),
-            ("database-sync", "Reconnect", "IconMD", ),]
+            [("refresh", "Refresh info", "IconMD", ),
+            ("sync", "Reconnect", "IconMD", ),]
         callback: root.on_drop_down_menu_item_clicked

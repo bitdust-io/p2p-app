@@ -165,6 +165,7 @@ class PrivateFilesScreen(screen.AppScreen):
         api_client.file_upload_start(
             local_path=file_path,
             remote_path=remote_path,
+            wait_result=True,
             cb=self.on_upload_file_started,
         )
 

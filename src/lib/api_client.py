@@ -210,6 +210,10 @@ def files_list(remote_path=None, key_id=None, recursive=False, all_customers=Fal
     }, cb=cb)
 
 
+def files_sync(force=False, cb=None):
+    return run('files_sync', kwargs={'force': force}, cb=cb)
+
+
 def file_info(remote_path, include_uploads=False, include_downloads=False, cb=None):
     return run('file_info', kwargs={
         'remote_path': remote_path,

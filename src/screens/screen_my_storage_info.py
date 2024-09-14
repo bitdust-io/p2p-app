@@ -9,15 +9,6 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-my_donated_storage_details_temlate_text = """
-[size={header_text_size}][b]donated storage[/b][/size]
-[size={text_size}][color=#909090]customers:[/color] {customers_num}
-[color=#909090]donated:[/color] {donated}
-[color=#909090]allocated:[/color] {consumed} ({consumed_percent})
-[color=#909090]used:[/color] {used} ({used_percent})
-[color=#909090]free:[/color] {free}[/size]
-"""
-
 my_consumed_storage_details_temlate_text = """
 [size={header_text_size}][b]consumed storage[/b][/size]
 [size={text_size}][color=#909090]suppliers:[/color] {suppliers_num}
@@ -27,10 +18,31 @@ my_consumed_storage_details_temlate_text = """
 [color=#909090]requested per supplier:[/color] {needed_per_supplier}
 [color=#909090]used per supplier:[/color] {used_per_supplier}
 [color=#909090]available per supplier:[/color] {available_per_supplier}[/size]
-"""
+
+[size={header_text_size}][b]my files[/b][/size]
+[size={text_size}][color=#909090]catalog items:[/color] {my_catalog_items}
+[color=#909090]files:[/color] {my_files}
+[color=#909090]files size:[/color] {my_files_size}
+[color=#909090]distributed data:[/color] {my_backups_size}
+[color=#909090]my keys:[/color] {my_keys}[/size]
+
+[size={header_text_size}][b]shared files[/b][/size]
+[size={text_size}][color=#909090]catalog items:[/color] {shared_catalog_items}
+[color=#909090]files:[/color] {shared_files}
+[color=#909090]files size:[/color] {shared_files_size}
+[color=#909090]distributed data:[/color] {shared_backups_size}
+[color=#909090]my keys:[/color] {shared_keys}[/size]"""
+
+my_donated_storage_details_temlate_text = """
+[size={header_text_size}][b]donated storage[/b][/size]
+[size={text_size}][color=#909090]customers:[/color] {customers_num}
+[color=#909090]donated:[/color] {donated}
+[color=#909090]allocated:[/color] {consumed} ({consumed_percent})
+[color=#909090]used:[/color] {used} ({used_percent})
+[color=#909090]free:[/color] {free}[/size]"""
 
 my_local_storage_details_temlate_text = """
-[size={header_text_size}][b]local files info[/b][/size]
+[size={header_text_size}][b]local data[/b][/size]
 [size={text_size}][color=#909090]cache files:[/color] {backups}
 [color=#909090]temp files:[/color] {temp}
 [color=#909090]used by customers:[/color] {customers}
@@ -62,11 +74,9 @@ class MyStorageInfoScreen(screen.AppScreen):
     def populate(self, *args, **kwargs):
         if _Debug:
             print('MyStorageInfoScreen.populate', args, kwargs)
-        refresh = kwargs.get('kwargs')
-        if refresh or not self.ids.my_donated_storage_details.text:
-            api_client.space_donated(cb=self.on_space_donated_result)
-        if refresh or not self.ids.my_consumed_storage_details.text:
-            api_client.space_consumed(cb=self.on_space_consumed_result)
+        refresh = kwargs.get('refresh')
+        api_client.space_consumed(cb=self.on_space_consumed_result)
+        api_client.space_donated(cb=self.on_space_donated_result)
         if refresh or not self.ids.my_local_storage_details.text:
             api_client.space_local(cb=self.on_space_local_result)
 
@@ -76,28 +86,6 @@ class MyStorageInfoScreen(screen.AppScreen):
 
     def on_leave(self, *args):
         self.ids.state_panel.release()
-
-    def on_space_donated_result(self, resp):
-        if _Debug:
-            print('MyStorageInfoScreen.on_space_donated_result', resp)
-        if not api_client.is_ok(resp):
-            self.ids.my_donated_storage_details.text = '\n'.join(api_client.response_errors(resp))
-            return
-        result = api_client.response_result(resp)
-        if not result:
-            self.ids.my_donated_storage_details.text = ''
-            return
-        self.ids.my_donated_storage_details.text = my_donated_storage_details_temlate_text.format(
-            header_text_size='{}sp'.format(self.app().font_size_medium_absolute),
-            text_size='{}sp'.format(self.app().font_size_normal_absolute),
-            customers_num=result.get('customers_num', 0),
-            consumed=system.get_nice_size(result.get('consumed', 0)),
-            donated=system.get_nice_size(result.get('donated', 0)),
-            free=system.get_nice_size(result.get('free', 0)),
-            used=system.get_nice_size(result.get('used', 0)),
-            consumed_percent=result.get('consumed_percent', ''),
-            used_percent=result.get('used_percent', ''),
-        )
 
     def on_space_consumed_result(self, resp):
         if _Debug:
@@ -119,6 +107,42 @@ class MyStorageInfoScreen(screen.AppScreen):
             needed_per_supplier=system.get_nice_size(result.get('needed_per_supplier', 0)),
             used_per_supplier=system.get_nice_size(result.get('used_per_supplier', 0)),
             available_per_supplier=system.get_nice_size(result.get('available_per_supplier', 0)),
+            used_percent=result.get('used_percent', ''),
+            my_catalog_items=result.get('my_catalog_items', 0),
+            my_files=result.get('my_files', 0),
+            my_folders=result.get('my_folders', 0),
+            my_keys=result.get('my_keys', 0),
+            my_files_size=system.get_nice_size(result.get('my_files_size', 0)),
+            my_folders_size=system.get_nice_size(result.get('my_folders_size', 0)),
+            my_backups_size=system.get_nice_size(result.get('my_backups_size', 0)),
+            shared_catalog_items=result.get('shared_catalog_items', 0),
+            shared_files=result.get('shared_files', 0),
+            shared_folders=result.get('shared_folders', 0),
+            shared_keys=result.get('shared_keys', 0),
+            shared_files_size=system.get_nice_size(result.get('shared_files_size', 0)),
+            shared_folders_size=system.get_nice_size(result.get('shared_folders_size', 0)),
+            shared_backups_size=system.get_nice_size(result.get('shared_backups_size', 0)),
+        )
+
+    def on_space_donated_result(self, resp):
+        if _Debug:
+            print('MyStorageInfoScreen.on_space_donated_result', resp)
+        if not api_client.is_ok(resp):
+            self.ids.my_donated_storage_details.text = '\n'.join(api_client.response_errors(resp))
+            return
+        result = api_client.response_result(resp)
+        if not result:
+            self.ids.my_donated_storage_details.text = ''
+            return
+        self.ids.my_donated_storage_details.text = my_donated_storage_details_temlate_text.format(
+            header_text_size='{}sp'.format(self.app().font_size_medium_absolute),
+            text_size='{}sp'.format(self.app().font_size_normal_absolute),
+            customers_num=result.get('customers_num', 0),
+            consumed=system.get_nice_size(result.get('consumed', 0)),
+            donated=system.get_nice_size(result.get('donated', 0)),
+            free=system.get_nice_size(result.get('free', 0)),
+            used=system.get_nice_size(result.get('used', 0)),
+            consumed_percent=result.get('consumed_percent', ''),
             used_percent=result.get('used_percent', ''),
         )
 
@@ -155,5 +179,7 @@ class MyStorageInfoScreen(screen.AppScreen):
     def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
             print('MyStorageInfoScreen.on_drop_down_menu_item_clicked', btn.icon)
-        if btn.icon == 'folder-sync':
-            pass
+        if btn.icon == 'refresh':
+            self.populate(refresh=True)
+        elif btn.icon == 'sync':
+            api_client.files_sync(force=True)
