@@ -188,12 +188,15 @@ class SharedLocationScreen(screen.AppScreen):
         api_client.file_upload_start(
             local_path=file_path,
             remote_path=remote_path,
+            wait_result=True,
             cb=self.on_upload_file_started,
         )
 
     def on_upload_file_started(self, resp):
         if _Debug:
             print('SharedLocationScreen.on_upload_file_started', resp)
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
 
     def on_file_clicked(self, *args, **kwargs):
         if _Debug:

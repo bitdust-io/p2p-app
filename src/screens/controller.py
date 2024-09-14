@@ -81,6 +81,8 @@ def all_screens():
             'screens/screen_shared_location_info.kv', 'screens.screen_shared_location_info', 'SharedLocationInfoScreen', ),
         'single_shared_file_screen': (
             'screens/screen_single_shared_file.kv', 'screens.screen_single_shared_file', 'SingleSharedFileScreen', ),
+        'my_storage_info_screen': (
+            'screens/screen_my_storage_info.kv', 'screens.screen_my_storage_info', 'MyStorageInfoScreen', ),
     }
 
 
