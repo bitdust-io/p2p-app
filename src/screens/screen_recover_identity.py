@@ -1,5 +1,4 @@
 import os
-import time
 
 from kivy.clock import mainthread
 
@@ -12,7 +11,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -111,11 +110,20 @@ class RecoverIdentityScreen(screen.AppScreen):
             key_src = system.ReadTextFile(file_path)
         except:
             key_src = None
+            import traceback
+            traceback.print_exc()
+        if _Debug:
+            print('key_src: %r' % key_src)
         if not key_src:
             self.ids.recover_identity_button.disabled = False
             self.ids.recover_identity_result_message.text = '[color=#f00]loading private key failed[/color]'
             self.ids.private_key_input.text = ''
             return
-        self.ids.recover_identity_button.disabled = False
-        self.ids.recover_identity_result_message.text = ''
-        self.ids.private_key_input.text = key_src
+        try:
+            self.ids.recover_identity_button.disabled = False
+            self.ids.recover_identity_result_message.text = ''
+            self.ids.private_key_input.text = key_src
+        except:
+            import traceback
+            traceback.print_exc()
+

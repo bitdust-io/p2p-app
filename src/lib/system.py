@@ -443,33 +443,34 @@ def open_path_in_os(filepath):
     """
     if _Debug:
         print('system.open_path_in_os', filepath)
-    if is_windows():
-        if os.path.isfile(filepath):
-            subprocess.Popen(['explorer', '/select,', '%s' % (filepath.replace('/', '\\'))])
+    try:
+        if is_windows():
+            if os.path.isfile(filepath):
+                subprocess.Popen(['explorer', '/select,', '%s' % (filepath.replace('/', '\\'))])
+                return True
+            subprocess.Popen(['explorer', '%s' % (filepath.replace('/', '\\'))])
             return True
-        subprocess.Popen(['explorer', '%s' % (filepath.replace('/', '\\'))])
-        return True
 
-    elif is_linux():
-        subprocess.Popen(['xdg-open', filepath])
-        return True
+        elif is_linux():
+            subprocess.Popen(['xdg-open', filepath])
+            return True
 
-    elif is_osx():
-        subprocess.Popen(['open', '-R', filepath])
-        return True
+        elif is_osx():
+            subprocess.Popen(['open', '-R', filepath])
+            return True
 
-    elif is_android():
-        try:
+        elif is_android():
             from lib.sharesheet import ShareSheet
             ShareSheet().view_file(filepath)
-        except Exception as exc:
-            if _Debug:
-                print('system.open_path_in_os', exc)
-            return False
-        return True
+            return True
+    except Exception as exc:
+        if _Debug:
+            print('system.open_path_in_os %r : %r' % (filepath, exc, ))
+        return False
     try:
         import webbrowser
         webbrowser.open(filepath)
+        return True
     except Exception as e:
         print('file %r failed to open with default OS method: %r' % (filepath, e, ))
     return False

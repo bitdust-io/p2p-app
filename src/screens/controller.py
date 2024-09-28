@@ -18,7 +18,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -507,7 +507,7 @@ class Controller(object):
             if model_name == 'service':
                 def _st(d):
                     return 1 if d['state'] == 'ON' else (
-                        -1 if d['state'] in ['OFF', 'NOT_INSTALLED', 'DEPENDS_OFF', 'CLOSED', ] else 0)
+                        -1 if d['state'] in ['OFF', 'NOT_INSTALLED', 'CLOSED', ] else 0)
                 if snap_id == 'service_my_data':
                     self.mw().state_my_data = _st(d)
                 elif snap_id == 'service_message_history':
@@ -521,6 +521,8 @@ class Controller(object):
                 self.private_files_index[path] = d['global_id']
             elif model_name == 'shared_file':
                 self.shared_files_index[d['remote_path']] = d['global_id']
+            elif model_name == 'backup_rebuilder':
+                self.mw().state_rebuilding = d['rebuilding']
             elif model_name == 'remote_version':
                 global_id = d['global_id']
                 _, _, version_id = d['backup_id'].rpartition('/')

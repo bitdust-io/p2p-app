@@ -16,6 +16,11 @@
 
 REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.txt').read().split('\n');l=[i.strip() for i in l if not i.strip().startswith('#')];sys.stdout.write(','.join(filter(None, l)));")
 
+ifeq ($(BITDUST_REPO),)
+	BITDUST_REPO=https://github.com/bitdust-io/public.git
+endif
+
+
 .cache:
 	@mkdir -p -v cache
 	@# if [ ! -f "./cache/support-compat-28.0.0.aar" ]; then curl https://dl.google.com/dl/android/maven2/com/android/support/support-compat/28.0.0/support-compat-28.0.0.aar -o ./cache/support-compat-28.0.0.aar; fi
@@ -30,7 +35,7 @@ REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.tx
 	@# cp -r -v ./src/etc/build.tmpl.gradle ./cache/python-for-android/pythonforandroid/bootstraps/common/build/templates/
 	@# cp -r -v ./src/etc/gradle-wrapper.properties ./cache/python-for-android/pythonforandroid/bootstraps/common/build/gradle/wrapper/
 	@# if [ ! -f "./cache/bundletool.jar" ]; then curl https://github.com/google/bundletool/releases/download/1.13.2/bundletool-all-1.13.2.jar -o cache/bundletool.jar; fi
-	@if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./cache/bitdust; fi
+	@if [ ! -d "./cache/bitdust" ]; then git clone $(BITDUST_REPO) ./cache/bitdust; fi
 	@# if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./cache/bitdust; fi
 	@cd ./cache/bitdust && git pull && git log --graph --oneline --decorate -1 && git rev-list --count HEAD >../revnum
 
@@ -83,7 +88,7 @@ build: .spec
 	@mv -v ./workspace/bin/*.aab ./bin/
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
 
-apk: build_arm64_v8a build_armeabi_v7a build_x86_64
+# apk: build_arm64_v8a build_armeabi_v7a build_x86_64
 # 	@rm -rfv ./workspace/bin/*.apk
 # 	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 # 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release 1>buildozer.log 2>buildozer.err
@@ -100,7 +105,7 @@ apk: build_arm64_v8a build_armeabi_v7a build_x86_64
 # 	@rm -rfv ./workspace/bin/BitDustAndroid_unsigned.apk
 # 	@rm -rfv ./workspace/bin/bitdust1-*-release-unsigned.apk
 
-debug:
+debug: .spec
 	@rm -rfv ./workspace/bin/*.apk
 	@# cd ./workspace/app/ && find . -type f -name "bpmain.py" -exec sed -i -e 's/_Debug = False/_Debug = True/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android debug 1>buildozer.log 2>buildozer.err

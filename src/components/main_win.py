@@ -25,7 +25,7 @@ from components.styles import AppStyle
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -76,6 +76,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     state_proxy_transport = NumericProperty(-1)
     state_my_data = NumericProperty(-1)
     state_message_history = NumericProperty(-1)
+    state_rebuilding = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -490,7 +491,10 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     def on_state_my_data(self, instance, value):
         if _Debug:
             print('MainWin.on_state_my_data', value)
-        self.populate_bottom_toolbar_icon('database', value)
+        not_blinking = value
+        if self.state_rebuilding:
+            not_blinking = 0
+        self.populate_bottom_toolbar_icon('database', not_blinking)
         self.control.on_state_my_data(instance, value)
 
     def on_state_message_history(self, instance, value):
@@ -498,3 +502,11 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             print('MainWin.on_state_message_history', value)
         self.populate_bottom_toolbar_icon('comments', value)
         self.control.on_state_message_history(instance, value)
+
+    def on_state_rebuilding(self, instance, value):
+        if _Debug:
+            print('MainWin.on_state_rebuilding', value)
+        not_blinking = self.state_my_data
+        if value:
+            not_blinking = 0
+        self.populate_bottom_toolbar_icon('database', not_blinking)
