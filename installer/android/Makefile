@@ -123,6 +123,7 @@ debug: .spec
 	@rm -rfv ./workspace/bin/bitdust1-*-release-unsigned.apk
 
 build_arm64_v8a:
+	~/.gradle/wrapper/dists/gradle-7.4.1-all/8bevta3mh7872g50ecurigeld/gradle-7.4.1/bin/gradle --stop || echo "gradle daemon was not stopped"
 	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release 1>buildozer.arm64_v8a.log 2>buildozer.arm64_v8a.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
@@ -134,6 +135,7 @@ build_arm64_v8a:
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
 
 build_armeabi_v7a:
+	~/.gradle/wrapper/dists/gradle-7.4.1-all/8bevta3mh7872g50ecurigeld/gradle-7.4.1/bin/gradle --stop || echo "gradle daemon was not stopped"
 	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile armeabi_v7a android release 1>buildozer.armeabi_v7a.log 2>buildozer.armeabi_v7a.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
@@ -145,6 +147,7 @@ build_armeabi_v7a:
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
 
 build_x86_64:
+	~/.gradle/wrapper/dists/gradle-7.4.1-all/8bevta3mh7872g50ecurigeld/gradle-7.4.1/bin/gradle --stop || echo "gradle daemon was not stopped"
 	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile x86_64 android release 1>buildozer.x86_64.log 2>buildozer.x86_64.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk

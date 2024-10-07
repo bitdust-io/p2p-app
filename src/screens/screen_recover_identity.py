@@ -1,6 +1,6 @@
 import os
 
-from kivy.clock import mainthread
+from kivy.clock import Clock, mainthread
 
 #------------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ from components import screen
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -113,7 +113,12 @@ class RecoverIdentityScreen(screen.AppScreen):
             import traceback
             traceback.print_exc()
         if _Debug:
-            print('key_src: %r' % key_src)
+            print('length: %r' % len(str(key_src)))
+        Clock.schedule_once(lambda dt: self.do_update_input_field(key_src))
+
+    def do_update_input_field(self, key_src):
+        if _Debug:
+            print('RecoverIdentityScreen.do_update_input_field: %r' % key_src)
         if not key_src:
             self.ids.recover_identity_button.disabled = False
             self.ids.recover_identity_result_message.text = '[color=#f00]loading private key failed[/color]'
@@ -126,4 +131,6 @@ class RecoverIdentityScreen(screen.AppScreen):
         except:
             import traceback
             traceback.print_exc()
+        if _Debug:
+            print('SUCCESS')
 
