@@ -175,6 +175,12 @@ class MyStorageInfoScreen(screen.AppScreen):
             self.main_win().select_screen('private_files_screen')
         elif args[1] == 'shared_files':
             self.main_win().select_screen('shares_screen')
+        elif args[1] == 'needed_space':
+            scr = self.main_win().select_screen('settings_screen')
+            if scr:
+                scr.open_item('services')
+                scr.open_item('services/customer')
+                scr.scroll_to_item('services/customer')
 
     def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:

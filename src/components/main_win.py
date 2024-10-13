@@ -318,7 +318,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             if not self.is_screen_selectable(screen_id):
                 if _Debug:
                     print('MainWin.select_screen   selecting screen %r not possible at the moment' % screen_id)
-                return False
+                return None
         if _Debug:
             print('MainWin.select_screen  starting transition to %r' % screen_id)
         if screen_id not in self.active_screens:
@@ -328,7 +328,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.selected_screen and self.selected_screen == screen_id:
             if _Debug:
                 print('MainWin.select_screen   skip, selected screen is already %r' % screen_id)
-            return True
+            return self.active_screens[screen_id][0]
         self.populate_toolbar_content(self.active_screens[screen_id][0])
         self.populate_hot_button(self.active_screens[screen_id][0])
         self.populate_dropdown_menu(self.active_screens[screen_id][0])
@@ -366,7 +366,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if clear_screens_stack:
             self.screens_stack.clear()
             self.screens_stack.append('welcome_screen')
-        return True
+        return self.active_screens[screen_id][0]
 
     def screen_back(self):
         back_to_screen = None

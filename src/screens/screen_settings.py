@@ -16,7 +16,7 @@ from components import layouts
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -229,6 +229,8 @@ class SettingsTreeView(TreeView):
 class SettingsScreen(screen.AppScreen):
 
     recent_tree_index = {}
+    to_be_opened = []
+    to_be_scrolled_to = []
 
     # def get_icon(self):
     #     return 'cogs'
@@ -241,7 +243,7 @@ class SettingsScreen(screen.AppScreen):
 
     def populate_node(self, node):
         if _Debug:
-            print('SettingsScreen.populate_node', node)
+            print('SettingsScreen.populate_node', node.item_key, node)
         api_client.config_get(
             key=node.item_key,
             include_info=True,
@@ -459,8 +461,47 @@ class SettingsScreen(screen.AppScreen):
             if node_item_key:
                 if node_item_key not in t:
                     self.recent_tree_index[node.item_key] = node
+                    # if _Debug:
+                    #     print('        ', node.item_key, node)
         if _Debug:
             print('SettingsScreen.build_tree   indexed %d elements' % len(self.recent_tree_index))
+        if self.to_be_opened:
+            item_key = self.to_be_opened.pop(0)
+            if item_key in self.recent_tree_index:
+                self.open_item(item_key)
+        if self.to_be_scrolled_to:
+            item_key = self.to_be_scrolled_to.pop(0)
+            if item_key in self.recent_tree_index:
+                self.scroll_to_item(item_key)
+
+    def open_item(self, item_key):
+        node = self.recent_tree_index.get(item_key)
+        if not node:
+            if item_key not in self.to_be_opened:
+                self.to_be_opened.append(item_key)
+            return
+        if _Debug:
+            print('SettingsScreen.open_item', item_key, node)
+        if node and not node.is_open:
+            self.ids.settings_tree.toggle_node(node)
+
+    def close_item(self, item_key):
+        node = self.recent_tree_index.get(item_key)
+        if _Debug:
+            print('SettingsScreen.close_item', item_key, node)
+        if node and node.is_open:
+            self.ids.settings_tree.toggle_node(node)
+
+    def scroll_to_item(self, item_key):
+        node = self.recent_tree_index.get(item_key)
+        if _Debug:
+            print('SettingsScreen.scroll_to_item', item_key, node)
+        if not node:
+            if item_key not in self.to_be_scrolled_to:
+                self.to_be_scrolled_to.append(item_key)
+            return
+        # TODO: item position is to be fixed 
+        self.ids.scroll_view.scroll_to(node, animate=False)
 
     def on_enter(self, *args):
         self.populate()
