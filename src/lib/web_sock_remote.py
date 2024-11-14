@@ -1,5 +1,5 @@
-import os
 import time
+import base64
 
 try:
     import thread
@@ -7,7 +7,6 @@ except ImportError:
     import _thread as thread
 
 import queue
-import json
 
 #------------------------------------------------------------------------------
 
@@ -15,17 +14,22 @@ from kivy.clock import mainthread
 
 #------------------------------------------------------------------------------
 
-from lib import web_socket
 from lib import system
+from lib import strng
+from lib import jsn
+from lib import rsa_key
+from lib import cipher
+from lib import hashes
+from lib import web_socket
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 _DebugAPIResponses = _Debug
 
 #------------------------------------------------------------------------------
 
-_APISecretFilePath = None
+_ClientInfoFilePath = None
 _WebSocketApp = None
 _WebSocketQueue = None
 _WebSocketReady = False
@@ -40,8 +44,8 @@ _ModelUpdateCallbacks = {}
 
 #------------------------------------------------------------------------------
 
-def start(callbacks={}, api_secret_filepath=None):
-    global _APISecretFilePath
+def start(callbacks={}, client_info_filepath=None):
+    global _ClientInfoFilePath
     global _WebSocketStarted
     global _WebSocketConnecting
     global _WebSocketQueue
@@ -49,8 +53,8 @@ def start(callbacks={}, api_secret_filepath=None):
     if is_started():
         raise Exception('already started')
     if _Debug:
-        print('web_sock.start() api_secret_filepath=%r' % api_secret_filepath)
-    _APISecretFilePath = api_secret_filepath
+        print('web_sock_remote.start() client_info_filepath=%r' % client_info_filepath)
+    _ClientInfoFilePath = client_info_filepath
     _RegisteredCallbacks = callbacks or {}
     _WebSocketConnecting = True
     _WebSocketStarted = True
@@ -60,7 +64,7 @@ def start(callbacks={}, api_secret_filepath=None):
 
 
 def stop():
-    global _APISecretFilePath
+    global _ClientInfoFilePath
     global _WebSocketStarted
     global _WebSocketQueue
     global _WebSocketConnecting
@@ -69,8 +73,8 @@ def stop():
     if not is_started():
         raise Exception('has not been started')
     if _Debug:
-        print('web_sock.stop()')
-    _APISecretFilePath = None
+        print('web_sock_remote.stop()')
+    _ClientInfoFilePath = None
     _RegisteredCallbacks = {}
     _WebSocketStarted = False
     _WebSocketConnecting = False
@@ -132,16 +136,32 @@ def model_update_callbacks():
 
 @mainthread
 def on_open(ws_inst):
+    global _ClientInfoFilePath
     global _WebSocketReady
     global _WebSocketClosed
     global _WebSocketConnecting
-    global _PendingCalls
     _WebSocketReady = True
     _WebSocketClosed = False
     _WebSocketConnecting = False
-    if _Debug:
-        print('websocket opened', time.time(), len(_PendingCalls))
     cb = registered_callbacks().get('on_open')
+    if cb:
+        cb(ws_inst)
+    client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
+    if _Debug:
+        print('websocket opened', time.time())
+    auth_token = client_info.get('auth_token')
+    if auth_token:
+        on_connect(ws_inst)
+        return
+    restart_handshake()
+
+
+@mainthread
+def on_connect(ws_inst):
+    global _PendingCalls
+    if _Debug:
+        print('websocket connected', time.time(), len(_PendingCalls))
+    cb = registered_callbacks().get('on_connect')
     if cb:
         cb(ws_inst)
     while _PendingCalls:
@@ -174,13 +194,86 @@ def on_close(ws_inst):
 @mainthread
 def on_message(ws_inst, message):
     global _CallbacksQueue
-    json_data = json.loads(message)
+    global _ClientInfoFilePath
+    json_data = jsn.loads(message)
+    if _Debug:
+        print('web_sock_remote.on_message %d bytes: %r' % (len(message), json_data))
+    cmd = json_data.get('cmd')
+    if cmd == 'server_public_key':
+        # SECURITY
+        # TODO: think about verifying if that is a malicious request that is intended to interrupt already connected "good guy"
+        # add more strict verification of the all input fields
+        try:
+            server_public_key = json_data['server_public_key']
+            confirmation_code = json_data.get('confirm')
+            signature = json_data.get('signature')
+            server_key_object = rsa_key.RSAKey()
+            server_key_object.fromString(server_public_key)
+            hashed_confirmation = hashes.sha1(strng.to_bin(server_public_key+'-'+confirmation_code))
+        except Exception as e:
+            if _Debug:
+                print('failed reading server_public_key', e)
+            restart_handshake()
+            return False
+        if not server_key_object.verify(strng.to_bin(signature), hashed_confirmation):
+            if _Debug:
+                print('web_sock_remote.on_message server public key response signature verification failed')
+            restart_handshake()
+            return False
+        client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
+        client_info['server_public_key'] = server_public_key
+        client_info['state'] = 'input_server_code'
+        system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
+        cb = registered_callbacks().get('on_handshake_started')
+        if cb:
+            cb()
+        # here, the app needs to ask from the user for an input (by hand) of the server digit code
+        # must raise an event to the UI and show a text input field widget
+        # or code needs to be entered in the terminal via stdin
+        # after user entered the server digit code next WS message will be sent with "cmd": "server-code"
+        return True
+    if cmd == 'client-code':
+        try:
+            encrypted_payload = json_data['auth']
+            signature = json_data['signature']
+            orig_encrypted_payload = base64.b64decode(strng.to_bin(encrypted_payload))
+            client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
+            client_code = client_info['client_code']
+            client_key_object = rsa_key.RSAKey()
+            client_key_object.fromDict(client_info['key'])
+            server_key_object = rsa_key.RSAKey()
+            server_key_object.fromString(client_info['server_public_key'])
+            received_salted_payload = strng.to_text(client_key_object.decrypt(orig_encrypted_payload))
+            hashed_payload = hashes.sha1(strng.to_bin(received_salted_payload))
+            json_payload = jsn.loads(received_salted_payload)
+            received_client_code = json_payload['client_code']
+            auth_token = json_payload['auth_token']
+            session_key = json_payload['session_key']
+        except Exception as e:
+            if _Debug:
+                print('failed reading server_public_key', e)
+            restart_handshake()
+            return False
+        if not server_key_object.verify(strng.to_bin(signature), hashed_payload):
+            if _Debug:
+                print('web_sock_remote.on_message authorization response signature verification failed')
+            restart_handshake()
+            return False
+        if received_client_code != client_code:
+            if _Debug:
+                print('web_sock_remote.on_message client code is not matching')
+            restart_handshake()
+            return False
+        client_info['auth_token'] = auth_token
+        client_info['session_key'] = session_key
+        system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
+        if _Debug:
+            print('AUTHORIZED!!!')
+        return True
     if 'payload' not in json_data:
         if _Debug:
-            print('web_sock.on_message no payload found in the response')
+            print('web_sock_remote.on_message no payload found in the response')
         return False
-    if _Debug:
-        print('web_sock.on_message %d bytes' % len(message))
     payload_type = json_data.get('type')
     if payload_type == 'event':
         return on_event(json_data)
@@ -192,12 +285,12 @@ def on_message(ws_inst, message):
         if 'call_id' not in json_data['payload']:
             if _Debug:
                 print('        call_id not found in the response')
-            return
+            return False
         call_id = json_data['payload']['call_id']
         if call_id not in _CallbacksQueue:
             if _Debug:
                 print('        call_id found in the response, but no callbacks registered')
-            return
+            return False
         result_callback = _CallbacksQueue.pop(call_id)
         if _DebugAPIResponses:
             if json_data['payload'].get('response'):
@@ -261,6 +354,48 @@ def on_model_update(json_data):
 
 #------------------------------------------------------------------------------
 
+def restart_handshake():
+    global _ClientInfoFilePath
+    client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
+    if _Debug:
+        print('about to generate new RSA key')
+    key_object = rsa_key.RSAKey()
+    key_object.generate(4096)
+    client_info['key'] = key_object.toDict(include_private=True)
+    client_info['state'] = 'init'
+    system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
+    json_data = {
+        'cmd': 'client-public-key',
+        'client_public_key': key_object.toPublicString(),
+    }
+    ws_queue().put_nowait((json_data, None, ))
+
+
+def continue_handshake(server_code):
+    global _ClientInfoFilePath
+    client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
+    salted_server_code = server_code + '-' + cipher.generate_secret_text(90)
+    server_key_object = rsa_key.RSAKey()
+    server_key_object.fromString(client_info['server_public_key'])
+    encrypted_server_code = base64.b64encode(server_key_object.encrypt(strng.to_bin(salted_server_code)))
+    hashed_server_code = hashes.sha1(strng.to_bin(salted_server_code))
+    client_key_object = rsa_key.RSAKey()
+    client_key_object.fromDict(client_info['key'])
+    client_info['client_code'] = cipher.generate_digits(6, as_text=True)
+    system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
+    # TODO: here must show the client_code digits in the app UI
+    # user will have to enter the displayed client code on the server manually
+    json_data = {
+        'cmd': 'server-code',
+        'server_code': strng.to_text(encrypted_server_code),
+        'signature': strng.to_text(client_key_object.sign(hashed_server_code)),
+    }
+    ws_queue().put_nowait((json_data, None, ))
+    if _Debug:
+        print('continue_handshake client code: %r' % client_info['client_code'])
+
+#------------------------------------------------------------------------------
+
 def requests_thread(active_queue):
     global _LastCallID
     global _CallbacksQueue
@@ -289,7 +424,7 @@ def requests_thread(active_queue):
             on_fail(Exception('websocket is closed'), result_callback)
             continue
         _CallbacksQueue[call_id] = result_callback
-        data = json.dumps(json_data)
+        data = jsn.dumps(json_data)
         if _Debug:
             print('sending', data)
         ws().send(data)
@@ -298,26 +433,19 @@ def requests_thread(active_queue):
 
 
 def websocket_thread():
-    global _APISecretFilePath
+    global _ClientInfoFilePath
     global _WebSocketApp
     global _WebSocketClosed
     web_socket.enableTrace(False)
     if _Debug:
-        print('websocket_thread() beginning _APISecretFilePath=%r' % _APISecretFilePath)
+        print('websocket_thread() beginning _ClientInfoFilePath=%r' % _ClientInfoFilePath)
     while is_started():
         if _Debug:
             print('websocket_thread() calling run_forever(ping_interval=10) %r' % time.asctime())
         _WebSocketClosed = False
-        ws_url = "ws://localhost:8280/"
-        if _APISecretFilePath:
-            if os.path.isfile(_APISecretFilePath):
-                api_secret = system.ReadTextFile(_APISecretFilePath)
-                if api_secret:
-                    ws_url += '?api_secret=' + api_secret
-        if _Debug:
-            print('websocket_thread() ws_url=%r' % ws_url)
+        client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
         _WebSocketApp = web_socket.WebSocketApp(
-            ws_url,
+            url=client_info['url'],
             on_message=on_message,
             on_error=on_error,
             on_close=on_close,
@@ -390,3 +518,55 @@ def ws_call(json_data, cb=None):
             cb(Exception('web socket was not started'))
         return False
     raise Exception('unexpected state %r' % st)
+
+#------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    from kivy.app import App
+
+    class TestApp(App):
+
+        def _on_websocket_open(self, ws_inst):
+            print('TestApp._on_websocket_open', ws_inst)
+    
+        def _on_websocket_connect(self, ws_inst):
+            print('TestApp._on_websocket_connect', ws_inst)
+            ws_queue().put_nowait(({'first': 'message'}, None, ))
+
+        def _on_websocket_handshake_started(self):
+            print('TestApp._on_websocket_handshake_started')
+            entered_server_code = input().strip()
+            continue_handshake(entered_server_code)
+
+        def _on_websocket_handshake_failed(self, ws_inst, err):
+            print('TestApp._on_websocket_handshake_failed', ws_inst, err)
+    
+        def _on_websocket_error(self, ws_inst, error):
+            print('TestApp._on_websocket_error', ws_inst, error)
+    
+        def _on_websocket_stream_message(self, json_data):
+            print('TestApp._on_websocket_stream_message', json_data)
+    
+        def _on_websocket_event(self, json_data):
+            print('TestApp._on_websocket_event', json_data)
+    
+        def _on_websocket_model_update(self, json_data):
+            print('TestApp._on_websocket_model_update', json_data)
+
+        def build(self):
+            start(
+                callbacks={
+                    'on_open': self._on_websocket_open,
+                    'on_handshake_failed': self._on_websocket_handshake_failed,
+                    'on_connect': self._on_websocket_connect,
+                    'on_error': self._on_websocket_error,
+                    'on_stream_message': self._on_websocket_stream_message,
+                    'on_event': self._on_websocket_event,
+                    'on_model_update': self._on_websocket_model_update,
+                    'on_handshake_started': self._on_websocket_handshake_started,
+                },
+                client_info_filepath='client.json',
+            )
+            return super().build()
+
+    TestApp().run()

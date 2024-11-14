@@ -11,7 +11,7 @@ _Debug = False
 about_temlate_text = """
 BitDust is an [u][color=#0000ff][ref=github_link]open-source[/ref][/color][/u] project of a worldwide distributed network that is aiming to provide online storage, safe personal communications and full control of your own private data.
 
-The BitDist p2p-app is a peer-to-peer application which provides secure distributed data storage and safe private communications.
+The BitDust p2p-app is a peer-to-peer application which provides secure distributed data storage and safe private communications.
 
 This is a story about respecting the digital freedoms of all people on this planet and taking full control over our own personal data that we send and receive over the Internet.
 

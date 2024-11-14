@@ -14,6 +14,10 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
+from lib import strng
+
+#------------------------------------------------------------------------------
+
 _LatestState = None
 _LatestAndroidSDKVersion = None
 _LatestAndroidBitDustActivity = None
@@ -175,6 +179,39 @@ def set_android_system_ui_visibility():
 
 #------------------------------------------------------------------------------
 
+def WriteTextFile(filepath, data):
+    """
+    A smart way to write data into text file. Return True if success.
+    This should be atomic operation - data is written to another temporary file and than renamed.
+    """
+    temp_path = filepath + '.tmp'
+    if os.path.exists(temp_path):
+        if not os.access(temp_path, os.W_OK):
+            return False
+    if os.path.exists(filepath):
+        if not os.access(filepath, os.W_OK):
+            return False
+        try:
+            os.remove(filepath)
+        except Exception as e:
+            if _Debug:
+                print('file %r write failed: %r' % (filepath, e, ))
+            return False
+    fout = open(temp_path, 'wt', encoding='utf-8')
+    text_data = strng.to_text(data)
+    fout.write(text_data)
+    fout.flush()
+    os.fsync(fout)
+    fout.close()
+    try:
+        os.rename(temp_path, filepath)
+    except Exception as e:
+        if _Debug:
+            print('file %r write failed: %r' % (filepath, e, ))
+        return False
+    return True
+
+
 def ReadTextFile(filename):
     """
     Read text file and return its content.
@@ -193,6 +230,7 @@ def ReadTextFile(filename):
             print('file %r read failed: %r' % (filename, e, ))
     return u''
 
+#------------------------------------------------------------------------------
 
 def WriteBinaryFile(filename, data):
     """
