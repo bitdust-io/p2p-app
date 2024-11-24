@@ -48,18 +48,20 @@ class CircularProgressBar(ProgressBar):
 
     def start(self, label='starting'):
         self.text_label = label
-        self._shown = True
-        if self._task:
-            self._task.cancel()
-        self._task = None
-        self._task = Clock.schedule_interval(self._animate, 0.02)
+        if not self._shown:
+            self._shown = True
+            if self._task:
+                self._task.cancel()
+            self._task = None
+            self._task = Clock.schedule_interval(self._animate, 0.02)
 
     def stop(self):
-        if self._task:
-            self._task.cancel()
-        self._task = None
-        self._shown = False
-        self.label.text = ''
+        if self._shown:
+            if self._task:
+                self._task.cancel()
+            self._task = None
+            self._shown = False
+            self.label.text = ''
         self.refresh_text()
         self.draw()
 
@@ -68,3 +70,6 @@ class CircularProgressBar(ProgressBar):
             self.set_value(self.value + 5)
         else:
             self.set_value(0)
+
+    def is_started(self):
+        return self._shown

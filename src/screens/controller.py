@@ -18,7 +18,8 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
+_DebugModelUpdates = False
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -196,14 +197,20 @@ class Controller(object):
     #------------------------------------------------------------------------------
 
     def verify_process_health(self, *args, **kwargs):
+        if _Debug:
+            print('Controller.verify_process_health', args, kwargs)
         self.mw().state_process_health = 0
         return api_client.process_health(cb=self.on_process_health_result)
 
     def verify_identity_get(self, *args, **kwargs):
+        if _Debug:
+            print('Controller.verify_identity_get', args, kwargs)
         self.mw().state_identity_get = 0
         return api_client.identity_get(cb=self.on_identity_get_result)
 
     def verify_network_connected(self, *args, **kwargs):
+        if _Debug:
+            print('Controller.verify_network_connected', args, kwargs)
         dt = 0
         if self.network_connected_latest:
             dt = time.time() - self.network_connected_latest
@@ -297,14 +304,14 @@ class Controller(object):
 
     def on_identity_get_result(self, resp):
         if _Debug:
-            print('Controller.on_identity_get_result', api_client.is_ok(resp))
+            print('Controller.on_identity_get_result', resp)
         self.identity_get_latest = time.time()
         if not api_client.is_ok(resp):
-            self.identity_get_latest = 0
             if api_client.response_errors(resp).count('local identity is not valid or not exist'):
-                self.mw().state_identity_get = 0
-            else:
                 self.mw().state_identity_get = -1
+            else:
+                self.identity_get_latest = 0
+                self.mw().state_identity_get = 0
             return
         self.identity_get_latest = time.time()
         self.my_global_id = api_client.result(resp).get('global_id')
@@ -463,7 +470,8 @@ class Controller(object):
             self.model_data[model_name] = OrderedDict()
         deleted = json_data['payload'].get('deleted')
         if _Debug:
-            print('Controller.on_model_update [%s] %s deleted:%r %r' % (model_name, snap_id, deleted, d, ))
+            if _DebugModelUpdates:
+                print('Controller.on_model_update [%s] %s deleted:%r %r' % (model_name, snap_id, deleted, d, ))
         if deleted:
             self.model_data[model_name].pop(snap_id, None)
             if model_name == 'private_file':

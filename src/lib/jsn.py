@@ -300,3 +300,28 @@ def loads(s, encoding='utf-8', **kw):
             os.write(fd, s)
             os.close(fd)
         raise exc
+
+
+#------------------------------------------------------------------------------
+
+
+def loads_text(s, encoding='utf-8', **kw):
+    """
+    Calls `json.loads()` with parameters.
+    Always translates all json keys and values into unicode strings.
+    """
+    if not s:
+        return None
+
+    enc_errors = kw.pop('errors', 'strict')
+
+    try:
+        return json.loads(s=s, object_hook=lambda itm: dict_items_to_text(itm, encoding=encoding, errors=enc_errors), **kw)
+    except Exception as exc:
+        if _Debug:
+            import os
+            import tempfile
+            fd, _ = tempfile.mkstemp(suffix='err', prefix='jsn_loads_', text=True)
+            os.write(fd, s)
+            os.close(fd)
+        raise exc

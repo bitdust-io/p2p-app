@@ -135,6 +135,10 @@ def process_stop(cb=None):
     return run('process_stop', cb=cb)
 
 
+def devices_list(sort=False, cb=None):
+    return run('devices_list', kwargs={'sort': sort, }, cb=cb)
+
+
 def identity_get(cb=None):
     return run('identity_get', cb=cb)
 

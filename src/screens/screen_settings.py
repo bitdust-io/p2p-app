@@ -2,8 +2,14 @@ import re
 
 #------------------------------------------------------------------------------
 
+from kivy.metrics import dp
+
 from kivy.uix.treeview import TreeView, TreeViewNode
 from kivy.properties import BooleanProperty, ListProperty, StringProperty, NumericProperty  # @UnresolvedImport
+
+from kivymd.uix.tab import MDTabsBase
+from kivymd.uix.floatlayout import MDFloatLayout
+from kivymd.uix.list import OneLineIconListItem, TwoLineIconListItem
 
 #------------------------------------------------------------------------------
 
@@ -17,6 +23,46 @@ from components import layouts
 #------------------------------------------------------------------------------
 
 _Debug = True
+
+#------------------------------------------------------------------------------
+
+class TabDevices(MDFloatLayout, MDTabsBase):
+    pass
+
+
+class NewDeviceItem(OneLineIconListItem):
+
+    def on_pressed(self):
+        if _Debug:
+            print('NewDeviceItem.on_pressed', self)
+        screen.select_screen('create_device_screen')
+
+
+class DeviceItem(TwoLineIconListItem):
+
+    name = StringProperty()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.height = dp(48) if not self._height else self._height
+
+    def get_secondary_text(self):
+        sec_text = 'connecting...'
+        sec_color = 'bbbf'
+        if _Debug:
+            print('DeviceItem.get_secondary_text', sec_text)
+        return '[size=10sp][color=%s]%s[/color][/size]' % (sec_color, sec_text, )
+
+    def on_pressed(self):
+        if _Debug:
+            print('DeviceItem.on_pressed', self)
+        # screen.select_screen(
+        #     screen_id='private_chat_{}'.format(self.global_id),
+        #     screen_type='private_chat_screen',
+        #     global_id=self.global_id,
+        #     username=self.username,
+        #     automat_index=automat_index,
+        # )
 
 #------------------------------------------------------------------------------
 
@@ -213,6 +259,10 @@ class TextElement(OptionElement, layouts.VerticalLayout):
 
 #------------------------------------------------------------------------------
 
+class TabOptions(MDFloatLayout, MDTabsBase):
+    pass
+
+
 class SettingsTreeView(TreeView):
 
     def on_node_expand(self, node):
@@ -240,6 +290,7 @@ class SettingsScreen(screen.AppScreen):
 
     def populate(self):
         api_client.services_list(cb=self.on_services_list_result)
+        api_client.devices_list(cb=self.on_devices_list_result)
 
     def populate_node(self, node):
         if _Debug:
@@ -256,7 +307,7 @@ class SettingsScreen(screen.AppScreen):
         return src
 
     def build_item(self, item_key, item_data, known_tree):
-        tv = self.ids.settings_tree
+        tv = self.ids.settings_tabs.ids.carousel.slides[1].ids.options_settings_tree
         parent = tv.get_root()
         item_path = item_key.split('/')
         built_count = 0
@@ -371,7 +422,7 @@ class SettingsScreen(screen.AppScreen):
         return built_count
 
     def build_tree(self, items_list, active_node=None):
-        tv = self.ids.settings_tree
+        tv = self.ids.settings_tabs.ids.carousel.slides[1].ids.options_settings_tree
         d = {}  # input elements by option key
         a = {}  # absolute path of each tree element
         t = {}  # known tree elements
@@ -483,14 +534,14 @@ class SettingsScreen(screen.AppScreen):
         if _Debug:
             print('SettingsScreen.open_item', item_key, node)
         if node and not node.is_open:
-            self.ids.settings_tree.toggle_node(node)
+            self.ids.settings_tabs.ids.carousel.slides[1].ids.options_settings_tree.toggle_node(node)
 
     def close_item(self, item_key):
         node = self.recent_tree_index.get(item_key)
         if _Debug:
             print('SettingsScreen.close_item', item_key, node)
         if node and node.is_open:
-            self.ids.settings_tree.toggle_node(node)
+            self.ids.settings_tabs.ids.carousel.slides[1].ids.options_settings_tree.toggle_node(node)
 
     def scroll_to_item(self, item_key):
         node = self.recent_tree_index.get(item_key)
@@ -501,10 +552,28 @@ class SettingsScreen(screen.AppScreen):
                 self.to_be_scrolled_to.append(item_key)
             return
         # TODO: item position is to be fixed 
-        self.ids.scroll_view.scroll_to(node, animate=False)
+        self.ids.settings_tabs.ids.carousel.slides[1].ids.options_scroll_view.scroll_to(node, animate=False)
 
     def on_enter(self, *args):
         self.populate()
+
+    def on_devices_list_result(self, resp):
+        if _Debug:
+            print('SettingsScreen.on_devices_list_result', resp)
+        if not api_client.is_ok(resp):
+            return
+        dlv = self.ids.settings_tabs.ids.carousel.slides[0].ids.devices_list_view
+        dlv.clear_widgets()
+        dlv.add_widget(NewDeviceItem())
+        if not isinstance(resp, dict):
+            return
+        result = api_client.response_result(resp)
+        if not result:
+            return
+        for one_device in result:
+            dlv.add_widget(DeviceItem(
+                name=one_device['name'],
+            ))
 
     def on_service_started_stopped(self, event_id, service_name):
         element_name = 'services/{}'.format(service_name[8:].replace('_', '-'))
@@ -519,7 +588,9 @@ class SettingsScreen(screen.AppScreen):
             print('SettingsScreen.on_service_started_stopped', event_id, service_name, element_name, current_state, node.service_state)
 
     def on_services_list_result(self, resp):
-        self.ids.status_label.from_api_response(resp)
+        if _Debug:
+            print('SettingsScreen.on_services_list_result', resp)
+        # self.ids.status_label.from_api_response(resp)
         if not api_client.is_ok(resp):
             return
         self.services_list_result = {}
@@ -528,7 +599,9 @@ class SettingsScreen(screen.AppScreen):
         api_client.configs_list(sort=True, include_info=False, cb=self.on_configs_list_result)
 
     def on_configs_list_result(self, resp):
-        self.ids.status_label.from_api_response(resp)
+        if _Debug:
+            print('SettingsScreen.on_configs_list_result', resp)
+        # self.ids.status_label.from_api_response(resp)
         if not api_client.is_ok(resp):
             return
         items_list = api_client.response_result(resp)
@@ -537,10 +610,10 @@ class SettingsScreen(screen.AppScreen):
     def on_item_clicked(self, option_key, node):
         if _Debug:
             print('SettingsScreen.on_item_clicked', option_key, node)
-        self.ids.settings_tree.toggle_node(node)
+        self.ids.settings_tabs.ids.carousel.slides[1].ids.options_settings_tree.toggle_node(node)
 
     def on_config_get_result(self, resp, option_key, node):
-        self.ids.status_label.from_api_response(resp)
+        # self.ids.status_label.from_api_response(resp)
         if not api_client.is_ok(resp):
             return
         items_list = api_client.response_result(resp)
@@ -552,3 +625,7 @@ class SettingsScreen(screen.AppScreen):
         if _Debug:
             print('SettingsScreen.on_option_value_modified', option_key, new_value)
         api_client.config_set(key=option_key, value=new_value)
+
+    def on_tab_switched(self, *args):
+        if _Debug:
+            print('SettingsScreen.on_tab_switched', args)

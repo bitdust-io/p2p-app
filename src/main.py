@@ -12,7 +12,7 @@ import traceback
 
 #------------------------------------------------------------------------------ 
 
-_Debug = False
+_Debug = True
 _DebugProfilingEnabled = False
 _DebugKivyOutputEnabled = True
 
