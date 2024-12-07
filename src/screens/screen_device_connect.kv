@@ -1,0 +1,63 @@
+<DeviceConnectScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            PageContainerWithPaddingLayout:
+
+                HorizontalContainerLayout:
+                    pos_hint: {'top': 1, 'left': 0}
+
+                    NormalLabel:
+                        id: status_message_label
+                        size_hint: 1, None
+                        height: self.texture_size[1]
+                        text: ''
+
+				HorizontalLayout:
+
+					FloatLayout:
+						size_hint: None, None
+						pos_hint: {'center_x':0.5, 'center_y': 0.5}
+						width: dp(250)
+						height: dp(250)
+
+						Image:
+							size_hint: None, None
+							allow_stretch: True
+							keep_ratio: True
+							pos_hint: {'center_x':0.5, 'center_y': 0.5}
+
+                HorizontalLayout:
+                    size_hint: 1, None
+                    height: self.minimum_height
+                    pos_hint: {'top': 1, 'left': 0}
+
+                    CustomTextField:
+                        id: url_input
+                        size_hint_x: None
+                        width: dp(250)
+                        hint_text: 'Web Socket URL location'
+                        text: ''
+
+                    VerticalLayout:
+                        size_hint: None, None
+                        width: self.minimum_width
+                        height: self.minimum_height
+
+                        RaisedIconButton:
+                            id: web_socket_connect_button
+                            _radius: dp(3)
+                            icon: 'plus'
+                            on_press: root.on_web_socket_connect_button_clicked()
+
+                        Widget:
+                            size_hint: None, None
+                            size: dp(16), dp(16)
+
+                VEmptySpace:
+
+        BottomEmptyScreenSpace:

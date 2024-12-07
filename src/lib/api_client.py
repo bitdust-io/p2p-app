@@ -139,6 +139,21 @@ def devices_list(sort=False, cb=None):
     return run('devices_list', kwargs={'sort': sort, }, cb=cb)
 
 
+def device_add(name, routed=False, activate=True, wait_listening=False, web_socket_port=None, key_size=None, cb=None):
+    return run('device_add', kwargs={
+        'name': name,
+        'routed': routed,
+        'activate': activate,
+        'wait_listening': wait_listening,
+        'web_socket_port': web_socket_port,
+        'key_size': key_size,
+    }, cb=cb)
+
+
+def device_info(name, cb=None):
+    return run('device_info', kwargs={'name': name, }, cb=cb)
+
+
 def identity_get(cb=None):
     return run('identity_get', cb=cb)
 

@@ -18,7 +18,7 @@ from lib import api_client
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 _DebugModelUpdates = False
 
 #------------------------------------------------------------------------------
@@ -38,6 +38,12 @@ def all_screens():
             'screens/screen_engine_status.kv', 'screens.screen_engine_status', 'EngineStatusScreen', ),
         'connecting_screen': (
             'screens/screen_connecting.kv', 'screens.screen_connecting', 'ConnectingScreen', ),
+        'device_add_screen': (
+            'screens/screen_device_add.kv', 'screens.screen_device_add', 'DeviceAddScreen', ),
+        'device_info_screen': (
+            'screens/screen_device_info.kv', 'screens.screen_device_info', 'DeviceInfoScreen', ),
+        'device_connect_screen': (
+            'screens/screen_device_connect.kv', 'screens.screen_device_connect', 'DeviceConnectScreen', ),
         'new_identity_screen': (
             'screens/screen_new_identity.kv', 'screens.screen_new_identity', 'NewIdentityScreen', ),
         'recover_identity_screen': (

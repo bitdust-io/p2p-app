@@ -40,6 +40,7 @@ KV_IMPORT = """
 #:import DistributedFileListEntry components.file_browser.DistributedFileListEntry
 #:import DistributedFileChooserListView components.file_browser.DistributedFileChooserListView
 #:import DistributedFileChooserListLayout components.file_browser.DistributedFileChooserListLayout
+#:import QRCodeWidget components.qr_code.QRCodeWidget
 #:import CircularProgressBar components.spinner.CircularProgressBar
 """
 
@@ -57,6 +58,7 @@ KV_FILES = [
     'components/selection.kv',
     'components/main_win.kv',
     'components/file_browser.kv',
+    'components/qr_code.kv',
 ]
 
 

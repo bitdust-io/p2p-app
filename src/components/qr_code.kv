@@ -1,0 +1,29 @@
+<QRCodeWidget>:
+
+    on_parent: if args[1]: qrimage.source = self.loading_image
+
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    canvas.after:
+        Color:
+            rgba: .5, .5, .5, 1 if root.show_border else 0
+        Line:
+            width: dp(1.333)
+            points:
+                self.x + dp(2), self.y + dp(2),\
+                self.x + self.width - dp(2), self.y + dp(2),\
+                self.x + self.width - dp(2), self.y + self.height - dp(2),\
+                self.x + dp(2), self.y + self.height - dp(2),\
+                self.x + dp(2), self.y + dp(2)
+
+    Image
+        id: qrimage
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        allow_stretch: True
+        size_hint: None, None
+        size: root.width * .9, root.height * .9

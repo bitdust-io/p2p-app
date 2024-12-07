@@ -1,0 +1,90 @@
+<DeviceAddScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            PageContainerWithPaddingLayout:
+
+                HorizontalContainerLayout:
+                    pos_hint: {'top': 1, 'left': 0}
+
+                    NormalLabel:
+                        id: status_message_label
+                        size_hint: 1, None
+                        height: self.texture_size[1]
+                        text: ''
+
+                HorizontalMinimumHeightLayout:
+                    pos_hint: {'top': 1, 'left': 0}
+
+                    CustomTextField:
+                        id: device_name_input
+                        size_hint_x: None
+                        width: dp(250)
+                        hint_text: 'Enter a label for your device'
+                        text: ''
+
+                HorizontalMinimumHeightLayout:
+                    pos_hint: {'top': 1, 'left': 0}
+
+                    MarkupLabel:
+                        size_hint: 1, None
+                        height: self.texture_size[1]
+                        text:
+                        	"""You can use one of two possible ways to connect your mobile device to this node.\n
+							If your computer is accessible for direct connections from the Internet (typical for web servers and cloud servers) and you can open a specific port number for incoming connections, you can use a direct secure connection - turn this option OFF.\n
+							The other method is a secure connection, where end-to-end encrypted traffic is redirected through other nodes in the network. For example, this is convenient for connecting to home or office computers."""
+
+                HorizontalLayout:
+                    size_hint: 1, None
+                    height: dp(48)
+
+                    HFlexMarkupLabel:
+                        label_height: dp(48)
+                        text: 'Routed connection:  '
+
+                    MDSwitch:
+                        id: routed_connection_switch_button
+                        active: True
+                        on_active: root.on_routed_connection_switch_button_changed(self.active)
+
+                HorizontalLayout:
+                    size_hint: 1, None
+                    height: dp(48)
+
+                    HFlexMarkupLabel:
+                        label_height: dp(48)
+                        text: 'Web socket port number:  '
+
+			        SingleLineTextInput:
+			            id: port_number_input
+			            size_hint_x: None
+			            width: dp(100)
+			            pos_hint: {'right': 1, 'center_y': .5}
+			            padding: dp(10), dp(6)
+			            halign: 'left'
+			            valign: 'center'
+			            font_size: app.setting_small_font_size
+			            input_filter: 'int'
+			            disabled: True
+			            text: '8282'
+
+                HorizontalLayout:
+                    size_hint: 1, None
+                    height: dp(48)
+
+	                FillRoundFlatButton:
+	                    id: create_device_button
+	                    text: "[size=18sp]{}[/size]  [size=16sp][b]add new device[/b][/size]".format(md_icon("key-variant"))
+	                    md_bg_color: app.theme_cls.accent_color
+	                    theme_text_color: "Custom"
+	                    text_color: app.color_white99
+	                    pos_hint: {'center_x': .5}
+	                    on_release: root.on_add_device_button_clicked()
+
+                VEmptySpace:
+
+        BottomEmptyScreenSpace:
