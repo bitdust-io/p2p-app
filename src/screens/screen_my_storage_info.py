@@ -172,11 +172,11 @@ class MyStorageInfoScreen(screen.AppScreen):
         if _Debug:
             print('MyStorageInfoScreen.on_my_consumed_storage_details_ref_pressed', args)
         if args[1] == 'my_files':
-            self.main_win().select_screen('private_files_screen')
+            screen.select_screen('private_files_screen')
         elif args[1] == 'shared_files':
-            self.main_win().select_screen('shares_screen')
+            screen.select_screen('shares_screen')
         elif args[1] == 'needed_space':
-            scr = self.main_win().select_screen('settings_screen')
+            scr = screen.select_screen('settings_screen')
             if scr:
                 scr.open_item('services')
                 scr.open_item('services/customer')

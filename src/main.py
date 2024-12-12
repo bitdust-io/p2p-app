@@ -101,6 +101,8 @@ from kivymd.app import MDApp
 
 #------------------------------------------------------------------------------
 
+from lib import jsn
+
 from screens import controller
 
 from components import styles
@@ -144,7 +146,31 @@ class BitDustApp(styles.AppStyle, MDApp):
     def __init__(self, **kwargs):
         global ROOT_PATH
         self.ROOT_PATH = ROOT_PATH
+        self.client_info = None
+        self.client_info_file_path = os.path.join(system.get_app_data_path(), 'client_info')
         super().__init__(**kwargs)
+
+    def load_client_info(self):
+        try:
+            self.client_info = jsn.loads(system.ReadTextFile(self.client_info_file_path) or '{}')
+        except:
+            if _Debug:
+                traceback.print_exc()
+            self.client_info = {}
+        if 'local' not in self.client_info:
+            self.client_info['local'] = False if system.is_android() else True
+            system.WriteTextFile(self.client_info_file_path, jsn.dumps(self.client_info, indent=2))
+        if _Debug:
+            print('BitDustApp.load_client_info:', self.client_info)
+        self.main_window.state_node_local = self.client_info.get('local', True)
+        self.main_window.state_device_authorized = bool(self.client_info.get('auth_token', None))
+        return self.client_info
+
+    def save_client_info(self):
+        if _Debug:
+            print('BitDustApp.save_client_info:', self.client_info)
+        system.WriteTextFile(self.client_info_file_path, jsn.dumps(self.client_info, indent=2))
+        return True
 
     def apply_styles(self):
         from kivy.app import App
@@ -221,12 +247,21 @@ class BitDustApp(styles.AppStyle, MDApp):
     def do_start(self, *args, **kwargs):
         if _Debug:
             print('BitDustApp.do_start', args, kwargs)
+        self.granted = args[0]
+        self.load_client_info()
+        if not self.control.verify_device_ready():
+            return True
+        return self.do_start_controller()
+
+    @mainthread
+    def do_start_controller(self):
+        if _Debug:
+            print('BitDustApp.do_start_controller')
         self.dont_gc = None
         if not system.is_android():
             self.control.start()
             self.start_engine()
             return True
-        self.granted = args[0]
         if not self.granted:
             mActivity.finishAndRemoveTask()
             return False
@@ -477,10 +512,13 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_stop(self):
         if _Debug:
             print('BitDustApp.on_stop')
-        self.finishing.set()
-        self.control.stop()
-        self.main_window.unregister_controller()
-        self.main_window.unregister_screens()
+        try:
+            self.finishing.set()
+            self.control.stop()
+            self.main_window.unregister_controller()
+            self.main_window.unregister_screens()
+        except Exception as e:
+            print(e)
 
     def on_pause(self):
         if _Debug:

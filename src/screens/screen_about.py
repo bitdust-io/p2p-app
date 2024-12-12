@@ -27,28 +27,10 @@ Also you can give us your feedback about the BitDust p2p-app or report a bug dir
 class AboutScreen(screen.AppScreen):
 
     def get_title(self):
-        return 'about'
-
-    def get_statuses(self):
-        return {
-            None: 'main process is not started yet',
-            'AT_STARTUP': 'starting the application',
-            'LOCAL': 'initializing local environment',
-            'MODULES': 'starting sub-modules',
-            'INSTALL': 'installing application',
-            'READY': 'application is ready',
-            'STOPPING': 'application is shutting down',
-            'SERVICES': 'starting network services',
-            'INTERFACES': 'starting application interfaces',
-            'EXIT': 'application is closed',
-        }
+        return 'about BitDust p2p-app'
 
     def on_enter(self, *args):
-        self.ids.state_panel.attach(automat_id='initializer')
         self.ids.about_text.text = about_temlate_text.format()
-
-    def on_leave(self, *args):
-        self.ids.state_panel.release()
 
     def on_about_text_ref_pressed(self, *args):
         if _Debug:

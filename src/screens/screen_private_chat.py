@@ -190,6 +190,6 @@ class PrivateChatScreen(screen.AppScreen):
         # if not api_client.is_ok(resp):
         #     snackbar.error(text='contact was not deleted: %s' % api_client.response_err(resp), bottom=False)
         #     return
-        screen.main_window().select_screen('friends_screen')
-        screen.main_window().screens_stack.clear()
-        screen.main_window().screens_stack.append('welcome_screen')
+        screen.select_screen('friends_screen')
+        screen.stack_clear()
+        screen.stack_append('welcome_screen')

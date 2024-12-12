@@ -9,6 +9,8 @@
 # pep517
 # zipp
 # plyer
+# opencv-python
+# pyzbar
 
 appdirs==1.4.4
 certifi==2022.9.24

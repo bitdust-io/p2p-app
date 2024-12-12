@@ -5,7 +5,7 @@
         pos_hint: {'center_x': .5}
         valign: 'middle'
         halign: 'center'
-        text: root.text
+        text: root.label
 
     GridLayout:
         cols: 2
@@ -19,3 +19,35 @@
         Button:
             text: 'No'
             on_release: root.dispatch('on_answer', 'no')
+
+
+<NumberInputPopup>:
+    cols: 1
+
+    Label:
+        pos_hint: {'center_x': .5}
+        valign: 'middle'
+        halign: 'center'
+        text: root.label
+
+    GridLayout:
+        cols: 2
+        size_hint_y: None
+        height: '144sp'
+
+        SingleLineTextInput:
+            id: number_input
+            size_hint_x: None
+            width: dp(100)
+            pos_hint: {'right': 1, 'center_y': .5}
+            padding: dp(10), dp(6)
+            halign: 'left'
+            valign: 'center'
+            font_size: app.setting_small_font_size
+            input_filter: 'int'
+            # text: '{}'.format(root.option_value)
+            # on_focus: root.on_focus_changed()
+
+        Button:
+            text: 'OK'
+            on_release: root.dispatch('on_answer', 'ok')

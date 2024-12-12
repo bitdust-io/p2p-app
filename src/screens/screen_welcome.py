@@ -135,16 +135,16 @@ class WelcomeScreen(screen.AppScreen):
                                     print('    added links')
 
     def on_search_people_link_pressed(self, instance, value):
-        self.main_win().select_screen('search_people_screen')
+        screen.select_screen('search_people_screen')
 
     def on_chat_with_friends_link_pressed(self, instance, value):
-        self.main_win().select_screen('conversations_screen')
+        screen.select_screen('conversations_screen')
 
     def on_upload_file_link_pressed(self, instance, value):
-        self.main_win().select_screen('private_files_screen')
+        screen.select_screen('private_files_screen')
 
     def on_share_file_link_pressed(self, instance, value):
-        self.main_win().select_screen('shares_screen')
+        screen.select_screen('shares_screen')
 
     def call_identity_get(self):
         api_client.identity_get(cb=self.on_identity_get_result)
@@ -159,7 +159,7 @@ class WelcomeScreen(screen.AppScreen):
         pass
 
     def on_create_identity_button_clicked(self, *args):
-        self.main_win().select_screen('new_identity_screen')
+        screen.select_screen('new_identity_screen')
 
     def on_identity_get_result(self, resp):
         if _Debug:
@@ -177,4 +177,4 @@ class WelcomeScreen(screen.AppScreen):
             print('WelcomeScreen.on_upload_file_button_clicked', args)
 
     def on_restore_existing_identity_pressed(self, instance, value):
-        self.main_win().select_screen('recover_identity_screen')
+        screen.select_screen('recover_identity_screen')

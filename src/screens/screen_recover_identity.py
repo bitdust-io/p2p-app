@@ -58,10 +58,10 @@ class RecoverIdentityScreen(screen.AppScreen):
             return
         self.main_win().state_identity_get = 0
         self.control().run()
-        self.main_win().select_screen('welcome_screen')
-        self.main_win().close_screen('new_identity_screen')
-        self.main_win().close_screen('recover_identity_screen')
-        self.main_win().screens_stack.clear()
+        screen.select_screen('welcome_screen')
+        screen.close_screen('new_identity_screen')
+        screen.close_screen('recover_identity_screen')
+        screen.stack_clear()
 
     @mainthread
     def on_load_private_key_pressed(self, *args):

@@ -69,6 +69,8 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     selected_screen = StringProperty('')
     dropdown_menu = ObjectProperty(None)
 
+    state_node_local = BooleanProperty(True)
+    state_device_authorized = BooleanProperty(False)
     state_process_health = NumericProperty(-1)
     state_identity_get = NumericProperty(-1)
     state_network_connected = NumericProperty(-1)
@@ -128,6 +130,9 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     def is_screen_selectable(self, screen_id):
         if not self.control:
             return False
+        if not self.state_node_local:
+            if not self.state_device_authorized:
+                return screen_id in ['device_connect_screen', 'about_screen', ]
         if self.state_process_health != 1:
             return screen_id in ['engine_status_screen', 'startup_screen', 'welcome_screen', 'about_screen', ]
         if self.state_identity_get != 1:
@@ -141,6 +146,15 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
 
     def update_menu_items(self):
         if not self.control:
+            return
+        if not self.state_node_local and not self.state_device_authorized:
+            self.menu().ids.menu_item_status.disabled = True
+            self.menu().ids.menu_item_my_identity.disabled = True
+            self.menu().ids.menu_item_chat.disabled = True
+            self.menu().ids.menu_item_friends.disabled = True
+            self.menu().ids.menu_item_settings.disabled = True
+            self.menu().ids.menu_item_private_files.disabled = True
+            self.menu().ids.menu_item_shares.disabled = True
             return
         self.menu().ids.menu_item_status.disabled = False
         if self.state_process_health != 1:
@@ -372,6 +386,8 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         back_to_screen = None
         if self.screens_stack:
             back_to_screen = self.screens_stack[-1]
+        if _Debug:
+            print('MainWin.screen_back %r' % back_to_screen)
         if back_to_screen:
             self.select_screen(back_to_screen)
             return True

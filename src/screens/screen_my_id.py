@@ -108,9 +108,9 @@ class MyIDScreen(screen.AppScreen):
         if _Debug:
             print('MyIDScreen.on_my_id_details_ref_pressed', args)
         if args[1] == 'new_identity':
-            self.main_win().select_screen('new_identity_screen')
+            screen.select_screen('new_identity_screen')
         elif args[1] == 'recover_identity':
-            self.main_win().select_screen('recover_identity_screen')
+            screen.select_screen('recover_identity_screen')
 
     def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:
@@ -207,10 +207,10 @@ class MyIDScreen(screen.AppScreen):
     def do_start_again(self, *args):
         self.app().control.start()
         self.app().start_engine(after_restart=True)
-        self.main_win().select_screen('welcome_screen')
-        self.main_win().close_screen('new_identity_screen')
-        self.main_win().close_screen('recover_identity_screen')
-        self.main_win().screens_stack.clear()
+        screen.select_screen('welcome_screen')
+        screen.close_screen('new_identity_screen')
+        screen.close_screen('recover_identity_screen')
+        screen.stack_clear()
         welcome_screen = self.main_win().get_active_screen('welcome_screen')
         if welcome_screen:
             Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)

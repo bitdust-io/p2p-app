@@ -42,7 +42,7 @@ class CreateGroupScreen(screen.AppScreen):
         self.ids.status_message_label.text = ''
         self.ids.create_group_button.disabled = False
         self.ids.group_label_input.disabled = False
-        self.main_win().select_screen('conversations_screen')
-        self.main_win().close_screen('create_group_screen')
-        self.main_win().screens_stack.clear()
-        self.main_win().screens_stack.append('welcome_screen')
+        screen.select_screen('conversations_screen')
+        screen.close_screen('create_group_screen')
+        screen.stack_clear()
+        screen.stack_append('welcome_screen')

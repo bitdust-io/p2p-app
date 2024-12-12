@@ -59,7 +59,7 @@ class CreateShareScreen(screen.AppScreen):
         self.ids.status_message_label.text = ''
         self.ids.create_share_button.disabled = False
         self.ids.share_label_input.disabled = False
-        self.main_win().select_screen('shares_screen')
-        self.main_win().close_screen('create_share_screen')
-        self.main_win().screens_stack.clear()
-        self.main_win().screens_stack.append('welcome_screen')
+        screen.select_screen('shares_screen')
+        screen.close_screen('create_share_screen')
+        screen.stack_clear()
+        screen.stack_append('welcome_screen')

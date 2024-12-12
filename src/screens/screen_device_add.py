@@ -22,7 +22,6 @@ class DeviceAddScreen(screen.AppScreen):
             self.ids.device_name_input.text = ''
             self.ids.routed_connection_switch_button.active = True
             self.ids.port_number_input.text = '8282'
-        # self.ids.status_message_label.text = ''
 
     def on_enter(self):
         self.clean_view(clear_input_field=True)
@@ -32,7 +31,6 @@ class DeviceAddScreen(screen.AppScreen):
             print('DeviceAddScreen.on_add_device_button_clicked', args, self.ids.device_name_input.text, self.ids.routed_connection_switch_button.active, int(self.ids.port_number_input.text))
         if not self.ids.device_name_input.text:
             return
-        # self.ids.status_message_label.text = ''
         api_client.device_add(
             name=self.ids.device_name_input.text.replace(' ', '_'),
             routed=self.ids.routed_connection_switch_button.active,
@@ -49,17 +47,16 @@ class DeviceAddScreen(screen.AppScreen):
             snackbar.error(text=api_client.response_err(resp))
             return
         r = api_client.result(resp)
-        # self.ids.status_message_label.text = ''
-        self.main_win().select_screen(
+        screen.select_screen(
             screen_id='device_info_{}'.format(r['name']),
             screen_type='device_info_screen',
             device_name=r['name'],
             automat_index=r.get('instance', {}).get('index'),
             automat_id=r.get('instance', {}).get('id'),
         )
-        self.main_win().close_screen('device_add_screen')
-        self.main_win().screens_stack.clear()
-        self.main_win().screens_stack.append('welcome_screen')
+        screen.close_screen('device_add_screen')
+        screen.stack_clear()
+        screen.stack_append('welcome_screen')
 
     def on_routed_connection_switch_button_changed(self, *args):
         if _Debug:

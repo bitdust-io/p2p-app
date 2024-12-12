@@ -27,7 +27,7 @@ _DebugModelUpdates = False
 # 2. create new file screens/screen_xxx.kv
 # 3. create new file screens/screen_xxx.py
 # 4. make changes in components.main_win.MainWin.select_screen() if it is required for screen identification
-# 5. to open screen use: screen.main_window().select_screen(screen_id='xxx_screen')
+# 5. to open screen use: screen.select_screen(screen_id='xxx_screen')
 #------------------------------------------------------------------------------ 
 
 def all_screens():
@@ -90,6 +90,8 @@ def all_screens():
             'screens/screen_single_shared_file.kv', 'screens.screen_single_shared_file', 'SingleSharedFileScreen', ),
         'my_storage_info_screen': (
             'screens/screen_my_storage_info.kv', 'screens.screen_my_storage_info', 'MyStorageInfoScreen', ),
+        'scan_qr_screen': (
+            None, 'screens.screen_scan_qr', 'ScanQRScreen', ),
     }
 
 
@@ -135,6 +137,14 @@ class Controller(object):
         self.my_global_id = None
         self.my_idurl = None
 
+    def verify_device_ready(self):
+        if self.mw().state_node_local:
+            return True
+        if self.mw().state_device_authorized:
+            return True
+        self.mw().select_screen('device_connect_screen')
+        return False
+
     def mw(self):
         return self.app.main_window
 
@@ -160,7 +170,8 @@ class Controller(object):
         if _Debug:
             print('Controller.stop')
         self.enabled = False
-        web_sock.stop()
+        if web_sock.is_started():
+            web_sock.stop()
 
     def send_process_stop(self, callback=None):
         self.mw().state_process_health = 0

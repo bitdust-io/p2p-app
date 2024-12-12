@@ -71,7 +71,7 @@ class EngineStatusScreen(screen.AppScreen):
     def on_network_connection_status_pressed(self, *args):
         if _Debug:
             print('EngineStatusScreen.on_network_connection_status_pressed', args)
-        self.main_win().select_screen('connecting_screen')
+        screen.select_screen('connecting_screen')
 
     def on_service(self, payload):
         if _Debug:

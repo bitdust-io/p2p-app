@@ -87,8 +87,8 @@ class BackupIdentityScreen(screen.AppScreen):
         self.ids.continue_button.disabled = False
 
     def on_continue_pressed(self, *args):
-        self.main_win().select_screen('welcome_screen')
-        self.main_win().close_screen('new_identity_screen')
-        self.main_win().close_screen('recover_identity_screen')
-        self.main_win().close_screen('backup_identity_screen')
-        self.main_win().screens_stack.clear()
+        screen.select_screen('welcome_screen')
+        screen.close_screen('new_identity_screen')
+        screen.close_screen('recover_identity_screen')
+        screen.close_screen('backup_identity_screen')
+        screen.stack_clear()
