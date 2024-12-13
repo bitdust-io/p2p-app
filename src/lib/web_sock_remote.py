@@ -163,7 +163,7 @@ def on_open(ws_inst):
         cb(ws_inst)
     client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
     if _Debug:
-        print('websocket opened', time.time())
+        print('websocket opened', time.time(), client_info)
     auth_token = client_info.get('auth_token')
     session_key_text = client_info.get('session_key')
     if auth_token and session_key_text:
@@ -187,7 +187,7 @@ def on_connect(ws_inst):
     while _PendingCalls:
         json_data, cb = _PendingCalls.pop(0)
         if _Debug:
-            print('pushing data', json_data)
+            print('on_connect pushing data', json_data)
         try:
             ws_queue().put_nowait((json_data, cb, ))
         except Exception as exc:
@@ -409,7 +409,7 @@ def restart_handshake():
         'client_public_key': key_object.toPublicString(),
     }
     if _Debug:
-        print('pushing data', json_data)
+        print('restart_handshake pushing data', json_data)
     ws_queue().put_nowait((json_data, None, ))
 
 
@@ -423,8 +423,8 @@ def continue_handshake(server_code):
     hashed_server_code = hashes.sha1(strng.to_bin(salted_server_code))
     client_key_object = rsa_key.RSAKey()
     client_key_object.fromDict(client_info['key'])
-    # client_info['client_code'] = cipher.generate_digits(6, as_text=True)
-    client_info['client_code'] = '111222'
+    client_info['client_code'] = cipher.generate_digits(6, as_text=True)
+    # client_info['client_code'] = '111222'
     system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
     # TODO: here must show the client_code digits in the app UI
     # user will have to enter the displayed client code on the server manually
@@ -434,10 +434,11 @@ def continue_handshake(server_code):
         'signature': strng.to_text(client_key_object.sign(hashed_server_code)),
     }
     if _Debug:
-        print('pushing data', json_data)
+        print('continue_handshake pushing data', json_data)
     ws_queue().put_nowait((json_data, None, ))
     if _Debug:
         print('continue_handshake client code: %r' % client_info['client_code'])
+    return client_info['client_code']
 
 #------------------------------------------------------------------------------
 
@@ -463,9 +464,13 @@ def requests_thread(active_queue):
             _LastCallID = json_data['call_id']
         call_id = json_data['call_id']
         if call_id in _CallbacksQueue:
+            if _Debug:
+                print('call_id was not unique')
             on_fail(Exception('call_id was not unique'), result_callback)
             continue
         if not ws():
+            if _Debug:
+                print('websocket is closed')
             on_fail(Exception('websocket is closed'), result_callback)
             continue
         _CallbacksQueue[call_id] = result_callback

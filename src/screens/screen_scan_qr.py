@@ -90,10 +90,6 @@ class ScanQRScreen(screen.AppScreen):
     def on_leave(self):
         if _Debug:
             print('ScanQRScreen.on_leave')
-        self.camera_task.cancel()
-        self.camera_task = None
-        self.camera_capture.release()
-        self.camera_capture = None
 
     def on_camera_update(self, dt):
         ret, frame = self.camera_capture.read()
@@ -116,12 +112,20 @@ class ScanQRScreen(screen.AppScreen):
             return
         result_text = ', '.join([symbol.data.decode('utf-8') for symbol in self.symbols])
         if _Debug:
-            print('scanned text:', result_text)
+            print('ScanQRScreen.on_camera_update scanned text:', result_text)
+        self.camera_task.cancel()
+        self.camera_task = None
+        self.camera_capture.release()
+        self.camera_capture = None
         if self.scan_qr_callback:
             self.scan_qr_callback(result_text)
 
     def on_cancel_button_clicked(self, *args):
         if _Debug:
             print('ScanQRScreen.on_cancel_button_clicked')
+        self.camera_task.cancel()
+        self.camera_task = None
+        self.camera_capture.release()
+        self.camera_capture = None
         if self.cancel_callback:
             self.cancel_callback()
