@@ -16,7 +16,7 @@ from kivy.uix.floatlayout import FloatLayout
 #------------------------------------------------------------------------------
 
 from components import screen
-from components.buttons import RaisedIconButton
+from components import buttons
 
 #------------------------------------------------------------------------------
 
@@ -70,7 +70,7 @@ class ScanQRScreen(screen.AppScreen):
                 pos_hint={'center_x': 0.5, 'center_y': 0.5, },
             )
             self.container.add_widget(self.camera_texture)
-            btn = RaisedIconButton(
+            btn = buttons.RaisedIconButton(
                 pos_hint={"center_x": 0.5, "center_y": 0, },
                 icon='close',
                 on_release=self.on_cancel_button_clicked,

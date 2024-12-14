@@ -436,6 +436,10 @@ class Controller(object):
                     old_state=event_data.get('old_state', ''),
                     new_state=event_data.get('new_state', ''),
                 )
+        elif event_id == 'web-socket-handshake-started':
+            self.mw().populate_device_server_code_display_dialog(event_data)
+        elif event_id == 'web-socket-handshake-proceeding':
+            self.mw().populate_device_client_code_input_dialog(event_data)
         # elif event_id in ['friend-connected', 'friend-disconnected', ]:
             # if self.mw().is_screen_active('friends_screen'):
             #     self.mw().get_active_screen('friends_screen').on_friend_state_changed(
@@ -679,3 +683,8 @@ class Controller(object):
         if _Debug:
             print('Controller.on_state_success %r %r %r, selected_screen=%r' % (
                 self.mw().state_process_health, self.mw().state_identity_get, self.mw().state_network_connected, self.mw().selected_screen, ))
+
+    def on_device_client_code_entered(self, device_name, inp):
+        if _Debug:
+            print('Controller.on_device_client_code_entered', device_name, inp)
+        api_client.device_client_code_input(name=device_name, client_code=inp)

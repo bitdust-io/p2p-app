@@ -21,7 +21,8 @@ from lib import system
 
 from components import webfont
 from components import all_components
-from components.styles import AppStyle
+from components import dialogs
+from components import styles
 
 #------------------------------------------------------------------------------
 
@@ -55,7 +56,7 @@ class CustomContentNavigationDrawer(BoxLayout):
 
 #------------------------------------------------------------------------------
 
-class MainWin(Screen, ThemableBehavior, AppStyle):
+class MainWin(Screen, ThemableBehavior, styles.AppStyle):
 
     control = None
     screens_map = {}
@@ -81,6 +82,8 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     state_rebuilding = BooleanProperty(False)
 
     def __init__(self, **kwargs):
+        self.device_server_code_display_dialog = None
+        self.device_client_code_input_dialog = None
         super().__init__(**kwargs)
         patch_kivy_core_window()
         Clock.schedule_once(self.on_init_done)
@@ -234,6 +237,30 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
 
     def populate_bottom_toolbar_icon(self, icon_name, state):
         Clock.schedule_once(lambda *a: self.footer_bar().update_bottom_action_bar_item(icon_name, state))
+
+    def populate_device_server_code_display_dialog(self, event_data):
+        if _Debug:
+            print('MainWin.populate_device_server_code_display_dialog', event_data)
+        server_code = event_data['server_code']
+        self.device_server_code_display_dialog = dialogs.open_message_dialog(
+            title='Authorization code',
+            text='[color=#000]Enter the authorization code dispalyed bellow on your device running BitDust p2p-app:\n\n\n[size=24sp]%s[/size][/color]' % server_code,
+            button_confirm='Continue',
+            cb=self.on_device_server_code_display_dialog_closed,
+        )
+
+    def populate_device_client_code_input_dialog(self, event_data):
+        if self.device_server_code_display_dialog:
+            self.device_server_code_display_dialog.dismiss()
+            self.device_server_code_display_dialog = None
+        device_name = event_data['device_name']
+        self.device_client_code_input_dialog = dialogs.open_number_input_dialog(
+            title='Device code',
+            text='Enter 6-digits authorization code generated on your device:',
+            button_confirm='Confirm',
+            button_cancel='Back',
+            cb=lambda inp: self.on_device_client_code_entered(device_name, inp),
+        )
 
     #------------------------------------------------------------------------------
 
@@ -526,3 +553,14 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if value:
             not_blinking = 0
         self.populate_bottom_toolbar_icon('database', not_blinking)
+
+    def on_device_server_code_display_dialog_closed(self, *args, **kwargs):
+        if _Debug:
+            print('MainWin.on_device_client_code_entered', args, kwargs)
+        self.device_server_code_display_dialog = None
+
+    def on_device_client_code_entered(self, device_name, inp):
+        if _Debug:
+            print('MainWin.on_device_client_code_entered', device_name, inp)
+        self.device_client_code_input_dialog = None
+        self.control.on_device_client_code_entered(device_name, inp)

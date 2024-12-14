@@ -154,6 +154,10 @@ def device_info(name, cb=None):
     return run('device_info', kwargs={'name': name, }, cb=cb)
 
 
+def device_client_code_input(name, client_code, cb=None):
+    return run('device_client_code_input', kwargs={'name': name, 'client_code': client_code, }, cb=cb)
+
+
 def identity_get(cb=None):
     return run('identity_get', cb=cb)
 
