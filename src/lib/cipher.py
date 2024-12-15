@@ -51,18 +51,22 @@ from lib import serialization
 #------------------------------------------------------------------------------
 
 
-def encrypt_json(raw_data, secret_bytes_key, cipher_type='AES'):
+def encrypt_json(raw_data, secret_bytes_key, cipher_type='AES', to_text=False, to_dict=False):
     # TODO: add salt to raw_data
-    padded_data = Padding.pad(
-        data_to_pad=raw_data,
-        block_size=AES.block_size,
-    )
     if cipher_type == 'AES':
+        padded_data = Padding.pad(
+            data_to_pad=raw_data,
+            block_size=AES.block_size,
+        )
         cipher = AES.new(
             key=secret_bytes_key,
             mode=AES.MODE_CBC,
         )
     elif cipher_type == 'DES3':
+        padded_data = Padding.pad(
+            data_to_pad=raw_data,
+            block_size=DES3.block_size,
+        )
         cipher = DES3.new(
             key=secret_bytes_key,
             mode=DES3.MODE_CBC,
@@ -74,17 +78,22 @@ def encrypt_json(raw_data, secret_bytes_key, cipher_type='AES'):
         'iv': base64.b64encode(cipher.iv).decode('utf-8'),
         'ct': base64.b64encode(ct_bytes).decode('utf-8'),
     }
-    encrypted_data = serialization.DictToBytes(dct, encoding='utf-8')
+    if to_dict:
+        return dct
+    encrypted_data = serialization.DictToBytes(dct, encoding='utf-8', to_text=to_text)
     return encrypted_data
 
 
-def decrypt_json(encrypted_data, secret_bytes_key, cipher_type='AES'):
-    dct = serialization.BytesToDict(
-        encrypted_data,
-        encoding='utf-8',
-        keys_to_text=True,
-        values_to_text=True,
-    )
+def decrypt_json(encrypted_data, secret_bytes_key, cipher_type='AES', from_dict=False):
+    if from_dict:
+        dct = encrypted_data
+    else:
+        dct = serialization.BytesToDict(
+            encrypted_data,
+            encoding='utf-8',
+            keys_to_text=True,
+            values_to_text=True,
+        )
     if cipher_type == 'AES':
         cipher = AES.new(
             key=secret_bytes_key,

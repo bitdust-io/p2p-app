@@ -315,6 +315,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         svc.start(mActivity, 'bitdust.png', 'BitDust Service', 'Started', '')
 
     def start_engine(self, after_restart=False):
+        if not self.main_window.state_node_local:
+            return True
         if self.main_window.engine_is_on:
             if _Debug:
                 print('BitDustApp.start_engine SKIP')
@@ -330,6 +332,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         return True
 
     def restart_engine(self):
+        if not self.main_window.state_node_local:
+            return
         if not self.main_window.engine_is_on:
             if _Debug:
                 print('BitDustApp.restart_engine SKIP')
@@ -344,6 +348,8 @@ class BitDustApp(styles.AppStyle, MDApp):
             self.check_restart_bitdust_process(params=['restart', ])
 
     def redeploy_engine(self):
+        if not self.main_window.state_node_local:
+            return
         if system.is_android():
             if _Debug:
                 print('BitDustApp.redeploy_engine NOT IMPLEMENTED')
@@ -354,6 +360,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.check_restart_bitdust_process(params=['redeploy', ])
 
     def stop_engine(self):
+        if not self.main_window.state_node_local:
+            return
         if not self.main_window.engine_is_on:
             if _Debug:
                 print('BitDustApp.stop_engine SKIP')
@@ -368,6 +376,8 @@ class BitDustApp(styles.AppStyle, MDApp):
             self.check_restart_bitdust_process(params=['stop', ])
 
     def start_android_service(self, shutdown=False):
+        if not self.main_window.state_node_local:
+            return False
         if not system.is_android():
             return False
         if _Debug:
@@ -386,6 +396,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         return True
 
     def stop_android_service(self):
+        if not self.main_window.state_node_local:
+            return False
         if not system.is_android():
             return False
         if _Debug:
@@ -397,6 +409,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         return True
 
     def check_restart_bitdust_process(self, params=[]):
+        if not self.main_window.state_node_local:
+            return None
         if not system.is_linux() and not system.is_osx() and not system.is_windows():
             if _Debug:
                 print('BitDustApp.check_restart_bitdust_process NOT IMPLEMENTED')

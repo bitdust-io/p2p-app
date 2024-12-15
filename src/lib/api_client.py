@@ -9,6 +9,7 @@ import time
 #------------------------------------------------------------------------------
 
 from lib import web_sock
+from lib import web_sock_remote
 
 #------------------------------------------------------------------------------
 
@@ -16,11 +17,29 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
+_IsLocal = None
+
+#------------------------------------------------------------------------------
+
+def set_web_sock_type(typ):
+    global _IsLocal
+    if typ == 'local':
+        _IsLocal = True
+    elif typ == 'remote':
+        _IsLocal = False
+    else:
+        raise Exception('unexpected web socket type')
+
+#------------------------------------------------------------------------------
+
 def run(method, kwargs={}, cb=None):
+    global _IsLocal
     if _Debug:
         print('api_client.run %r %r' % (method, time.asctime(), ))
     jd = {'command': 'api_call', 'method': method, 'kwargs': kwargs, }
-    return web_sock.ws_call(json_data=jd, cb=cb)
+    if _IsLocal:
+        return web_sock.ws_call(json_data=jd, cb=cb)
+    return web_sock_remote.ws_call(json_data=jd, cb=cb)
 
 #------------------------------------------------------------------------------
 
@@ -91,22 +110,40 @@ def red_err(response):
 #--- API streaming
 
 def add_model_listener(model_name, listener_cb):
-    if listener_cb in (web_sock.model_update_callbacks().get(model_name) or []):
+    global _IsLocal
+    if _IsLocal:
+        if listener_cb in (web_sock.model_update_callbacks().get(model_name) or []):
+            return False
+        if model_name not in web_sock.model_update_callbacks():
+            web_sock.model_update_callbacks()[model_name] = []
+        web_sock.model_update_callbacks()[model_name].append(listener_cb)
+        return True
+    if listener_cb in (web_sock_remote.model_update_callbacks().get(model_name) or []):
         return False
-    if model_name not in web_sock.model_update_callbacks():
-        web_sock.model_update_callbacks()[model_name] = []
-    web_sock.model_update_callbacks()[model_name].append(listener_cb)
+    if model_name not in web_sock_remote.model_update_callbacks():
+        web_sock_remote.model_update_callbacks()[model_name] = []
+    web_sock_remote.model_update_callbacks()[model_name].append(listener_cb)
     return True
 
 
 def remove_model_listener(model_name, listener_cb):
-    if model_name not in web_sock.model_update_callbacks():
+    global _IsLocal
+    if _IsLocal:
+        if model_name not in web_sock.model_update_callbacks():
+            return False
+        if listener_cb not in web_sock.model_update_callbacks()[model_name]:
+            return False
+        web_sock.model_update_callbacks()[model_name].remove(listener_cb)
+        if not web_sock.model_update_callbacks()[model_name]:
+            web_sock.model_update_callbacks().pop(model_name)
+        return True
+    if model_name not in web_sock_remote.model_update_callbacks():
         return False
-    if listener_cb not in web_sock.model_update_callbacks()[model_name]:
+    if listener_cb not in web_sock_remote.model_update_callbacks()[model_name]:
         return False
-    web_sock.model_update_callbacks()[model_name].remove(listener_cb)
-    if not web_sock.model_update_callbacks()[model_name]:
-        web_sock.model_update_callbacks().pop(model_name)
+    web_sock_remote.model_update_callbacks()[model_name].remove(listener_cb)
+    if not web_sock_remote.model_update_callbacks()[model_name]:
+        web_sock_remote.model_update_callbacks().pop(model_name)
     return True
 
 

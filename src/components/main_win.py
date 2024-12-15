@@ -150,15 +150,26 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
     def update_menu_items(self):
         if not self.control:
             return
-        if not self.state_node_local and not self.state_device_authorized:
-            self.menu().ids.menu_item_status.disabled = True
-            self.menu().ids.menu_item_my_identity.disabled = True
-            self.menu().ids.menu_item_chat.disabled = True
-            self.menu().ids.menu_item_friends.disabled = True
-            self.menu().ids.menu_item_settings.disabled = True
-            self.menu().ids.menu_item_private_files.disabled = True
-            self.menu().ids.menu_item_shares.disabled = True
-            return
+        if not self.state_node_local:
+            if self.state_device_authorized:
+                if self.state_process_health != 1:
+                    self.menu().ids.menu_item_status.disabled = True
+                    self.menu().ids.menu_item_my_identity.disabled = True
+                    self.menu().ids.menu_item_chat.disabled = True
+                    self.menu().ids.menu_item_friends.disabled = True
+                    self.menu().ids.menu_item_settings.disabled = True
+                    self.menu().ids.menu_item_private_files.disabled = True
+                    self.menu().ids.menu_item_shares.disabled = True
+                    return
+            else:
+                self.menu().ids.menu_item_status.disabled = True
+                self.menu().ids.menu_item_my_identity.disabled = True
+                self.menu().ids.menu_item_chat.disabled = True
+                self.menu().ids.menu_item_friends.disabled = True
+                self.menu().ids.menu_item_settings.disabled = True
+                self.menu().ids.menu_item_private_files.disabled = True
+                self.menu().ids.menu_item_shares.disabled = True
+                return
         self.menu().ids.menu_item_status.disabled = False
         if self.state_process_health != 1:
             self.menu().ids.menu_item_my_identity.disabled = True
@@ -342,7 +353,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
                         print('closing inactive screen %r : %d ~ %d' % (screen_id, time.time(), closed_time, ))
                     self.close_screen(screen_id)
 
-    def select_screen(self, screen_id, verify_state=False, screen_type=None, clear_screens_stack=False, **kwargs):
+    def select_screen(self, screen_id, verify_state=False, screen_type=None, clear_stack=False, **kwargs):
         if screen_type is None:
             screen_type = screen_id
             if screen_type.startswith('private_chat_'):
@@ -395,7 +406,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         self.selected_screen = screen_id
         # if self.selected_screen in ['engine_status_screen', 'connecting_screen', 'startup_screen', ]:
         #     self.screens_stack = []
-        if self.screens_stack and not clear_screens_stack:
+        if self.screens_stack and not clear_stack:
             self.tbar().left_action_items = [["arrow-left", self.on_nav_back_button_clicked, ], ]
         else:
             self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
@@ -404,7 +415,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         self.ids.screen_manager.current = screen_id
         self.active_screens[screen_id][0].close_drop_down_menu()
         self.active_screens[screen_id][0].on_opened()
-        if clear_screens_stack:
+        if clear_stack:
             self.screens_stack.clear()
             self.screens_stack.append('welcome_screen')
         return self.active_screens[screen_id][0]

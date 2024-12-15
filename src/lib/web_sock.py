@@ -55,8 +55,10 @@ def start(callbacks={}, api_secret_filepath=None):
     _WebSocketConnecting = True
     _WebSocketStarted = True
     _WebSocketQueue = queue.Queue(maxsize=1000)
-    thread.start_new_thread(websocket_thread, ())
-    thread.start_new_thread(requests_thread, (_WebSocketQueue, ))
+    websocket_thread_id = thread.start_new_thread(websocket_thread, ())
+    requests_thread_id = thread.start_new_thread(requests_thread, (_WebSocketQueue, ))
+    if _Debug:
+        print('    websocket_thread_id=%r requests_thread_id=%r' % (websocket_thread_id, requests_thread_id, ))
 
 
 def stop():

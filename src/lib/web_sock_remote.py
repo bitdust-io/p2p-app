@@ -68,8 +68,18 @@ def start(callbacks={}, client_info_filepath=None):
     _WebSocketAuthToken = None
     _WebSocketSessionKey = None
     _WebSocketQueue = queue.Queue(maxsize=1000)
-    thread.start_new_thread(websocket_thread, ())
-    thread.start_new_thread(requests_thread, (_WebSocketQueue, ))
+    client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
+    auth_token = client_info.get('auth_token')
+    session_key_text = client_info.get('session_key')
+    if auth_token and session_key_text:
+        if _Debug:
+            print('web_sock_remote.start was already AUTHORIZED')
+        _WebSocketAuthToken = auth_token
+        _WebSocketSessionKey = base64.b64decode(strng.to_bin(session_key_text))
+    websocket_thread_id = thread.start_new_thread(websocket_thread, ())
+    requests_thread_id = thread.start_new_thread(requests_thread, (_WebSocketQueue, ))
+    if _Debug:
+        print('    websocket_thread_id=%r requests_thread_id=%r' % (websocket_thread_id, requests_thread_id, ))
 
 
 def stop():
@@ -80,6 +90,7 @@ def stop():
     global _WebSocketReady
     global _WebSocketAuthToken
     global _WebSocketSessionKey
+    global _WebSocketApp
     global _RegisteredCallbacks
     if not is_started():
         raise Exception('has not been started')
@@ -95,14 +106,17 @@ def stop():
     while True:
         try:
             json_data, _ = ws_queue().get_nowait()
-            print('cleaned unfinished call', json_data)
+            if _Debug:
+                print('cleaned unfinished call', json_data)
         except queue.Empty:
             break
     _WebSocketQueue.put_nowait((None, None, ))
-    if ws():
+    if _WebSocketApp:
+        _WebSocketApp.close()
+    else:
         if _Debug:
-            print('websocket already closed')
-        ws().close()
+            print('websocket was already closed')
+    _WebSocketApp = None
 
 #------------------------------------------------------------------------------
 
@@ -186,8 +200,8 @@ def on_connect(ws_inst):
         cb(ws_inst)
     while _PendingCalls:
         json_data, cb = _PendingCalls.pop(0)
-        if _Debug:
-            print('on_connect pushing data', json_data)
+        # if _Debug:
+        #     print('on_connect pushing data', json_data)
         try:
             ws_queue().put_nowait((json_data, cb, ))
         except Exception as exc:
@@ -239,7 +253,7 @@ def on_message(ws_inst, message):
     global _WebSocketSessionKey
     json_data = jsn.loads(message)
     if _Debug:
-        print('web_sock_remote.on_message %d bytes: %r' % (len(message), json_data))
+        print('web_sock_remote.on_message %d bytes' % len(message))
     cmd = json_data.get('cmd')
     if cmd == 'server-public-key':
         # SECURITY
@@ -355,6 +369,13 @@ def on_message(ws_inst, message):
                 return on_stream_message(decrypted_json_payload)
             if payload_type == 'model':
                 return on_model_update(decrypted_json_payload)
+    if cmd == 'server-disconnected':
+        if _Debug:
+            print('    routed web socket connection was DISCONNECTED from server side')
+        cb = registered_callbacks().get('on_server_disconnected')
+        if cb:
+            cb()
+        return False
     if _Debug:
         print('       message was not processed', json_data)
     return False
@@ -400,7 +421,7 @@ def restart_handshake():
     if _Debug:
         print('about to generate new RSA key')
     key_object = rsa_key.RSAKey()
-    key_object.generate(4096)
+    key_object.generate(2048)
     client_info['key'] = key_object.toDict(include_private=True)
     client_info['state'] = 'init'
     system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
@@ -476,7 +497,7 @@ def requests_thread(active_queue):
         _CallbacksQueue[call_id] = result_callback
         raw_data = serialization.DictToBytes(json_data, encoding='utf-8', to_text=True)
         if _Debug:
-            print('    sending %d bytes: %r' % (len(raw_data), raw_data))
+            print('    sending %d bytes' % len(raw_data))
         try:
             ws().send(raw_data)
         except Exception as exc:
@@ -584,8 +605,8 @@ def ws_call(json_data, cb=None):
     global _PendingCalls
     global _ClientInfoFilePath
     st = verify_state()
-    if _Debug:
-        print('ws_call', st)
+    # if _Debug:
+    #     print('ws_call', st)
     if st == 'ready':
         encrypted_json_data = encrypt_api_payload(json_data)
         ws_queue().put_nowait((encrypted_json_data, cb, ))

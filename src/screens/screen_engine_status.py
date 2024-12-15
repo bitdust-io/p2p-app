@@ -33,7 +33,11 @@ class EngineStatusScreen(screen.AppScreen):
     def populate(self):
         if _Debug:
             print('EngineStatusScreen.populate state_panel_attached=%r' % self.state_panel_attached)
-        self.on_service(None)
+        if screen.main_window().state_node_local:
+            self.ids.button_engine_on.disabled = False
+            self.on_service(None)
+        else:
+            self.ids.button_engine_on.disabled = True
 
     def on_enter(self, *args):
         if _Debug:

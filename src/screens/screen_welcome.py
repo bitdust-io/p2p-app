@@ -13,8 +13,6 @@ _Debug = True
 
 class WelcomeScreen(screen.AppScreen):
 
-    verify_network_connected_task = None
-
     def get_statuses(self):
         return {
             None: '',

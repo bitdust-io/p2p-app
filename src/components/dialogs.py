@@ -4,8 +4,14 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
-from kivymd.uix.button import MDFillRoundFlatButton
+from kivymd.uix.button import MDFillRoundFlatButton, MDFlatButton
 from kivymd.uix.dialog import MDDialog
+
+#------------------------------------------------------------------------------
+
+from components import spinner
+
+from components import layouts
 
 #------------------------------------------------------------------------------
 
@@ -124,6 +130,45 @@ def open_message_dialog(title, text, button_confirm='Confirm', cb=None):
         size_hint_x=None,
         width=dp(360),
         auto_dismiss=False,
+    )
+    popup.open()
+    return popup
+
+#------------------------------------------------------------------------------
+
+def open_spinner_dialog(title, label='', button_cancel=None, cb_cancel=None):
+    popup = None
+    spin = spinner.CircularProgressBar(
+        size_hint=(None, None),
+        size=(dp(125), dp(125)),
+        pos_hint={'center_x': .5, 'center_y': .6},
+        max=360,
+    )
+    spin.start(label=label)
+
+    def on_cancel(*args, **kwargs):
+        popup.dismiss()
+        if cb_cancel:
+            cb_cancel()
+
+    def on_dismiss(*args, **kwargs):
+        spin.stop()
+
+    popup = MDDialog(
+        title=title,
+        type='custom',
+        content_cls=spin,
+        buttons=[
+            MDFlatButton(
+                font_size=sp(14),
+                text=button_cancel,
+                on_release=on_cancel,
+            ),
+        ] if button_cancel else [],
+        size_hint_x=None,
+        width=dp(170),
+        auto_dismiss=False,
+        on_dismiss=on_dismiss,
     )
     popup.open()
     return popup
