@@ -36,3 +36,10 @@
                         on_ref_press: root.on_device_info_details_ref_pressed(*args)
 
         BottomEmptyScreenSpace:
+
+
+    DropDownMenu:
+        id: drop_down_menu
+        data:
+            [('qrcode-remove', 'Delete this device', ),]
+        callback: root.on_drop_down_menu_item_clicked

@@ -94,7 +94,7 @@ class DeviceInfoScreen(screen.AppScreen):
             snackbar.error(text=api_client.response_err(resp))
             return
         result = api_client.result(resp)
-        self.url = result.get('url', '')
+        self.url = result.get('url', '') or ''
         result.update(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             small_text_size='{}sp'.format(self.app().font_size_small_absolute),
@@ -119,3 +119,19 @@ class DeviceInfoScreen(screen.AppScreen):
         if args[1] == 'copy_url':
             if self.url:
                 Clipboard.copy(self.url)
+
+    def on_drop_down_menu_item_clicked(self, btn):
+        if _Debug:
+            print('DeviceInfoScreen.on_drop_down_menu_item_clicked', btn.icon)
+        if btn.icon == 'qrcode-remove':
+            api_client.device_remove(
+                name=self.device_name,
+                cb=self.on_device_remove_result,
+            )
+
+    def on_device_remove_result(self, resp):
+        if _Debug:
+            print('DeviceInfoScreen.on_device_remove_result', resp)
+        screen.select_screen('settings_screen')
+        screen.stack_clear()
+        screen.stack_append('welcome_screen')

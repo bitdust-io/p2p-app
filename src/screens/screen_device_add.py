@@ -2,6 +2,7 @@ from lib import api_client
 
 from components import screen
 from components import snackbar
+from components import dialogs
 
 #------------------------------------------------------------------------------
 
@@ -13,6 +14,8 @@ class DeviceAddScreen(screen.AppScreen):
 
     # def get_icon(self):
     #     return 'chat-plus'
+
+    spinner_dialog = None
 
     def get_title(self):
         return 'add new device'
@@ -33,11 +36,18 @@ class DeviceAddScreen(screen.AppScreen):
         if not self.ids.device_name_input.text:
             self.ids.device_name_input.focus = True
             return
+        self.ids.create_device_button.disabled = True
+        self.spinner_dialog = dialogs.open_spinner_dialog(
+            title='',
+            label='connecting',
+            button_cancel='[u][color=#0000dd]Cancel[/color][/u]',
+            cb_cancel=self.on_cancel_spinner_dialog,
+        )
         api_client.device_add(
             name=self.ids.device_name_input.text.replace(' ', '_'),
             routed=self.ids.routed_connection_switch_button.active,
             activate=True,
-            wait_listening=False,
+            wait_listening=True,
             web_socket_port=int(self.ids.port_number_input.text),
             cb=self.on_device_add_result,
         )
@@ -45,6 +55,10 @@ class DeviceAddScreen(screen.AppScreen):
     def on_device_add_result(self, resp):
         if _Debug:
             print('DeviceAddScreen.on_device_add_result', resp)
+        self.ids.create_device_button.disabled = False
+        if self.spinner_dialog:
+            self.spinner_dialog.dismiss()
+            self.spinner_dialog = None
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
             return
@@ -64,3 +78,7 @@ class DeviceAddScreen(screen.AppScreen):
         if _Debug:
             print('DeviceAddScreen.on_routed_connection_switch_button_changed', args)
         self.ids.port_number_input.disabled = args[0]
+
+    def on_cancel_spinner_dialog(self):
+        self.ids.create_device_button.disabled = False
+        self.spinner_dialog = None

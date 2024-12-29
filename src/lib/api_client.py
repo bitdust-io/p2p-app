@@ -187,6 +187,10 @@ def device_add(name, routed=False, activate=True, wait_listening=False, web_sock
     }, cb=cb)
 
 
+def device_remove(name, cb=None):
+    return run('device_remove', kwargs={'name': name, }, cb=cb)
+
+
 def device_info(name, cb=None):
     return run('device_info', kwargs={'name': name, }, cb=cb)
 
