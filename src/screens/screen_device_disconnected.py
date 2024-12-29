@@ -139,7 +139,16 @@ class DeviceDisconnectedScreen(screen.AppScreen):
 
     def do_connect(self, interval=None):
         if _Debug:
-            print('DeviceDisconnectedScreen.do_connect', self.counter)
+            print('DeviceDisconnectedScreen.do_connect')
+        if web_sock_remote.is_started():
+            web_sock_remote.stop()
+            Clock.schedule_once(self.do_start_connecting, .1)
+        else:
+            self.do_start_connecting()
+
+    def do_start_connecting(self, interval=None):
+        if _Debug:
+            print('DeviceDisconnectedScreen.do_start_connecting', self.counter)
         self.counter += 1
         web_sock_remote.start(
             callbacks={

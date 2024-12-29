@@ -219,6 +219,7 @@ class DeviceConnectScreen(screen.AppScreen):
             print('DeviceConnectScreen.on_enter', args)
         if system.is_android():
             self.ids.selection_tabs.ids.carousel.slides[0].ids.local_device_button.disabled = True
+            self.ids.selection_tabs.switch_tab('Remote', search_by='title')
 
     def on_leave(self, *args):
         if _Debug:

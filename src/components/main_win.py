@@ -252,6 +252,9 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
     def populate_device_server_code_display_dialog(self, event_data):
         if _Debug:
             print('MainWin.populate_device_server_code_display_dialog', event_data)
+        if self.device_server_code_display_dialog:
+            self.device_server_code_display_dialog.dismiss()
+            self.device_server_code_display_dialog = None
         server_code = event_data['server_code']
         self.device_server_code_display_dialog = dialogs.open_message_dialog(
             title='Authorization code',
