@@ -111,7 +111,7 @@ from components import snackbar
 #------------------------------------------------------------------------------
 
 if system.is_android():
-    from jnius import autoclass, cast  # @UnresolvedImport
+    # from jnius import autoclass, cast  # @UnresolvedImport
     import encodings.idna  # @UnusedImport
 
     from android import mActivity  # @UnresolvedImport
@@ -146,29 +146,35 @@ class BitDustApp(styles.AppStyle, MDApp):
     def __init__(self, **kwargs):
         global ROOT_PATH
         self.ROOT_PATH = ROOT_PATH
-        self.client_info = None
+        if _Debug:
+            print('BitDustApp.__init__ ROOT_PATH=%r app_data_path=%r' % (self.ROOT_PATH, system.get_app_data_path(), ))
+        if not os.path.exists(system.get_app_data_path()):
+            os.makedirs(system.get_app_data_path())
+        self.client_info = {}
         self.client_info_file_path = os.path.join(system.get_app_data_path(), 'client_info')
         super().__init__(**kwargs)
 
     def load_client_info(self):
         try:
-            self.client_info = jsn.loads(system.ReadTextFile(self.client_info_file_path) or '{}')
+            _client_info = jsn.loads(system.ReadTextFile(self.client_info_file_path) or '{}')
         except:
             if _Debug:
                 traceback.print_exc()
-            self.client_info = {}
+            _client_info = {}
+        if not _client_info:
+            return None
+        self.client_info = _client_info
         if 'local' not in self.client_info:
-            self.client_info['local'] = False if system.is_android() else True
-            system.WriteTextFile(self.client_info_file_path, jsn.dumps(self.client_info, indent=2))
+            return None
         if _Debug:
-            print('BitDustApp.load_client_info:', self.client_info)
+            print('BitDustApp.load_client_info:', self.client_info_file_path, self.client_info)
         self.main_window.state_node_local = self.client_info.get('local', True)
         self.main_window.state_device_authorized = bool(self.client_info.get('auth_token', None))
         return self.client_info
 
     def save_client_info(self):
         if _Debug:
-            print('BitDustApp.save_client_info:', self.client_info)
+            print('BitDustApp.save_client_info:', self.client_info_file_path, self.client_info)
         system.WriteTextFile(self.client_info_file_path, jsn.dumps(self.client_info, indent=2))
         return True
 
@@ -239,8 +245,12 @@ class BitDustApp(styles.AppStyle, MDApp):
     def init_components(self):
         from components import all_components
         all_components.ROOT_APP_PATH = self.ROOT_PATH
+        if _Debug:
+            print('BitDustApp.init_components ROOT_APP_PATH=%r' % all_components.ROOT_APP_PATH)
         Builder.load_string(all_components.KV_IMPORT)
         for kv_file in all_components.KV_FILES:
+            if _Debug:
+                print('    loading %r' % kv_file)
             Builder.load_file(os.path.join(all_components.ROOT_APP_PATH, kv_file))
 
     @mainthread
@@ -279,40 +289,40 @@ class BitDustApp(styles.AppStyle, MDApp):
         context =  mActivity.getApplicationContext()
         return str(context.getPackageName()) + '.Service' + 'Bitdustnode'
 
-    def service_is_running(self):
-        service_name = self.get_service_name()
-        if _Debug:
-            print('BitDustApp.service_is_running', service_name)
-        try:
-            context =  mActivity.getApplicationContext()
-        except:
-            if _Debug:
-                traceback.print_exc()
-        sys_service = mActivity.getSystemService(context.ACTIVITY_SERVICE)
-        manager = cast('android.app.ActivityManager', sys_service)
-        try:
-            lst = manager.getRunningServices(100)
-        except:
-            if _Debug:
-                traceback.print_exc()
-        for service in lst:
-            if service.service.getClassName() == service_name:
-                if _Debug:
-                    print('BitDustApp.service_is_running is True')
-                return True
-        if _Debug:
-            print('BitDustApp.service_is_running is False')
-        return False
+    # def service_is_running(self):
+    #     service_name = self.get_service_name()
+    #     if _Debug:
+    #         print('BitDustApp.service_is_running', service_name)
+    #     try:
+    #         context =  mActivity.getApplicationContext()
+    #     except:
+    #         if _Debug:
+    #             traceback.print_exc()
+    #     sys_service = mActivity.getSystemService(context.ACTIVITY_SERVICE)
+    #     manager = cast('android.app.ActivityManager', sys_service)
+    #     try:
+    #         lst = manager.getRunningServices(100)
+    #     except:
+    #         if _Debug:
+    #             traceback.print_exc()
+    #     for service in lst:
+    #         if service.service.getClassName() == service_name:
+    #             if _Debug:
+    #                 print('BitDustApp.service_is_running is True')
+    #             return True
+    #     if _Debug:
+    #         print('BitDustApp.service_is_running is False')
+    #     return False
 
-    def start_service_if_not_running(self):
-        if _Debug:
-            print('BitDustApp.start_service_if_not_running', self.get_service_name())
-        if self.service_is_running():
-            return
-        svc = autoclass(self.get_service_name())
-        if _Debug:
-            print('BitDustApp.start_service_if_not_running service', svc)
-        svc.start(mActivity, 'bitdust.png', 'BitDust Service', 'Started', '')
+    # def start_service_if_not_running(self):
+    #     if _Debug:
+    #         print('BitDustApp.start_service_if_not_running', self.get_service_name())
+    #     if self.service_is_running():
+    #         return
+    #     svc = autoclass(self.get_service_name())
+    #     if _Debug:
+    #         print('BitDustApp.start_service_if_not_running service', svc)
+    #     svc.start(mActivity, 'bitdust.png', 'BitDust Service', 'Started', '')
 
     def start_engine(self, after_restart=False):
         if not self.main_window.state_node_local:
@@ -325,9 +335,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.start_engine, after_restart=%r' % after_restart)
         self.main_window.engine_is_on = True
         self.main_window.state_process_health = 0
-        if system.is_android():
-            self.start_android_service()
-        else:
+        if not system.is_android():
             self.check_restart_bitdust_process()
         return True
 
@@ -341,10 +349,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.restart_engine')
         self.main_window.state_process_health = 0
-        if system.is_android():
-            self.stop_android_service()
-            Clock.schedule_once(lambda x: self.start_android_service(), .5)
-        else:
+        if not system.is_android():
             self.check_restart_bitdust_process(params=['restart', ])
 
     def redeploy_engine(self):
@@ -370,43 +375,41 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.stop_engine')
         self.main_window.engine_is_on = False
         self.main_window.state_process_health = -1
-        if system.is_android():
-            self.stop_android_service()
-        else:
+        if not system.is_android():
             self.check_restart_bitdust_process(params=['stop', ])
 
-    def start_android_service(self, shutdown=False):
-        if not self.main_window.state_node_local:
-            return False
-        if not system.is_android():
-            return False
-        if _Debug:
-            print('BitDustApp.start_android_service app data path is %r' % system.get_app_data_path())
-        try:
-            if self.main_window.is_screen_active('welcome_screen'):
-                welcome_screen = self.main_window.get_active_screen('welcome_screen')
-                if welcome_screen:
-                    Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
-            self.main_window.engine_log = '\n'
-            self.start_service_if_not_running()
-        except:
-            if _Debug:
-                traceback.print_exc()
-            return False
-        return True
+    # def start_android_service(self, shutdown=False):
+    #     if not self.main_window.state_node_local:
+    #         return False
+    #     if not system.is_android():
+    #         return False
+    #     if _Debug:
+    #         print('BitDustApp.start_android_service app data path is %r' % system.get_app_data_path())
+    #     try:
+    #         if self.main_window.is_screen_active('welcome_screen'):
+    #             welcome_screen = self.main_window.get_active_screen('welcome_screen')
+    #             if welcome_screen:
+    #                 Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
+    #         self.main_window.engine_log = '\n'
+    #         self.start_service_if_not_running()
+    #     except:
+    #         if _Debug:
+    #             traceback.print_exc()
+    #         return False
+    #     return True
 
-    def stop_android_service(self):
-        if not self.main_window.state_node_local:
-            return False
-        if not system.is_android():
-            return False
-        if _Debug:
-            print('BitDustApp.stop_service')
-        self.main_window.engine_log = '\n'
-        self.control.send_process_stop()
-        if _Debug:
-            print('BitDustApp.stop_service about to STOP')
-        return True
+    # def stop_android_service(self):
+    #     if not self.main_window.state_node_local:
+    #         return False
+    #     if not system.is_android():
+    #         return False
+    #     if _Debug:
+    #         print('BitDustApp.stop_service')
+    #     self.main_window.engine_log = '\n'
+    #     self.control.send_process_stop()
+    #     if _Debug:
+    #         print('BitDustApp.stop_service about to STOP')
+    #     return True
 
     def check_restart_bitdust_process(self, params=[]):
         if not self.main_window.state_node_local:
@@ -512,6 +515,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         permissions = []
         if system.android_sdk_version() >= 33:
             permissions = [
+                Permission.CAMERA,
                 Permission.POST_NOTIFICATIONS,
                 Permission.READ_MEDIA_AUDIO,
                 Permission.READ_MEDIA_IMAGES,
@@ -589,7 +593,11 @@ class BitDustApp(styles.AppStyle, MDApp):
 def main():
     if _Debug:
         print('BitDustApp.main   process is starting')
-    BitDustApp().run()
+    try:
+        BitDustApp().run()
+    except Exception as exc:
+        if _Debug:
+            print('Exception raised: %r' % exc)
     if _Debug:
         print('BitDustApp.main   process is finishing')
 

@@ -55,7 +55,7 @@ icon.filename = bitdust.png
 orientation = portrait
 
 # (list) List of service to declare
-services = Bitdustnode:./service/main.py:foreground
+# services = Bitdustnode:./service/main.py:foreground
 
 #
 # OSX Specific
@@ -95,7 +95,7 @@ android.presplash_color = #81A6FF
 android.presplash_lottie = loading_animation.json
 
 # (list) Permissions
-android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_MEDIA_IMAGES,READ_MEDIA_VIDEO,READ_MEDIA_AUDIO,FOREGROUND_SERVICE,DOWNLOAD_WITHOUT_NOTIFICATION,POST_NOTIFICATIONS 
+android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_MEDIA_IMAGES,READ_MEDIA_VIDEO,READ_MEDIA_AUDIO,DOWNLOAD_WITHOUT_NOTIFICATION,POST_NOTIFICATIONS,CAMERA
 
 # (int) Target Android API, should be as high as possible.
 android.api = 34
@@ -238,7 +238,7 @@ android.allow_backup = True
 #android.uses_library =
 
 # (str) Android logcat filters to use
-android.logcat_filters = *:S python:D Bitdustnode:D ServiceBitdustnode:D
+android.logcat_filters = *:S python:D Bitdustnode:D
 
 # (bool) Copy library instead of making a libpymodules.so
 #android.copy_libs = 1
@@ -269,7 +269,7 @@ android.release_artifact = aab
 # p4a.source_dir = ../cache/python-for-android
 
 # (str) The directory in which python-for-android should look for your own build recipes (if any)
-p4a.local_recipes = ./recipes/
+# p4a.local_recipes = ./recipes/
 
 # (str) Filename to the hook for p4a
 #p4a.hook =

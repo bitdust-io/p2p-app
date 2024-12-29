@@ -566,20 +566,15 @@ class SettingsScreen(screen.AppScreen):
     def on_devices_list_result(self, resp):
         if _Debug:
             print('SettingsScreen.on_devices_list_result', resp)
+        dlv = self.ids.settings_tabs.ids.carousel.slides[0].ids.devices_list_view
+        dlv.clear_widgets()
+        dlv.add_widget(NewDeviceItem())
         if not isinstance(resp, dict):
             return
         if not api_client.is_ok(resp):
             return
         result = api_client.response_result(resp)
         if not result:
-            return
-        try:
-            dlv = self.ids.settings_tabs.ids.carousel.slides[0].ids.devices_list_view
-            dlv.clear_widgets()
-            dlv.add_widget(NewDeviceItem())
-        except:
-            import traceback
-            traceback.print_exc()
             return
         if _Debug:
             print('SettingsScreen.on_devices_list_result', dlv, result)

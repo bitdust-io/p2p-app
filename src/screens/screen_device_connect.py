@@ -58,13 +58,7 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
         screen.select_screen(
             screen_id='scan_qr_screen',
             scan_qr_callback=self.on_scan_qr_ready,
-            cancel_callback=self.on_scan_qr_cancel,
         )
-
-    def on_scan_qr_cancel(self, *args):
-        if _Debug:
-            print('TabRemoteDevice.on_scan_qr_cancel', args)
-        screen.screen_back()
 
     def on_scan_qr_ready(self, *args):
         if _Debug:
@@ -163,6 +157,8 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
         self.server_code_input_dialog = None
         if not inp:
             self.ids.qr_scan_open_button.disabled = False
+            if web_sock_remote.is_started():
+                web_sock_remote.stop()
             return
         client_code = web_sock_remote.continue_handshake(server_code=inp)
         self.confirmation_code_dialog = dialogs.open_message_dialog(

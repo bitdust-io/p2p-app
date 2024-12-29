@@ -94,7 +94,7 @@ def all_screens():
         'my_storage_info_screen': (
             'screens/screen_my_storage_info.kv', 'screens.screen_my_storage_info', 'MyStorageInfoScreen', ),
         'scan_qr_screen': (
-            None, 'screens.screen_scan_qr', 'ScanQRScreen', ),
+            'screens/screen_scan_qr.kv', 'screens.screen_scan_qr', 'ScanQRScreen', ),
     }
 
 
@@ -142,7 +142,12 @@ class Controller(object):
         self.is_local = None
 
     def verify_device_ready(self):
-        if self.mw().state_node_local:
+        if _Debug:
+            print('Controller.verify_device_ready', self.mw().state_node_local, self.mw().state_device_authorized)
+        if self.mw().state_node_local is None:
+            self.mw().select_screen('device_connect_screen')
+            return False
+        if self.mw().state_node_local is True:
             return True
         if self.mw().state_device_authorized:
             return True

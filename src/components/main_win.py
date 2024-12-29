@@ -70,7 +70,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
     selected_screen = StringProperty('')
     dropdown_menu = ObjectProperty(None)
 
-    state_node_local = BooleanProperty(True)
+    state_node_local = ObjectProperty(None)
     state_device_authorized = BooleanProperty(False)
     state_process_health = NumericProperty(-1)
     state_identity_get = NumericProperty(-1)
@@ -133,7 +133,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
     def is_screen_selectable(self, screen_id):
         if not self.control:
             return False
-        if not self.state_node_local:
+        if self.state_node_local is False:
             if not self.state_device_authorized:
                 return screen_id in ['device_connect_screen', 'about_screen', ]
         if self.state_process_health != 1:
@@ -150,7 +150,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
     def update_menu_items(self):
         if not self.control:
             return
-        if not self.state_node_local:
+        if self.state_node_local is False:
             if self.state_device_authorized:
                 if self.state_process_health != 1:
                     self.menu().ids.menu_item_status.disabled = True

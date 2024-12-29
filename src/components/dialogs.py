@@ -104,6 +104,7 @@ def open_number_input_dialog(title, text, max_text_length=6, button_confirm='Con
         width=dp(360),
         auto_dismiss=False,
     )
+    popup.update_width = lambda *args: None
     popup.open()
     return popup
 
@@ -131,6 +132,7 @@ def open_message_dialog(title, text, button_confirm='Confirm', cb=None):
         width=dp(360),
         auto_dismiss=False,
     )
+    popup.update_width = lambda *args: None
     popup.open()
     return popup
 
@@ -170,5 +172,6 @@ def open_spinner_dialog(title, label='', button_cancel=None, cb_cancel=None):
         auto_dismiss=False,
         on_dismiss=on_dismiss,
     )
+    popup.update_width = lambda *args: None
     popup.open()
     return popup

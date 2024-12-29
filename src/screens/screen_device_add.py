@@ -20,6 +20,7 @@ class DeviceAddScreen(screen.AppScreen):
     def clean_view(self, clear_input_field=False):
         if clear_input_field:
             self.ids.device_name_input.text = ''
+            self.ids.device_name_input.focus = True
             self.ids.routed_connection_switch_button.active = True
             self.ids.port_number_input.text = '8282'
 
@@ -30,6 +31,7 @@ class DeviceAddScreen(screen.AppScreen):
         if _Debug:
             print('DeviceAddScreen.on_add_device_button_clicked', args, self.ids.device_name_input.text, self.ids.routed_connection_switch_button.active, int(self.ids.port_number_input.text))
         if not self.ids.device_name_input.text:
+            self.ids.device_name_input.focus = True
             return
         api_client.device_add(
             name=self.ids.device_name_input.text.replace(' ', '_'),
