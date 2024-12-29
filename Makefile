@@ -26,12 +26,10 @@
 
 REQUIREMENTS_TXT:=requirements.txt
 
-REQUIREMENTS_ANDROID:="kivy==2.1.0,kivymd==1.0.2,PIL,sdl,plyer,pyjnius,service_identity,pyparsing,appdirs,cffi,six,pycryptodome,attrs,hyperlink,idna,cryptography,automat,android,toml,incremental,twisted,python3"
-
 OS=$(shell lsb_release -si 2>/dev/null || uname)
 PIP:="venv/bin/pip"
 PYTHON="venv/bin/python"
-PYTHON_VERSION=python3.9
+PYTHON_VERSION=python3
 
 .PHONY: clean pyclean
 

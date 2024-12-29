@@ -38,7 +38,7 @@ from ._exceptions import *
 from . import _logging
 
 
-_Debug = True
+_Debug = False
 
 
 __all__ = ["WebSocketApp"]
