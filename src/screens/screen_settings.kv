@@ -1,3 +1,36 @@
+<NewDeviceItem>:
+    text: 'New device'
+    divider: None
+    on_release: root.on_pressed()
+
+    CustomIconLeftWidget:
+        icon: 'qrcode-scan'
+        padding: (0, 0, 0, 0)
+        pos_hint: {'center_y': 0.5}
+        md_bg_color: app.theme_cls.accent_color
+        theme_text_color: "Custom"
+        text_color: app.color_white
+        on_release: root.on_pressed()
+
+
+<DeviceItem>:
+    text: root.name
+    secondary_text: root.get_secondary_text()
+    divider: None
+    on_release: root.on_pressed()
+    _txt_top_pad: dp(4)
+    _txt_bot_pad: dp(4)
+
+    CustomIconLeftWidget:
+        icon: 'account'
+        padding: (0, 0, 0, 0)
+        pos_hint: {'center_y': 0.5}
+        md_bg_color: app.theme_cls.primary_color
+        theme_text_color: "Custom"
+        text_color: app.color_white
+        on_release: root.on_pressed()
+
+
 # <OptionValueTextInput>:
 #     size_hint_x: None
 #     size_hint_y: None
@@ -290,6 +323,33 @@
     hide_root: True
 
 
+<TabDevices>:
+
+    VerticalScrollView:
+        id: devices_scroll_view
+
+        MDList:
+            id: devices_list_view
+            pos_hint: {'top': 1}
+
+
+<TabOptions>:
+
+    VerticalScrollView:
+        id: options_scroll_view
+
+        PageContainerWithLeftPaddingLayout:
+            size_hint: None, None
+            width: root.width - app.scroll_bar_width
+            height: self.minimum_height
+
+            SettingsTreeView:
+                id: options_settings_tree
+                pos_hint: {'top': 1}
+                size_hint: 1, None
+                height: self.minimum_height
+
+
 <SettingsScreen>:
 
     ScreenContainerLayout:
@@ -298,27 +358,18 @@
 
         AppScreenLayout:
 
-            HorizontalContainerLayout:
+			MDTabs:
+				id: settings_tabs
+				anim_duration: 0
+				background_color: (1, 1, 1, 0)
+				text_color_normal: (0, 0, 0, .5)
+				text_color_active: self.theme_cls.primary_color
+        		on_tab_switch: root.on_tab_switched(*args)
 
-                StatusLabel:
-                    id: status_label
-                    size_hint: 1, None
-                    height: self.texture_size[1]
-                    text: ''
+				TabDevices:
+					title: "Devices"
 
-            VerticalScrollView:
-                id: scroll_view
-
-                PageContainerWithLeftPaddingLayout:
-                    size_hint: None, None
-                    width: root.width - app.scroll_bar_width
-                    height: self.minimum_height
-
-                    SettingsTreeView:
-                        id: settings_tree
-                        pos_hint: {'top': 1}
-                        size_hint: 1, None
-                        height: self.minimum_height
+				TabOptions:
+					title: "Options"
 
         BottomEmptyScreenSpace:
-

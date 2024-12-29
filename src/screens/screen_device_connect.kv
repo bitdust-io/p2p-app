@@ -1,0 +1,143 @@
+<TabLocalDevice>:
+
+    VerticalScrollView:
+        id: tab_local_device_view
+
+        PageContainerWithLeftPaddingLayout:
+            size_hint: None, None
+            width: root.width - app.scroll_bar_width
+            height: self.minimum_height
+
+	        MarkupLabel:
+	            pos_hint: {'top': 1}
+	            size_hint_y: None
+	            text_size: self.width, None
+	            height: self.texture_size[1]
+	            color: app.color_black
+	            text:
+	            	"""
+	            	[size=20sp][b]Local BitDust Node[/b][/size]\n
+		            BitDust engine will be running in background on this machine.\n
+		            This type of connection is only available for Desktop platforms.\n"""
+
+			VFixedEmptySpace:
+
+            FillRoundFlatButton:
+                id: local_device_button
+                text: "[size=16sp][b]confirm[/b][/size]"
+                md_bg_color: app.theme_cls.accent_color
+                theme_text_color: "Custom"
+                text_color: app.color_white99
+                pos_hint: {'left': 0}
+                on_release: root.on_local_device_button_clicked()
+
+
+<TabRemoteDevice>:
+
+    VerticalScrollView:
+        id: tab_remote_device_view
+
+        PageContainerWithLeftPaddingLayout:
+            size_hint: None, None
+            width: root.width - app.scroll_bar_width
+            height: self.minimum_height
+
+	        MarkupLabel:
+	            pos_hint: {'top': 1}
+	            size_hint_y: None
+	            text_size: self.width, None
+	            height: self.texture_size[1]
+	            color: app.color_black
+	            text:
+	            	"""
+	            	[size=20sp][b]Remotely running BitDust Node[/b][/size]\n
+	            	BitDust engine is running on another Desktop computer under your control and this App will be connected remotely.\n
+	            	Open BitDust p2p-app on your Desktop, go to Menu -> Settings -> Devices and create a new device configuration.\n
+	            	Scan QR code displayed on your screen and be ready to enter 6-digits security code.\n
+	            	Connection will be established automatically\n"""
+
+			VFixedEmptySpace:
+
+            FillRoundFlatButton:
+                id: qr_scan_open_button
+                text: "[size=18sp]{}[/size]  [size=16sp][b]scan QR code[/b][/size]".format(md_icon("barcode-scan"))
+                md_bg_color: app.theme_cls.primary_color
+                theme_text_color: "Custom"
+                text_color: app.color_white99
+                pos_hint: {'left': 0}
+                on_release: root.on_qr_scan_open_button_clicked()
+
+			VFixedEmptySpace:
+
+            FillRoundFlatButton:
+                id: remote_device_button
+                text: "[size=16sp][b]confirm[/b][/size]"
+                md_bg_color: app.theme_cls.accent_color
+                theme_text_color: "Custom"
+                text_color: app.color_white99
+                pos_hint: {'left': 0}
+                disabled: True
+                on_release: root.on_remote_device_button_clicked()
+
+
+<TabCloudServer>:
+
+    VerticalScrollView:
+        id: tab_cloud_server_view
+
+        PageContainerWithLeftPaddingLayout:
+            size_hint: None, None
+            width: root.width - app.scroll_bar_width
+            height: self.minimum_height
+
+	        MarkupLabel:
+	            pos_hint: {'top': 1}
+	            size_hint_y: None
+	            text_size: self.width, None
+	            height: self.texture_size[1]
+	            color: app.color_black
+	            text:
+		            """
+		            [size=20sp][b]BitDust Node on headless server[/b][/size]\n
+	            	BitDust engine is running on your VPS, dedicated server or in a docker image and this App will be connected remotely.\n
+	            	At the moment this feature is under construction.\n"""
+
+			VFixedEmptySpace:
+
+            FillRoundFlatButton:
+                id: cloud_device_button
+                text: "[size=16sp][b]confirm[/b][/size]"
+                md_bg_color: app.theme_cls.accent_color
+                theme_text_color: "Custom"
+                text_color: app.color_white99
+                pos_hint: {'left': 0}
+                disabled: True
+                on_release: root.on_cloud_device_button_clicked()
+
+
+<DeviceConnectScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+			MDTabs:
+				id: selection_tabs
+				anim_duration: 0
+				background_color: (1, 1, 1, 0)
+				text_color_normal: (0, 0, 0, .5)
+				text_color_active: self.theme_cls.primary_color
+        		on_tab_switch: root.on_tab_switched(*args)
+
+				TabLocalDevice:
+					title: "Local"
+
+				TabRemoteDevice:
+					title: "Remote"
+
+				TabCloudServer:
+					title: "Cloud server"
+
+        BottomEmptyScreenSpace:

@@ -36,8 +36,34 @@ def control():
     return my_app().control
 
 
-def select_screen(screen_id, verify_state=False, screen_type=None, **kwargs):
-    return main_window().select_screen(screen_id, verify_state=verify_state, screen_type=screen_type, **kwargs)
+def select_screen(screen_id, verify_state=False, screen_type=None, clear_stack=False, **kwargs):
+    return main_window().select_screen(
+        screen_id,
+        verify_state=verify_state,
+        screen_type=screen_type,
+        clear_stack=clear_stack,
+        **kwargs,
+    )
+
+
+def close_screen(screen_id):
+    return main_window().close_screen(screen_id)
+
+
+def close_active_screens(exclude_screens=[]):
+    return main_window().close_active_screens(exclude_screens=exclude_screens)
+
+
+def screen_back():
+    return main_window().screen_back()
+
+
+def stack_clear():
+    main_window().screens_stack.clear()
+
+
+def stack_append(screen_id):
+    main_window().screens_stack.append(screen_id)
 
 
 def model(model_name=None, snap_id=None):

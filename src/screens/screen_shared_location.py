@@ -222,13 +222,13 @@ class SharedLocationScreen(screen.AppScreen):
         if _Debug:
             print('SharedLocationScreen.on_grant_access_button_clicked', args)
         if self.model('correspondent'):
-            self.main_win().select_screen(
+            screen.select_screen(
                 screen_id='select_friend_screen',
                 result_callback=self.on_grant_access_user_selected,
                 screen_header='Select user to be granted access to the shared location [b]%s[/b]:' % self.label,
             )
         else:
-            self.main_win().select_screen(screen_id='friends_screen')
+            screen.select_screen('friends_screen')
 
     def on_grant_access_user_selected(self, user_global_id):
         if _Debug:
@@ -239,7 +239,7 @@ class SharedLocationScreen(screen.AppScreen):
             key_id=self.key_id,
             label=self.label,
         )
-        self.main_win().close_screen(screen_id='select_friend_screen')
+        screen.close_screen('select_friend_screen')
         api_client.share_grant(
             key_id=self.key_id,
             trusted_user_id=user_global_id,
@@ -258,7 +258,7 @@ class SharedLocationScreen(screen.AppScreen):
         if _Debug:
             print('SharedLocationScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'information':
-            self.main_win().select_screen(
+            screen.select_screen(
                 screen_id='shared_location_info_{}'.format(self.key_id),
                 screen_type='shared_location_info_screen',
                 key_id=self.key_id,
@@ -309,6 +309,6 @@ class SharedLocationScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
         else:
-            self.main_win().select_screen('shares_screen')
-            self.main_win().close_screen(screen_id='shared_location_{}'.format(key_id))
+            screen.select_screen('shares_screen')
+            screen.close_screen('shared_location_{}'.format(key_id))
             snackbar.success(text='shared location deleted')

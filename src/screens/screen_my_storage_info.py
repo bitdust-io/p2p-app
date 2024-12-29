@@ -19,14 +19,14 @@ my_consumed_storage_details_temlate_text = """
 [color=#909090]used per supplier:[/color] {used_per_supplier}
 [color=#909090]available per supplier:[/color] {available_per_supplier}[/size]
 
-[size={header_text_size}][b]my files[/b][/size]
+[size={header_text_size}][b][u][color=#0000ff][ref=my_files]my files[/ref][/color][/u][/b][/size]
 [size={text_size}][color=#909090]catalog items:[/color] {my_catalog_items}
 [color=#909090]files:[/color] {my_files}
 [color=#909090]files size:[/color] {my_files_size}
 [color=#909090]distributed data:[/color] {my_backups_size}
 [color=#909090]my keys:[/color] {my_keys}[/size]
 
-[size={header_text_size}][b]shared files[/b][/size]
+[size={header_text_size}][b][u][color=#0000ff][ref=shared_files]shared files[/ref][/color][/u][/b][/size]
 [size={text_size}][color=#909090]catalog items:[/color] {shared_catalog_items}
 [color=#909090]files:[/color] {shared_files}
 [color=#909090]files size:[/color] {shared_files_size}
@@ -168,13 +168,19 @@ class MyStorageInfoScreen(screen.AppScreen):
             diskfree_percent=result.get('diskfree_percent', ''),
         )
 
-    def on_my_donated_storage_details_ref_pressed(self, *args):
+    def on_my_consumed_storage_details_ref_pressed(self, *args):
         if _Debug:
-            print('MyStorageInfoScreen.on_my_donated_storage_details_ref_pressed', args)
-        # if args[1] == 'new_identity':
-        #     self.main_win().select_screen('new_identity_screen')
-        # elif args[1] == 'recover_identity':
-        #     self.main_win().select_screen('recover_identity_screen')
+            print('MyStorageInfoScreen.on_my_consumed_storage_details_ref_pressed', args)
+        if args[1] == 'my_files':
+            screen.select_screen('private_files_screen')
+        elif args[1] == 'shared_files':
+            screen.select_screen('shares_screen')
+        elif args[1] == 'needed_space':
+            scr = screen.select_screen('settings_screen')
+            if scr:
+                scr.open_item('services')
+                scr.open_item('services/customer')
+                scr.scroll_to_item('services/customer')
 
     def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:

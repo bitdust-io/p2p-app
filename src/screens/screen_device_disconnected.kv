@@ -1,0 +1,31 @@
+<DeviceDisconnectedScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            VEmptySpace:
+                size_hint_y: 0.5
+
+			CircularProgressBar:
+				id: spinner
+				size_hint: (None, None)
+				size: dp(100), dp(100)
+                halign: 'center'
+                pos_hint: {'center_x': .5}
+                max: 360
+
+            MarkupLabel:
+				id: text_label
+				size_hint: (0.8, None)
+				height: dp(180)
+				halign: 'center'
+                pos_hint: {'center_x': .5}
+                on_ref_press: root.on_text_label_ref_pressed(*args)
+
+            VEmptySpace:
+                size_hint_y: 0.5
+
+        BottomEmptyScreenSpace:

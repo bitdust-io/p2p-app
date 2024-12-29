@@ -1,5 +1,4 @@
-# from kivy.clock import Clock  # @UnresolvedImport
-# from kivy.metrics import dp
+from kivy.clock import Clock
 
 #------------------------------------------------------------------------------
 
@@ -9,17 +8,18 @@ from components import webfont
 from components import screen
 from components import buttons
 from components import labels
-# from components import spinner
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
 class WelcomeScreen(screen.AppScreen):
 
-    verify_network_connected_task = None
+    def __init__(self, **kw):
+        self.refresh_task = None
+        super(WelcomeScreen, self).__init__(**kw)
 
     def get_statuses(self):
         return {
@@ -36,6 +36,13 @@ class WelcomeScreen(screen.AppScreen):
         }
 
     def populate(self):
+        if self.refresh_task:
+            self.refresh_task.cancel()
+            self.refresh_task = None
+        self.refresh_task = Clock.schedule_once(lambda dt: self.do_populate(), 0.01)
+
+    def do_populate(self):
+        self.refresh_task = None
         process_health = self.main_win().state_process_health
         identity_get = self.main_win().state_identity_get
         network_connected = self.main_win().state_network_connected
@@ -49,87 +56,111 @@ class WelcomeScreen(screen.AppScreen):
                     self.ids.central_widget.remove_widget(w)
                 if isinstance(w, labels.HFlexMarkupLabel):
                     self.ids.central_widget.remove_widget(w)
+            if _Debug:
+                print('    spinner starting, removed widgets')
         else:
             if identity_get == 0:
-                self.ids.spinner.stop()
-                btn_exists = False
-                for w in self.ids.central_widget.children:
-                    if isinstance(w, buttons.FillRoundFlatButton):
-                        btn_exists = True
-                        break
-                if not btn_exists:
-                    btn = buttons.FillRoundFlatButton(
-                        text="[size=22sp]{}[/size]  [size=16sp][b]create new identity[/b][/size]".format(webfont.md_icon("account-plus")),
-                        pos_hint={'center_x': .5},
-                        md_bg_color=self.app().color_success_green,
-                        text_color=self.app().color_white99,
-                        on_release=self.on_create_identity_button_clicked,
-                    )
-                    lbl = labels.HFlexMarkupLabel(
-                        pos_hint={'center_x': .5},
-                        markup=True,
-                        text="[u][color=#0000ff][ref=link]restore existing identity[/ref][/color][/u]",
-                    )
-                    lbl.bind(on_ref_press=self.on_restore_existing_identity_pressed)
-                    self.ids.central_widget.add_widget(btn)
-                    self.ids.central_widget.add_widget(lbl)
-            else:
+                self.ids.spinner.start(label='starting')
                 for w in self.ids.central_widget.children:
                     if isinstance(w, buttons.FillRoundFlatButton):
                         self.ids.central_widget.remove_widget(w)
                     if isinstance(w, labels.HFlexMarkupLabel):
                         self.ids.central_widget.remove_widget(w)
-                if network_connected != 1:
-                    self.ids.spinner.start(label='connecting')
-                else:
+                if _Debug:
+                    print('    spinner starting, removed widgets')
+            else:
+                if identity_get == -1:
                     self.ids.spinner.stop()
-                    if identity_get == 1:
-                        link_exists = False
-                        for w in self.ids.central_widget.children:
-                            if isinstance(w, labels.HFlexMarkupLabel):
-                                if w.text.count('search people'):
-                                    link_exists = True
-                                    break
-                        if not link_exists:
-                            link_search_people = labels.HFlexMarkupLabel(
-                                pos_hint={'center_x': .5}, markup=True,
-                                text="[u][color=#0000ff][ref=link]search people[/ref][/color][/u]",
-                            )
-                            link_search_people.bind(on_ref_press=self.on_search_people_link_pressed)
-                            self.ids.central_widget.add_widget(link_search_people)
-                            link_chat = labels.HFlexMarkupLabel(
-                                pos_hint={'center_x': .5}, markup=True,
-                                text="[u][color=#0000ff][ref=link]chat with friends[/ref][/color][/u]",
-                            )
-                            link_chat.bind(on_ref_press=self.on_chat_with_friends_link_pressed)
-                            self.ids.central_widget.add_widget(link_chat)
-                            link_upload_file = labels.HFlexMarkupLabel(
-                                pos_hint={'center_x': .5}, markup=True,
-                                text="[u][color=#0000ff][ref=link]upload a file[/ref][/color][/u]",
-                            )
-                            link_upload_file.bind(on_ref_press=self.on_upload_file_link_pressed)
-                            self.ids.central_widget.add_widget(link_upload_file)
-                            link_share_file = labels.HFlexMarkupLabel(
-                                pos_hint={'center_x': .5}, markup=True,
-                                text="[u][color=#0000ff][ref=link]share a file[/ref][/color][/u]",
-                            )
-                            link_share_file.bind(on_ref_press=self.on_share_file_link_pressed)
-                            self.ids.central_widget.add_widget(link_share_file)
-
-    def on_search_people_link_pressed(self, instance, value):
-        self.main_win().select_screen('search_people_screen')
-
-    def on_chat_with_friends_link_pressed(self, instance, value):
-        self.main_win().select_screen('conversations_screen')
-
-    def on_upload_file_link_pressed(self, instance, value):
-        self.main_win().select_screen('private_files_screen')
-
-    def on_share_file_link_pressed(self, instance, value):
-        self.main_win().select_screen('shares_screen')
+                    if _Debug:
+                        print('    spinner stopped')
+                    btn_exists = False
+                    for w in self.ids.central_widget.children:
+                        if isinstance(w, buttons.FillRoundFlatButton):
+                            btn_exists = True
+                            break
+                    if not btn_exists:
+                        btn = buttons.FillRoundFlatButton(
+                            text="[size=22sp]{}[/size]  [size=16sp][b]create new identity[/b][/size]".format(webfont.md_icon("account-plus")),
+                            pos_hint={'center_x': .5},
+                            md_bg_color=self.app().color_success_green,
+                            text_color=self.app().color_white99,
+                            on_release=self.on_create_identity_button_clicked,
+                        )
+                        lbl = labels.HFlexMarkupLabel(
+                            pos_hint={'center_x': .5},
+                            markup=True,
+                            text="[u][color=#0000ff][ref=link]restore existing identity[/ref][/color][/u]",
+                        )
+                        lbl.bind(on_ref_press=self.on_restore_existing_identity_pressed)
+                        self.ids.central_widget.add_widget(btn)
+                        self.ids.central_widget.add_widget(lbl)
+                        if _Debug:
+                            print('    added create/restore identity buttons')
+                else:
+                    for w in self.ids.central_widget.children:
+                        if isinstance(w, buttons.FillRoundFlatButton):
+                            self.ids.central_widget.remove_widget(w)
+                        if isinstance(w, labels.HFlexMarkupLabel):
+                            self.ids.central_widget.remove_widget(w)
+                    if _Debug:
+                        print('    removed widgets')
+                    if network_connected != 1:
+                        self.ids.spinner.start(label='connecting')
+                        if _Debug:
+                            print('    spinner connecting')
+                    else:
+                        self.ids.spinner.stop()
+                        if _Debug:
+                            print('    spinner stopped')
+                        if identity_get == 1:
+                            link_exists = False
+                            for w in self.ids.central_widget.children:
+                                if isinstance(w, labels.HFlexMarkupLabel):
+                                    if w.text.count('search people'):
+                                        link_exists = True
+                                        break
+                            if not link_exists:
+                                link_search_people = labels.HFlexMarkupLabel(
+                                    pos_hint={'center_x': .5}, markup=True,
+                                    text="[u][color=#0000ff][ref=link]search people[/ref][/color][/u]",
+                                )
+                                link_search_people.bind(on_ref_press=self.on_search_people_link_pressed)
+                                self.ids.central_widget.add_widget(link_search_people)
+                                link_chat = labels.HFlexMarkupLabel(
+                                    pos_hint={'center_x': .5}, markup=True,
+                                    text="[u][color=#0000ff][ref=link]chat with friends[/ref][/color][/u]",
+                                )
+                                link_chat.bind(on_ref_press=self.on_chat_with_friends_link_pressed)
+                                self.ids.central_widget.add_widget(link_chat)
+                                link_upload_file = labels.HFlexMarkupLabel(
+                                    pos_hint={'center_x': .5}, markup=True,
+                                    text="[u][color=#0000ff][ref=link]upload a file[/ref][/color][/u]",
+                                )
+                                link_upload_file.bind(on_ref_press=self.on_upload_file_link_pressed)
+                                self.ids.central_widget.add_widget(link_upload_file)
+                                link_share_file = labels.HFlexMarkupLabel(
+                                    pos_hint={'center_x': .5}, markup=True,
+                                    text="[u][color=#0000ff][ref=link]share a file[/ref][/color][/u]",
+                                )
+                                link_share_file.bind(on_ref_press=self.on_share_file_link_pressed)
+                                self.ids.central_widget.add_widget(link_share_file)
+                                if _Debug:
+                                    print('    added links')
 
     def call_identity_get(self):
         api_client.identity_get(cb=self.on_identity_get_result)
+
+    def on_search_people_link_pressed(self, instance, value):
+        screen.select_screen('search_people_screen')
+
+    def on_chat_with_friends_link_pressed(self, instance, value):
+        screen.select_screen('conversations_screen')
+
+    def on_upload_file_link_pressed(self, instance, value):
+        screen.select_screen('private_files_screen')
+
+    def on_share_file_link_pressed(self, instance, value):
+        screen.select_screen('shares_screen')
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='initializer')
@@ -141,7 +172,7 @@ class WelcomeScreen(screen.AppScreen):
         pass
 
     def on_create_identity_button_clicked(self, *args):
-        self.main_win().select_screen('new_identity_screen')
+        screen.select_screen('new_identity_screen')
 
     def on_identity_get_result(self, resp):
         if _Debug:
@@ -159,4 +190,4 @@ class WelcomeScreen(screen.AppScreen):
             print('WelcomeScreen.on_upload_file_button_clicked', args)
 
     def on_restore_existing_identity_pressed(self, instance, value):
-        self.main_win().select_screen('recover_identity_screen')
+        screen.select_screen('recover_identity_screen')

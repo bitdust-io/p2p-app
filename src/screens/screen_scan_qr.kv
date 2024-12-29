@@ -1,0 +1,28 @@
+<CameraContainer>:
+	id: proxy
+    size_hint: 1, 1
+
+    Camera:
+        id: camera_instance
+        resolution: (640, 480)
+        center: self.size and proxy.center
+        fit_mode: 'contain'
+        size: (proxy.height, proxy.width) if root.is_android else (proxy.width, proxy.height)
+
+        canvas.before:
+            PushMatrix
+            Rotate:
+                angle: -90 if root.is_android else 0
+                origin: self.center
+        canvas.after:
+            PopMatrix
+
+
+<ScanQRScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+        	id: container

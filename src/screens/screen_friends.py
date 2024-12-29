@@ -1,8 +1,9 @@
 from kivy.metrics import dp
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
-from kivymd.uix.list import OneLineIconListItem
-from kivymd.uix.list import TwoLineIconListItem
+from kivymd.uix.list import OneLineIconListItem, TwoLineIconListItem
+
+#------------------------------------------------------------------------------
 
 from lib import api_client
 

@@ -162,13 +162,13 @@ class GroupChatScreen(screen.AppScreen):
             print('GroupChatScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'account-plus':
             if self.model('correspondent'):
-                self.main_win().select_screen(
+                screen.select_screen(
                     screen_id='select_friend_screen',
                     result_callback=self.on_user_selected,
                     screen_header='Select user to be invited to the group [b]%s[/b]:' % self.label,
                 )
             else:
-                self.main_win().select_screen(screen_id='friends_screen')
+                screen.select_screen('friends_screen')
         elif btn.icon == 'human-greeting-proximity':
             api_client.group_join(
                 group_key_id=self.global_id,
@@ -193,7 +193,7 @@ class GroupChatScreen(screen.AppScreen):
                 cb=self.on_group_close_result,
             )
         elif btn.icon == 'information':
-            self.main_win().select_screen(
+            screen.select_screen(
                 screen_id='info_'+self.global_id,
                 screen_type='group_info_screen',
                 global_id=self.global_id,
@@ -205,13 +205,13 @@ class GroupChatScreen(screen.AppScreen):
     def on_user_selected(self, user_global_id):
         if _Debug:
             print('GroupChatScreen.on_user_selected', user_global_id)
-        self.main_win().select_screen(
+        screen.select_screen(
             screen_id=self.global_id,
             screen_type='group_chat_screen',
             global_id=self.global_id,
             label=self.label,
         )
-        self.main_win().close_screen(screen_id='select_friend_screen')
+        screen.close_screen('select_friend_screen')
         api_client.group_share(
             group_key_id=self.global_id,
             trusted_user_id=user_global_id,
@@ -237,15 +237,15 @@ class GroupChatScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp), bottom=False)
         else:
-            self.main_win().select_screen('conversations_screen')
-            self.main_win().close_screen(screen_id=self.global_id)
+            screen.select_screen('conversations_screen')
+            screen.close_screen(self.global_id)
 
     def on_group_close_result(self, resp):
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp), bottom=False)
         else:
-            self.main_win().select_screen('conversations_screen')
-            self.main_win().close_screen(screen_id=self.global_id)
+            screen.select_screen('conversations_screen')
+            screen.close_screen(self.global_id)
 
     def on_group_reconnect_result(self, resp):
         if not api_client.is_ok(resp):

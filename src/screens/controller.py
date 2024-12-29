@@ -13,12 +13,14 @@ from kivy.clock import Clock
 #------------------------------------------------------------------------------
 
 from lib import system
-from lib import web_sock
 from lib import api_client
+from lib import web_sock
+from lib import web_sock_remote
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
+_DebugModelUpdates = False
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -26,7 +28,7 @@ _Debug = False
 # 2. create new file screens/screen_xxx.kv
 # 3. create new file screens/screen_xxx.py
 # 4. make changes in components.main_win.MainWin.select_screen() if it is required for screen identification
-# 5. to open screen use: screen.main_window().select_screen(screen_id='xxx_screen')
+# 5. to open screen use: screen.select_screen(screen_id='xxx_screen')
 #------------------------------------------------------------------------------ 
 
 def all_screens():
@@ -37,6 +39,14 @@ def all_screens():
             'screens/screen_engine_status.kv', 'screens.screen_engine_status', 'EngineStatusScreen', ),
         'connecting_screen': (
             'screens/screen_connecting.kv', 'screens.screen_connecting', 'ConnectingScreen', ),
+        'device_add_screen': (
+            'screens/screen_device_add.kv', 'screens.screen_device_add', 'DeviceAddScreen', ),
+        'device_info_screen': (
+            'screens/screen_device_info.kv', 'screens.screen_device_info', 'DeviceInfoScreen', ),
+        'device_connect_screen': (
+            'screens/screen_device_connect.kv', 'screens.screen_device_connect', 'DeviceConnectScreen', ),
+        'device_disconnected_screen': (
+            'screens/screen_device_disconnected.kv', 'screens.screen_device_disconnected', 'DeviceDisconnectedScreen', ),
         'new_identity_screen': (
             'screens/screen_new_identity.kv', 'screens.screen_new_identity', 'NewIdentityScreen', ),
         'recover_identity_screen': (
@@ -83,6 +93,8 @@ def all_screens():
             'screens/screen_single_shared_file.kv', 'screens.screen_single_shared_file', 'SingleSharedFileScreen', ),
         'my_storage_info_screen': (
             'screens/screen_my_storage_info.kv', 'screens.screen_my_storage_info', 'MyStorageInfoScreen', ),
+        'scan_qr_screen': (
+            'screens/screen_scan_qr.kv', 'screens.screen_scan_qr', 'ScanQRScreen', ),
     }
 
 
@@ -127,6 +139,20 @@ class Controller(object):
         self.remote_files_details = {}
         self.my_global_id = None
         self.my_idurl = None
+        self.is_local = None
+
+    def verify_device_ready(self):
+        if _Debug:
+            print('Controller.verify_device_ready', self.mw().state_node_local, self.mw().state_device_authorized)
+        if self.mw().state_node_local is None:
+            self.mw().select_screen('device_connect_screen')
+            return False
+        if self.mw().state_node_local is True:
+            return True
+        if self.mw().state_device_authorized:
+            return True
+        self.mw().select_screen('device_connect_screen')
+        return False
 
     def mw(self):
         return self.app.main_window
@@ -134,17 +160,38 @@ class Controller(object):
     def start(self):
         if _Debug:
             print('Controller.start')
+        if self.mw().state_node_local:
+            api_client.set_web_sock_type('local')
+        else:
+            if not self.mw().state_device_authorized:
+                raise Exception('device was not authorized')
+            api_client.set_web_sock_type('remote')
         self.enabled = True
-        web_sock.start(
-            callbacks={
-                'on_open': self.on_websocket_open,
-                'on_error': self.on_websocket_error,
-                'on_stream_message': self.on_websocket_stream_message,
-                'on_event': self.on_websocket_event,
-                'on_model_update': self.on_model_update,
-            },
-            api_secret_filepath=os.path.join(system.get_app_data_path(), 'apisecret'),
-        )
+        if self.mw().state_node_local:
+            self.is_local = True
+            web_sock.start(
+                callbacks={
+                    'on_open': self.on_websocket_open,
+                    'on_error': self.on_websocket_error,
+                    'on_stream_message': self.on_websocket_stream_message,
+                    'on_event': self.on_websocket_event,
+                    'on_model_update': self.on_model_update,
+                },
+                api_secret_filepath=os.path.join(system.get_app_data_path(), 'apisecret'),
+            )
+        else:
+            self.is_local = False
+            web_sock_remote.start(
+                callbacks={
+                    'on_open': self.on_websocket_open,
+                    'on_error': self.on_websocket_error,
+                    'on_stream_message': self.on_websocket_stream_message,
+                    'on_event': self.on_websocket_event,
+                    'on_model_update': self.on_model_update,
+                    'on_server_disconnected': self.on_routed_web_socket_node_disconnected,
+                },
+                client_info_filepath=self.app.client_info_file_path,
+            )
         self.mw().update_menu_items()
         self.mw().select_screen('welcome_screen')
         self.run()
@@ -153,7 +200,12 @@ class Controller(object):
         if _Debug:
             print('Controller.stop')
         self.enabled = False
-        web_sock.stop()
+        if self.is_local:
+            if web_sock.is_started():
+                web_sock.stop()
+        else:
+            if web_sock_remote.is_started():
+                web_sock_remote.stop()
 
     def send_process_stop(self, callback=None):
         self.mw().state_process_health = 0
@@ -163,7 +215,9 @@ class Controller(object):
         return api_client.request_model_data(model_name, query_details=query_details)
 
     def is_web_socket_ready(self):
-        return web_sock.is_ready()
+        if self.is_local:
+            return web_sock.is_ready()
+        return web_sock_remote.is_ready()
 
     def run(self):
         if _Debug:
@@ -196,14 +250,20 @@ class Controller(object):
     #------------------------------------------------------------------------------
 
     def verify_process_health(self, *args, **kwargs):
+        if _Debug:
+            print('Controller.verify_process_health', args, kwargs)
         self.mw().state_process_health = 0
         return api_client.process_health(cb=self.on_process_health_result)
 
     def verify_identity_get(self, *args, **kwargs):
+        if _Debug:
+            print('Controller.verify_identity_get', args, kwargs)
         self.mw().state_identity_get = 0
         return api_client.identity_get(cb=self.on_identity_get_result)
 
     def verify_network_connected(self, *args, **kwargs):
+        if _Debug:
+            print('Controller.verify_network_connected', args, kwargs)
         dt = 0
         if self.network_connected_latest:
             dt = time.time() - self.network_connected_latest
@@ -297,14 +357,14 @@ class Controller(object):
 
     def on_identity_get_result(self, resp):
         if _Debug:
-            print('Controller.on_identity_get_result', api_client.is_ok(resp))
+            print('Controller.on_identity_get_result', resp)
         self.identity_get_latest = time.time()
         if not api_client.is_ok(resp):
-            self.identity_get_latest = 0
             if api_client.response_errors(resp).count('local identity is not valid or not exist'):
-                self.mw().state_identity_get = 0
-            else:
                 self.mw().state_identity_get = -1
+            else:
+                self.identity_get_latest = 0
+                self.mw().state_identity_get = 0
             return
         self.identity_get_latest = time.time()
         self.my_global_id = api_client.result(resp).get('global_id')
@@ -340,7 +400,6 @@ class Controller(object):
             self.network_connected_latest = 0
             self.verify_process_health()
         api_client.start_model_streaming('online_status', request_all=True)
-        api_client.start_model_streaming('service', request_all=True)
         api_client.start_model_streaming('key', request_all=True)
         api_client.start_model_streaming('correspondent', request_all=True)
         api_client.start_model_streaming('message', request_all=True)
@@ -349,6 +408,7 @@ class Controller(object):
         api_client.start_model_streaming('private_file', request_all=True)
         api_client.start_model_streaming('shared_file', request_all=True)
         api_client.start_model_streaming('remote_version', request_all=True)
+        api_client.start_model_streaming('service', request_all=True)
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:
@@ -412,6 +472,10 @@ class Controller(object):
                     old_state=event_data.get('old_state', ''),
                     new_state=event_data.get('new_state', ''),
                 )
+        elif event_id == 'web-socket-handshake-started':
+            self.mw().populate_device_server_code_display_dialog(event_data)
+        elif event_id == 'web-socket-handshake-proceeding':
+            self.mw().populate_device_client_code_input_dialog(event_data)
         # elif event_id in ['friend-connected', 'friend-disconnected', ]:
             # if self.mw().is_screen_active('friends_screen'):
             #     self.mw().get_active_screen('friends_screen').on_friend_state_changed(
@@ -463,7 +527,8 @@ class Controller(object):
             self.model_data[model_name] = OrderedDict()
         deleted = json_data['payload'].get('deleted')
         if _Debug:
-            print('Controller.on_model_update [%s] %s deleted:%r %r' % (model_name, snap_id, deleted, d, ))
+            if _DebugModelUpdates:
+                print('Controller.on_model_update [%s] %s deleted:%r %r' % (model_name, snap_id, deleted, d, ))
         if deleted:
             self.model_data[model_name].pop(snap_id, None)
             if model_name == 'private_file':
@@ -507,7 +572,7 @@ class Controller(object):
             if model_name == 'service':
                 def _st(d):
                     return 1 if d['state'] == 'ON' else (
-                        -1 if d['state'] in ['OFF', 'NOT_INSTALLED', 'DEPENDS_OFF', 'CLOSED', ] else 0)
+                        -1 if d['state'] in ['OFF', 'NOT_INSTALLED', 'CLOSED', ] else 0)
                 if snap_id == 'service_my_data':
                     self.mw().state_my_data = _st(d)
                 elif snap_id == 'service_message_history':
@@ -521,6 +586,8 @@ class Controller(object):
                 self.private_files_index[path] = d['global_id']
             elif model_name == 'shared_file':
                 self.shared_files_index[d['remote_path']] = d['global_id']
+            elif model_name == 'backup_rebuilder':
+                self.mw().state_rebuilding = d['rebuilding']
             elif model_name == 'remote_version':
                 global_id = d['global_id']
                 _, _, version_id = d['backup_id'].rpartition('/')
@@ -561,10 +628,20 @@ class Controller(object):
             self.mw().state_message_history = -1
             self.mw().update_menu_items()
             self.model_data.clear()
-            if self.mw().selected_screen not in process_dead_screens_list():
-                self.mw().select_screen('welcome_screen')
-                self.mw().close_active_screens(exclude_screens=['welcome_screen', ])
-                self.mw().screens_stack.clear()
+            if self.mw().state_node_local:
+                if self.mw().selected_screen not in process_dead_screens_list():
+                    self.mw().select_screen('welcome_screen')
+                    self.mw().close_active_screens(exclude_screens=['welcome_screen', ])
+                    self.mw().screens_stack.clear()
+            else:
+                if self.mw().state_device_authorized:
+                    self.mw().select_screen('device_disconnected_screen', clear_stack=True)
+                    self.mw().close_active_screens(exclude_screens=['device_disconnected_screen', ])
+                    self.mw().screens_stack.clear()
+                else:
+                    self.mw().select_screen('device_connect_screen', clear_stack=True)
+                    self.mw().close_active_screens(exclude_screens=['device_connect_screen', ])
+                    self.mw().screens_stack.clear()
             return
         if value == 1:
             self.mw().update_menu_items()
@@ -652,3 +729,14 @@ class Controller(object):
         if _Debug:
             print('Controller.on_state_success %r %r %r, selected_screen=%r' % (
                 self.mw().state_process_health, self.mw().state_identity_get, self.mw().state_network_connected, self.mw().selected_screen, ))
+
+    def on_device_client_code_entered(self, device_name, inp):
+        if _Debug:
+            print('Controller.on_device_client_code_entered', device_name, inp)
+        api_client.device_client_code_input(name=device_name, client_code=inp)
+
+    def on_routed_web_socket_node_disconnected(self):
+        if _Debug:
+            print('Controller.on_routed_web_socket_node_disconnected')
+        self.stop()
+        self.mw().state_process_health = -1

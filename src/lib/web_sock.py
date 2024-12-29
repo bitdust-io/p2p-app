@@ -55,8 +55,10 @@ def start(callbacks={}, api_secret_filepath=None):
     _WebSocketConnecting = True
     _WebSocketStarted = True
     _WebSocketQueue = queue.Queue(maxsize=1000)
-    thread.start_new_thread(websocket_thread, ())
-    thread.start_new_thread(requests_thread, (_WebSocketQueue, ))
+    websocket_thread_id = thread.start_new_thread(websocket_thread, ())
+    requests_thread_id = thread.start_new_thread(requests_thread, (_WebSocketQueue, ))
+    if _Debug:
+        print('    websocket_thread_id=%r requests_thread_id=%r' % (websocket_thread_id, requests_thread_id, ))
 
 
 def stop():
@@ -213,7 +215,7 @@ def on_message(ws_inst, message):
 @mainthread
 def on_error(ws_inst, error):
     if _Debug:
-        print('on_error', error)
+        print('on_error', ws_inst, error)
     cb = registered_callbacks().get('on_error')
     if cb:
         cb(ws_inst, error)
@@ -318,14 +320,15 @@ def websocket_thread():
             print('websocket_thread() ws_url=%r' % ws_url)
         _WebSocketApp = web_socket.WebSocketApp(
             ws_url,
-            on_message = on_message,
-            on_error = on_error,
-            on_close = on_close,
-            on_open = on_open,
+            on_message=on_message,
+            on_error=on_error,
+            on_close=on_close,
+            on_open=on_open,
         )
         try:
             ret = ws().run_forever(ping_interval=10)
         except Exception as exc:
+            ret = None
             _WebSocketApp = None
             if _Debug:
                 print('websocket_thread(): %r' % exc)

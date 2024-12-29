@@ -2,8 +2,14 @@ import re
 
 #------------------------------------------------------------------------------
 
+from kivy.metrics import dp
+
 from kivy.uix.treeview import TreeView, TreeViewNode
 from kivy.properties import BooleanProperty, ListProperty, StringProperty, NumericProperty  # @UnresolvedImport
+
+from kivymd.uix.tab import MDTabsBase
+from kivymd.uix.floatlayout import MDFloatLayout
+from kivymd.uix.list import OneLineIconListItem, TwoLineIconListItem
 
 #------------------------------------------------------------------------------
 
@@ -16,7 +22,53 @@ from components import layouts
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
+
+#------------------------------------------------------------------------------
+
+class TabDevices(MDFloatLayout, MDTabsBase):
+    pass
+
+
+class NewDeviceItem(OneLineIconListItem):
+
+    def on_pressed(self):
+        if _Debug:
+            print('NewDeviceItem.on_pressed', self)
+        screen.select_screen('device_add_screen')
+
+
+class DeviceItem(TwoLineIconListItem):
+
+    name = StringProperty()
+    automat_index = NumericProperty(None, allownone=True)
+    automat_id = StringProperty()
+    automat_state = StringProperty()
+    authorized = BooleanProperty(False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.height = dp(48) if not self._height else self._height
+
+    def get_secondary_text(self):
+        sec_text = 'authorized' if self.authorized else 'waiting for authorization...'
+        sec_color = 'adaf' if self.authorized else 'bbbf'
+        if _Debug:
+            print('DeviceItem.get_secondary_text', sec_text)
+        return '[size=10sp][color=%s]%s[/color][/size]' % (sec_color, sec_text, )
+
+    def on_pressed(self):
+        if _Debug:
+            print('DeviceItem.on_pressed', self, self.name, self.automat_index, self.automat_id)
+        automat_index = self.automat_index or None
+        automat_index = int(automat_index) if automat_index is not None else None
+        screen.select_screen(
+            screen_id='device_info_{}'.format(self.name),
+            screen_type='device_info_screen',
+            device_name=self.name,
+            automat_index=automat_index,
+            automat_id=self.automat_id,
+        )
 
 #------------------------------------------------------------------------------
 
@@ -213,12 +265,16 @@ class TextElement(OptionElement, layouts.VerticalLayout):
 
 #------------------------------------------------------------------------------
 
+class TabOptions(MDFloatLayout, MDTabsBase):
+    pass
+
+
 class SettingsTreeView(TreeView):
 
     def on_node_expand(self, node):
         if _Debug:
             print('SettingsTreeView.on_node_expand', node.item_key, node.item_data)
-        self.parent.parent.parent.parent.parent.populate_node(node)
+        self.parent.parent.parent.parent.parent.parent.parent.parent.parent.parent.populate_node(node)
 
     def on_node_collapse(self, node):
         if _Debug:
@@ -229,6 +285,8 @@ class SettingsTreeView(TreeView):
 class SettingsScreen(screen.AppScreen):
 
     recent_tree_index = {}
+    to_be_opened = []
+    to_be_scrolled_to = []
 
     # def get_icon(self):
     #     return 'cogs'
@@ -238,10 +296,11 @@ class SettingsScreen(screen.AppScreen):
 
     def populate(self):
         api_client.services_list(cb=self.on_services_list_result)
+        api_client.devices_list(cb=self.on_devices_list_result)
 
     def populate_node(self, node):
         if _Debug:
-            print('SettingsScreen.populate_node', node)
+            print('SettingsScreen.populate_node', node.item_key, node)
         api_client.config_get(
             key=node.item_key,
             include_info=True,
@@ -254,7 +313,7 @@ class SettingsScreen(screen.AppScreen):
         return src
 
     def build_item(self, item_key, item_data, known_tree):
-        tv = self.ids.settings_tree
+        tv = self.ids.settings_tabs.ids.carousel.slides[1].ids.options_settings_tree
         parent = tv.get_root()
         item_path = item_key.split('/')
         built_count = 0
@@ -369,7 +428,7 @@ class SettingsScreen(screen.AppScreen):
         return built_count
 
     def build_tree(self, items_list, active_node=None):
-        tv = self.ids.settings_tree
+        tv = self.ids.settings_tabs.ids.carousel.slides[1].ids.options_settings_tree
         d = {}  # input elements by option key
         a = {}  # absolute path of each tree element
         t = {}  # known tree elements
@@ -459,11 +518,74 @@ class SettingsScreen(screen.AppScreen):
             if node_item_key:
                 if node_item_key not in t:
                     self.recent_tree_index[node.item_key] = node
+                    # if _Debug:
+                    #     print('        ', node.item_key, node)
         if _Debug:
             print('SettingsScreen.build_tree   indexed %d elements' % len(self.recent_tree_index))
+        if self.to_be_opened:
+            item_key = self.to_be_opened.pop(0)
+            if item_key in self.recent_tree_index:
+                self.open_item(item_key)
+        if self.to_be_scrolled_to:
+            item_key = self.to_be_scrolled_to.pop(0)
+            if item_key in self.recent_tree_index:
+                self.scroll_to_item(item_key)
+
+    def open_item(self, item_key):
+        node = self.recent_tree_index.get(item_key)
+        if not node:
+            if item_key not in self.to_be_opened:
+                self.to_be_opened.append(item_key)
+            return
+        if _Debug:
+            print('SettingsScreen.open_item', item_key, node)
+        if node and not node.is_open:
+            self.ids.settings_tabs.ids.carousel.slides[1].ids.options_settings_tree.toggle_node(node)
+
+    def close_item(self, item_key):
+        node = self.recent_tree_index.get(item_key)
+        if _Debug:
+            print('SettingsScreen.close_item', item_key, node)
+        if node and node.is_open:
+            self.ids.settings_tabs.ids.carousel.slides[1].ids.options_settings_tree.toggle_node(node)
+
+    def scroll_to_item(self, item_key):
+        node = self.recent_tree_index.get(item_key)
+        if _Debug:
+            print('SettingsScreen.scroll_to_item', item_key, node)
+        if not node:
+            if item_key not in self.to_be_scrolled_to:
+                self.to_be_scrolled_to.append(item_key)
+            return
+        # TODO: item position is to be fixed 
+        self.ids.settings_tabs.ids.carousel.slides[1].ids.options_scroll_view.scroll_to(node, animate=False)
 
     def on_enter(self, *args):
         self.populate()
+
+    def on_devices_list_result(self, resp):
+        if _Debug:
+            print('SettingsScreen.on_devices_list_result', resp)
+        dlv = self.ids.settings_tabs.ids.carousel.slides[0].ids.devices_list_view
+        dlv.clear_widgets()
+        dlv.add_widget(NewDeviceItem())
+        if not isinstance(resp, dict):
+            return
+        if not api_client.is_ok(resp):
+            return
+        result = api_client.response_result(resp)
+        if not result:
+            return
+        if _Debug:
+            print('SettingsScreen.on_devices_list_result', dlv, result)
+        for one_device in result:
+            dlv.add_widget(DeviceItem(
+                name=one_device['name'],
+                automat_index=one_device.get('instance', {}).get('index'),
+                automat_id=one_device.get('instance', {}).get('id'),
+                automat_state=one_device.get('instance', {}).get('state'),
+                authorized=(True if one_device.get('meta', {}).get('auth_token') else False),
+            ))
 
     def on_service_started_stopped(self, event_id, service_name):
         element_name = 'services/{}'.format(service_name[8:].replace('_', '-'))
@@ -478,7 +600,9 @@ class SettingsScreen(screen.AppScreen):
             print('SettingsScreen.on_service_started_stopped', event_id, service_name, element_name, current_state, node.service_state)
 
     def on_services_list_result(self, resp):
-        self.ids.status_label.from_api_response(resp)
+        if _Debug:
+            print('SettingsScreen.on_services_list_result')
+        # self.ids.status_label.from_api_response(resp)
         if not api_client.is_ok(resp):
             return
         self.services_list_result = {}
@@ -487,7 +611,9 @@ class SettingsScreen(screen.AppScreen):
         api_client.configs_list(sort=True, include_info=False, cb=self.on_configs_list_result)
 
     def on_configs_list_result(self, resp):
-        self.ids.status_label.from_api_response(resp)
+        if _Debug:
+            print('SettingsScreen.on_configs_list_result')
+        # self.ids.status_label.from_api_response(resp)
         if not api_client.is_ok(resp):
             return
         items_list = api_client.response_result(resp)
@@ -496,10 +622,10 @@ class SettingsScreen(screen.AppScreen):
     def on_item_clicked(self, option_key, node):
         if _Debug:
             print('SettingsScreen.on_item_clicked', option_key, node)
-        self.ids.settings_tree.toggle_node(node)
+        self.ids.settings_tabs.ids.carousel.slides[1].ids.options_settings_tree.toggle_node(node)
 
     def on_config_get_result(self, resp, option_key, node):
-        self.ids.status_label.from_api_response(resp)
+        # self.ids.status_label.from_api_response(resp)
         if not api_client.is_ok(resp):
             return
         items_list = api_client.response_result(resp)
@@ -511,3 +637,7 @@ class SettingsScreen(screen.AppScreen):
         if _Debug:
             print('SettingsScreen.on_option_value_modified', option_key, new_value)
         api_client.config_set(key=option_key, value=new_value)
+
+    def on_tab_switched(self, *args):
+        if _Debug:
+            print('SettingsScreen.on_tab_switched', args)

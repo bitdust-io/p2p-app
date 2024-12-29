@@ -30,9 +30,7 @@ REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.tx
 	@# cp -r -v ./src/etc/build.tmpl.gradle ./cache/python-for-android/pythonforandroid/bootstraps/common/build/templates/
 	@# cp -r -v ./src/etc/gradle-wrapper.properties ./cache/python-for-android/pythonforandroid/bootstraps/common/build/gradle/wrapper/
 	@# if [ ! -f "./cache/bundletool.jar" ]; then curl https://github.com/google/bundletool/releases/download/1.13.2/bundletool-all-1.13.2.jar -o cache/bundletool.jar; fi
-	@if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/bitdust-io/public.git ./cache/bitdust; fi
-	@# if [ ! -d "./cache/bitdust" ]; then git clone https://github.com/vesellov/devel.git ./cache/bitdust; fi
-	@cd ./cache/bitdust && git pull && git log --graph --oneline --decorate -1 && git rev-list --count HEAD >../revnum
+	@cd ./cache && git rev-list --count HEAD >revnum
 
 .workspace:
 	@rm -rf ./bin/* && rm -rf workspace && mkdir -p -v workspace
@@ -40,7 +38,7 @@ REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.tx
 	@# cp -v ./cache/support-compat-28.0.0.aar workspace/
 
 .venv:
-	@cd ./workspace/ && rm -rf venv && python3 -m venv venv && ./venv/bin/pip install --upgrade pip >pip.log && ./venv/bin/pip install -r ../../../requirements.txt >>pip.log
+	@cd ./workspace/ && rm -rf venv && python3 -m venv venv && ./venv/bin/pip install --upgrade pip >pip.log
 
 .install_buildozer:
 	@cd ./cache/buildozer/ && ../../workspace/venv/bin/python setup.py build && ../../workspace/venv/bin/pip install -e .
@@ -52,19 +50,7 @@ REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.tx
 	@echo "revision number based on total amount of commits in the Git repository is:" && cat ./cache/revnum
 	@cd ./workspace/ && python3 -c "cv=open('core_version').read().strip().split('.');v=list(open('version').read().strip().split('.'));v[0]=cv[0];v[-2]=str(int(v[-2])+1);v[-1]=open('../cache/revnum').read().strip();open('version','w').write(('.'.join(v)).strip())"
 	@echo "new version will be:" && cat ./workspace/version && echo ""
-	@rm -rf ./workspace/app && mkdir -p -v ./workspace/app && cp -r ../../src/* ./workspace/app/ && mkdir -p -v ./workspace/app/bitdust_copy
-	@cd ./cache/bitdust && git checkout-index -a -f --prefix="../../workspace/app/bitdust_copy/"
-	@mv ./workspace/app/bitdust_copy/bitdust ./workspace/app/
-	@mv ./workspace/app/bitdust_copy/bitdust_forks ./workspace/app/
-	@mv ./workspace/app/bitdust_copy/default_network.json ./workspace/app/
-	@rm -rf ./workspace/app/bitdust_copy/
-	@rm -rf ./workspace/app/deploy
-	@rm -rf ./workspace/app/bitdust/devops
-	@rm -rf ./workspace/app/bitdust/regress
-	@rm -rf ./workspace/app/bitdust/regression
-	@rm -rf ./workspace/app/bitdust/tests
-	@rm -rf ./workspace/app/bitdust/icons
-	@rm -rf ./workspace/app/bitdust_forks/Bismuth/wallet
+	@rm -rf ./workspace/app && mkdir -p -v ./workspace/app && cp -r ../../src/* ./workspace/app/
 	@python3 -c "v=open('./workspace/version').read().strip();open('./workspace/app/version.py','w').write('__version__ = \"%s\"' % v);"
 
 .spec: .prepare .venv .install_buildozer
@@ -83,7 +69,7 @@ build: .spec
 	@mv -v ./workspace/bin/*.aab ./bin/
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
 
-apk: build_arm64_v8a build_armeabi_v7a build_x86_64
+# apk: build_arm64_v8a build_armeabi_v7a build_x86_64
 # 	@rm -rfv ./workspace/bin/*.apk
 # 	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 # 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release 1>buildozer.log 2>buildozer.err
@@ -100,10 +86,12 @@ apk: build_arm64_v8a build_armeabi_v7a build_x86_64
 # 	@rm -rfv ./workspace/bin/BitDustAndroid_unsigned.apk
 # 	@rm -rfv ./workspace/bin/bitdust1-*-release-unsigned.apk
 
-debug:
+debug: .spec
+	~/.gradle/wrapper/dists/gradle-8.0.2-all/14bt34ptcsg1ikmfn78tdh1keu/gradle-8.0.2/bin/gradle --stop || echo "gradle daemon was not stopped"
 	@rm -rfv ./workspace/bin/*.apk
 	@# cd ./workspace/app/ && find . -type f -name "bpmain.py" -exec sed -i -e 's/_Debug = False/_Debug = True/g' {} +
-	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android debug 1>buildozer.log 2>buildozer.err
+	cd ./workspace/ && GRADLE_OPTS="-Xms1724m -Xmx5048m -Dorg.gradle.jvmargs='-Xms1724m -Xmx5048m'" PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android debug  
+	@# 1>buildozer.log 2>buildozer.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
 	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
 	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true ./bin/BitDustAndroid.apk
@@ -118,6 +106,7 @@ debug:
 	@rm -rfv ./workspace/bin/bitdust1-*-release-unsigned.apk
 
 build_arm64_v8a:
+	~/.gradle/wrapper/dists/gradle-8.0.2-all/14bt34ptcsg1ikmfn78tdh1keu/gradle-8.0.2/bin/gradle --stop || echo "gradle daemon was not stopped"
 	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release 1>buildozer.arm64_v8a.log 2>buildozer.arm64_v8a.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
@@ -129,6 +118,7 @@ build_arm64_v8a:
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
 
 build_armeabi_v7a:
+	~/.gradle/wrapper/dists/gradle-8.0.2-all/14bt34ptcsg1ikmfn78tdh1keu/gradle-8.0.2/bin/gradle --stop || echo "gradle daemon was not stopped"
 	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile armeabi_v7a android release 1>buildozer.armeabi_v7a.log 2>buildozer.armeabi_v7a.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
@@ -140,6 +130,7 @@ build_armeabi_v7a:
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
 
 build_x86_64:
+	~/.gradle/wrapper/dists/gradle-8.0.2-all/14bt34ptcsg1ikmfn78tdh1keu/gradle-8.0.2/bin/gradle --stop || echo "gradle daemon was not stopped"
 	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile x86_64 android release 1>buildozer.x86_64.log 2>buildozer.x86_64.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
@@ -161,7 +152,7 @@ clean_full:
 
 system_dependencies:
 	@sudo apt-get update; sudo apt-get install --yes --no-install-recommends openjdk-11-jdk cython3 autoconf automake libtool ccache lld zipalign apksigner
-	@python3 -m pip install Cython
+	@python3 -m pip install --upgrade Cython
 
 test:
 	@adb install -r -d bin/BitDustAndroid_arm64_v8a.apk

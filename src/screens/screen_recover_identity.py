@@ -1,7 +1,6 @@
 import os
-import time
 
-from kivy.clock import mainthread
+from kivy.clock import Clock, mainthread
 
 #------------------------------------------------------------------------------
 
@@ -59,10 +58,10 @@ class RecoverIdentityScreen(screen.AppScreen):
             return
         self.main_win().state_identity_get = 0
         self.control().run()
-        self.main_win().select_screen('welcome_screen')
-        self.main_win().close_screen('new_identity_screen')
-        self.main_win().close_screen('recover_identity_screen')
-        self.main_win().screens_stack.clear()
+        screen.select_screen('welcome_screen')
+        screen.close_screen('new_identity_screen')
+        screen.close_screen('recover_identity_screen')
+        screen.stack_clear()
 
     @mainthread
     def on_load_private_key_pressed(self, *args):
@@ -111,11 +110,27 @@ class RecoverIdentityScreen(screen.AppScreen):
             key_src = system.ReadTextFile(file_path)
         except:
             key_src = None
+            import traceback
+            traceback.print_exc()
+        if _Debug:
+            print('length: %r' % len(str(key_src)))
+        Clock.schedule_once(lambda dt: self.do_update_input_field(key_src))
+
+    def do_update_input_field(self, key_src):
+        if _Debug:
+            print('RecoverIdentityScreen.do_update_input_field: %r' % key_src)
         if not key_src:
             self.ids.recover_identity_button.disabled = False
             self.ids.recover_identity_result_message.text = '[color=#f00]loading private key failed[/color]'
             self.ids.private_key_input.text = ''
             return
-        self.ids.recover_identity_button.disabled = False
-        self.ids.recover_identity_result_message.text = ''
-        self.ids.private_key_input.text = key_src
+        try:
+            self.ids.recover_identity_button.disabled = False
+            self.ids.recover_identity_result_message.text = ''
+            self.ids.private_key_input.text = key_src
+        except:
+            import traceback
+            traceback.print_exc()
+        if _Debug:
+            print('SUCCESS')
+

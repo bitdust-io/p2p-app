@@ -21,11 +21,12 @@ from lib import system
 
 from components import webfont
 from components import all_components
-from components.styles import AppStyle
+from components import dialogs
+from components import styles
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -55,7 +56,7 @@ class CustomContentNavigationDrawer(BoxLayout):
 
 #------------------------------------------------------------------------------
 
-class MainWin(Screen, ThemableBehavior, AppStyle):
+class MainWin(Screen, ThemableBehavior, styles.AppStyle):
 
     control = None
     screens_map = {}
@@ -69,6 +70,8 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     selected_screen = StringProperty('')
     dropdown_menu = ObjectProperty(None)
 
+    state_node_local = ObjectProperty(None)
+    state_device_authorized = BooleanProperty(False)
     state_process_health = NumericProperty(-1)
     state_identity_get = NumericProperty(-1)
     state_network_connected = NumericProperty(-1)
@@ -76,8 +79,11 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     state_proxy_transport = NumericProperty(-1)
     state_my_data = NumericProperty(-1)
     state_message_history = NumericProperty(-1)
+    state_rebuilding = BooleanProperty(False)
 
     def __init__(self, **kwargs):
+        self.device_server_code_display_dialog = None
+        self.device_client_code_input_dialog = None
         super().__init__(**kwargs)
         patch_kivy_core_window()
         Clock.schedule_once(self.on_init_done)
@@ -127,6 +133,9 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     def is_screen_selectable(self, screen_id):
         if not self.control:
             return False
+        if self.state_node_local is False:
+            if not self.state_device_authorized:
+                return screen_id in ['device_connect_screen', 'about_screen', ]
         if self.state_process_health != 1:
             return screen_id in ['engine_status_screen', 'startup_screen', 'welcome_screen', 'about_screen', ]
         if self.state_identity_get != 1:
@@ -141,6 +150,26 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     def update_menu_items(self):
         if not self.control:
             return
+        if self.state_node_local is False:
+            if self.state_device_authorized:
+                if self.state_process_health != 1:
+                    self.menu().ids.menu_item_status.disabled = True
+                    self.menu().ids.menu_item_my_identity.disabled = True
+                    self.menu().ids.menu_item_chat.disabled = True
+                    self.menu().ids.menu_item_friends.disabled = True
+                    self.menu().ids.menu_item_settings.disabled = True
+                    self.menu().ids.menu_item_private_files.disabled = True
+                    self.menu().ids.menu_item_shares.disabled = True
+                    return
+            else:
+                self.menu().ids.menu_item_status.disabled = True
+                self.menu().ids.menu_item_my_identity.disabled = True
+                self.menu().ids.menu_item_chat.disabled = True
+                self.menu().ids.menu_item_friends.disabled = True
+                self.menu().ids.menu_item_settings.disabled = True
+                self.menu().ids.menu_item_private_files.disabled = True
+                self.menu().ids.menu_item_shares.disabled = True
+                return
         self.menu().ids.menu_item_status.disabled = False
         if self.state_process_health != 1:
             self.menu().ids.menu_item_my_identity.disabled = True
@@ -219,6 +248,33 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
 
     def populate_bottom_toolbar_icon(self, icon_name, state):
         Clock.schedule_once(lambda *a: self.footer_bar().update_bottom_action_bar_item(icon_name, state))
+
+    def populate_device_server_code_display_dialog(self, event_data):
+        if _Debug:
+            print('MainWin.populate_device_server_code_display_dialog', event_data)
+        if self.device_server_code_display_dialog:
+            self.device_server_code_display_dialog.dismiss()
+            self.device_server_code_display_dialog = None
+        server_code = event_data['server_code']
+        self.device_server_code_display_dialog = dialogs.open_message_dialog(
+            title='Authorization code',
+            text='[color=#000]Enter the authorization code dispalyed bellow on your device running BitDust p2p-app:\n\n\n[size=24sp]%s[/size][/color]' % server_code,
+            button_confirm='Continue',
+            cb=self.on_device_server_code_display_dialog_closed,
+        )
+
+    def populate_device_client_code_input_dialog(self, event_data):
+        if self.device_server_code_display_dialog:
+            self.device_server_code_display_dialog.dismiss()
+            self.device_server_code_display_dialog = None
+        device_name = event_data['device_name']
+        self.device_client_code_input_dialog = dialogs.open_number_input_dialog(
+            title='Device code',
+            text='Enter 6-digits authorization code generated on your device:',
+            button_confirm='Confirm',
+            button_cancel='Back',
+            cb=lambda inp: self.on_device_client_code_entered(device_name, inp),
+        )
 
     #------------------------------------------------------------------------------
 
@@ -300,7 +356,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
                         print('closing inactive screen %r : %d ~ %d' % (screen_id, time.time(), closed_time, ))
                     self.close_screen(screen_id)
 
-    def select_screen(self, screen_id, verify_state=False, screen_type=None, clear_screens_stack=False, **kwargs):
+    def select_screen(self, screen_id, verify_state=False, screen_type=None, clear_stack=False, **kwargs):
         if screen_type is None:
             screen_type = screen_id
             if screen_type.startswith('private_chat_'):
@@ -317,7 +373,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             if not self.is_screen_selectable(screen_id):
                 if _Debug:
                     print('MainWin.select_screen   selecting screen %r not possible at the moment' % screen_id)
-                return False
+                return None
         if _Debug:
             print('MainWin.select_screen  starting transition to %r' % screen_id)
         if screen_id not in self.active_screens:
@@ -327,13 +383,13 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.selected_screen and self.selected_screen == screen_id:
             if _Debug:
                 print('MainWin.select_screen   skip, selected screen is already %r' % screen_id)
-            return True
+            return self.active_screens[screen_id][0]
         self.populate_toolbar_content(self.active_screens[screen_id][0])
         self.populate_hot_button(self.active_screens[screen_id][0])
         self.populate_dropdown_menu(self.active_screens[screen_id][0])
         if self.selected_screen:
             if _Debug:
-                print('MainWin.select_screen   is about to switch away screen manger from currently selected screen %r' % self.selected_screen)
+                print('MainWin.select_screen   is about to switch away screen manager from currently selected screen %r' % self.selected_screen)
             self.screen_closed_time[self.selected_screen] = time.time()
             if self.selected_screen in self.active_screens:
                 self.active_screens[self.selected_screen][0].close_drop_down_menu()
@@ -353,7 +409,7 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         self.selected_screen = screen_id
         # if self.selected_screen in ['engine_status_screen', 'connecting_screen', 'startup_screen', ]:
         #     self.screens_stack = []
-        if self.screens_stack and not clear_screens_stack:
+        if self.screens_stack and not clear_stack:
             self.tbar().left_action_items = [["arrow-left", self.on_nav_back_button_clicked, ], ]
         else:
             self.tbar().left_action_items = [["menu", self.on_left_menu_button_clicked, ], ]
@@ -362,15 +418,17 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         self.ids.screen_manager.current = screen_id
         self.active_screens[screen_id][0].close_drop_down_menu()
         self.active_screens[screen_id][0].on_opened()
-        if clear_screens_stack:
+        if clear_stack:
             self.screens_stack.clear()
             self.screens_stack.append('welcome_screen')
-        return True
+        return self.active_screens[screen_id][0]
 
     def screen_back(self):
         back_to_screen = None
         if self.screens_stack:
             back_to_screen = self.screens_stack[-1]
+        if _Debug:
+            print('MainWin.screen_back %r' % back_to_screen)
         if back_to_screen:
             self.select_screen(back_to_screen)
             return True
@@ -453,7 +511,8 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
+                welcome_screen.populate()
+                # Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
 
     def on_state_identity_get(self, instance, value):
         if _Debug:
@@ -463,7 +522,8 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
+                welcome_screen.populate()
+                # Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
 
     def on_state_network_connected(self, instance, value):
         if _Debug:
@@ -473,7 +533,8 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
+                welcome_screen.populate()
+                # Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
 
     def on_state_entangled_dht(self, instance, value):
         if _Debug:
@@ -490,7 +551,10 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
     def on_state_my_data(self, instance, value):
         if _Debug:
             print('MainWin.on_state_my_data', value)
-        self.populate_bottom_toolbar_icon('database', value)
+        not_blinking = value
+        if self.state_rebuilding:
+            not_blinking = 0
+        self.populate_bottom_toolbar_icon('database', not_blinking)
         self.control.on_state_my_data(instance, value)
 
     def on_state_message_history(self, instance, value):
@@ -498,3 +562,22 @@ class MainWin(Screen, ThemableBehavior, AppStyle):
             print('MainWin.on_state_message_history', value)
         self.populate_bottom_toolbar_icon('comments', value)
         self.control.on_state_message_history(instance, value)
+
+    def on_state_rebuilding(self, instance, value):
+        if _Debug:
+            print('MainWin.on_state_rebuilding', value)
+        not_blinking = self.state_my_data
+        if value:
+            not_blinking = 0
+        self.populate_bottom_toolbar_icon('database', not_blinking)
+
+    def on_device_server_code_display_dialog_closed(self, *args, **kwargs):
+        if _Debug:
+            print('MainWin.on_device_client_code_entered', args, kwargs)
+        self.device_server_code_display_dialog = None
+
+    def on_device_client_code_entered(self, device_name, inp):
+        if _Debug:
+            print('MainWin.on_device_client_code_entered', device_name, inp)
+        self.device_client_code_input_dialog = None
+        self.control.on_device_client_code_entered(device_name, inp)

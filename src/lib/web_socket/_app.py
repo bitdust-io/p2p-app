@@ -38,6 +38,9 @@ from ._exceptions import *
 from . import _logging
 
 
+_Debug = True
+
+
 __all__ = ["WebSocketApp"]
 
 class Dispatcher:
@@ -228,7 +231,7 @@ class WebSocketApp(object):
             If close_frame is set, we will invoke the on_close handler with the
             statusCode and reason from there.
             """
-            if thread and thread.isAlive():
+            if thread:
                 isAlive = False
                 if hasattr(thread, 'isAlive'):
                     isAlive = thread.isAlive()
@@ -311,6 +314,8 @@ class WebSocketApp(object):
 
             dispatcher.read(self.sock.sock, read, check)
         except (Exception, KeyboardInterrupt, SystemExit) as e:
+            if _Debug:
+                print('WebSocketApp is about to call %r with: %r' % (self.on_error, e))
             self._callback(self.on_error, e)
             if isinstance(e, SystemExit):
                 # propagate SystemExit further

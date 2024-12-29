@@ -30,8 +30,8 @@ from kivymd.uix.tooltip import MDTooltip
 
 from lib import system
 
-from components.buttons import TransparentIconButton, FloatingActionButton
-from components.styles import AppStyle
+from components import buttons
+from components import styles
 
 #------------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-class CustomActionAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
+class CustomActionAppBarButton(buttons.TransparentIconButton, MDTooltip, styles.AppStyle):
     anim = None
 
     def __init__(self, **kwargs):
@@ -73,7 +73,7 @@ class CustomActionAppBarButton(TransparentIconButton, MDTooltip, AppStyle):
 
 #------------------------------------------------------------------------------
 
-class CustomFloatingActionButton(FloatingActionButton):
+class CustomFloatingActionButton(buttons.FloatingActionButton):
     _scale_x = NumericProperty(1)
     _scale_y = NumericProperty(1)
 
@@ -448,7 +448,7 @@ class CustomTopToolbar(NotchedBox):
 
 #------------------------------------------------------------------------------
 
-class CustomBottomToolbar(CustomNotchedBox, AppStyle):
+class CustomBottomToolbar(CustomNotchedBox, styles.AppStyle):
 
     left_action_items = ListProperty()
     right_action_items = ListProperty()

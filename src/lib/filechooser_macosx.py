@@ -5,8 +5,8 @@ Mac OS X file chooser
 
 try:
     from plyer.facades import FileChooser
-    from pyobjus import autoclass, objc_arr, objc_str
-    from pyobjus.dylib_manager import load_framework, INCLUDE
+    from pyobjus import autoclass, objc_arr, objc_str  # @UnresolvedImport
+    from pyobjus.dylib_manager import load_framework, INCLUDE  # @UnresolvedImport
 except Exception as e:
     print(e)
     raise

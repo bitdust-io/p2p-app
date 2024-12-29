@@ -5,7 +5,7 @@
         pos_hint: {'center_x': .5}
         valign: 'middle'
         halign: 'center'
-        text: root.text
+        text: root.label
 
     GridLayout:
         cols: 2
@@ -19,3 +19,22 @@
         Button:
             text: 'No'
             on_release: root.dispatch('on_answer', 'no')
+
+
+<InputNumberContent>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "120dp"
+
+    MDLabel:
+        text: root.text_content
+
+    MDTextField:
+    	id: number_input
+        size_hint_x: None
+        width: "100dp"
+        max_text_length: root.max_text_length
+        input_filter: 'int'
+        required: True
+        mode: "rectangle"

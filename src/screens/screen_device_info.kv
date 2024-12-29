@@ -1,0 +1,45 @@
+<DeviceInfoScreen>:
+
+    ScreenContainerLayout:
+
+        TopEmptyScreenSpace:
+
+        AppScreenLayout:
+
+            AutomatShortStatusPanel:
+                id: state_panel
+                size_hint_x: 1
+                statuses: root.get_statuses()
+
+            VerticalScrollView:
+
+                VerticalWithPaddingLayout:
+                    size_hint: None, None
+                    pos_hint: {'top': 1}
+                    height: self.minimum_height
+                    width: root.width - app.scroll_bar_width
+
+					QRCodeWidget:
+						id: qr_code_image
+						data: ''
+						size_hint_y: None
+						height: dp(250)
+						show_border: False
+
+                    MarkupLabel:
+                        id: device_info_details
+                        size_hint_y: None
+                        text_size: self.width, None
+                        height: self.texture_size[1]
+                        color: app.color_black
+                        text: ''
+                        on_ref_press: root.on_device_info_details_ref_pressed(*args)
+
+        BottomEmptyScreenSpace:
+
+
+    DropDownMenu:
+        id: drop_down_menu
+        data:
+            [('qrcode-remove', 'Delete this device', ),]
+        callback: root.on_drop_down_menu_item_clicked
