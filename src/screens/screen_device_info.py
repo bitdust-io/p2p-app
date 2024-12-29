@@ -94,7 +94,8 @@ class DeviceInfoScreen(screen.AppScreen):
             snackbar.error(text=api_client.response_err(resp))
             return
         result = api_client.result(resp)
-        self.url = result.get('url', '') or ''
+        connected_routers = result.get('instance', {}).get('connected_routers', []) or []
+        self.url = connected_routers[0] if connected_routers else ''
         result.update(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             small_text_size='{}sp'.format(self.app().font_size_small_absolute),

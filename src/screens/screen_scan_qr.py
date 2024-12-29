@@ -45,7 +45,10 @@ class ScanQRScreen(screen.AppScreen):
             print('ScanQRScreen.init_kwargs', kw)
         self.scan_qr_callback = kw.pop('scan_qr_callback', '')
         return kw
-    
+
+    def get_title(self):
+        return 'scan QR code'
+
     def on_enter(self):
         if _Debug:
             print('ScanQRScreen.on_enter')

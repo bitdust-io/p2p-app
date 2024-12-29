@@ -83,7 +83,9 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
             button_cancel='[u][color=#0000dd]Cancel[/color][/u]',
             cb_cancel=self.on_cancel_spinner_dialog,
         )
-        Clock.schedule_once(self.do_connect)
+        if web_sock_remote.is_started():
+            web_sock_remote.stop()
+        Clock.schedule_once(self.do_connect, 1)
 
     def on_websocket_open(self, ws_inst):
         if _Debug:
@@ -179,6 +181,8 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
             web_sock_remote.stop()
 
     def do_connect(self, interval=None):
+        if _Debug:
+            print('TabRemoteDevice.do_connect')
         web_sock_remote.start(
             callbacks={
                 'on_open': self.on_websocket_open,
@@ -204,7 +208,7 @@ class TabCloudServer(MDFloatLayout, MDTabsBase):
 class DeviceConnectScreen(screen.AppScreen):
 
     def get_title(self):
-        return 'BitDust node configuration'
+        return 'node configuration'
 
     def on_tab_switched(self, *args):
         if _Debug:
