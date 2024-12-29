@@ -434,12 +434,14 @@ class BitDustApp(styles.AppStyle, MDApp):
             if self.main_window.is_screen_active('welcome_screen'):
                 welcome_screen = self.main_window.get_active_screen('welcome_screen')
                 if welcome_screen:
-                    Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
+                    welcome_screen.populate()
+                    # Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
             return
         if self.main_window.is_screen_active('welcome_screen'):
             welcome_screen = self.main_window.get_active_screen('welcome_screen')
             if welcome_screen:
-                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
+                welcome_screen.populate()
+                # Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
         if system.is_linux():
             system.BackgroundProcess(
                 cmd=['/bin/bash', './src/deploy/linux.sh', ] + params,
@@ -552,6 +554,9 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_resume(self):
         if _Debug:
             print('BitDustApp.on_resume')
+        self.load_client_info()
+        if not self.control.verify_device_ready():
+            return
         self.control.verify_process_health()
         self.control.verify_identity_get()
         self.control.verify_network_connected()

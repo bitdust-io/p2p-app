@@ -11,8 +11,6 @@ from kivymd.uix.dialog import MDDialog
 
 from components import spinner
 
-from components import layouts
-
 #------------------------------------------------------------------------------
 
 _Debug = True
@@ -103,6 +101,7 @@ def open_number_input_dialog(title, text, max_text_length=6, button_confirm='Con
         size_hint_x=None,
         width=dp(360),
         auto_dismiss=False,
+        pos_hint={'y': .15},
     )
     popup.update_width = lambda *args: None
     popup.open()
@@ -131,6 +130,7 @@ def open_message_dialog(title, text, button_confirm='Confirm', cb=None):
         size_hint_x=None,
         width=dp(360),
         auto_dismiss=False,
+        pos_hint={'y': .15},
     )
     popup.update_width = lambda *args: None
     popup.open()
@@ -171,6 +171,7 @@ def open_spinner_dialog(title, label='', button_cancel=None, cb_cancel=None):
         width=dp(170),
         auto_dismiss=False,
         on_dismiss=on_dismiss,
+        pos_hint={'y': .15},
     )
     popup.update_width = lambda *args: None
     popup.open()

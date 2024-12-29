@@ -112,7 +112,7 @@ class DeviceDisconnectedScreen(screen.AppScreen):
 
     def do_populate_text_label(self):
         if self.counter > 0:
-            self.ids.text_label.text = 'The application is trying to connect to a remote BitDust node.' \
+            self.ids.text_label.text = 'The application is trying to connect to a remote BitDust node.\n' \
             'Make sure the BitDust app is running on your remote machine and the Internet is stable on both devices.\n' \
             'You can also [u][color=#0000ff][ref=link]re-authorize[/ref][/color][/u] your device again.'
 

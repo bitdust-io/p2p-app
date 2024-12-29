@@ -215,7 +215,7 @@ def on_message(ws_inst, message):
 @mainthread
 def on_error(ws_inst, error):
     if _Debug:
-        print('on_error', error)
+        print('on_error', ws_inst, error)
     cb = registered_callbacks().get('on_error')
     if cb:
         cb(ws_inst, error)

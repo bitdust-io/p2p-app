@@ -386,7 +386,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         self.populate_dropdown_menu(self.active_screens[screen_id][0])
         if self.selected_screen:
             if _Debug:
-                print('MainWin.select_screen   is about to switch away screen manger from currently selected screen %r' % self.selected_screen)
+                print('MainWin.select_screen   is about to switch away screen manager from currently selected screen %r' % self.selected_screen)
             self.screen_closed_time[self.selected_screen] = time.time()
             if self.selected_screen in self.active_screens:
                 self.active_screens[self.selected_screen][0].close_drop_down_menu()
@@ -508,7 +508,8 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
+                welcome_screen.populate()
+                # Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
 
     def on_state_identity_get(self, instance, value):
         if _Debug:
@@ -518,7 +519,8 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
+                welcome_screen.populate()
+                # Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
 
     def on_state_network_connected(self, instance, value):
         if _Debug:
@@ -528,7 +530,8 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
             if welcome_screen:
-                Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
+                welcome_screen.populate()
+                # Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.01)
 
     def on_state_entangled_dht(self, instance, value):
         if _Debug:

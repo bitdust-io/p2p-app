@@ -213,4 +213,5 @@ class MyIDScreen(screen.AppScreen):
         screen.stack_clear()
         welcome_screen = self.main_win().get_active_screen('welcome_screen')
         if welcome_screen:
-            Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)
+            welcome_screen.populate()
+        #     Clock.schedule_once(lambda dt: welcome_screen.populate(), 0.1)

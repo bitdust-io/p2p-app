@@ -1,3 +1,7 @@
+from kivy.clock import Clock
+
+#------------------------------------------------------------------------------
+
 from lib import api_client
 
 from components import webfont
@@ -12,6 +16,10 @@ _Debug = True
 #------------------------------------------------------------------------------
 
 class WelcomeScreen(screen.AppScreen):
+
+    def __init__(self, **kw):
+        self.refresh_task = None
+        super(WelcomeScreen, self).__init__(**kw)
 
     def get_statuses(self):
         return {
@@ -28,6 +36,13 @@ class WelcomeScreen(screen.AppScreen):
         }
 
     def populate(self):
+        if self.refresh_task:
+            self.refresh_task.cancel()
+            self.refresh_task = None
+        self.refresh_task = Clock.schedule_once(lambda dt: self.do_populate(), 0.01)
+
+    def do_populate(self):
+        self.refresh_task = None
         process_health = self.main_win().state_process_health
         identity_get = self.main_win().state_identity_get
         network_connected = self.main_win().state_network_connected
@@ -132,6 +147,9 @@ class WelcomeScreen(screen.AppScreen):
                                 if _Debug:
                                     print('    added links')
 
+    def call_identity_get(self):
+        api_client.identity_get(cb=self.on_identity_get_result)
+
     def on_search_people_link_pressed(self, instance, value):
         screen.select_screen('search_people_screen')
 
@@ -143,9 +161,6 @@ class WelcomeScreen(screen.AppScreen):
 
     def on_share_file_link_pressed(self, instance, value):
         screen.select_screen('shares_screen')
-
-    def call_identity_get(self):
-        api_client.identity_get(cb=self.on_identity_get_result)
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='initializer')

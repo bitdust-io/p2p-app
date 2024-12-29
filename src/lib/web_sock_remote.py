@@ -60,7 +60,7 @@ def start(callbacks={}, client_info_filepath=None):
     if is_started():
         raise Exception('already started')
     if _Debug:
-        print('web_sock_remote.start() client_info_filepath=%r' % client_info_filepath)
+        print('web_sock_remote.start client_info_filepath=%r' % client_info_filepath)
     _ClientInfoFilePath = client_info_filepath
     _RegisteredCallbacks = callbacks or {}
     _WebSocketConnecting = True
@@ -95,7 +95,7 @@ def stop():
     if not is_started():
         raise Exception('has not been started')
     if _Debug:
-        print('web_sock_remote.stop()')
+        print('web_sock_remote.stop')
     _ClientInfoFilePath = None
     _RegisteredCallbacks = {}
     _WebSocketStarted = False
@@ -107,7 +107,7 @@ def stop():
         try:
             json_data, _ = ws_queue().get_nowait()
             if _Debug:
-                print('cleaned unfinished call', json_data)
+                print('web_sock_remote.stop cleaned unfinished call', json_data)
         except queue.Empty:
             break
     _WebSocketQueue.put_nowait((None, None, ))
@@ -115,7 +115,7 @@ def stop():
         _WebSocketApp.close()
     else:
         if _Debug:
-            print('websocket was already closed')
+            print('web_sock_remote.stop websocket was already closed')
     _WebSocketApp = None
 
 #------------------------------------------------------------------------------
@@ -177,12 +177,12 @@ def on_open(ws_inst):
         cb(ws_inst)
     client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
     if _Debug:
-        print('websocket opened', time.time(), client_info)
+        print('web_sock_remote.on_open websocket opened', time.time(), client_info)
     auth_token = client_info.get('auth_token')
     session_key_text = client_info.get('session_key')
     if auth_token and session_key_text:
         if _Debug:
-            print('web_sock_remote.on_message was already AUTHORIZED', ws_inst)
+            print('web_sock_remote.on_open was already AUTHORIZED', ws_inst)
         _WebSocketAuthToken = auth_token
         _WebSocketSessionKey = base64.b64decode(strng.to_bin(session_key_text))
         on_connect(ws_inst)
@@ -194,7 +194,7 @@ def on_open(ws_inst):
 def on_connect(ws_inst):
     global _PendingCalls
     if _Debug:
-        print('websocket connected', ws_inst, time.time(), len(_PendingCalls))
+        print('web_sock_remote.on_connect websocket connected', ws_inst, time.time(), len(_PendingCalls))
     cb = registered_callbacks().get('on_connect')
     if cb:
         cb(ws_inst)
@@ -206,7 +206,7 @@ def on_connect(ws_inst):
             ws_queue().put_nowait((json_data, cb, ))
         except Exception as exc:
             if _Debug:
-                print('websocket was not opened', exc)
+                print('web_sock_remote.on_connect websocket was not opened', exc)
             _PendingCalls.insert(0, (json_data, cb, ))
             on_error(ws_inst, exc)
             return
@@ -221,7 +221,7 @@ def on_close(ws_inst):
     _WebSocketClosed = True
     _WebSocketConnecting = False
     if _Debug:
-        print('websocket closed', ws_inst, time.time())
+        print('web_sock_remote.on_close websocket closed', ws_inst, time.time())
     cb = registered_callbacks().get('on_close')
     if cb:
         cb(ws_inst)
@@ -230,7 +230,7 @@ def on_close(ws_inst):
 @mainthread
 def on_error(ws_inst, error):
     if _Debug:
-        print('on_error', ws_inst, error)
+        print('web_sock_remote.on_error', ws_inst, error)
     cb = registered_callbacks().get('on_error')
     if cb:
         cb(ws_inst, error)
@@ -239,7 +239,7 @@ def on_error(ws_inst, error):
 @mainthread
 def on_fail(err, result_callback=None):
     if _Debug:
-        print('on_fail', err)
+        print('web_sock_remote.on_fail', err)
     if result_callback:
         result_callback(err)
 
@@ -268,7 +268,7 @@ def on_message(ws_inst, message):
             hashed_confirmation = hashes.sha1(strng.to_bin(server_public_key+'-'+confirmation_code))
         except Exception as e:
             if _Debug:
-                print('failed reading server_public_key', e)
+                print('web_sock_remote.on_message failed reading server_public_key', e)
             restart_handshake()
             return False
         if not server_key_object.verify(strng.to_bin(signature), hashed_confirmation):
@@ -305,7 +305,7 @@ def on_message(ws_inst, message):
             received_client_code, auth_token, session_key_text, _ = received_salted_payload.split('#')  
         except Exception as e:
             if _Debug:
-                print('failed reading server_public_key', e)
+                print('web_sock_remote.on_message failed reading server_public_key', e)
             restart_handshake()
             return False
         if not server_key_object.verify(strng.to_bin(signature), hashed_payload):
@@ -331,14 +331,14 @@ def on_message(ws_inst, message):
     if cmd in ['response', 'push']:
         if 'iv' not in json_data or 'ct' not in json_data:
             if _Debug:
-                print('received not encrypted web socket message: %r' % json_data)
+                print('web_sock_remote.on_message received not encrypted web socket message: %r' % json_data)
             return False
         try:
             decrypted_raw_data = cipher.decrypt_json(json_data, _WebSocketSessionKey, from_dict=True)
             decrypted_json_payload = serialization.BytesToDict(decrypted_raw_data, keys_to_text=True, values_to_text=True, encoding='utf-8')
         except Exception as exc:
             if _Debug:
-                print('failed receiving incoming message payload: %r' % exc)
+                print('web_sock_remote.on_message failed receiving incoming message payload: %r' % exc)
             return False
         if 'payload' not in decrypted_json_payload:
             if _Debug:
@@ -419,7 +419,7 @@ def restart_handshake():
     global _ClientInfoFilePath
     client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
     if _Debug:
-        print('about to generate new RSA key')
+        print('web_sock_remote.restart_handshake about to generate new RSA key')
     key_object = rsa_key.RSAKey()
     key_object.generate(2048)
     client_info['key'] = key_object.toDict(include_private=True)
@@ -430,7 +430,7 @@ def restart_handshake():
         'client_public_key': key_object.toPublicString(),
     }
     if _Debug:
-        print('restart_handshake pushing data', json_data)
+        print('web_sock_remote.restart_handshake pushing data', json_data)
     ws_queue().put_nowait((json_data, None, ))
 
 
@@ -455,10 +455,10 @@ def continue_handshake(server_code):
         'signature': strng.to_text(client_key_object.sign(hashed_server_code)),
     }
     if _Debug:
-        print('continue_handshake pushing data', json_data)
+        print('web_sock_remote.continue_handshake pushing data', json_data)
     ws_queue().put_nowait((json_data, None, ))
     if _Debug:
-        print('continue_handshake client code: %r' % client_info['client_code'])
+        print('web_sock_remote.continue_handshake client code: %r' % client_info['client_code'])
     return client_info['client_code']
 
 #------------------------------------------------------------------------------
@@ -467,16 +467,16 @@ def requests_thread(active_queue):
     global _LastCallID
     global _CallbacksQueue
     if _Debug:
-        print('starting requests_thread()')
+        print('web_sock_remote is starting requests_thread()')
     while True:
         if not is_started():
             if _Debug:
-                print('finishing requests_thread() because web socket is not started')
+                print('web_sock_remote is finishing requests_thread() because web socket is not started')
             break
         json_data, result_callback = active_queue.get()
         if json_data is None:
             if _Debug:
-                print('going to stop requests thread')
+                print('web_sock_remote is going to stop requests_thread()')
             break
         if 'call_id' not in json_data:
             _LastCallID += 1
@@ -486,12 +486,12 @@ def requests_thread(active_queue):
         call_id = json_data['call_id']
         if call_id in _CallbacksQueue:
             if _Debug:
-                print('call_id was not unique')
+                print('web_sock_remote ERROR call_id was not unique')
             on_fail(Exception('call_id was not unique'), result_callback)
             continue
         if not ws():
             if _Debug:
-                print('websocket is closed')
+                print('web_sock_remote websocket is closed')
             on_fail(Exception('websocket is closed'), result_callback)
             continue
         _CallbacksQueue[call_id] = result_callback
@@ -502,9 +502,9 @@ def requests_thread(active_queue):
             ws().send(raw_data)
         except Exception as exc:
             if _Debug:
-                print('errors sending data', exc)
+                print('web_sock_remote errors sending data', exc)
     if _Debug:
-        print('requests_thread() finished')
+        print('web_sock_remote.requests_thread() finished')
 
 
 def websocket_thread():
@@ -515,21 +515,21 @@ def websocket_thread():
     global _WebSocketConnectingMaxAttempts
     web_socket.enableTrace(False)
     if _Debug:
-        print('websocket_thread() beginning _ClientInfoFilePath=%r' % _ClientInfoFilePath)
+        print('web_sock_remote.websocket_thread beginning _ClientInfoFilePath=%r' % _ClientInfoFilePath)
     client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
     routers = client_info['routers']
     _WebSocketConnectingMaxAttempts = len(routers)
     _WebSocketConnectingAttempts = 1
     while is_started():
         if _Debug:
-            print('websocket_thread() calling run_forever(ping_interval=10) %r' % time.asctime())
+            print('web_sock_remote.websocket_thread calling run_forever(ping_interval=10) %r' % time.asctime())
         _WebSocketClosed = False
         if _WebSocketConnectingAttempts > _WebSocketConnectingMaxAttempts:
-            on_error(Exception('connection attempts exceeded, failed connecting to web socket routers'))
+            on_error(None, Exception('connection attempts exceeded, failed connecting to web socket routers'))
             break
         url = routers[_WebSocketConnectingAttempts - 1]
         if _Debug:
-            print('    going to connect to %r, attempts=%r, max_attempts=%r' % (url, _WebSocketConnectingAttempts, _WebSocketConnectingMaxAttempts))
+            print('web_sock_remote.websocket_thread is going to connect to %r, attempts=%r, max_attempts=%r' % (url, _WebSocketConnectingAttempts, _WebSocketConnectingMaxAttempts))
         _WebSocketApp = web_socket.WebSocketApp(
             url=url,
             on_message=on_message,
@@ -543,10 +543,10 @@ def websocket_thread():
             ret = None
             _WebSocketApp = None
             if _Debug:
-                print('websocket_thread(): %r' % exc)
+                print('web_sock_remote.websocket_thread: %r' % exc)
             time.sleep(1)
         if _Debug:
-            print('websocket_thread().run_forever() returned: %r  is_started: %r' % (ret, is_started(), ))
+            print('web_sock_remote.websocket_thread run_forever() returned: %r  is_started: %r' % (ret, is_started(), ))
         if _WebSocketApp:
             del _WebSocketApp
             _WebSocketApp = None
@@ -556,7 +556,7 @@ def websocket_thread():
         _WebSocketConnectingAttempts += 1
     _WebSocketApp = None
     if _Debug:
-        print('websocket_thread() finished')
+        print('web_sock_remote.websocket_thread finished')
 
 #------------------------------------------------------------------------------
 
@@ -569,7 +569,7 @@ def verify_state():
             print('WS CALL REFUSED, web socket already closed')
         if is_connecting():
             if _Debug:
-                print('web socket closed but still connecting')
+                print('web_sock_remote.verify_state web socket closed but still connecting')
             return 'closed'
         return 'closed'
     if is_ready():
@@ -597,7 +597,7 @@ def encrypt_api_payload(json_data):
         'payload': encrypted_json_data,
     }
     if _Debug:
-        print('encrypt_api_payload', len(raw_bytes))
+        print('web_sock_remote.encrypt_api_payload', len(raw_bytes))
     return ret
 
 
@@ -618,12 +618,12 @@ def ws_call(json_data, cb=None):
     if st == 'connecting':
         encrypted_json_data = encrypt_api_payload(json_data)
         if _Debug:
-            print('web socket still connecting, remember pending request', encrypted_json_data)
+            print('web_sock_remote.ws_call web socket still connecting, remember pending request', encrypted_json_data)
         _PendingCalls.append((encrypted_json_data, cb, ))
         return True
     if st == 'not-started':
         if _Debug:
-            print('web socket was not started')
+            print('web_sock_remote.ws_call web socket was not started')
         if cb:
             cb(Exception('web socket was not started'))
         return False
