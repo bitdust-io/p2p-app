@@ -476,6 +476,9 @@ class Controller(object):
             self.mw().populate_device_server_code_display_dialog(event_data)
         elif event_id == 'web-socket-handshake-proceeding':
             self.mw().populate_device_client_code_input_dialog(event_data)
+        elif event_id == 'web-socket-handshake-failed':
+            self.mw().close_device_server_code_display_dialog()
+            self.mw().close_device_client_code_input_dialog()
         # elif event_id in ['friend-connected', 'friend-disconnected', ]:
             # if self.mw().is_screen_active('friends_screen'):
             #     self.mw().get_active_screen('friends_screen').on_friend_state_changed(

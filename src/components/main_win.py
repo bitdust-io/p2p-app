@@ -252,9 +252,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
     def populate_device_server_code_display_dialog(self, event_data):
         if _Debug:
             print('MainWin.populate_device_server_code_display_dialog', event_data)
-        if self.device_server_code_display_dialog:
-            self.device_server_code_display_dialog.dismiss()
-            self.device_server_code_display_dialog = None
+        self.close_device_server_code_display_dialog()
         server_code = event_data['server_code']
         self.device_server_code_display_dialog = dialogs.open_message_dialog(
             title='Authorization code',
@@ -263,10 +261,15 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
             cb=self.on_device_server_code_display_dialog_closed,
         )
 
-    def populate_device_client_code_input_dialog(self, event_data):
+    def close_device_server_code_display_dialog(self):
         if self.device_server_code_display_dialog:
             self.device_server_code_display_dialog.dismiss()
             self.device_server_code_display_dialog = None
+
+    def populate_device_client_code_input_dialog(self, event_data):
+        if _Debug:
+            print('MainWin.populate_device_client_code_input_dialog', event_data)
+        self.close_device_client_code_input_dialog()
         device_name = event_data['device_name']
         self.device_client_code_input_dialog = dialogs.open_number_input_dialog(
             title='Device code',
@@ -275,6 +278,11 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
             button_cancel='Back',
             cb=lambda inp: self.on_device_client_code_entered(device_name, inp),
         )
+
+    def close_device_client_code_input_dialog(self, event_data):
+        if self.device_server_code_display_dialog:
+            self.device_server_code_display_dialog.dismiss()
+            self.device_server_code_display_dialog = None
 
     #------------------------------------------------------------------------------
 

@@ -282,7 +282,7 @@ def on_message(ws_inst, message):
         system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
         cb = registered_callbacks().get('on_handshake_started')
         if cb:
-            cb()
+            cb(ws_inst)
         # here, the app needs to ask from the user for an input (by hand) of the server digit code
         # must raise an event to the UI and show a text input field widget
         # or code needs to be entered in the terminal via stdin
@@ -306,17 +306,23 @@ def on_message(ws_inst, message):
         except Exception as e:
             if _Debug:
                 print('web_sock_remote.on_message failed reading server_public_key', e)
-            restart_handshake()
+            cb = registered_callbacks().get('on_handshake_failed')
+            if cb:
+                cb(ws_inst, e)
             return False
         if not server_key_object.verify(strng.to_bin(signature), hashed_payload):
             if _Debug:
                 print('web_sock_remote.on_message authorization response signature verification failed')
-            restart_handshake()
+            cb = registered_callbacks().get('on_handshake_failed')
+            if cb:
+                cb(ws_inst, Exception('signature verification failed'))
             return False
         if received_client_code != client_code:
             if _Debug:
                 print('web_sock_remote.on_message client code is not matching')
-            restart_handshake()
+            cb = registered_callbacks().get('on_handshake_failed')
+            if cb:
+                cb(ws_inst, Exception('client code is not matching'))
             return False
         client_info['auth_token'] = auth_token
         client_info['session_key'] = session_key_text
@@ -374,7 +380,7 @@ def on_message(ws_inst, message):
             print('    routed web socket connection was DISCONNECTED from server side')
         cb = registered_callbacks().get('on_server_disconnected')
         if cb:
-            cb()
+            cb(ws_inst)
         return False
     if _Debug:
         print('       message was not processed', json_data)
