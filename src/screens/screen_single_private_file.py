@@ -1,17 +1,19 @@
 import os
 import tempfile
+import platformdirs
 
 #------------------------------------------------------------------------------
 
-from lib import api_client
 from lib import system
+from lib import api_client
+from lib import api_file_transfer
 
 from components import screen
 from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -48,13 +50,11 @@ class SinglePrivateFileScreen(screen.AppScreen):
         if _Debug:
             print('SinglePrivateFileScreen.init_kwargs', kw)
         self.global_id = kw.pop('global_id', '')
-        self.remote_path = kw.pop('remote_path', '')
         self.details = kw.pop('details', {})
-        if system.is_android():
-            self.local_path = ''
-            self.local_uri = None
-        else:
-            self.local_path = self.details.get('local_path')
+        self.remote_path = kw.pop('remote_path', '')
+        self.local_uri = None
+        self.local_path = self.details.get('local_path')
+        self.file_name = self.details.get('path')
         return kw
 
     def get_title(self):
@@ -107,19 +107,13 @@ class SinglePrivateFileScreen(screen.AppScreen):
         self.ids.state_panel.release()
 
     def on_download_file_button_clicked(self):
-        destination_path = None
-        if system.is_android():
-            from android.storage import app_storage_path  # @UnresolvedImport
-            destination_path = tempfile.mkdtemp(dir=app_storage_path())
-            if not os.path.exists(destination_path):
-                os.makedirs(destination_path)
         if _Debug:
-            print('SinglePrivateFileScreen.on_download_file_button_clicked remote_path=%s destination_path=%s' % (self.remote_path, destination_path, ))
+            print('SinglePrivateFileScreen.on_download_file_button_clicked remote_path=%s' % self.remote_path)
         api_client.file_download_start(
             remote_path=self.remote_path,
-            destination_path=destination_path,
+            destination_path=None,
             wait_result=True,
-            cb=lambda resp: self.on_file_download_result(resp, destination_path),
+            cb=self.on_file_download_result,
         )
 
     def on_delete_file_button_clicked(self):
@@ -137,24 +131,49 @@ class SinglePrivateFileScreen(screen.AppScreen):
         screen.main_window().screen_back()
         screen.main_window().close_screen(screen_id='private_file_{}'.format(self.global_id))
 
-    def on_file_download_result(self, resp, destination_path):
+    def on_file_download_result(self, resp):
         if _Debug:
-            print('SinglePrivateFileScreen.on_file_download_result', resp, destination_path)
-        if system.is_android():
-            # TODO: move the following inside a thread
-            for filename in os.listdir(destination_path):
-                from androidstorage4kivy import SharedStorage  # @UnresolvedImport
-                self.local_uri = SharedStorage().copy_to_shared(
-                    private_file=os.path.join(destination_path, filename),
-                )
-            system.rmdir_recursive(destination_path, ignore_errors=True)
-            self.ids.open_file_button.disabled = not self.local_uri
-        else:
-            self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
+            print('SinglePrivateFileScreen.on_file_download_result', resp)
         if not api_client.is_ok(resp):
             snackbar.error(text='download failed: %s' % api_client.response_err(resp))
-        else:
+            return
+        if screen.control().is_local:
+            self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
             snackbar.success(text='downloading is complete')
+            return
+        # if system.is_android():
+        #     from android.storage import app_storage_path  # @UnresolvedImport
+        #     destination_path = tempfile.mkdtemp(dir=app_storage_path())
+        #     if not os.path.exists(destination_path):
+        #         os.makedirs(destination_path)
+        # # TODO: move the following inside a thread
+        # for filename in os.listdir(destination_path):
+        #     from androidstorage4kivy import SharedStorage  # @UnresolvedImport
+        #     self.local_uri = SharedStorage().copy_to_shared(
+        #         private_file=os.path.join(destination_path, filename),
+        #     )
+        # system.rmdir_recursive(destination_path, ignore_errors=True)
+        # self.ids.open_file_button.disabled = not self.local_uri
+        api_file_transfer.file_download(
+            source_path=self.local_path,
+            destination_path=os.path.join(platformdirs.user_downloads_dir(), self.file_name),
+            result_callback=self.on_file_transfer_result,
+        )
+
+    def on_file_transfer_result(self, result):
+        if _Debug:
+            print('SinglePrivateFileScreen.on_file_transfer_result', result)
+        if isinstance(result, Exception):
+            snackbar.error(text=str(result))
+            return
+        destination_path = os.path.join(platformdirs.user_downloads_dir(), self.file_name)
+        if system.is_android():
+            from androidstorage4kivy import SharedStorage  # @UnresolvedImport
+            self.local_uri = SharedStorage().copy_to_shared(private_file=destination_path)
+            self.ids.open_file_button.disabled = not self.local_uri
+        else:
+            self.ids.open_file_button.disabled = not os.path.exists(destination_path)
+        snackbar.success(text='downloading is complete')
 
     def on_open_file_button_clicked(self):
         if _Debug:

@@ -733,7 +733,7 @@ class Controller(object):
     def on_device_client_code_entered(self, device_name, inp):
         if _Debug:
             print('Controller.on_device_client_code_entered', device_name, inp)
-        api_client.device_client_code_input(name=device_name, client_code=inp)
+        api_client.device_authorization_client_code(name=device_name, client_code=inp)
 
     def on_routed_web_socket_node_disconnected(self):
         if _Debug:

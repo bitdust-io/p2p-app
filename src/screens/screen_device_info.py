@@ -9,7 +9,7 @@ from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -81,6 +81,8 @@ class DeviceInfoScreen(screen.AppScreen):
         self.ids.state_panel.release()
 
     def populate(self, **kwargs):
+        if _Debug:
+            print('DeviceInfoScreen.populate')
         api_client.device_info(
             name=self.device_name,
             cb=self.on_device_info_result,
@@ -134,5 +136,6 @@ class DeviceInfoScreen(screen.AppScreen):
         if _Debug:
             print('DeviceInfoScreen.on_device_remove_result', resp)
         screen.select_screen('settings_screen')
+        screen.close_screen(screen_id='device_info_{}'.format(self.device_name))
         screen.stack_clear()
         screen.stack_append('welcome_screen')

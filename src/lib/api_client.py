@@ -107,6 +107,13 @@ def red_err(response):
 
 
 #------------------------------------------------------------------------------
+#--- API data transfer
+
+def open_sequential_stream(block_size=None, reader=None, writer=None):
+    return
+
+
+#------------------------------------------------------------------------------
 #--- API streaming
 
 def add_model_listener(model_name, listener_cb):
@@ -161,8 +168,14 @@ def stop_model_streaming(model_name):
 def request_model_data(model_name, query_details=None):
     return run('request_model_data', kwargs={'model_name': model_name, 'query_details': query_details, })
 
+
 #------------------------------------------------------------------------------
 #--- API methods
+
+
+def chunk_read(path, offset, max_size=1024*32, cb=None):
+    return run('chunk_read', kwargs={'path': path, 'offset': offset, 'max_size': max_size, }, cb=cb)
+
 
 def process_health(cb=None):
     return run('process_health', cb=cb)
@@ -195,8 +208,8 @@ def device_info(name, cb=None):
     return run('device_info', kwargs={'name': name, }, cb=cb)
 
 
-def device_client_code_input(name, client_code, cb=None):
-    return run('device_client_code_input', kwargs={'name': name, 'client_code': client_code, }, cb=cb)
+def device_authorization_client_code(name, client_code, cb=None):
+    return run('device_authorization_client_code', kwargs={'name': name, 'client_code': client_code, }, cb=cb)
 
 
 def identity_get(cb=None):

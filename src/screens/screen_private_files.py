@@ -1,10 +1,10 @@
 import os
 
 from kivy.clock import mainthread
-from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
+# from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
 from kivymd.uix.list import OneLineIconListItem
-from kivymd.uix.list import TwoLineIconListItem
+# from kivymd.uix.list import TwoLineIconListItem
 
 from lib import api_client
 from lib import system
@@ -19,24 +19,24 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-class PrivateFileItem(TwoLineIconListItem):
-
-    type = StringProperty()
-    name = StringProperty()
-    global_id = StringProperty()
-    remote_path = StringProperty()
-    customer = StringProperty()
-    size = NumericProperty(0)
-
-    def get_secondary_text(self):
-        sec_text = ''
-        if _Debug:
-            print('PrivateFileItem.get_secondary_text', self.global_id, sec_text)
-        return '[color=dddf]%s[/color]' % sec_text
-
-    def on_pressed(self):
-        if _Debug:
-            print('PrivateFileItem.on_pressed', self)
+# class PrivateFileItem(TwoLineIconListItem):
+#
+#     type = StringProperty()
+#     name = StringProperty()
+#     global_id = StringProperty()
+#     remote_path = StringProperty()
+#     customer = StringProperty()
+#     size = NumericProperty(0)
+#
+#     def get_secondary_text(self):
+#         sec_text = ''
+#         if _Debug:
+#             print('PrivateFileItem.get_secondary_text', self.global_id, sec_text)
+#         return '[color=dddf]%s[/color]' % sec_text
+#
+#     def on_pressed(self):
+#         if _Debug:
+#             print('PrivateFileItem.on_pressed', self)
 
 
 class UploadPrivateFile(OneLineIconListItem):

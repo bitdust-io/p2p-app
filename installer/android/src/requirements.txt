@@ -17,3 +17,4 @@ qrcode
 pyzbar
 pillow
 libzbar
+platformdirs

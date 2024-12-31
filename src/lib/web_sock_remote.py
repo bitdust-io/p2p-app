@@ -25,7 +25,7 @@ from lib import web_socket
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 _DebugAPIResponses = _Debug
 
 #------------------------------------------------------------------------------
@@ -628,67 +628,3 @@ def ws_call(json_data, cb=None):
             cb(Exception('web socket was not started'))
         return False
     raise Exception('unexpected state %r' % st)
-
-#------------------------------------------------------------------------------
-
-class TestApp(object):
-
-    def __init__(self):
-        self.completed = False
-
-    def _on_identity_get_response(self, resp):
-        if _Debug:
-            print('TestApp._on_identity_get_response', resp)
-        stop()
-        self.completed = True
-
-    def _on_websocket_open(self, ws_inst):
-        if _Debug:
-            print('TestApp._on_websocket_open', ws_inst)
-
-    def _on_websocket_connect(self, ws_inst):
-        if _Debug:
-            print('TestApp._on_websocket_connect', ws_inst)
-        json_data = {"command": "api_call", "method": "identity_get", "kwargs": {}}
-        ws_call(json_data, cb=self._on_identity_get_response)
-
-    def _on_websocket_handshake_started(self):
-        if _Debug:
-            print('TestApp._on_websocket_handshake_started')
-        entered_server_code = '333444'
-        continue_handshake(entered_server_code)
-
-    def _on_websocket_handshake_failed(self, ws_inst, err):
-        if _Debug:
-            print('TestApp._on_websocket_handshake_failed', ws_inst, err)
-
-    def _on_websocket_error(self, ws_inst, error):
-        if _Debug:
-            print('TestApp._on_websocket_error', ws_inst, error)
-
-    def _on_websocket_stream_message(self, json_data):
-        if _Debug:
-            print('TestApp._on_websocket_stream_message', json_data)
-
-    def _on_websocket_event(self, json_data):
-        if _Debug:
-            print('TestApp._on_websocket_event', json_data)
-
-    def _on_websocket_model_update(self, json_data):
-        if _Debug:
-            print('TestApp._on_websocket_model_update', json_data)
-
-    def begin(self):
-        start(
-            callbacks={
-                'on_open': self._on_websocket_open,
-                'on_handshake_failed': self._on_websocket_handshake_failed,
-                'on_connect': self._on_websocket_connect,
-                'on_error': self._on_websocket_error,
-                'on_stream_message': self._on_websocket_stream_message,
-                'on_event': self._on_websocket_event,
-                'on_model_update': self._on_websocket_model_update,
-                'on_handshake_started': self._on_websocket_handshake_started,
-            },
-            client_info_filepath='client.json',
-        )
