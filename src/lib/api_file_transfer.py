@@ -27,6 +27,8 @@ def file_download(source_path, destination_path, chunk_size=32*1024, result_call
 
     @mainthread
     def on_chunk_received(resp):
+        if _Debug:
+            print('api_file_transfer.file_download.on_chunk_received', resp)
         if not api_client.is_ok(resp):
             if result_callback:
                 result_callback(Exception(api_client.response_err(resp)))
@@ -54,6 +56,8 @@ def file_download(source_path, destination_path, chunk_size=32*1024, result_call
 
     @mainthread
     def do_chunk_request():
+        if _Debug:
+            print('api_file_transfer.file_download.do_chunk_request', source_path, offset)
         api_client.chunk_read(path=source_path, offset=offset, max_size=chunk_size, cb=on_chunk_received)
 
     do_chunk_request()

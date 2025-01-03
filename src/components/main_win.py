@@ -279,7 +279,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
             cb=lambda inp: self.on_device_client_code_entered(device_name, inp),
         )
 
-    def close_device_client_code_input_dialog(self, event_data):
+    def close_device_client_code_input_dialog(self):
         if self.device_server_code_display_dialog:
             self.device_server_code_display_dialog.dismiss()
             self.device_server_code_display_dialog = None
