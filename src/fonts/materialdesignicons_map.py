@@ -1,3 +1,5 @@
+# https://pictogrammers.com/library/mdi/
+
 import os
 
 materialdesignicons_ttf_filepath = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'md.ttf')

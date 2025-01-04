@@ -1,12 +1,11 @@
 import os
 
 from kivy.clock import mainthread
-from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
 from kivymd.uix.list import OneLineIconListItem
-from kivymd.uix.list import TwoLineIconListItem
 
 from lib import api_client
+from lib import api_file_transfer
 from lib import system
 from lib import util
 
@@ -18,26 +17,6 @@ from components import snackbar
 _Debug = False
 
 #------------------------------------------------------------------------------
-
-class PrivateFileItem(TwoLineIconListItem):
-
-    type = StringProperty()
-    name = StringProperty()
-    global_id = StringProperty()
-    remote_path = StringProperty()
-    customer = StringProperty()
-    size = NumericProperty(0)
-
-    def get_secondary_text(self):
-        sec_text = ''
-        if _Debug:
-            print('PrivateFileItem.get_secondary_text', self.global_id, sec_text)
-        return '[color=dddf]%s[/color]' % sec_text
-
-    def on_pressed(self):
-        if _Debug:
-            print('PrivateFileItem.on_pressed', self)
-
 
 class UploadPrivateFile(OneLineIconListItem):
 
@@ -68,10 +47,7 @@ class PrivateFilesScreen(screen.AppScreen):
         }
 
     def populate(self, *args, **kwargs):
-        pass
-        # api_client.request_model_data('private_file')
-        # if self.control().my_global_id:
-        #     api_client.request_model_data('remote_version', query_details={'key_id': 'master${}'.format(self.control().my_global_id), })
+        self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering
 
     def on_created(self):
         self.ids.files_list_view.init(
@@ -79,6 +55,7 @@ class PrivateFilesScreen(screen.AppScreen):
             key_id='master${}'.format(self.control().my_global_id) if self.control().my_global_id else None,
             file_clicked_callback=self.on_file_clicked,
         )
+        screen.main_window().bind(state_file_transfering=self.ids.upload_file_button.setter("disabled"))
 
     def on_destroying(self):
         self.ids.files_list_view.shutdown()
@@ -142,13 +119,13 @@ class PrivateFilesScreen(screen.AppScreen):
                 pass
         file_path = args[0][0]
         file_name = os.path.basename(file_path)
-        remote_path = util.clean_remote_path(file_name)
         if not system.is_android():
             if not os.path.isfile(file_path):
                 if _Debug:
                     print('PrivateFilesScreen.on_upload_file_selected file do not exist', file_path)
-                snackbar.error(text='file path not found: %r' % file_path)
+                snackbar.error(text='file not found')
                 return
+        remote_path = util.clean_remote_path(file_name)
         api_client.file_create(
             remote_path=remote_path,
             as_folder=False,
@@ -162,8 +139,30 @@ class PrivateFilesScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
             return
+        screen.main_window().state_file_transfering = True
+        if screen.control().is_local:
+            api_client.file_upload_start(
+                local_path=file_path,
+                remote_path=remote_path,
+                wait_result=True,
+                cb=self.on_upload_file_started,
+            )
+        else:
+            api_file_transfer.file_upload(
+                source_path=file_path,
+                result_callback=lambda result: self.on_file_transfer_result(result, remote_path),
+            )
+
+    def on_file_transfer_result(self, result, remote_path):
+        if _Debug:
+            print('PrivateFilesScreen.on_file_transfer_result', result, remote_path)
+        screen.main_window().state_file_transfering = False
+        if isinstance(result, Exception):
+            snackbar.error(text=str(result))
+            return
+        screen.main_window().state_file_transfering = True
         api_client.file_upload_start(
-            local_path=file_path,
+            local_path=result,
             remote_path=remote_path,
             wait_result=True,
             cb=self.on_upload_file_started,
@@ -172,6 +171,7 @@ class PrivateFilesScreen(screen.AppScreen):
     def on_upload_file_started(self, resp):
         if _Debug:
             print('PrivateFilesScreen.on_upload_file_started', resp)
+        screen.main_window().state_file_transfering = False
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
 

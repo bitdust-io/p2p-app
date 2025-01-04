@@ -117,6 +117,12 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
         if self.spinner_dialog:
             self.spinner_dialog.dismiss()
             self.spinner_dialog = None
+        if self.confirmation_code_dialog:
+            self.confirmation_code_dialog.dismiss()
+            self.confirmation_code_dialog = None
+        if self.server_code_input_dialog:
+            self.server_code_input_dialog.dismiss()
+            self.server_code_input_dialog = None
         snackbar.error(text=str(error))
         self.ids.qr_scan_open_button.disabled = False
 
@@ -129,9 +135,9 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
         snackbar.error(text=str(error))
         self.ids.qr_scan_open_button.disabled = False
 
-    def on_websocket_handshake_started(self):
+    def on_websocket_handshake_started(self, ws_inst):
         if _Debug:
-            print('TabRemoteDevice.on_websocket_handshake_started')
+            print('TabRemoteDevice.on_websocket_handshake_started', ws_inst)
         if self.spinner_dialog:
             self.spinner_dialog.dismiss()
             self.spinner_dialog = None
@@ -143,9 +149,9 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
             cb=self.on_server_code_entered,
         )
 
-    def on_websocket_server_disconnected(self):
+    def on_websocket_server_disconnected(self, ws_inst):
         if _Debug:
-            print('TabRemoteDevice.on_websocket_server_disconnected')
+            print('TabRemoteDevice.on_websocket_server_disconnected', ws_inst)
         if web_sock_remote.is_started():
             web_sock_remote.stop()
         if self.device_check_task:

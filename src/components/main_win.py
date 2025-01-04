@@ -80,6 +80,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
     state_my_data = NumericProperty(-1)
     state_message_history = NumericProperty(-1)
     state_rebuilding = BooleanProperty(False)
+    state_file_transfering = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         self.device_server_code_display_dialog = None
@@ -252,9 +253,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
     def populate_device_server_code_display_dialog(self, event_data):
         if _Debug:
             print('MainWin.populate_device_server_code_display_dialog', event_data)
-        if self.device_server_code_display_dialog:
-            self.device_server_code_display_dialog.dismiss()
-            self.device_server_code_display_dialog = None
+        self.close_device_server_code_display_dialog()
         server_code = event_data['server_code']
         self.device_server_code_display_dialog = dialogs.open_message_dialog(
             title='Authorization code',
@@ -263,10 +262,15 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
             cb=self.on_device_server_code_display_dialog_closed,
         )
 
-    def populate_device_client_code_input_dialog(self, event_data):
+    def close_device_server_code_display_dialog(self):
         if self.device_server_code_display_dialog:
             self.device_server_code_display_dialog.dismiss()
             self.device_server_code_display_dialog = None
+
+    def populate_device_client_code_input_dialog(self, event_data):
+        if _Debug:
+            print('MainWin.populate_device_client_code_input_dialog', event_data)
+        self.close_device_client_code_input_dialog()
         device_name = event_data['device_name']
         self.device_client_code_input_dialog = dialogs.open_number_input_dialog(
             title='Device code',
@@ -275,6 +279,11 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
             button_cancel='Back',
             cb=lambda inp: self.on_device_client_code_entered(device_name, inp),
         )
+
+    def close_device_client_code_input_dialog(self):
+        if self.device_server_code_display_dialog:
+            self.device_server_code_display_dialog.dismiss()
+            self.device_server_code_display_dialog = None
 
     #------------------------------------------------------------------------------
 
@@ -528,7 +537,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
     def on_state_network_connected(self, instance, value):
         if _Debug:
             print('MainWin.on_state_network_connected', value)
-        self.populate_bottom_toolbar_icon('lan-connect', value)
+        self.populate_bottom_toolbar_icon('share-variant', value)
         self.control.on_state_network_connected(instance, value)
         if self.is_screen_active('welcome_screen'):
             welcome_screen = self.get_active_screen('welcome_screen')
@@ -570,6 +579,11 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         if value:
             not_blinking = 0
         self.populate_bottom_toolbar_icon('database', not_blinking)
+
+    def on_state_file_transfering(self, instance, value):
+        if _Debug:
+            print('MainWin.on_state_file_transfering', value)
+        self.populate_bottom_toolbar_icon('wifi-arrow-up-down', 0 if value else -1)
 
     def on_device_server_code_display_dialog_closed(self, *args, **kwargs):
         if _Debug:

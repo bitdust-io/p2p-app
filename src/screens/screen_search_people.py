@@ -36,8 +36,6 @@ class NoUsersFound(labels.NormalLabel):
 
 class SearchPeopleScreen(screen.AppScreen):
 
-    search_started = False
-
     def init_kwargs(self, **kw):
         self.return_screen_id = kw.pop('return_screen_id', 'friends_screen')
         return kw
@@ -45,45 +43,37 @@ class SearchPeopleScreen(screen.AppScreen):
     def get_title(self):
         return "search people"
 
-    # def get_icon(self):
-    #     return 'account-search'
-
     def clean_view(self, clear_input_field=False):
         if clear_input_field:
             self.ids.search_input.text = ''
         self.ids.search_results.clear_widgets()
 
-    def start_search(self):
-        if self.search_started:
-            return
-        nickname = self.ids.search_input.text.strip().lower()
-        if not nickname:
-            return
+    def start_search(self, randomized=False):
         self.clean_view()
         self.ids.search_button.disabled = True
-        self.search_started = True
-        api_client.user_observe(
-            nickname=nickname,
-            attempts=3,
-            cb=self.on_user_observe_result,
-        )
-
-    def randomized_lookup(self):
-        if self.search_started:
-            return
-        self.clean_view()
-        self.ids.search_button.disabled = True
-        self.search_started = True
-        api_client.dht_user_random(
-            count=3,
-            cb=self.on_randomized_lookup_result,
-        )
+        self.ids.random_search_button.disabled = True
+        if randomized:
+            api_client.dht_user_random(
+                count=3,
+                cb=self.on_user_observe_result,
+            )
+        else:
+            nickname = self.ids.search_input.text.strip().lower()
+            if not nickname:
+                self.clean_view(clear_input_field=True)
+                self.ids.search_button.disabled = False
+                self.ids.random_search_button.disabled = False
+                return
+            api_client.user_observe(
+                nickname=nickname,
+                attempts=3,
+                cb=self.on_user_observe_result,
+            )
 
     def on_enter(self):
-        if self.search_started:
-            return
         self.clean_view(clear_input_field=True)
         self.ids.search_button.disabled = False
+        self.ids.random_search_button.disabled = False
 
     def on_search_input_key_enter_pressed(self, *args):
         if _Debug:
@@ -94,48 +84,24 @@ class SearchPeopleScreen(screen.AppScreen):
         self.start_search()
 
     def on_random_button_clicked(self):
-        self.randomized_lookup()
+        self.start_search(randomized=True)
 
     def on_user_observe_result(self, resp):
-        self.search_started = False
         self.clean_view()
         self.ids.search_button.disabled = False
+        self.ids.random_search_button.disabled = False
         if _Debug:
             print('SearchPeopleScreen.on_user_observe_result', resp)
         if not isinstance(resp, dict):
-            self.ids.search_results.add_widget(NoUsersFound(
-                text=str(resp),
-            ))
+            self.ids.search_results.add_widget(NoUsersFound(text=str(resp)))
             return
         result = resp.get('payload', {}).get('response' , {}).get('result', [])
         if not result:
-            self.ids.search_results.add_widget(NoUsersFound(
-                text='no users found'
-            ))
+            self.ids.search_results.add_widget(NoUsersFound(text='no users found'))
             return
         for r in result:
-            self.ids.search_results.add_widget(SearchPeopleResult(
-                label_text=str(r['global_id']),
-            ))
-
-    def on_randomized_lookup_result(self, resp):
-        self.search_started = False
-        self.clean_view()
-        self.ids.search_button.disabled = False
-        if _Debug:
-            print('SearchPeopleScreen.on_randomized_lookup_result', resp)
-        if not isinstance(resp, dict):
-            self.ids.search_results.add_widget(NoUsersFound(
-                text=str(resp),
-            ))
-            return
-        result = resp.get('payload', {}).get('response' , {}).get('result', [])
-        if not result:
-            self.ids.search_results.add_widget(NoUsersFound(
-                text='no users found'
-            ))
-            return
-        for idurl in result:
-            self.ids.search_results.add_widget(SearchPeopleResult(
-                label_text=util.IDUrlToGlobalID(idurl),
-            ))
+            if isinstance(r, str):
+                user_id = util.IDUrlToGlobalID(r)
+            else:
+                user_id = str(r['global_id'])
+            self.ids.search_results.add_widget(SearchPeopleResult(label_text=user_id))

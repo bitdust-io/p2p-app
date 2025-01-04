@@ -6,9 +6,10 @@ from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 from kivymd.uix.list import OneLineIconListItem
 from kivymd.uix.list import TwoLineIconListItem
 
-from lib import api_client
 from lib import system
 from lib import util
+from lib import api_client
+from lib import api_file_transfer
 
 from components import screen
 from components import snackbar
@@ -84,14 +85,24 @@ class SharedLocationScreen(screen.AppScreen):
         }
 
     def populate(self, *args, **kwargs):
-        pass
+        if _Debug:
+            print('SharedLocationScreen.populate', screen.main_window().state_file_transfering)
+        self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
 
     def on_created(self):
+        if _Debug:
+            print('SharedLocationScreen.on_created', screen.main_window().state_file_transfering)
         self.ids.files_list_view.init(
             file_system_type='shared',
             key_id=self.key_id,
             file_clicked_callback=self.on_file_clicked,
         )
+        screen.main_window().bind(state_file_transfering=self.on_state_file_transfering)
+
+    def on_state_file_transfering(self, instance, value):
+        if _Debug:
+            print('SharedLocationScreen.on_state_file_transfering', screen.main_window().state_file_transfering, self.ids.files_list_view.opened)
+        self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
 
     def on_destroying(self):
         self.ids.files_list_view.shutdown()
@@ -110,11 +121,11 @@ class SharedLocationScreen(screen.AppScreen):
         if api_client.is_ok(resp):
             if api_client.result(resp)['active']:
                 self.ids.files_list_view.open()
-                self.ids.upload_file_button.disabled = False
-                self.ids.upload_file_button.md_bg_color = self.app().theme_cls.accent_color
+                self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
+                # self.ids.upload_file_button.md_bg_color = self.app().theme_cls.accent_color
                 return
-        self.ids.upload_file_button.disabled = True
         self.ids.files_list_view.close()
+        self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
 
     def on_state_panel_release(self, resp):
         pass
@@ -170,8 +181,6 @@ class SharedLocationScreen(screen.AppScreen):
                 snackbar.error(text='file path not found: %r' % file_path)
                 return
         remote_path = '{}:{}'.format(self.key_id, util.clean_remote_path(file_name))
-        if _Debug:
-            print('SharedLocationScreen.on_upload_file_selected', args, kwargs, remote_path)
         api_client.file_create(
             remote_path=remote_path,
             as_folder=False,
@@ -185,8 +194,30 @@ class SharedLocationScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
             return
+        screen.main_window().state_file_transfering = True
+        if screen.control().is_local:
+            api_client.file_upload_start(
+                local_path=file_path,
+                remote_path=remote_path,
+                wait_result=True,
+                cb=self.on_upload_file_started,
+            )
+        else:
+            api_file_transfer.file_upload(
+                source_path=file_path,
+                result_callback=lambda result: self.on_file_transfer_result(result, remote_path),
+            )
+
+    def on_file_transfer_result(self, result, remote_path):
+        if _Debug:
+            print('SharedLocationScreen.on_file_transfer_result', result, remote_path)
+        screen.main_window().state_file_transfering = False
+        if isinstance(result, Exception):
+            snackbar.error(text=str(result))
+            return
+        screen.main_window().state_file_transfering = True
         api_client.file_upload_start(
-            local_path=file_path,
+            local_path=result,
             remote_path=remote_path,
             wait_result=True,
             cb=self.on_upload_file_started,
@@ -195,6 +226,7 @@ class SharedLocationScreen(screen.AppScreen):
     def on_upload_file_started(self, resp):
         if _Debug:
             print('SharedLocationScreen.on_upload_file_started', resp)
+        screen.main_window().state_file_transfering = False
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
 
@@ -297,8 +329,8 @@ class SharedLocationScreen(screen.AppScreen):
         if _Debug:
             print('SharedLocationScreen.on_share_close_result', resp)
         if api_client.is_ok(resp):
-            self.ids.upload_file_button.disabled = True
             self.ids.files_list_view.close()
+            self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
             snackbar.success(text='shared location closed')
         else:
             snackbar.error(text=api_client.response_err(resp))

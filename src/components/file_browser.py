@@ -358,6 +358,8 @@ class DistributedFileChooserListView(FileChooserController):
             self._update_files()
             return
         remote_path = payload['data'].get('remote_path')
+        if not remote_path:
+            return
         if self.file_system_type == 'shared':
             if not global_id.startswith(self.file_system.key_id):
                 return

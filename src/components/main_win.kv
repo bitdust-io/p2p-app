@@ -203,7 +203,7 @@
                 "cb": lambda x: [app.main_window.nav().set_state("close"), app.main_window.select_screen('engine_status_screen', clear_stack=False, verify_state=True)]},
                 {"icon": "id-card", "icon_pack": "IconICO", "tooltip": "my identity",
                 "cb": lambda x: [app.main_window.nav().set_state("close"), app.main_window.select_screen('my_id_screen', clear_stack=False, verify_state=True)]},
-                {"icon": "lan-connect", "icon_pack": "IconMD", "tooltip": "peer-to-peer connections",
+                {"icon": "share-variant", "icon_pack": "Icon", "tooltip": "peer-to-peer connections",
                 "cb": lambda x: [app.main_window.nav().set_state("close"), app.main_window.select_screen('connecting_screen', clear_stack=False, verify_state=True)]},
                 {"icon": "family-tree", "icon_pack": "Icon", "tooltip": "distributed hash table",
                 "cb": lambda x: None},
@@ -212,5 +212,7 @@
                 {"icon": "database", "icon_pack": "IconFA", "tooltip": "distributed storage", "size": "18sp",
                 "cb": lambda x: [app.main_window.nav().set_state("close"), app.main_window.select_screen('my_storage_info_screen', clear_stack=False, verify_state=True)]},
                 {"icon": "comments", "icon_pack": "IconFA", "tooltip": "chat messages",
-                "cb": lambda x: [app.main_window.nav().set_state("close"), app.main_window.select_screen('conversations_screen', clear_stack=False, verify_state=True)]},]
+                "cb": lambda x: [app.main_window.nav().set_state("close"), app.main_window.select_screen('conversations_screen', clear_stack=False, verify_state=True)]},
+                {"icon": "wifi-arrow-up-down", "icon_pack": "Icon", "tooltip": "uploading / downloading",
+                "cb": lambda x: None},]
             on_action_button: root.on_hot_button_clicked()

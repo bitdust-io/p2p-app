@@ -282,7 +282,7 @@ def on_message(ws_inst, message):
         system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
         cb = registered_callbacks().get('on_handshake_started')
         if cb:
-            cb()
+            cb(ws_inst)
         # here, the app needs to ask from the user for an input (by hand) of the server digit code
         # must raise an event to the UI and show a text input field widget
         # or code needs to be entered in the terminal via stdin
@@ -306,17 +306,23 @@ def on_message(ws_inst, message):
         except Exception as e:
             if _Debug:
                 print('web_sock_remote.on_message failed reading server_public_key', e)
-            restart_handshake()
+            cb = registered_callbacks().get('on_handshake_failed')
+            if cb:
+                cb(ws_inst, e)
             return False
         if not server_key_object.verify(strng.to_bin(signature), hashed_payload):
             if _Debug:
                 print('web_sock_remote.on_message authorization response signature verification failed')
-            restart_handshake()
+            cb = registered_callbacks().get('on_handshake_failed')
+            if cb:
+                cb(ws_inst, Exception('signature verification failed'))
             return False
         if received_client_code != client_code:
             if _Debug:
                 print('web_sock_remote.on_message client code is not matching')
-            restart_handshake()
+            cb = registered_callbacks().get('on_handshake_failed')
+            if cb:
+                cb(ws_inst, Exception('client code is not matching'))
             return False
         client_info['auth_token'] = auth_token
         client_info['session_key'] = session_key_text
@@ -374,7 +380,7 @@ def on_message(ws_inst, message):
             print('    routed web socket connection was DISCONNECTED from server side')
         cb = registered_callbacks().get('on_server_disconnected')
         if cb:
-            cb()
+            cb(ws_inst)
         return False
     if _Debug:
         print('       message was not processed', json_data)
@@ -628,67 +634,3 @@ def ws_call(json_data, cb=None):
             cb(Exception('web socket was not started'))
         return False
     raise Exception('unexpected state %r' % st)
-
-#------------------------------------------------------------------------------
-
-class TestApp(object):
-
-    def __init__(self):
-        self.completed = False
-
-    def _on_identity_get_response(self, resp):
-        if _Debug:
-            print('TestApp._on_identity_get_response', resp)
-        stop()
-        self.completed = True
-
-    def _on_websocket_open(self, ws_inst):
-        if _Debug:
-            print('TestApp._on_websocket_open', ws_inst)
-
-    def _on_websocket_connect(self, ws_inst):
-        if _Debug:
-            print('TestApp._on_websocket_connect', ws_inst)
-        json_data = {"command": "api_call", "method": "identity_get", "kwargs": {}}
-        ws_call(json_data, cb=self._on_identity_get_response)
-
-    def _on_websocket_handshake_started(self):
-        if _Debug:
-            print('TestApp._on_websocket_handshake_started')
-        entered_server_code = '333444'
-        continue_handshake(entered_server_code)
-
-    def _on_websocket_handshake_failed(self, ws_inst, err):
-        if _Debug:
-            print('TestApp._on_websocket_handshake_failed', ws_inst, err)
-
-    def _on_websocket_error(self, ws_inst, error):
-        if _Debug:
-            print('TestApp._on_websocket_error', ws_inst, error)
-
-    def _on_websocket_stream_message(self, json_data):
-        if _Debug:
-            print('TestApp._on_websocket_stream_message', json_data)
-
-    def _on_websocket_event(self, json_data):
-        if _Debug:
-            print('TestApp._on_websocket_event', json_data)
-
-    def _on_websocket_model_update(self, json_data):
-        if _Debug:
-            print('TestApp._on_websocket_model_update', json_data)
-
-    def begin(self):
-        start(
-            callbacks={
-                'on_open': self._on_websocket_open,
-                'on_handshake_failed': self._on_websocket_handshake_failed,
-                'on_connect': self._on_websocket_connect,
-                'on_error': self._on_websocket_error,
-                'on_stream_message': self._on_websocket_stream_message,
-                'on_event': self._on_websocket_event,
-                'on_model_update': self._on_websocket_model_update,
-                'on_handshake_started': self._on_websocket_handshake_started,
-            },
-            client_info_filepath='client.json',
-        )

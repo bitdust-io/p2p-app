@@ -54,7 +54,8 @@
                     RaisedIconButton:
                         id: search_button
                         _radius: dp(3)
-                        icon: 'search-web'
+                        icon_pack: 'IconICO'
+                        icon: 'search-user'
                         on_press: root.on_search_button_clicked()
 
                     Widget:
@@ -71,9 +72,10 @@
                     height: self.minimum_height
 
                     RaisedIconButton:
-                        id: search_button
+                        id: random_search_button
                         _radius: dp(3)
-                        icon: 'dice-5-outline'
+                        icon_pack: 'IconICO'
+                        icon: 'dice-multiple'
                         on_press: root.on_random_button_clicked()
 
                     Widget:
@@ -91,4 +93,3 @@
                     spacing: dp(5)
 
         BottomEmptyScreenSpace:
-

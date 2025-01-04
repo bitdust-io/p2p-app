@@ -85,16 +85,16 @@ class DeviceDisconnectedScreen(screen.AppScreen):
             self.device_check_task = None
         self.device_check_task = Clock.schedule_once(self.do_connect, 5)
 
-    def on_websocket_handshake_started(self):
+    def on_websocket_handshake_started(self, ws_inst):
         if _Debug:
-            print('DeviceDisconnectedScreen.on_websocket_handshake_started')
+            print('DeviceDisconnectedScreen.on_websocket_handshake_started', ws_inst)
         if web_sock_remote.is_started():
             web_sock_remote.stop()
         self.do_open_device_connect_screen()
 
-    def on_websocket_server_disconnected(self):
+    def on_websocket_server_disconnected(self, ws_inst):
         if _Debug:
-            print('DeviceDisconnectedScreen.on_websocket_server_disconnected')
+            print('DeviceDisconnectedScreen.on_websocket_server_disconnected', ws_inst)
         if web_sock_remote.is_started():
             web_sock_remote.stop()
         self.do_populate_text_label()

@@ -427,6 +427,8 @@ class BackgroundProcess(object):
 #------------------------------------------------------------------------------
 
 def get_nice_size(size_bytes):
+    if strng.is_text(size_bytes):
+        return size_bytes
     sz = float(size_bytes)
     for unit in ('B', 'KB', 'MB', 'GB', 'TB'):
         if sz < 1024.0:
