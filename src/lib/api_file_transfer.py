@@ -83,7 +83,6 @@ def file_upload(source_path, chunk_size=32*1024, result_callback=None):
         if result_callback:
             result_callback(exc)
         return
-    counter = 0
 
     @mainthread
     def on_chunk_result(resp, destination_path):

@@ -1,3 +1,5 @@
+# https://icofont.com/icons
+
 import os
 
 icofont_ttf_filepath = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'icofont.ttf')

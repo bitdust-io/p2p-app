@@ -1,3 +1,5 @@
+# https://fontawesome.com/v5/search?o=r&m=free
+
 import os
 
 fontawesome_ttf_filepath = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'fa-solid.ttf')

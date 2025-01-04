@@ -601,8 +601,9 @@ def main():
     try:
         BitDustApp().run()
     except Exception as exc:
-        if _Debug:
-            print('Exception raised: %r' % exc)
+        print('Exception raised')
+        print(exc)
+        traceback.print_exc()
     if _Debug:
         print('BitDustApp.main   process is finishing')
 

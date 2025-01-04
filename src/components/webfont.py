@@ -9,6 +9,7 @@ _Debug = False
 #------------------------------------------------------------------------------
 # Font Awesome
 # https://fontawesome.com
+# https://fontawesome.com/v5/search?o=r&m=free
 
 def is_fa_icon(name):
     return name in fontawesome_codes
@@ -36,6 +37,7 @@ def fa_icon(name, font_file=None, with_spaces=True, with_font_tag=True):
 #------------------------------------------------------------------------------
 # ICO Font
 # https://icofont.com
+# https://icofont.com/icons
 
 def is_icofont_icon(name):
     return name in icofont_codes
@@ -63,6 +65,7 @@ def icofont_icon(name, font_file=None, with_spaces=True, with_font_tag=True):
 #------------------------------------------------------------------------------
 # Material Design Icons
 # https://materialdesignicons.com
+# https://pictogrammers.com/library/mdi
 
 def is_md_icon(name):
     return name in materialdesignicons_codes
@@ -117,6 +120,8 @@ def get_font_path(icon_pack):
 
 
 def make_icon(name, icon_pack='IconMD', font_file=None, with_spaces=False):
+    if _Debug:
+        print('webfont.make_icon', icon_pack, name)
     if icon_pack in ['Icon', 'Icons', ]:
         from kivymd.icon_definitions import md_icons
         from kivy.core.text import LabelBase
