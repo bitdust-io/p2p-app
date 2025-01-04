@@ -738,8 +738,8 @@ class Controller(object):
             print('Controller.on_device_client_code_entered', device_name, inp)
         api_client.device_authorization_client_code(name=device_name, client_code=inp)
 
-    def on_routed_web_socket_node_disconnected(self):
+    def on_routed_web_socket_node_disconnected(self, ws_inst):
         if _Debug:
-            print('Controller.on_routed_web_socket_node_disconnected')
+            print('Controller.on_routed_web_socket_node_disconnected', ws_inst)
         self.stop()
         self.mw().state_process_health = -1

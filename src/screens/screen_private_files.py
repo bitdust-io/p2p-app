@@ -7,6 +7,7 @@ from kivymd.uix.list import OneLineIconListItem
 # from kivymd.uix.list import TwoLineIconListItem
 
 from lib import api_client
+from lib import api_file_transfer
 from lib import system
 from lib import util
 
@@ -147,7 +148,7 @@ class PrivateFilesScreen(screen.AppScreen):
             if not os.path.isfile(file_path):
                 if _Debug:
                     print('PrivateFilesScreen.on_upload_file_selected file do not exist', file_path)
-                snackbar.error(text='file path not found: %r' % file_path)
+                snackbar.error(text='file not found')
                 return
         api_client.file_create(
             remote_path=remote_path,
@@ -162,8 +163,27 @@ class PrivateFilesScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
             return
+        if screen.control().is_local:
+            api_client.file_upload_start(
+                local_path=file_path,
+                remote_path=remote_path,
+                wait_result=True,
+                cb=self.on_upload_file_started,
+            )
+        else:
+            api_file_transfer.file_upload(
+                source_path=file_path,
+                result_callback=lambda result: self.on_file_transfer_result(result, remote_path),
+            )
+
+    def on_file_transfer_result(self, result, remote_path):
+        if _Debug:
+            print('PrivateFilesScreen.on_file_transfer_result', result, remote_path)
+        if isinstance(result, Exception):
+            snackbar.error(text=str(result))
+            return
         api_client.file_upload_start(
-            local_path=file_path,
+            local_path=result,
             remote_path=remote_path,
             wait_result=True,
             cb=self.on_upload_file_started,

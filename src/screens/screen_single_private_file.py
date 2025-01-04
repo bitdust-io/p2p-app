@@ -13,7 +13,7 @@ from components import snackbar
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ private_file_info_text = """
 [color=#909090]remote path:[/color] {remote_path}
 [color=#909090]global ID:[/color] {global_id}
 [color=#909090]size:[/color] {size_text}
-[color=#909090]local path:[/color] {local_path}
+[color=#909090]downloaded to:[/color] {download_path}
 {versions_text}
 [/size]
 """
@@ -53,7 +53,7 @@ class SinglePrivateFileScreen(screen.AppScreen):
         self.details = kw.pop('details', {})
         self.remote_path = kw.pop('remote_path', '')
         self.local_uri = None
-        self.local_path = self.details.get('local_path')
+        self.downloaded_path = None
         self.file_name = self.details.get('path')
         return kw
 
@@ -79,7 +79,7 @@ class SinglePrivateFileScreen(screen.AppScreen):
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             header_text_size='{}sp'.format(self.app().font_size_large_absolute),
             remote_path=self.remote_path,
-            local_path=self.local_path or '',
+            download_path=self.downloaded_path or '',
             global_id=self.global_id,
             size_text=system.get_nice_size(self.details.get('size', 0)),
         )
@@ -92,10 +92,13 @@ class SinglePrivateFileScreen(screen.AppScreen):
             versions_text += version_info_text.format(**v)
         ctx['versions_text'] = versions_text
         self.ids.private_file_details.text = private_file_info_text.format(**ctx)
-        if system.is_android():
-            self.ids.open_file_button.disabled = not self.local_uri
+        if screen.control().is_local:
+            self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
         else:
-            self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
+            if system.is_android():
+                self.ids.open_file_button.disabled = not self.local_uri
+            else:
+                self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id='service_my_data')
@@ -135,28 +138,35 @@ class SinglePrivateFileScreen(screen.AppScreen):
         if _Debug:
             print('SinglePrivateFileScreen.on_file_download_result', resp)
         if not api_client.is_ok(resp):
-            snackbar.error(text='download failed: %s' % api_client.response_err(resp))
+            snackbar.error(text=api_client.response_err(resp))
+            return
+        local_path = api_client.response_result(resp).get('local_path')
+        destination_path = os.path.join(platformdirs.user_downloads_dir(), self.file_name)
+        if not local_path:
+            self.downloaded_path = None
+            self.ids.open_file_button.disabled = True
+            snackbar.error(text='file was not downloaded')
             return
         if screen.control().is_local:
-            self.ids.open_file_button.disabled = not self.local_path or not os.path.exists(self.local_path)
-            snackbar.success(text='downloading is complete')
+            try:
+                os.rename(local_path, platformdirs.user_downloads_dir())
+            except Exception as exc:
+                self.downloaded_path = None
+                self.ids.open_file_button.disabled = True
+                snackbar.error(str(exc))
+                return
+            if os.path.exists(destination_path):
+                self.downloaded_path = destination_path
+                self.ids.open_file_button.disabled = False
+                snackbar.success(text='downloading is complete')
+            else:
+                self.downloaded_path = None
+                self.ids.open_file_button.disabled = True
+                snackbar.error(text='file was not downloaded')
             return
-        # if system.is_android():
-        #     from android.storage import app_storage_path  # @UnresolvedImport
-        #     destination_path = tempfile.mkdtemp(dir=app_storage_path())
-        #     if not os.path.exists(destination_path):
-        #         os.makedirs(destination_path)
-        # # TODO: move the following inside a thread
-        # for filename in os.listdir(destination_path):
-        #     from androidstorage4kivy import SharedStorage  # @UnresolvedImport
-        #     self.local_uri = SharedStorage().copy_to_shared(
-        #         private_file=os.path.join(destination_path, filename),
-        #     )
-        # system.rmdir_recursive(destination_path, ignore_errors=True)
-        # self.ids.open_file_button.disabled = not self.local_uri
         api_file_transfer.file_download(
-            source_path=self.local_path,
-            destination_path=os.path.join(platformdirs.user_downloads_dir(), self.file_name),
+            source_path=local_path,
+            destination_path=destination_path,
             result_callback=self.on_file_transfer_result,
         )
 
@@ -172,18 +182,23 @@ class SinglePrivateFileScreen(screen.AppScreen):
             self.local_uri = SharedStorage().copy_to_shared(private_file=destination_path)
             self.ids.open_file_button.disabled = not self.local_uri
         else:
-            self.ids.open_file_button.disabled = not os.path.exists(destination_path)
+            self.downloaded_path = destination_path
+            self.ids.open_file_button.disabled = not os.path.exists(self.downloaded_path)
         snackbar.success(text='downloading is complete')
 
     def on_open_file_button_clicked(self):
         if _Debug:
             print('SinglePrivateFileScreen.on_open_file_button_clicked')
-        if system.is_android():
-            if self.local_uri:
-                system.open_path_in_os(self.local_uri)
+        if screen.control().is_local:
+            if self.downloaded_path and os.path.exists(self.downloaded_path):
+                system.open_path_in_os(self.downloaded_path)
         else:
-            if self.local_path and os.path.exists(self.local_path):
-                system.open_path_in_os(self.local_path)
+            if system.is_android():
+                if self.local_uri:
+                    system.open_path_in_os(self.local_uri)
+            else:
+                if self.downloaded_path:
+                    system.open_path_in_os(self.downloaded_path)
 
     def on_remote_version(self, payload):
         if _Debug:

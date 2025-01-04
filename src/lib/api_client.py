@@ -13,7 +13,7 @@ from lib import web_sock_remote
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 
 #------------------------------------------------------------------------------
 
@@ -175,6 +175,10 @@ def request_model_data(model_name, query_details=None):
 
 def chunk_read(path, offset, max_size=1024*32, cb=None):
     return run('chunk_read', kwargs={'path': path, 'offset': offset, 'max_size': max_size, }, cb=cb)
+
+
+def chunk_write(data, path=None, cb=None):
+    return run('chunk_write', kwargs={'data': data, 'path': path, }, cb=cb)
 
 
 def process_health(cb=None):
