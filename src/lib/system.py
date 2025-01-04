@@ -1,6 +1,7 @@
 import os
 import subprocess
 import time
+import platformdirs
 import threading
 from queue import Queue
 
@@ -80,6 +81,16 @@ def get_app_data_path():
         return os.path.join(os.path.expanduser('~'), '.bitdust')
 
     return os.path.join(os.path.expanduser('~'), '.bitdust')
+
+
+def get_downloads_dir():
+    if is_android():
+        from android.storage import app_storage_path  # @UnresolvedImport
+        downloads_dir = os.path.join(app_storage_path(), 'downloads')
+        if not os.path.exists(downloads_dir):
+            os.makedirs(downloads_dir)
+        return downloads_dir
+    return platformdirs.user_downloads_dir()
 
 #------------------------------------------------------------------------------
 

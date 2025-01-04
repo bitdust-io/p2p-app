@@ -111,7 +111,6 @@ from components import snackbar
 #------------------------------------------------------------------------------
 
 if system.is_android():
-    # from jnius import autoclass, cast  # @UnresolvedImport
     import encodings.idna  # @UnusedImport
 
     from android import mActivity  # @UnresolvedImport
@@ -126,8 +125,6 @@ if system.is_android():
     if _Debug:
         print('BitDustApp primary_external_storage_path=%r' % primary_external_storage_path())
         print('BitDustApp app_storage_path=%r' % app_storage_path())
-
-    # from lib.permissions import check_permission, request_permissions  # @UnresolvedImport
 
     PACKAGE_NAME = u'org.bitdust_io.bitdust1'
     SERVICE_NAME = u'{packagename}.Service{servicename}'.format(

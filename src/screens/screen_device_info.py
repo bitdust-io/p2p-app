@@ -38,6 +38,7 @@ class DeviceInfoScreen(screen.AppScreen):
         self.automat_index = None
         self.automat_id = None
         self.url = ''
+        self.deleted = False
         super(DeviceInfoScreen, self).__init__(**kwargs)
 
     def init_kwargs(self, **kw):
@@ -83,6 +84,8 @@ class DeviceInfoScreen(screen.AppScreen):
     def populate(self, **kwargs):
         if _Debug:
             print('DeviceInfoScreen.populate')
+        if self.deleted:
+            return
         api_client.device_info(
             name=self.device_name,
             cb=self.on_device_info_result,
@@ -135,6 +138,7 @@ class DeviceInfoScreen(screen.AppScreen):
     def on_device_remove_result(self, resp):
         if _Debug:
             print('DeviceInfoScreen.on_device_remove_result', resp)
+        self.deleted = True
         screen.select_screen('settings_screen')
         screen.close_screen(screen_id='device_info_{}'.format(self.device_name))
         screen.stack_clear()
