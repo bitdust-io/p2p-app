@@ -11,7 +11,7 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-def file_download(source_path, destination_path, chunk_size=32*1024, result_callback=None):
+def file_download(source_path, destination_path, chunk_size=64*1024, result_callback=None):
     if _Debug:
         print('api_file_transfer.file_download', source_path, destination_path)
     try:
@@ -67,14 +67,14 @@ def file_download(source_path, destination_path, chunk_size=32*1024, result_call
     @mainthread
     def do_chunk_request(offset):
         if _Debug:
-            print('api_file_transfer.file_download.do_chunk_request', source_path, offset)
+            print('api_file_transfer.file_download.do_chunk_request', source_path, destination_path, offset)
         api_client.chunk_read(path=source_path, offset=offset, max_size=chunk_size, cb=lambda resp: on_chunk_received(resp, offset))
 
     do_chunk_request(0)
 
 #------------------------------------------------------------------------------
 
-def file_upload(source_path, chunk_size=32*1024, result_callback=None):
+def file_upload(source_path, chunk_size=64*1024, result_callback=None):
     if _Debug:
         print('api_file_transfer.file_upload', source_path)
     try:

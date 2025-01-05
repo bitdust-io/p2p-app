@@ -1,5 +1,4 @@
 import os
-import platformdirs
 
 #------------------------------------------------------------------------------
 
@@ -53,7 +52,7 @@ class SingleSharedFileScreen(screen.AppScreen):
         self.details = kw.pop('details', {})
         self.local_uri = None
         self.file_name = self.details.get('path')
-        self.downloaded_path = os.path.join(platformdirs.user_downloads_dir(), self.file_name)
+        self.downloaded_path = os.path.join(system.get_downloads_dir(), self.file_name)
         return kw
 
     def get_title(self):
@@ -76,7 +75,7 @@ class SingleSharedFileScreen(screen.AppScreen):
         if _Debug:
             print('SingleSharedFileScreen.populate', self.details)
         if system.is_android():
-            download_path = self.local_uri or ''
+            download_path = self.downloaded_path or ''
         else:
             download_path = (self.downloaded_path if (self.downloaded_path and os.path.exists(self.downloaded_path)) else '') or ''
         ctx = self.details.copy()
@@ -99,7 +98,7 @@ class SingleSharedFileScreen(screen.AppScreen):
             self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
         else:
             if system.is_android():
-                self.ids.open_file_button.disabled = not self.local_uri
+                self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
             else:
                 self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
         self.ids.download_file_button.disabled = screen.main_window().state_file_transfering
@@ -148,30 +147,26 @@ class SingleSharedFileScreen(screen.AppScreen):
             snackbar.error(text=api_client.response_err(resp))
             return
         local_path = api_client.response_result(resp).get('local_path')
-        destination_path = os.path.join(platformdirs.user_downloads_dir(), self.file_name)
+        destination_path = os.path.join(system.get_downloads_dir(), self.file_name)
         if not local_path:
             self.downloaded_path = None
-            # self.ids.open_file_button.disabled = True
             snackbar.error(text='file was not downloaded')
             self.populate()
             return
         if screen.control().is_local:
             try:
-                os.rename(local_path, platformdirs.user_downloads_dir())
+                os.rename(local_path, system.get_downloads_dir())
             except Exception as exc:
                 self.downloaded_path = None
-                # self.ids.open_file_button.disabled = True
                 snackbar.error(str(exc))
                 self.populate()
                 return
             if os.path.exists(destination_path):
                 self.downloaded_path = destination_path
-                # self.ids.open_file_button.disabled = False
                 snackbar.success(text='downloading is complete')
                 self.populate()
             else:
                 self.downloaded_path = None
-                # self.ids.open_file_button.disabled = True
                 snackbar.error(text='file was not downloaded')
                 self.populate()
             return
@@ -189,14 +184,13 @@ class SingleSharedFileScreen(screen.AppScreen):
         if isinstance(result, Exception):
             snackbar.error(text=str(result))
             return
-        destination_path = os.path.join(platformdirs.user_downloads_dir(), self.file_name)
+        destination_path = os.path.join(system.get_downloads_dir(), self.file_name)
         if system.is_android():
-            from androidstorage4kivy import SharedStorage  # @UnresolvedImport
-            self.local_uri = SharedStorage().copy_to_shared(private_file=destination_path)
-            # self.ids.open_file_button.disabled = not self.local_uri
+            # from androidstorage4kivy import SharedStorage  # @UnresolvedImport
+            # self.local_uri = SharedStorage().copy_to_shared(private_file=destination_path)
+            self.downloaded_path = destination_path
         else:
             self.downloaded_path = destination_path
-            # self.ids.open_file_button.disabled = not os.path.exists(self.downloaded_path)
         snackbar.success(text='downloading is complete')
         self.populate()
 
@@ -208,8 +202,13 @@ class SingleSharedFileScreen(screen.AppScreen):
                 system.open_path_in_os(self.downloaded_path)
         else:
             if system.is_android():
-                if self.local_uri:
-                    system.open_path_in_os(self.local_uri)
+                if self.downloaded_path:
+                    from androidstorage4kivy import SharedStorage  # @UnresolvedImport
+                    self.local_uri = SharedStorage().copy_to_shared(private_file=self.downloaded_path)
+                    if self.local_uri:
+                        system.open_path_in_os(self.local_uri)
+                # if self.local_uri:
+                #     system.open_path_in_os(self.local_uri)
             else:
                 if self.downloaded_path:
                     system.open_path_in_os(self.downloaded_path)
@@ -238,6 +237,8 @@ class SingleSharedFileScreen(screen.AppScreen):
     def on_shared_file_details_ref_pressed(self, *args):
         if _Debug:
             print('SingleSharedFileScreen.on_shared_file_details_ref_pressed', args)
+        if screen.main_window().state_file_transfering:
+            return
         if args[1].startswith('download_'):
             backup_id = args[1][9:]
             screen.main_window().state_file_transfering = True
