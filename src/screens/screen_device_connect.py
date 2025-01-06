@@ -6,6 +6,7 @@ from kivymd.uix.floatlayout import MDFloatLayout
 #------------------------------------------------------------------------------
 
 from lib import system
+from lib import util
 from lib import web_sock_remote
 
 from components import screen
@@ -52,8 +53,8 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
         if _Debug:
             print('TabRemoteDevice.on_url_enter_button_clicked', args)
         self.url_input_dialog = dialogs.open_text_input_dialog(
-            title='Device URL',
-            text='Enter device URL generated on the remote BitDust node:',
+            title='Connection info',
+            text='Enter device connection info generated on the remote BitDust node:',
             button_confirm='Continue',
             button_cancel='Back',
             cb=self.on_url_entered,
@@ -63,9 +64,7 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
         if _Debug:
             print('TabRemoteDevice.on_url_entered', inp)
         self.url_input_dialog = None
-        router_url = inp.strip()
-        if not router_url.startswith('ws://'):
-            router_url = 'ws://' + router_url
+        router_url = util.unpack_device_url(inp.strip())
         screen.main_window().state_node_local = False
         screen.my_app().client_info['local'] = screen.main_window().state_node_local
         if router_url:
@@ -93,8 +92,7 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
             router_url = args[0].strip()
         if not router_url:
             return
-        if not router_url.startswith('ws://'):
-            router_url = 'ws://' + router_url
+        router_url = util.unpack_device_url(router_url)
         screen.screen_back()
         screen.main_window().state_node_local = False
         screen.my_app().client_info['local'] = screen.main_window().state_node_local
