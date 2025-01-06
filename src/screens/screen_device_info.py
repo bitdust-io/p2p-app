@@ -19,16 +19,11 @@ device_info_temlate_text = """
 
 [color=#909090]authorized:[/color] {authorized}
 
-[color=#909090]URL:[/color]
-
-[size={large_text_size}][font=RobotoMono-Regular]    {url}[/font][/size]  [u][color=#0000ff][ref=copy_url][copy to clipboard][/ref][/color][/u]
-
+[color=#909090]URL:[/color] [size={large_text_size}][font=RobotoMono-Regular]{url}[/font][/size]   [u][color=#0000ff][ref=copy_url][copy to clipboard][/ref][/color][/u]
 
 Scan the QR code above using the BitDust p2p-app on your mobile device and be ready to enter the 6-digit verification code to authorize your mobile device.
 
-You can also manually enter the URL address specified above on your remote device.
-
-[/size]
+You can also manually enter the URL address specified above on your remote device.[/size]
 """
 
 
