@@ -56,12 +56,61 @@ def open_yes_no_dialog(title, text, cb=None):
 #------------------------------------------------------------------------------
 
 
+class InputTextContent(BoxLayout):
+    text_content = StringProperty()
+
+
+def open_text_input_dialog(title, text, button_confirm='Confirm', button_cancel='Cancel', cb=None):
+    popup = None
+    content = InputTextContent(text_content=text)
+
+    def on_confirm(*args, **kwargs):
+        inp = content.ids.text_input.text
+        popup.dismiss()
+        if cb:
+            cb(inp)
+
+    def on_cancel(*args, **kwargs):
+        popup.dismiss()
+        if cb:
+            cb(None)
+
+    popup = MDDialog(
+        title=title,
+        type='custom',
+        content_cls=content,
+        buttons=[
+            MDFillRoundFlatButton(
+                font_size=sp(16),
+                text=button_confirm,
+                on_release=on_confirm,
+                text_color=(1,1,1,1),
+            ),
+            MDFillRoundFlatButton(
+                font_size=sp(16),
+                text=button_cancel,
+                on_release=on_cancel,
+                text_color=(1,1,1,1),
+            ),
+        ],
+        size_hint_x=None,
+        width=dp(360),
+        auto_dismiss=False,
+        pos_hint={'y': .15},
+    )
+    popup.update_width = lambda *args: None
+    popup.open()
+    return popup
+
+#------------------------------------------------------------------------------
+
+
 class InputNumberContent(BoxLayout):
     text_content = StringProperty()
     max_text_length = NumericProperty()
 
 
-def open_number_input_dialog(title, text, max_text_length=6, button_confirm='Confirm', button_cancel='Cancel', cb=None):
+def open_number_input_dialog(title, text, min_text_length=None, max_text_length=None, button_confirm='Confirm', button_cancel='Cancel', cb=None):
     popup = None
     content = InputNumberContent(
         text_content=text,
@@ -70,10 +119,15 @@ def open_number_input_dialog(title, text, max_text_length=6, button_confirm='Con
 
     def on_confirm(*args, **kwargs):
         inp = content.ids.number_input.text
-        if len(inp) == 6:
+        if min_text_length is None:
             popup.dismiss()
             if cb:
                 cb(inp)
+        else:
+            if len(inp) == min_text_length:
+                popup.dismiss()
+                if cb:
+                    cb(inp)
 
     def on_cancel(*args, **kwargs):
         popup.dismiss()

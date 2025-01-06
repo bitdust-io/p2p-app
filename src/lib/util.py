@@ -32,3 +32,16 @@ def clean_remote_path(file_path):
     That method replaces special chararts of the file_path.
     """
     return file_path.replace('$', '%24').replace('@', '%40').replace(':', '%3a')
+
+
+def pack_device_url(url):
+    _u = url.replace('ws://', '')
+    _head, _, _tail = _u.rpartition('/?r=')
+    return _head + ':' + _tail
+
+
+def unpack_device_url(inp):
+    _head, _, _tail = inp.rpartition(':')
+    if not _head.startswith('ws://'):
+        _head = 'ws://' + _head
+    return _head + '/?r=' + _tail

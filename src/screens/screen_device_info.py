@@ -3,6 +3,7 @@ from kivy.core.clipboard import Clipboard
 #------------------------------------------------------------------------------
 
 from lib import api_client
+from lib import util
 
 from components import screen
 from components import snackbar
@@ -19,13 +20,11 @@ device_info_temlate_text = """
 
 [color=#909090]authorized:[/color] {authorized}
 
-[color=#909090]URL:[/color] [size={small_text_size}][font=RobotoMono-Regular]{url}[/font][/size]  [u][color=#0000ff][ref=copy_url][copy to clipboard][/ref][/color][/u]
+[color=#909090]connection info:[/color] [size={large_text_size}][font=RobotoMono-Regular]{url}[/font][/size]   [u][color=#0000ff][ref=copy_url][copy to clipboard][/ref][/color][/u]
 
 Scan the QR code above using the BitDust p2p-app on your mobile device and be ready to enter the 6-digit verification code to authorize your mobile device.
 
-If you are experiencing difficulties scanning the QR code, you can manually enter on your mobile device the URL address specified above.
-
-[/size]
+You can also manually enter the connection info specified above on your remote device.[/size]
 """
 
 
@@ -104,15 +103,16 @@ class DeviceInfoScreen(screen.AppScreen):
         result.update(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             small_text_size='{}sp'.format(self.app().font_size_small_absolute),
+            large_text_size='{}sp'.format(self.app().font_size_large_absolute),
             name=result.get('name', ''),
             state=result.get('instance', {}).get('state', '') or 'CLOSED',
-            url=self.url,
+            url=util.pack_device_url(self.url),
             authorized='yes' if result.get('meta', {}).get('auth_token') else 'no',
         )
         if _Debug:
             print('DeviceInfoScreen.on_device_info_result result updated:', result)
         self.ids.device_info_details.text = device_info_temlate_text.format(**result)
-        self.ids.qr_code_image.data = self.url
+        self.ids.qr_code_image.data = util.pack_device_url(self.url)
 
     def on_automat_state_changed(self, event_data):
         if _Debug:
@@ -124,7 +124,7 @@ class DeviceInfoScreen(screen.AppScreen):
             print('DeviceInfoScreen.on_device_info_details_ref_pressed', args)
         if args[1] == 'copy_url':
             if self.url:
-                Clipboard.copy(self.url)
+                Clipboard.copy(util.pack_device_url(self.url))
 
     def on_drop_down_menu_item_clicked(self, btn):
         if _Debug:

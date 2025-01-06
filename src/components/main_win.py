@@ -275,6 +275,8 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         self.device_client_code_input_dialog = dialogs.open_number_input_dialog(
             title='Device code',
             text='Enter 6-digits authorization code generated on your device:',
+            min_text_length=6,
+            max_text_length=6,
             button_confirm='Confirm',
             button_cancel='Back',
             cb=lambda inp: self.on_device_client_code_entered(device_name, inp),
