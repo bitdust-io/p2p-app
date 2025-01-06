@@ -17,14 +17,14 @@
 	            text:
 	            	"""
 	            	[size=20sp][b]Local BitDust Node[/b][/size]\n
-		            BitDust engine will be running in background on this machine.\n
-		            This type of connection is only available for Desktop platforms.\n"""
+		            BitDust node will be running in background on this machine.\n
+		            This type of connection is only available for Laptops and Desktops.\n"""
 
 			VFixedEmptySpace:
 
             FillRoundFlatButton:
                 id: local_device_button
-                text: "[size=16sp][b]confirm[/b][/size]"
+                text: "[size=18sp]{}[/size]  [size=16sp][b]confirm & start[/b][/size]  ".format(md_icon("check-bold"))
                 md_bg_color: app.theme_cls.accent_color
                 theme_text_color: "Custom"
                 text_color: app.color_white99
@@ -49,19 +49,29 @@
 	            height: self.texture_size[1]
 	            color: app.color_black
 	            text:
-	            	"""
+	            	f"""
 	            	[size=20sp][b]Remotely running BitDust Node[/b][/size]\n
-	            	BitDust engine is running on another Desktop computer under your control and this App will be connected remotely.\n
-	            	Open BitDust p2p-app on your Desktop, go to Menu -> Settings -> Devices and create a new device configuration.\n
-	            	Scan QR code displayed on your screen and be ready to enter 6-digits security code.\n
-	            	Connection will be established automatically\n"""
+	            	BitDust node is running under your control on a:
+	            	{md_icon("circle-medium")} Laptop
+	            	{md_icon("circle-medium")} Desktop computer
+	            	{md_icon("circle-medium")} VPS
+	            	{md_icon("circle-medium")} Dedicated cloud server
+	            	{md_icon("circle-medium")} Docker image
+	            	{md_icon("circle-medium")} Raspberry Pi
+	            	{md_icon("circle-medium")} other kind of device\n
+	            	The BitDust app running on that device will be connected remotely via secure web socket connection.\n
+	            	To configure that, open BitDust p2p-app on your Desktop, go to Menu -> Settings -> Devices and create a new device configuration.\n
+	            	If you are running BitDust node on a headless server with no user interface, type in the command line:\n
+	            	[font=RobotoMono-Regular]    bitdust device add[/font]\n\n
+	            	Then scan QR code displayed on your screen or enter url printed in the command line output.\n
+	            	Be ready to enter 6-digits security code. Connection will be established automatically.\n"""
 
 			VFixedEmptySpace:
 
             FillRoundFlatButton:
                 id: qr_scan_open_button
                 text: "[size=18sp]{}[/size]  [size=16sp][b]scan QR code[/b][/size]".format(md_icon("barcode-scan"))
-                md_bg_color: app.theme_cls.primary_color
+                md_bg_color: app.theme_cls.accent_color
                 theme_text_color: "Custom"
                 text_color: app.color_white99
                 pos_hint: {'left': 0}
@@ -70,49 +80,15 @@
 			VFixedEmptySpace:
 
             FillRoundFlatButton:
-                id: remote_device_button
-                text: "[size=16sp][b]confirm[/b][/size]"
+                id: url_enter_button
+                text: "[size=18sp]{}[/size]  [size=16sp][b]enter URL[/b][/size]".format(md_icon("console-line"))
                 md_bg_color: app.theme_cls.accent_color
                 theme_text_color: "Custom"
                 text_color: app.color_white99
                 pos_hint: {'left': 0}
-                disabled: True
-                on_release: root.on_remote_device_button_clicked()
-
-
-<TabCloudServer>:
-
-    VerticalScrollView:
-        id: tab_cloud_server_view
-
-        PageContainerWithLeftPaddingLayout:
-            size_hint: None, None
-            width: root.width - app.scroll_bar_width
-            height: self.minimum_height
-
-	        MarkupLabel:
-	            pos_hint: {'top': 1}
-	            size_hint_y: None
-	            text_size: self.width, None
-	            height: self.texture_size[1]
-	            color: app.color_black
-	            text:
-		            """
-		            [size=20sp][b]BitDust Node on headless server[/b][/size]\n
-	            	BitDust engine is running on your VPS, dedicated server or in a docker image and this App will be connected remotely.\n
-	            	At the moment this feature is under construction.\n"""
+                on_release: root.on_url_enter_button_clicked()
 
 			VFixedEmptySpace:
-
-            FillRoundFlatButton:
-                id: cloud_device_button
-                text: "[size=16sp][b]confirm[/b][/size]"
-                md_bg_color: app.theme_cls.accent_color
-                theme_text_color: "Custom"
-                text_color: app.color_white99
-                pos_hint: {'left': 0}
-                disabled: True
-                on_release: root.on_cloud_device_button_clicked()
 
 
 <DeviceConnectScreen>:
@@ -136,8 +112,5 @@
 
 				TabRemoteDevice:
 					title: "Remote"
-
-				TabCloudServer:
-					title: "Cloud server"
 
         BottomEmptyScreenSpace:

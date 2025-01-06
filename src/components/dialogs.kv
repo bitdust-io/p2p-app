@@ -21,6 +21,23 @@
             on_release: root.dispatch('on_answer', 'no')
 
 
+<InputTextContent>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "120dp"
+
+    MDLabel:
+        text: root.text_content
+
+    MDTextField:
+    	id: text_input
+        size_hint_x: None
+        width: "280dp"
+        required: True
+        mode: "rectangle"
+
+
 <InputNumberContent>:
     orientation: "vertical"
     spacing: "12dp"
