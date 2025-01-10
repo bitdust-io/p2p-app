@@ -2,8 +2,8 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <!-- CHANGE THESE EVERY VERSION -->
-  <?define ProductVersion="0.0.1" ?>
-  <?define ProductCode="{B2DEFD49-5467-4A11-0001-BD238154D23D}"?>
+  <?define ProductVersion="0.0.2" ?>
+  <?define ProductCode="{B2DEFD49-5467-4A11-0002-BD238154D23D}"?>
 
   <!-- DO NOT CHANGE THESE AFTER FIRST RELEASE -->
   <?define ProjectDir = ".\"?>
