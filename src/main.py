@@ -480,15 +480,23 @@ class BitDustApp(styles.AppStyle, MDApp):
 
     @mainthread
     def on_deploy_process_stdout(self, line):
-        if _Debug:
-            print('DEPLOY OUT:', line.decode().rstrip())
-        if line.decode().startswith('#####'):
-            self.main_window.engine_log += line.decode()[6:]
+        try:
+            if _Debug:
+                print('DEPLOY OUT:', line.decode().rstrip())
+            if line.decode().startswith('#####'):
+                self.main_window.engine_log += line.decode()[6:]
+        except Exception as e:
+            if _Debug:
+                print(e)
 
     @mainthread
     def on_deploy_process_stderr(self, line):
-        if _Debug:
-            print('DEPLOY ERR:', line.decode().rstrip())
+        try:
+            if _Debug:
+                print('DEPLOY ERR:', line.decode().rstrip())
+        except Exception as e:
+            if _Debug:
+                print(e)
 
     @mainthread
     def on_deploy_process_result(self, retcode):
