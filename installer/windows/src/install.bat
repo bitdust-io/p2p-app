@@ -6,7 +6,7 @@ cd /D "%CURRENT_PATH%"
 
 set BITDUST_GIT_REPO=https://github.com/bitdust-io/public.git
 set BITDUST_APP_GIT_REPO=https://github.com/bitdust-io/p2p-app.git
-set PYTHON_URL=https://www.python.org/ftp/python/3.8.6/python-3.8.6-embed-win32.zip
+set PYTHON_URL=https://www.python.org/ftp/python/3.10.9/python-3.10.9-embed-win32.zip
 set GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py
 
 set _my_datetime=%date%_%time%
@@ -45,10 +45,13 @@ set GIT_EXE=%BITDUST_HOME%\git\bin\git.exe
 
 echo ### Stopping BitDust
 taskkill /IM bitdust-p2p-app.exe /F /T 2>nul 1>nul
+taskkill /IM bitdust-node.exe /F /T 2>nul 1>nul
+taskkill /IM bitdust-console.exe /F /T 2>nul 1>nul
 
 
 echo ### Prepare Python interpretator files
-if exist %PYTHON_EXE% goto PythonInstalled
+if exist %PYTHON_EXE% rmdir /q /s "%BITDUST_HOME%\python" >nul 2>&1
+if exist "%BITDUST_HOME%\venv" rmdir /q /s "%BITDUST_HOME%\venv" >nul 2>&1
 :PythonToBeInstalled
 cd /D "%BITDUST_HOME%"
 echo ### Downloading Python interpretator
@@ -56,15 +59,15 @@ cscript /nologo "%CURRENT_PATH%\download_python.js"
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 echo ### Extracting Python binaries
 cd /D "%CURRENT_PATH%"
-unzip.exe -o -q %BITDUST_HOME%\python-3.8.6-embed-win32.zip -d %BITDUST_HOME%\python
-copy /B /Y python38._pth %BITDUST_HOME%\python
+unzip.exe -o -q %BITDUST_HOME%\python-3.10.9-embed-win32.zip -d %BITDUST_HOME%\python
+copy /B /Y python310._pth %BITDUST_HOME%\python
 copy /B /Y bitdust.ico %BITDUST_HOME%\python\
 copy /B /Y rcedit.exe %BITDUST_HOME%\python\
 cd /D "%BITDUST_HOME%\python"
 copy /B /Y pythonw.exe bitdust-p2p-app.exe
 rcedit.exe bitdust-p2p-app.exe --set-icon bitdust.ico --set-version-string FileDescription "BitDust p2p-app"
 if %errorlevel% neq 0 goto DEPLOY_ERROR
-del /q /s /f %BITDUST_HOME%\python-3.8.6-embed-win32.zip >nul 2>&1
+del /q /s /f %BITDUST_HOME%\python-3.10.9-embed-win32.zip >nul 2>&1
 echo ### Installing PIP package manager
 cd /D "%BITDUST_HOME%"
 cscript /nologo "%CURRENT_PATH%\download_pip.js"
@@ -73,7 +76,7 @@ if %errorlevel% neq 0 goto DEPLOY_ERROR
 del /q /s /f %BITDUST_HOME%\get-pip.py >nul 2>&1
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 echo ### Installing virtualenv package
-%PYTHON_EXE% -m pip install -U virtualenv
+%PYTHON_EXE% -m pip install --no-warn-script-location -U virtualenv
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 :PythonInstalled
 
@@ -109,7 +112,7 @@ if %errorlevel% neq 0 goto DEPLOY_ERROR
 
 
 echo ### Building environment for user interface
-%PYTHON_EXE% -m pip install -U -r %BITDUST_HOME%\ui\requirements-win.txt
+%PYTHON_EXE% -m pip install --no-warn-script-location -U -r %BITDUST_HOME%\ui\requirements-win.txt
 if %errorlevel% neq 0 goto DEPLOY_ERROR
 
 
