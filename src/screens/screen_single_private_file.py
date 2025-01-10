@@ -156,8 +156,21 @@ class SinglePrivateFileScreen(screen.AppScreen):
             self.populate()
             return
         if screen.control().is_local:
+            if os.path.exists(destination_path):
+                # TODO: open popup dialog and ask user if destination file suppose to be overwritten
+                # TODO: move all that into a separate thread to no block the main threads
+                try:
+                    if os.path.isdir(destination_path):
+                        system.rmdir_recursive(destination_path, ignore_errors=True)
+                    else:
+                        os.remove(destination_path)
+                except Exception as exc:
+                    self.downloaded_path = None
+                    snackbar.error(str(exc))
+                    self.populate()
+                    return
             try:
-                os.rename(local_path, system.get_downloads_dir())
+                os.rename(local_path, destination_path)
             except Exception as exc:
                 self.downloaded_path = None
                 snackbar.error(str(exc))
