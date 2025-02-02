@@ -1,3 +1,4 @@
+import os
 import time
 import base64
 
@@ -14,14 +15,35 @@ from kivy.clock import mainthread
 
 #------------------------------------------------------------------------------
 
+
+#------------------------------------------------------------------------------
+
 from lib import system
+
+#------------------------------------------------------------------------------
+
+_USE_PYCRYPTODOME = True
+
+if system.is_ios():
+    _USE_PYCRYPTODOME = False
+
+#------------------------------------------------------------------------------
+
 from lib import strng
 from lib import jsn
-from lib import rsa_key
-from lib import cipher
-from lib import hashes
 from lib import serialization
 from lib import web_socket
+
+#------------------------------------------------------------------------------
+
+if _USE_PYCRYPTODOME:
+    from lib import rsa_key
+    from lib import cipher
+    from lib import hashes
+else:
+    from lib import rsa_key_slow as rsa_key
+    from lib import cipher_slow as cipher
+    from lib import hashes_slow as hashes
 
 #------------------------------------------------------------------------------
 

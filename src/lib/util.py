@@ -1,5 +1,4 @@
 
-
 def UrlParseFast(url):
     """
     Return a 5-items tuple from url address :
