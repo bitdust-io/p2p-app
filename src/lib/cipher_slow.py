@@ -40,7 +40,6 @@ import base64
 
 from lib import serialization
 from lib import aes
-from lib import pkcs7
 
 #------------------------------------------------------------------------------
 
@@ -48,8 +47,8 @@ from lib import pkcs7
 def encrypt_json(raw_data, secret_bytes_key, cipher_type='AES', to_text=False, to_dict=False):
     # TODO: add salt to raw_data
     if cipher_type == 'AES':
-        padded_data = pkcs7.PKCS7().encode(raw_data)
-        cipher = aes.AES(key=secret_bytes_key)
+        padded_data = raw_data
+        cipher = aes.AES(secret_bytes_key)
         iv = os.urandom(16)
         ct_bytes = cipher.encrypt_cbc(padded_data, iv)
         dct = {
@@ -77,12 +76,12 @@ def decrypt_json(encrypted_data, secret_bytes_key, cipher_type='AES', from_dict=
             values_to_text=True,
         )
     if cipher_type == 'AES':
-        cipher = aes.AES(key=secret_bytes_key)
+        cipher = aes.AES(secret_bytes_key)
         padded_data = cipher.decrypt_cbc(
             ciphertext=base64.b64decode(dct['ct'].encode('utf-8')),
             iv=base64.b64decode(dct['iv'].encode('utf-8')),
         )
-        raw_data = pkcs7.PKCS7().decode(padded_data)
+        raw_data = padded_data
     elif cipher_type == 'DES3':
         raise NotImplementedError()
     else:
