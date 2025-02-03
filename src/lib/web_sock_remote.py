@@ -1,4 +1,3 @@
-import os
 import time
 import base64
 
@@ -12,9 +11,6 @@ import queue
 #------------------------------------------------------------------------------
 
 from kivy.clock import mainthread
-
-#------------------------------------------------------------------------------
-
 
 #------------------------------------------------------------------------------
 
@@ -47,7 +43,7 @@ else:
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 _DebugAPIResponses = _Debug
 
 #------------------------------------------------------------------------------
@@ -222,8 +218,8 @@ def on_connect(ws_inst):
         cb(ws_inst)
     while _PendingCalls:
         json_data, cb = _PendingCalls.pop(0)
-        # if _Debug:
-        #     print('on_connect pushing data', json_data)
+        if _Debug:
+            print('on_connect pushing data', json_data)
         try:
             ws_queue().put_nowait((json_data, cb, ))
         except Exception as exc:
