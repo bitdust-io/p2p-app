@@ -12,9 +12,9 @@ import traceback
 
 #------------------------------------------------------------------------------ 
 
-_Debug = True
+_Debug = False
 _ProfilingEnabled = False
-_HideKivyOutput = True
+_HideKivyOutput = not _Debug
 _UnbufferedOutput = False
 _UTF8EncodedOutput = False
 

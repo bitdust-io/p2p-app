@@ -35,7 +35,6 @@ from __future__ import absolute_import
 #------------------------------------------------------------------------------
 
 _Debug = False
-_DebugLevel = 10
 _CryptoLog = None
 
 #------------------------------------------------------------------------------
@@ -137,10 +136,23 @@ class RSAKey(object):
             if key_src.count(b'BEGIN RSA PUBLIC KEY'):
                 self.keyObject = rsa.PublicKey.load_pkcs1(key_src)
                 self.privateKeyObject = None
+            elif key_src.count(b'BEGIN RSA PRIVATE KEY'):
+                self.privateKeyObject = rsa.PrivateKey.load_pkcs1(key_src)
+                self.keyObject = rsa.PublicKey(self.privateKeyObject.n, self.privateKeyObject.e)
+            elif key_src.count(b'ssh-rsa '):
+                keystring = binascii.a2b_base64(key_src.split(b' ')[1])
+                keyparts = []
+                while len(keystring) > 4:
+                    length = struct.unpack(">I", keystring[:4])[0]
+                    keyparts.append(keystring[4:4 + length])
+                    keystring = keystring[4 + length:]
+                e = number.bytes_to_long(keyparts[1])
+                n = number.bytes_to_long(keyparts[2])
+                self.keyObject = rsa.PublicKey(n, e)
+                self.privateKeyObject = None
             else:
                 self.privateKeyObject = rsa.PrivateKey.load_pkcs1(key_src)
                 self.keyObject = rsa.PublicKey(self.privateKeyObject.n, self.privateKeyObject.e)
-                self.keyObject = RSA.import_key(key_src)  # @UndefinedVariable
         except Exception as exc:
             if _Debug:
                 print(exc, 'key_src=%r' % key_src)
@@ -158,13 +170,27 @@ class RSAKey(object):
             if key_src.count(b'BEGIN RSA PUBLIC KEY'):
                 self.keyObject = rsa.PublicKey.load_pkcs1(key_src)
                 self.privateKeyObject = None
+            elif key_src.count(b'BEGIN RSA PRIVATE KEY'):
+                self.privateKeyObject = rsa.PrivateKey.load_pkcs1(key_src)
+                self.keyObject = rsa.PublicKey(self.privateKeyObject.n, self.privateKeyObject.e)
+            elif key_src.count(b'ssh-rsa '):
+                keystring = binascii.a2b_base64(key_src.split(b' ')[1])
+                keyparts = []
+                while len(keystring) > 4:
+                    length = struct.unpack(">I", keystring[:4])[0]
+                    keyparts.append(keystring[4:4 + length])
+                    keystring = keystring[4 + length:]
+                e = number.bytes_to_long(keyparts[1])
+                n = number.bytes_to_long(keyparts[2])
+                self.keyObject = rsa.PublicKey(n, e)
+                self.privateKeyObject = None
             else:
                 self.privateKeyObject = rsa.PrivateKey.load_pkcs1(key_src)
                 self.keyObject = rsa.PublicKey(self.privateKeyObject.n, self.privateKeyObject.e)
-                self.keyObject = RSA.import_key(key_src)  # @UndefinedVariable
         except Exception as exc:
             if _Debug:
                 print(exc, 'key_src=%r' % key_src)
+            raise ValueError('failed to read key body')
         del key_src
         # gc.collect()
         return True
