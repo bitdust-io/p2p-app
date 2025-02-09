@@ -64,6 +64,8 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
         if _Debug:
             print('TabRemoteDevice.on_url_entered', inp)
         self.url_input_dialog = None
+        if not inp:
+            return
         router_url = util.unpack_device_url(inp.strip())
         screen.main_window().state_node_local = False
         screen.my_app().client_info['local'] = screen.main_window().state_node_local
@@ -256,7 +258,7 @@ class DeviceConnectScreen(screen.AppScreen):
     def on_enter(self, *args):
         if _Debug:
             print('DeviceConnectScreen.on_enter', args)
-        if system.is_android():
+        if system.is_android() or system.is_ios():
             self.ids.selection_tabs.ids.carousel.slides[0].ids.local_device_button.disabled = True
             self.ids.selection_tabs.switch_tab('Remote', search_by='title')
         else:

@@ -23,8 +23,6 @@ _USE_PYCRYPTODOME = True
 if system.is_ios():
     _USE_PYCRYPTODOME = False
 
-_USE_PYCRYPTODOME = False
-
 #------------------------------------------------------------------------------
 
 from lib import strng
@@ -45,7 +43,7 @@ else:
 
 #------------------------------------------------------------------------------
 
-_Debug = True
+_Debug = False
 _DebugAPIResponses = _Debug
 
 #------------------------------------------------------------------------------

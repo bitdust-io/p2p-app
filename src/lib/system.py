@@ -61,6 +61,10 @@ def is_ios():
 def is_osx():
     return current_platform() == 'macosx'
 
+
+def is_mobile():
+    return is_android() or is_ios()
+
 #------------------------------------------------------------------------------
 
 def get_app_data_path():

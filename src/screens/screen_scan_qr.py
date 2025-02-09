@@ -1,5 +1,4 @@
 from collections import namedtuple
-from pyzbar import pyzbar
 from PIL import Image, ImageOps
 
 #------------------------------------------------------------------------------
@@ -33,11 +32,14 @@ class CameraContainer(AnchorLayout):
 class ScanQRScreen(screen.AppScreen):
 
     symbols = ListProperty([])
-    code_types = ListProperty(set(pyzbar.ZBarSymbol))
 
     def __init__(self, **kw):
         self.scan_qr_callback = None
         self.is_android = system.is_android()
+        self.is_ios = system.is_ios()
+        if not self.is_ios:
+            from pyzbar import pyzbar
+            self.code_types = ListProperty(set(pyzbar.ZBarSymbol))
         super(ScanQRScreen, self).__init__(**kw)
 
     def init_kwargs(self, **kw):
@@ -50,12 +52,15 @@ class ScanQRScreen(screen.AppScreen):
         return 'scan QR code'
 
     def on_enter(self):
-        if _Debug:
-            print('ScanQRScreen.on_enter')
         self.camera = CameraContainer()
         self.ids.container.add_widget(self.camera)
-        self.camera.ids.camera_instance._camera.bind(on_texture=self.on_tex)
+        if _Debug:
+            print('ScanQRScreen.on_enter', type(self.camera.ids.camera_instance), type(self.camera.ids.camera_instance._camera))
+        if not self.is_ios:
+            self.camera.ids.camera_instance._camera.bind(on_texture=self.on_tex)
         self.camera.ids.camera_instance.play = True
+        if self.is_ios:
+            self.camera.ids.camera_instance._camera.start_metadata_analysis(callback=self.on_tex_ios)
 
     def on_leave(self):
         if _Debug:
@@ -68,11 +73,12 @@ class ScanQRScreen(screen.AppScreen):
                 if _Debug:
                     print('ScanQRScreen.on_leave', exc)
         else:
-            try:
-                self.camera.ids.camera_instance._camera._device.release()
-            except Exception as exc:
-                if _Debug:
-                    print('ScanQRScreen.on_leave', exc)
+            if not self.is_ios:
+                try:
+                    self.camera.ids.camera_instance._camera._device.release()
+                except Exception as exc:
+                    if _Debug:
+                        print('ScanQRScreen.on_leave', exc)
         self.ids.container.remove_widget(self.camera)
         del self.camera
         self.camera = None
@@ -84,7 +90,18 @@ class ScanQRScreen(screen.AppScreen):
         pil_image = ImageOps.mirror(pil_image)
         return pil_image
 
+    def on_tex_ios(self, *args, **kwargs):
+        if _Debug:
+            print('ScanQRScreen.on_tex_ios', args, kwargs)
+        if args and self.scan_qr_callback:
+            _cb = self.scan_qr_callback
+            self.scan_qr_callback = None
+            _cb(args[0])
+
     def on_tex(self, camera):
+        if _Debug:
+            print('ScanQRScreen.on_tex', camera)
+        from pyzbar import pyzbar
         try:
             image_data = camera.texture.pixels
             size = camera.texture.size
