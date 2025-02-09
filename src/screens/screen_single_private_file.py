@@ -97,10 +97,7 @@ class SinglePrivateFileScreen(screen.AppScreen):
         if screen.control().is_local:
             self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
         else:
-            if system.is_android():
-                self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
-            else:
-                self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
+            self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
         self.ids.download_file_button.disabled = screen.main_window().state_file_transfering
 
     def on_created(self):

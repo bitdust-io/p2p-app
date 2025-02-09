@@ -42,9 +42,6 @@ _CryptoLog = None
 
 import hashlib
 
-from Cryptodome.Hash import MD5
-from Cryptodome.Hash import SHA1
-
 #------------------------------------------------------------------------------
 
 from lib import strng
@@ -58,7 +55,7 @@ def md5(inp, hexdigest=False, return_object=False):
     #     _CryptoLog = os.environ.get('CRYPTO_LOG') == '1'
     if not strng.is_bin(inp):
         raise ValueError('input must by byte string')
-    h = MD5.new(inp)
+    h = hashlib.md5(inp)
     if _Debug:
         if _CryptoLog:
             print('md5 hexdigest:', h.hexdigest())
@@ -75,8 +72,7 @@ def sha1(inp, hexdigest=False, return_object=False):
     #     _CryptoLog = os.environ.get('CRYPTO_LOG') == '1'
     if not strng.is_bin(inp):
         raise ValueError('input must by byte string')
-    # h = hashlib.sha1(inp)
-    h = SHA1.new(inp)
+    h = hashlib.sha1(inp)
     if _Debug:
         if _CryptoLog:
             print('sha1 hexdigest:', h.hexdigest())
@@ -94,7 +90,6 @@ def sha256(inp, hexdigest=False, return_object=False):
     if not strng.is_bin(inp):
         raise ValueError('input must by byte string')
     h = hashlib.sha256(inp)
-    # h = SHA256.new(inp)
     if _Debug:
         if _CryptoLog:
             print('sha256 hexdigest:', h.hexdigest())

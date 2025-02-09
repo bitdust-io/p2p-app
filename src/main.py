@@ -13,15 +13,18 @@ import traceback
 #------------------------------------------------------------------------------ 
 
 _Debug = False
-_DebugProfilingEnabled = False
-_DebugKivyOutputEnabled = True
+_ProfilingEnabled = False
+_HideKivyOutput = not _Debug
+_UnbufferedOutput = False
+_UTF8EncodedOutput = False
 
 #------------------------------------------------------------------------------
 
-if _Debug and _DebugKivyOutputEnabled:
-    os.environ["KIVY_NO_CONSOLELOG"] = "0"
-else:
-    os.environ["KIVY_NO_CONSOLELOG"] = "1"
+if _HideKivyOutput:
+    if _Debug:
+        os.environ["KIVY_NO_CONSOLELOG"] = "0"
+    else:
+        os.environ["KIVY_NO_CONSOLELOG"] = "1"
 
 #------------------------------------------------------------------------------
 
@@ -36,10 +39,11 @@ if platform.system() == 'Windows':
 else:
     locale.setlocale(locale.LC_CTYPE, 'en_US.UTF-8')
 
-if platform.system() != 'Windows' and 'ANDROID_ARGUMENT' not in os.environ:
-    import codecs
-    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())  # @UndefinedVariable
-    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())  # @UndefinedVariable
+if _UTF8EncodedOutput:
+    if platform.system() != 'Windows' and 'ANDROID_ARGUMENT' not in os.environ:
+        import codecs
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())  # @UndefinedVariable
+        sys.stderr = codecs.getwriter("utf-8")(sys.stderr.detach())  # @UndefinedVariable
 
 #------------------------------------------------------------------------------
 
@@ -47,9 +51,10 @@ from lib import system
 
 #------------------------------------------------------------------------------
 
-if platform.system() != 'Windows' and 'ANDROID_ARGUMENT' not in os.environ:
-    sys.stdout = system.UnbufferedStream(sys.stdout)
-    sys.stderr = system.UnbufferedStream(sys.stderr)
+if _UnbufferedOutput:
+    if platform.system() != 'Windows' and 'ANDROID_ARGUMENT' not in os.environ:
+        sys.stdout = system.UnbufferedStream(sys.stdout)
+        sys.stderr = system.UnbufferedStream(sys.stderr)
 
 #------------------------------------------------------------------------------
 
@@ -86,8 +91,8 @@ Config.set('kivy', 'window_icon', os.path.join(ROOT_PATH, 'images', 'bitdust.png
 if 'ANDROID_ARGUMENT' not in os.environ:
     Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
-if _Debug:
-    Config.set('kivy', 'log_level', 'debug')
+# if _Debug:
+#     Config.set('kivy', 'log_level', 'debug')
 
 from kivy.lang import Builder
 from kivy.clock import Clock, mainthread
@@ -332,7 +337,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.start_engine, after_restart=%r' % after_restart)
         self.main_window.engine_is_on = True
         self.main_window.state_process_health = 0
-        if not system.is_android():
+        if not system.is_mobile():
             self.check_restart_bitdust_process()
         return True
 
@@ -346,13 +351,13 @@ class BitDustApp(styles.AppStyle, MDApp):
         if _Debug:
             print('BitDustApp.restart_engine')
         self.main_window.state_process_health = 0
-        if not system.is_android():
+        if not system.is_mobile():
             self.check_restart_bitdust_process(params=['restart', ])
 
     def redeploy_engine(self):
         if not self.main_window.state_node_local:
             return
-        if system.is_android():
+        if system.is_mobile():
             if _Debug:
                 print('BitDustApp.redeploy_engine NOT IMPLEMENTED')
             return
@@ -372,7 +377,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.stop_engine')
         self.main_window.engine_is_on = False
         self.main_window.state_process_health = -1
-        if not system.is_android():
+        if not system.is_mobile():
             self.check_restart_bitdust_process(params=['stop', ])
 
     # def start_android_service(self, shutdown=False):
@@ -509,7 +514,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_start(self):
         if _Debug:
             print('BitDustApp.on_start')
-            if _DebugProfilingEnabled:
+            if _ProfilingEnabled:
                 import cProfile
                 self.profile = cProfile.Profile()
                 self.profile.enable()
@@ -548,9 +553,9 @@ class BitDustApp(styles.AppStyle, MDApp):
     def on_pause(self):
         if _Debug:
             print('BitDustApp.on_pause')
-            if _DebugProfilingEnabled:
+            if _ProfilingEnabled:
                 self.profile.disable()
-                if system.is_android():
+                if system.is_mobile():
                     pass
                 else:
                     self.profile.dump_stats('./debug.profile')
@@ -606,8 +611,7 @@ def main():
     try:
         BitDustApp().run()
     except Exception as exc:
-        print('Exception raised')
-        print(exc)
+        print('Exception raised: %r' % exc)
         traceback.print_exc()
     if _Debug:
         print('BitDustApp.main   process is finishing')
