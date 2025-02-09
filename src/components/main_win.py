@@ -310,9 +310,9 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
                     if _Debug:
                         print('MainWin.open_screen   KV file already loaded, but not marked: %r' % screen_kv_file)
                 else:
-                    if _Debug:
-                        print('MainWin.open_screen   is about to load KV file : %r' % screen_kv_file)
                     Builder.load_file(screen_kv_file)
+                    if _Debug:
+                        print('MainWin.open_screen   loaded KV file : %r' % screen_kv_file)
                 self.screens_loaded.add(screen_kv_file)
         screen_class = Factory.get(screen_class_name)
         if not screen_class:

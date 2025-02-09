@@ -5,7 +5,7 @@ docutils==0.21.2
 filelock==3.14.0
 idna==3.10
 ios==1.1
-Kivy==2.3.0
+Kivy==2.3.1
 Kivy-Garden==0.1.5
 kivymd==1.0.2
 numpy==2.2.2
@@ -15,7 +15,6 @@ platformdirs==4.3.6
 pyasn1==0.6.1
 Pygments==2.19.1
 pyobjus==1.2.4.dev0
-pyzbar==0.1.9
 qrcode==8.0
 requests==2.32.3
 rsa==4.9
