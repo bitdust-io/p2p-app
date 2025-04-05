@@ -46,7 +46,7 @@ if [ "$1" == "deploy" ]; then
   BUNDLE_ID=$(osascript -e 'id of app "../../../../"')
   # We are not allowed to edit anything within the .app for security reasons.
   export KIVY_HOME="~/Library/Application Support/$BUNDLE_ID"
-  export PYTHONHOME="${ABS_SCRIPT_PATH}/python3"
+  # export PYTHONHOME="${ABS_SCRIPT_PATH}/python3"
 
   echo "updating Python packages ..."
   ${ENGINE_PIP_BIN} --default-timeout=10 install -q -U -r "${ENGINE_DIR}/requirements.txt" || echo "pip requirements install failed"
