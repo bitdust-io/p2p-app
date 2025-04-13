@@ -579,11 +579,16 @@ class SettingsScreen(screen.AppScreen):
         if _Debug:
             print('SettingsScreen.on_devices_list_result', dlv, result)
         for one_device in result:
+            if not one_device:
+                continue
+            inst = one_device.get('instance')
+            if not inst:
+                continue
             dlv.add_widget(DeviceItem(
                 name=one_device['name'],
-                automat_index=one_device.get('instance', {}).get('index'),
-                automat_id=one_device.get('instance', {}).get('id'),
-                automat_state=one_device.get('instance', {}).get('state'),
+                automat_index=inst.get('index'),
+                automat_id=inst.get('id'),
+                automat_state=inst.get('state'),
                 authorized=(True if one_device.get('meta', {}).get('auth_token') else False),
             ))
 

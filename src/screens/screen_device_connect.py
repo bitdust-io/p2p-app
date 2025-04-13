@@ -40,6 +40,7 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
     confirmation_code_dialog = None
     spinner_dialog = None
     device_check_task = None
+    busy = False
 
     def on_qr_scan_open_button_clicked(self, *args):
         if _Debug:
@@ -66,6 +67,9 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
         self.url_input_dialog = None
         if not inp:
             return
+        if self.busy:
+            return
+        self.busy = True
         router_url = util.unpack_device_url(inp.strip())
         screen.main_window().state_node_local = False
         screen.my_app().client_info['local'] = screen.main_window().state_node_local
@@ -94,6 +98,9 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
             router_url = args[0].strip()
         if not router_url:
             return
+        if self.busy:
+            return
+        self.busy = True
         router_url = util.unpack_device_url(router_url)
         screen.screen_back()
         screen.main_window().state_node_local = False
@@ -130,7 +137,7 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
             web_sock_remote.stop()
         screen.my_app().load_client_info()
         success = bool(screen.my_app().client_info.get('auth_token'))
-        self.ids.qr_scan_open_button.disabled = not system.is_android()
+        self.ids.qr_scan_open_button.disabled = not system.is_mobile()
         if self.confirmation_code_dialog:
             self.confirmation_code_dialog.dismiss()
             self.confirmation_code_dialog = None
@@ -152,6 +159,7 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
     def on_websocket_handshake_failed(self, ws_inst, error):
         if _Debug:
             print('TabRemoteDevice.on_websocket_handshake_failed', ws_inst, error)
+        self.busy = False
         if self.spinner_dialog:
             self.spinner_dialog.dismiss()
             self.spinner_dialog = None
@@ -165,16 +173,17 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
             self.url_input_dialog.dismiss()
             self.url_input_dialog = None
         snackbar.error(text=str(error))
-        self.ids.qr_scan_open_button.disabled = not system.is_android()
+        self.ids.qr_scan_open_button.disabled = not system.is_mobile()
 
     def on_websocket_error(self, ws_inst, error):
         if _Debug:
             print('TabRemoteDevice.on_websocket_error', ws_inst, error)
+        self.busy = False
         if self.spinner_dialog:
             self.spinner_dialog.dismiss()
             self.spinner_dialog = None
         snackbar.error(text=str(error))
-        self.ids.qr_scan_open_button.disabled = not system.is_android()
+        self.ids.qr_scan_open_button.disabled = not system.is_mobile()
 
     def on_websocket_handshake_started(self, ws_inst):
         if _Debug:
@@ -204,10 +213,13 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
 
     def on_server_code_entered(self, inp):
         if _Debug:
-            print('TabRemoteDevice.on_server_code_entered', inp)
+            print('TabRemoteDevice.on_server_code_entered', inp, self.server_code_input_dialog)
+        if not self.server_code_input_dialog:
+            return
         self.server_code_input_dialog = None
         if not inp:
-            self.ids.qr_scan_open_button.disabled = not system.is_android()
+            self.busy = False
+            self.ids.qr_scan_open_button.disabled = not system.is_mobile()
             if web_sock_remote.is_started():
                 web_sock_remote.stop()
             return
@@ -221,10 +233,12 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
 
     def on_confirmation_code_dialog_closed(self, *args, **kwargs):
         self.confirmation_code_dialog = None
-        self.ids.qr_scan_open_button.disabled = not system.is_android()
+        self.busy = False
+        self.ids.qr_scan_open_button.disabled = not system.is_mobile()
 
     def on_cancel_spinner_dialog(self):
-        self.ids.qr_scan_open_button.disabled = not system.is_android()
+        self.busy = False
+        self.ids.qr_scan_open_button.disabled = not system.is_mobile()
         self.spinner_dialog = None
         if web_sock_remote.is_started():
             web_sock_remote.stop()
@@ -258,7 +272,7 @@ class DeviceConnectScreen(screen.AppScreen):
     def on_enter(self, *args):
         if _Debug:
             print('DeviceConnectScreen.on_enter', args)
-        if system.is_android() or system.is_ios():
+        if system.is_mobile():
             self.ids.selection_tabs.ids.carousel.slides[0].ids.local_device_button.disabled = True
             self.ids.selection_tabs.switch_tab('Remote', search_by='title')
         else:

@@ -28,16 +28,22 @@ cur_dir := $(dir $(mkfile_path))
 	@python3 -c "v=open('./workspace/version').read().strip();open('./workspace/app/version.py','w').write('__version__ = \"%s\"' % v);"
 
 build: .prepare .venv
-	@if [ ! -d "./workspace/build" ]; then cd ./workspace/ && ./venv/bin/toolchain build python3 kivy freetype libffi libjpeg libpng pillow; fi
+	@if [ ! -d "./workspace/build" ]; then cd ./workspace/ && ./venv/bin/toolchain build python3 kivy freetype libffi libjpeg libpng pillow pyobjus; fi
 	@cd ./workspace/ && ./venv/bin/toolchain pip3 install -r requirements.txt
 	@if [ ! -d "./workspace/bitdust-p2p-app-ios" ]; then cd ./workspace/ && ./venv/bin/toolchain create bitdust-p2p-app ${cur_dir}/workspace/app; fi
 	@cp -v ./src/main.m ./workspace/bitdust-p2p-app-ios/
 	@cp -v ./src/icon.png ./workspace/bitdust-p2p-app-ios/
+	@cp -v ./src/logo1024.png ./workspace/bitdust-p2p-app-ios/
 	@cd ./workspace/ && ./venv/bin/toolchain update bitdust-p2p-app-ios/bitdust-p2p-app.xcodeproj
 	@echo "" && echo 'now run "make open_project" and click "build" in the Xcode dashboard'
 
 clean:
 	@rm -rf ./workspace
+
+update_project:
+	@cp -r -v ../../src/* ./workspace/app/
+	@cd ./workspace/app/ && rm -rf deploy && rm -rf service && rm -rf tools && find . -type d -name __pycache__ -exec rm -rf {} +
+	@cd ./workspace/ && ./venv/bin/toolchain update bitdust-p2p-app-ios/bitdust-p2p-app.xcodeproj
 
 open_project:
 	@cd ./workspace/ && open bitdust-p2p-app-ios/bitdust-p2p-app.xcodeproj

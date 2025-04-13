@@ -84,6 +84,9 @@ def get_app_data_path():
     elif is_osx():
         return os.path.join(os.path.expanduser('~'), '.bitdust')
 
+    elif is_ios():
+        return os.path.join(os.path.expanduser('~'), 'Documents', '.bitdust')
+
     return os.path.join(os.path.expanduser('~'), '.bitdust')
 
 
@@ -94,6 +97,8 @@ def get_downloads_dir():
         if not os.path.exists(downloads_dir):
             os.makedirs(downloads_dir)
         return downloads_dir
+    if is_ios():
+        return os.path.join(os.path.expanduser('~'), 'Documents')
     return platformdirs.user_downloads_dir()
 
 #------------------------------------------------------------------------------
@@ -492,6 +497,35 @@ def make_nice_file_condition(file_info):
 
 #------------------------------------------------------------------------------
 
+def open_url(url):
+    if _Debug:
+        print('system.open_url', url)
+    try:
+        if is_ios():
+            from pyobjus import autoclass, objc_str  # @UnresolvedImport
+            from pyobjus.dylib_manager import load_framework  # @UnresolvedImport
+            load_framework('/System/Library/Frameworks/UIKit.framework')
+            UIApplication = autoclass("UIApplication")
+            NSURL = autoclass("NSURL")
+            NSDictionary = autoclass("NSDictionary")
+            app = UIApplication.sharedApplication()
+            ns_url = NSURL.URLWithString_(objc_str(url))
+            options = NSDictionary.dictionary()  # Proper empty NSDictionary
+            if ns_url and app:
+                app.openURL_options_completionHandler_(ns_url, options, None)
+            else:
+                if _Debug:
+                    print("system.open_url Invalid URL or UIApplication instance: %r" % url)
+        else:
+            import webbrowser
+            webbrowser.open(url)
+    except Exception as exc:
+        if _Debug:
+            print('system.open_url %r : %r' % (url, exc, ))
+        return False
+    return True
+
+
 def open_path_in_os(filepath):
     """
     A portable way to open location or file on local disk with a default OS method.
@@ -518,6 +552,23 @@ def open_path_in_os(filepath):
             from lib.sharesheet import ShareSheet
             ShareSheet().view_file(filepath)
             return True
+
+        elif is_ios():
+            from pyobjus import autoclass, objc_str  # @UnresolvedImport
+            from pyobjus.dylib_manager import load_framework  # @UnresolvedImport
+            load_framework('/System/Library/Frameworks/UIKit.framework')
+            UIApplication = autoclass("UIApplication")
+            NSURL = autoclass("NSURL")
+            NSDictionary = autoclass("NSDictionary")
+            app = UIApplication.sharedApplication()
+            ns_url = NSURL.URLWithString_(objc_str('shareddocuments://'+filepath))
+            options = NSDictionary.dictionary()  # Proper empty NSDictionary
+            if ns_url and app:
+                app.openURL_options_completionHandler_(ns_url, options, None)
+            else:
+                if _Debug:
+                    print("system.open_path_in_os Invalid URL or UIApplication instance: %r" % filepath)
+
     except Exception as exc:
         if _Debug:
             print('system.open_path_in_os %r : %r' % (filepath, exc, ))
@@ -529,6 +580,40 @@ def open_path_in_os(filepath):
     except Exception as e:
         print('file %r failed to open with default OS method: %r' % (filepath, e, ))
     return False
+
+
+def share_dialog(title: str, text: str) -> None:
+    """Opens the native dialog 'Share with...'."""
+    # if platform == "android":
+    #     PythonActivity = autoclass("org.kivy.android.PythonActivity")
+    #     Intent = autoclass("android.content.Intent")
+    #     String = autoclass("java.lang.String")
+    #
+    #     intent = Intent()
+    #     intent.setAction(Intent.ACTION_SEND)
+    #     intent.putExtra(Intent.EXTRA_TEXT, String("{}".format(text)))
+    #     intent.setType("text/plain")
+    #     chooser = Intent.createChooser(intent, String(title))
+    #     PythonActivity.mActivity.startActivity(chooser)
+    # elif platform == "ios":
+    #     load_framework("/System/Library/Frameworks/UIKit.framework")
+    #
+    #     UIApplication = autoclass("UIApplication")
+    #     NSString = autoclass("NSString")
+    #     UIActivityViewController = autoclass("UIActivityViewController")
+    #
+    #     share_str = NSString.stringWithUTF8String_(text)
+    #     uiActivityViewController = UIActivityViewController.alloc().init()
+    #     activityViewController = (
+    #         uiActivityViewController.initWithActivityItems_applicationActivities_(
+    #             [share_str], None
+    #         )
+    #     )
+    #     UIcontroller = UIApplication.sharedApplication().keyWindow.rootViewController()
+    #     UIcontroller.presentViewController_animated_completion_(
+    #         activityViewController, True, None
+    #     )
+
 
 #------------------------------------------------------------------------------
 

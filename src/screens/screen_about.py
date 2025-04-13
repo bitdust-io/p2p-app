@@ -1,4 +1,4 @@
-import webbrowser
+from lib import system
 
 from components import screen
 
@@ -36,8 +36,8 @@ class AboutScreen(screen.AppScreen):
         if _Debug:
             print('AboutScreen.on_about_text_ref_pressed', args)
         if args[1] == 'github_link':
-            webbrowser.open('https://github.com/bitdust-io')
+            system.open_url('https://github.com/bitdust-io')
         elif args[1] == 'web_site_link':
-            webbrowser.open('https://bitdust.io')
+            system.open_url('https://bitdust.io')
         elif args[1] == 'feedback_link':
-            webbrowser.open('https://forms.gle/RkJW3L7NTamZ5K8m6')
+            system.open_url('https://forms.gle/RkJW3L7NTamZ5K8m6')

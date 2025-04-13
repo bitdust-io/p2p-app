@@ -119,6 +119,8 @@ def open_number_input_dialog(title, text, min_text_length=None, max_text_length=
 
     def on_confirm(*args, **kwargs):
         inp = content.ids.number_input.text
+        if _Debug:
+            print('dialogs.open_number_input_dialog.on_confirm', args, kwargs, cb, inp)
         if min_text_length is None:
             popup.dismiss()
             if cb:
@@ -130,6 +132,8 @@ def open_number_input_dialog(title, text, min_text_length=None, max_text_length=
                     cb(inp)
 
     def on_cancel(*args, **kwargs):
+        if _Debug:
+            print('dialogs.open_number_input_dialog.on_cancel', args, kwargs, cb)
         popup.dismiss()
         if cb:
             cb(None)

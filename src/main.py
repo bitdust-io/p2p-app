@@ -9,6 +9,7 @@ import platform
 import threading
 import locale
 import traceback
+import pprint
 
 #------------------------------------------------------------------------------ 
 
@@ -37,7 +38,8 @@ if platform.system() == 'Windows':
     # here is the assumption for every Windows-based OS : we are running on Python 3.8 or higher
     os.add_dll_directory(scriptdir)  # @UndefinedVariable
 else:
-    locale.setlocale(locale.LC_CTYPE, 'en_US.UTF-8')
+    if os.environ.get('KIVY_BUILD', '') != 'ios':
+        locale.setlocale(locale.LC_CTYPE, 'en_US.UTF-8')
 
 if _UTF8EncodedOutput:
     if platform.system() != 'Windows' and 'ANDROID_ARGUMENT' not in os.environ:
@@ -81,6 +83,8 @@ if _Debug:
     print('BitDustApp os.listdir()', os.listdir(os.getcwd()))
     print('BitDustApp platform.uname()', platform.uname())
     print('BitDustApp ROOT_PATH', ROOT_PATH)
+    print('BitDustApp system.get_app_data_path()', system.get_app_data_path())
+    print('BitDustApp ENV', pprint.pformat(dict(os.environ)))
 
 #------------------------------------------------------------------------------
 
@@ -88,11 +92,11 @@ from kivy.config import Config
 
 Config.set('kivy', 'window_icon', os.path.join(ROOT_PATH, 'images', 'bitdust.png'))
 
-if 'ANDROID_ARGUMENT' not in os.environ:
+if not system.is_mobile():
     Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
-# if _Debug:
-#     Config.set('kivy', 'log_level', 'debug')
+if _Debug:
+    Config.set('kivy', 'log_level', 'debug')
 
 from kivy.lang import Builder
 from kivy.clock import Clock, mainthread
