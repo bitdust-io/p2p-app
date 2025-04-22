@@ -5,7 +5,7 @@ from pyobjus.dylib_manager import load_framework  # @UnresolvedImport
 load_framework('/System/Library/Frameworks/Photos.framework')
 
 
-_Debug = True
+_Debug = False
 
 
 class IOSFileChooser(object):

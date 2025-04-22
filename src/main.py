@@ -242,9 +242,14 @@ class BitDustApp(styles.AppStyle, MDApp):
 
         Window.bind(on_keyboard=self.on_key_input)
 
-        from kivy.uix.anchorlayout import AnchorLayout
-        self.wrapper = AnchorLayout()
-        self.wrapper.padding = [0, 0, 0, 0, ]
+        from components import layouts
+        from kivy.metrics import dp
+        self.wrapper = layouts.WrapperLayout()
+        self.wrapper.background_color = self.theme_cls.primary_color
+        if system.is_ios():
+            self.wrapper.padding = [0, 0, 0, dp(17), ]
+        else:
+            self.wrapper.padding = [0, 0, 0, 0, ]
         self.wrapper.add_widget(self.main_window)
         return self.wrapper
 
