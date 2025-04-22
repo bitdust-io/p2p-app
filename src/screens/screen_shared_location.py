@@ -13,6 +13,8 @@ from lib import api_file_transfer
 
 from components import screen
 from components import snackbar
+from components import buttons
+from components import webfont
 
 #------------------------------------------------------------------------------
 
@@ -88,6 +90,8 @@ class SharedLocationScreen(screen.AppScreen):
         if _Debug:
             print('SharedLocationScreen.populate', screen.main_window().state_file_transfering)
         self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
+        if system.is_ios() and self.upload_multimedia_button:
+            self.upload_multimedia_button.disabled = screen.main_window().state_file_transfering
 
     def on_created(self):
         if _Debug:
@@ -98,14 +102,26 @@ class SharedLocationScreen(screen.AppScreen):
             file_clicked_callback=self.on_file_clicked,
         )
         screen.main_window().bind(state_file_transfering=self.on_state_file_transfering)
+        self.upload_multimedia_button = None
+        if system.is_ios():
+            self.upload_multimedia_button = buttons.FillRoundFlatButton(
+                text="[size=22sp]{}[/size] [size=16sp]photo[/size]".format(webfont.md_icon("image")),
+                md_bg_color=self.app().theme_cls.accent_color,
+                theme_text_color="Custom",
+                text_color=self.app().color_white99,
+                on_release=self.on_upload_multimedia_button_clicked,
+            )
+            self.ids.top_buttons_container.add_widget(self.upload_multimedia_button, index=1)
+            screen.main_window().bind(state_file_transfering=self.upload_multimedia_button.setter("disabled"))            
+
+    def on_destroying(self):
+        self.upload_multimedia_button = None
+        self.ids.files_list_view.shutdown()
 
     def on_state_file_transfering(self, instance, value):
         if _Debug:
             print('SharedLocationScreen.on_state_file_transfering', screen.main_window().state_file_transfering, self.ids.files_list_view.opened)
         self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
-
-    def on_destroying(self):
-        self.ids.files_list_view.shutdown()
 
     def on_enter(self, *args):
         self.ids.state_panel.attach(automat_id=self.automat_id, callback_start=self.on_state_panel_attach)
@@ -154,7 +170,6 @@ class SharedLocationScreen(screen.AppScreen):
         elif system.is_ios():
             from lib import filechooser_ios
             fc = filechooser_ios.IOSFileChooser(
-                title="Share a file",
                 on_selection=self.on_upload_file_selected,
             )
             fc.run()
@@ -168,6 +183,17 @@ class SharedLocationScreen(screen.AppScreen):
                 show_hidden=False,
                 on_selection=self.on_upload_file_selected,
             )
+
+    @mainthread
+    def on_upload_multimedia_button_clicked(self, *args):
+        if _Debug:
+            print('SharedLocationScreen.on_upload_multimedia_button_clicked', args)
+        if system.is_ios():
+            from lib import filechooser_ios
+            fc = filechooser_ios.IOSImageChooser(
+                on_selection=self.on_upload_file_selected,
+            )
+            fc.run()
 
     def on_upload_file_selected(self, *args, **kwargs):
         if _Debug:

@@ -11,10 +11,12 @@ from lib import util
 
 from components import screen
 from components import snackbar
+from components import buttons
+from components import webfont
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 
 #------------------------------------------------------------------------------
 
@@ -48,6 +50,8 @@ class PrivateFilesScreen(screen.AppScreen):
 
     def populate(self, *args, **kwargs):
         self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering
+        if system.is_ios() and self.upload_multimedia_button:
+            self.upload_multimedia_button.disabled = screen.main_window().state_file_transfering
 
     def on_created(self):
         self.ids.files_list_view.init(
@@ -56,8 +60,20 @@ class PrivateFilesScreen(screen.AppScreen):
             file_clicked_callback=self.on_file_clicked,
         )
         screen.main_window().bind(state_file_transfering=self.ids.upload_file_button.setter("disabled"))
+        self.upload_multimedia_button = None
+        if system.is_ios():
+            self.upload_multimedia_button = buttons.FillRoundFlatButton(
+                text="[size=22sp]{}[/size] [size=16sp]photo[/size]".format(webfont.md_icon("image")),
+                md_bg_color=self.app().theme_cls.accent_color,
+                theme_text_color="Custom",
+                text_color=self.app().color_white99,
+                on_release=self.on_upload_multimedia_button_clicked,
+            )
+            self.ids.top_buttons_container.add_widget(self.upload_multimedia_button, index=1)
+            screen.main_window().bind(state_file_transfering=self.upload_multimedia_button.setter("disabled"))
 
     def on_destroying(self):
+        self.upload_multimedia_button = None
         self.ids.files_list_view.shutdown()
 
     def on_enter(self, *args):
@@ -99,7 +115,6 @@ class PrivateFilesScreen(screen.AppScreen):
         elif system.is_ios():
             from lib import filechooser_ios
             fc = filechooser_ios.IOSFileChooser(
-                title="Upload a file",
                 on_selection=self.on_upload_file_selected,
             )
             fc.run()
@@ -113,6 +128,17 @@ class PrivateFilesScreen(screen.AppScreen):
                 show_hidden=False,
                 on_selection=self.on_upload_file_selected,
             )
+
+    @mainthread
+    def on_upload_multimedia_button_clicked(self, *args):
+        if _Debug:
+            print('PrivateFilesScreen.on_upload_multimedia_button_clicked', args)
+        if system.is_ios():
+            from lib import filechooser_ios
+            fc = filechooser_ios.IOSImageChooser(
+                on_selection=self.on_upload_file_selected,
+            )
+            fc.run()
 
     def on_upload_file_selected(self, *args, **kwargs):
         if _Debug:
