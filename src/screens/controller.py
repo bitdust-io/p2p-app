@@ -549,7 +549,7 @@ class Controller(object):
                 delivered = 0.0
                 reliable = 0.0
                 total_file_versions = 0
-                for one_snap_id in self.remote_versions_index[global_id].values():
+                for one_snap_id in self.remote_versions_index.get(global_id, {}).values():
                     version_details = self.model_data['remote_version'].get(one_snap_id)
                     if version_details:
                         sz += version_details['data']['size']

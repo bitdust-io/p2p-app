@@ -390,7 +390,8 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         if screen_id not in self.active_screens:
             self.open_screen(screen_id, screen_type, **kwargs)
         else:
-            self.active_screens[screen_id][0].init_kwargs(**kwargs)
+            if kwargs:
+                self.active_screens[screen_id][0].init_kwargs(**kwargs)
         if self.selected_screen and self.selected_screen == screen_id:
             if _Debug:
                 print('MainWin.select_screen   skip, selected screen is already %r' % screen_id)

@@ -579,6 +579,11 @@ class SettingsScreen(screen.AppScreen):
         if _Debug:
             print('SettingsScreen.on_devices_list_result', dlv, result)
         for one_device in result:
+            if not one_device:
+                continue
+            inst = one_device.get('instance')
+            if not inst:
+                continue
             dlv.add_widget(DeviceItem(
                 name=one_device['name'],
                 automat_index=(one_device.get('instance', {}) or {}).get('index'),
