@@ -11,6 +11,7 @@ from kivy.uix.anchorlayout import AnchorLayout
 from components import screen
 
 from lib import system
+from lib import strng
 
 #------------------------------------------------------------------------------
 
@@ -92,11 +93,11 @@ class ScanQRScreen(screen.AppScreen):
 
     def on_tex_ios(self, *args, **kwargs):
         if _Debug:
-            print('ScanQRScreen.on_tex_ios', args, kwargs)
+            print('ScanQRScreen.on_tex_ios', args, kwargs, self.scan_qr_callback)
         if args and self.scan_qr_callback:
             _cb = self.scan_qr_callback
             self.scan_qr_callback = None
-            _cb(args[0])
+            _cb(strng.to_text(args[1]))
 
     def on_tex(self, camera):
         if _Debug:

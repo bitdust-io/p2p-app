@@ -326,13 +326,13 @@ def websocket_thread():
             on_open=on_open,
         )
         try:
-            ret = ws().run_forever(ping_interval=10)
+            ret = ws().run_forever(ping_interval=60, ping_timeout=15)
         except Exception as exc:
             ret = None
             _WebSocketApp = None
             if _Debug:
                 print('websocket_thread(): %r' % exc)
-            time.sleep(1)
+            time.sleep(5)
         if _Debug:
             print('websocket_thread().run_forever() returned: %r  is_started: %r' % (ret, is_started(), ))
         if _WebSocketApp:
@@ -340,7 +340,7 @@ def websocket_thread():
             _WebSocketApp = None
         if not is_started():
             break
-        time.sleep(1)
+        time.sleep(5)
     _WebSocketApp = None
     if _Debug:
         print('websocket_thread() finished')

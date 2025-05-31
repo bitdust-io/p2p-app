@@ -42,8 +42,8 @@ class DeviceItem(TwoLineIconListItem):
 
     name = StringProperty()
     automat_index = NumericProperty(None, allownone=True)
-    automat_id = StringProperty()
-    automat_state = StringProperty()
+    automat_id = StringProperty(None, allownone=True)
+    automat_state = StringProperty(None, allownone=True)
     authorized = BooleanProperty(False)
 
     def __init__(self, **kwargs):
@@ -579,11 +579,16 @@ class SettingsScreen(screen.AppScreen):
         if _Debug:
             print('SettingsScreen.on_devices_list_result', dlv, result)
         for one_device in result:
+            if not one_device:
+                continue
+            inst = one_device.get('instance')
+            if not inst:
+                continue
             dlv.add_widget(DeviceItem(
                 name=one_device['name'],
-                automat_index=one_device.get('instance', {}).get('index'),
-                automat_id=one_device.get('instance', {}).get('id'),
-                automat_state=one_device.get('instance', {}).get('state'),
+                automat_index=(one_device.get('instance', {}) or {}).get('index'),
+                automat_id=(one_device.get('instance', {}) or {}).get('id'),
+                automat_state=(one_device.get('instance', {}) or {}).get('state'),
                 authorized=(True if one_device.get('meta', {}).get('auth_token') else False),
             ))
 

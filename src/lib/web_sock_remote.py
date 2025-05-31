@@ -469,10 +469,9 @@ def continue_handshake(server_code):
     client_key_object = rsa_key.RSAKey()
     client_key_object.fromDict(client_info['key'])
     client_info['client_code'] = cipher.generate_digits(6, as_text=True)
-    # client_info['client_code'] = '111222'
     system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
-    # TODO: here must show the client_code digits in the app UI
-    # user will have to enter the displayed client code on the server manually
+    # here must be shown the client_code digits in the BitDust Node UI
+    # user will have to enter the displayed client code on the server manually if BitDust runs in headless mode
     json_data = {
         'cmd': 'server-code',
         'server_code': strng.to_text(encrypted_server_code),
@@ -562,13 +561,13 @@ def websocket_thread():
             on_open=on_open,
         )
         try:
-            ret = ws().run_forever(ping_interval=10)
+            ret = ws().run_forever(ping_interval=60, ping_timeout=15)
         except Exception as exc:
             ret = None
             _WebSocketApp = None
             if _Debug:
                 print('web_sock_remote.websocket_thread: %r' % exc)
-            time.sleep(1)
+            time.sleep(5)
         if _Debug:
             print('web_sock_remote.websocket_thread run_forever() returned: %r  is_started: %r' % (ret, is_started(), ))
         if _WebSocketApp:
@@ -576,7 +575,7 @@ def websocket_thread():
             _WebSocketApp = None
         if not is_started():
             break
-        time.sleep(1)
+        time.sleep(5)
         _WebSocketConnectingAttempts += 1
     _WebSocketApp = None
     if _Debug:

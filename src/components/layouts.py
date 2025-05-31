@@ -1,5 +1,5 @@
 from kivy.clock import Clock
-from kivy.properties import ObjectProperty, NumericProperty  # @UnresolvedImport
+from kivy.properties import ColorProperty, ObjectProperty, NumericProperty  # @UnresolvedImport
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.stacklayout import StackLayout
@@ -141,3 +141,8 @@ class DelayedResizeLayout(AnchorLayout):
     def add_root_widget(self, w):
         self.root_widget = w
         self.add_widget(self.root_widget)
+
+#------------------------------------------------------------------------------
+
+class WrapperLayout(AnchorLayout):
+    background_color = ColorProperty([1, 0, 0, 1, ])

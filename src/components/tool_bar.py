@@ -541,9 +541,6 @@ class CustomBottomToolbar(CustomNotchedBox, styles.AppStyle):
                 text_color=self.state2color(-1),
                 tooltip_text=item.get('tooltip') or '',
                 on_release=item.get('cb') or (lambda x: None),
-                # theme_text_color="Custom" if not self.opposite_colors else "Primary",
-                # text_color=self.specific_text_color,
-                # opposite_colors=self.opposite_colors,
             )
             action_bar.add_widget(w)
         action_bar.width = new_width
@@ -684,3 +681,4 @@ class CustomBottomAppBar(FloatLayout):
         if isinstance(widget, CustomBottomToolbar):
             super().add_widget(widget)
             return super().add_widget(widget.bottom_action_button)
+        return super().add_widget(widget, index=index, canvas=canvas)
