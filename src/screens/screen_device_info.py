@@ -98,14 +98,14 @@ class DeviceInfoScreen(screen.AppScreen):
             snackbar.error(text=api_client.response_err(resp))
             return
         result = api_client.result(resp)
-        connected_routers = result.get('instance', {}).get('connected_routers', []) or []
+        connected_routers = (result.get('instance', {}) or {}).get('connected_routers', []) or []
         self.url = connected_routers[0] if connected_routers else ''
         result.update(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             small_text_size='{}sp'.format(self.app().font_size_small_absolute),
             large_text_size='{}sp'.format(self.app().font_size_large_absolute),
             name=result.get('name', ''),
-            state=result.get('instance', {}).get('state', '') or 'CLOSED',
+            state=(result.get('instance', {}) or {}).get('state', '') or 'CLOSED',
             url=util.pack_device_url(self.url),
             authorized='yes' if result.get('meta', {}).get('auth_token') else 'no',
         )

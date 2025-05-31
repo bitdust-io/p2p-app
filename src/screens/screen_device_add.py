@@ -67,8 +67,8 @@ class DeviceAddScreen(screen.AppScreen):
             screen_id='device_info_{}'.format(r['name']),
             screen_type='device_info_screen',
             device_name=r['name'],
-            automat_index=r.get('instance', {}).get('index'),
-            automat_id=r.get('instance', {}).get('id'),
+            automat_index=(r.get('instance', {}) or {}).get('index'),
+            automat_id=(r.get('instance', {}) or {}).get('id'),
         )
         screen.close_screen('device_add_screen')
         screen.stack_clear()
