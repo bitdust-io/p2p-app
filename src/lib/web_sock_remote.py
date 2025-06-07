@@ -43,7 +43,7 @@ else:
 
 #------------------------------------------------------------------------------
 
-_Debug = False
+_Debug = True
 _DebugAPIResponses = _Debug
 
 #------------------------------------------------------------------------------
@@ -468,7 +468,7 @@ def continue_handshake(server_code):
     hashed_server_code = hashes.sha1(strng.to_bin(salted_server_code))
     client_key_object = rsa_key.RSAKey()
     client_key_object.fromDict(client_info['key'])
-    client_info['client_code'] = cipher.generate_digits(6, as_text=True)
+    client_info['client_code'] = cipher.generate_digits(4, as_text=True)
     system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
     # here must be shown the client_code digits in the BitDust Node UI
     # user will have to enter the displayed client code on the server manually if BitDust runs in headless mode
@@ -561,7 +561,7 @@ def websocket_thread():
             on_open=on_open,
         )
         try:
-            ret = ws().run_forever(ping_interval=60, ping_timeout=15)
+            ret = ws().run_forever(ping_interval=5*60, ping_timeout=15)
         except Exception as exc:
             ret = None
             _WebSocketApp = None

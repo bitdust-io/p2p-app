@@ -193,9 +193,9 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
             self.spinner_dialog = None
         self.server_code_input_dialog = dialogs.open_number_input_dialog(
             title='Authorization code',
-            text='Enter 6-digits authorization code generated on the remote BitDust node:',
-            min_text_length=6,
-            max_text_length=6,
+            text='Enter the 4 digits authorization code generated on the remote BitDust node:',
+            min_text_length=4,
+            max_text_length=4,
             button_confirm='Continue',
             button_cancel='Back',
             cb=self.on_server_code_entered,
@@ -226,7 +226,7 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
         client_code = web_sock_remote.continue_handshake(server_code=inp)
         self.confirmation_code_dialog = dialogs.open_message_dialog(
             title='Confirmation code',
-            text='[color=#000]Enter the confirmation code dispalyed bellow in your BitDust node Desktop app:\n\n\n[size=24sp]%s[/size][/color]' % client_code,
+            text='[color=#000]Enter the 4 digits confirmation code dispalyed bellow in your BitDust node Desktop app:\n\n\n[size=24sp]%s[/size][/color]' % client_code,
             button_confirm='Continue',
             cb=self.on_confirmation_code_dialog_closed,
         )
