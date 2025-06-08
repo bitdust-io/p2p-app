@@ -116,8 +116,13 @@ class StatusPanelLayout(HorizontalLayout):
 
 #------------------------------------------------------------------------------
 
+from kivy.metrics import sp
+
 class VerticalScrollView(ScrollView):
-    pass
+    always_overscroll = False
+    scroll_type = ['content', 'bars']
+    scroll_wheel_distance = sp(40)
+    smooth_scroll_end = 10
 
 #------------------------------------------------------------------------------
 
