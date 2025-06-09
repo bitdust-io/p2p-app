@@ -269,9 +269,9 @@ def on_message(ws_inst, message):
     global _WebSocketAuthToken
     global _WebSocketSessionKey
     json_data = jsn.loads(message)
-    if _Debug:
-        print('web_sock_remote.on_message %d bytes' % len(message))
     cmd = json_data.get('cmd')
+    if _Debug:
+        print('web_sock_remote.on_message [%s] with %d bytes' % ((str(cmd)[:20]), len(message)))
     if cmd == 'server-public-key':
         # SECURITY
         # TODO: think about verifying if that is a malicious request that is intended to interrupt already connected "good guy"
@@ -404,11 +404,14 @@ def on_message(ws_inst, message):
             try:
                 client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
                 client_info['routers'] = decrypted_json_payload['routers']
+                client_info['authorized_routers'] = decrypted_json_payload.get('authorized_routers') or {}
                 system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
             except Exception as e:
                 if _Debug:
                     print('web_sock_remote.on_message failed writing updated routers list', e)
                 return False
+            if _Debug:
+                print('        routers list was updated: %r' % client_info['routers'])
             return True
     if cmd == 'server-disconnected':
         if _Debug:
