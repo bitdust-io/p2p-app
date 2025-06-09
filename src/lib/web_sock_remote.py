@@ -554,13 +554,13 @@ def websocket_thread():
     global _WebSocketConnectingAttempts
     web_socket.enableTrace(False)
     if _Debug:
-        print('web_sock_remote.websocket_thread beginning _ClientInfoFilePath=%r' % _ClientInfoFilePath)
+        print('web_sock_remote.websocket_thread beginning _ClientInfoFilePath=%r attempts=%r' % (_ClientInfoFilePath, _WebSocketConnectingAttempts))
     client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
     routers = client_info['routers']
     max_attempts = len(routers)
-    _WebSocketConnectingAttempts = 0
+    if _WebSocketConnectingAttempts > max_attempts:
+        _WebSocketConnectingAttempts = 0
     while is_started():
-        _WebSocketConnectingAttempts += 1
         if _Debug:
             print('web_sock_remote.websocket_thread making %d attempt, calling run_forever() %r' % (_WebSocketConnectingAttempts, time.asctime()))
         _WebSocketClosed = False
@@ -571,6 +571,7 @@ def websocket_thread():
             on_error(None, Exception('connection attempts exceeded, failed connecting to web socket routers'))
             break
         url = routers[_WebSocketConnectingAttempts - 1]
+        _WebSocketConnectingAttempts += 1
         if _Debug:
             print('web_sock_remote.websocket_thread is going to connect to %r, attempts=%r, max_attempts=%r' % (url, _WebSocketConnectingAttempts, max_attempts))
         _WebSocketApp = web_socket.WebSocketApp(

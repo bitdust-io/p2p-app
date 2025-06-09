@@ -1,4 +1,5 @@
 from kivy.clock import Clock
+from kivy.clock import mainthread
 
 #------------------------------------------------------------------------------
 
@@ -146,6 +147,7 @@ class DeviceDisconnectedScreen(screen.AppScreen):
         else:
             self.do_start_connecting()
 
+    @mainthread
     def do_start_connecting(self, interval=None):
         if _Debug:
             print('DeviceDisconnectedScreen.do_start_connecting', self.counter)
