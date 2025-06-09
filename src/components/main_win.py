@@ -256,8 +256,8 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         self.close_device_server_code_display_dialog()
         server_code = event_data['server_code']
         self.device_server_code_display_dialog = dialogs.open_message_dialog(
-            title='Authorization code',
-            text='[color=#000]Enter the 4 digits authorization code dispalyed bellow on your device running BitDust p2p-app:\n\n\n[size=24sp]%s[/size][/color]' % server_code,
+            title='Device authorization code',
+            text='[color=#000]Here is your device authorization code:\n\n[size=24sp]%s[/size]\n\nEnter those 4 digits in the BitDust p2p-app running on your remote device to continue device authorization procedure.[/color]' % server_code,
             button_confirm='Continue',
             cb=self.on_device_server_code_display_dialog_closed,
         )
@@ -273,8 +273,8 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         self.close_device_client_code_input_dialog()
         device_name = event_data['device_name']
         self.device_client_code_input_dialog = dialogs.open_number_input_dialog(
-            title='Device code',
-            text='Enter 4 digits authorization code generated on your device:',
+            title='Device confirmation code',
+            text='Please enter the 4 digits confirmation code displayed in BitDust p2p-app running on your remote device:',
             min_text_length=4,
             max_text_length=4,
             button_confirm='Confirm',
