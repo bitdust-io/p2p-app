@@ -1,4 +1,5 @@
 from kivy.clock import Clock
+from kivy.clock import mainthread
 
 #------------------------------------------------------------------------------
 
@@ -15,6 +16,7 @@ _Debug = False
 class DeviceDisconnectedScreen(screen.AppScreen):
 
     device_check_task = None
+    device_process_health_task = None
 
     def get_title(self):
         return 'connecting to BitDust node'
@@ -43,12 +45,27 @@ class DeviceDisconnectedScreen(screen.AppScreen):
     def on_websocket_connect(self, ws_inst):
         if _Debug:
             print('DeviceDisconnectedScreen.on_websocket_connect', ws_inst)
+        if self.device_process_health_task:
+            self.device_process_health_task.cancel()
+            self.device_process_health_task = None
+        self.device_process_health_task = Clock.schedule_once(self.do_process_health, 0)
+
+    def do_process_health(self, *args, **kwargs):
+        if _Debug:
+            print('DeviceDisconnectedScreen.do_process_health', args, kwargs)
         jd = {'command': 'api_call', 'method': 'process_health', 'kwargs': {}, }
         web_sock_remote.ws_call(json_data=jd, cb=self.on_process_health_result)
+        if self.device_process_health_task:
+            self.device_process_health_task.cancel()
+            self.device_process_health_task = None
+        self.device_process_health_task = Clock.schedule_once(self.do_process_health, 5)
 
     def on_process_health_result(self, resp):
         if _Debug:
             print('DeviceDisconnectedScreen.on_process_health_result %r' % resp)
+        if self.device_process_health_task:
+            self.device_process_health_task.cancel()
+            self.device_process_health_task = None
         if web_sock_remote.is_started():
             web_sock_remote.stop()
         if not isinstance(resp, dict):
@@ -146,6 +163,7 @@ class DeviceDisconnectedScreen(screen.AppScreen):
         else:
             self.do_start_connecting()
 
+    @mainthread
     def do_start_connecting(self, interval=None):
         if _Debug:
             print('DeviceDisconnectedScreen.do_start_connecting', self.counter)

@@ -98,7 +98,12 @@ def open_text_input_dialog(title, text, button_confirm='Confirm', button_cancel=
         auto_dismiss=False,
         pos_hint={'y': .15},
     )
+
+    def on_open(*args, **kwargs):
+        content.ids.text_input.focus = True
+
     popup.update_width = lambda *args: None
+    popup.bind(on_open=on_open)
     popup.open()
     return popup
 
@@ -161,7 +166,12 @@ def open_number_input_dialog(title, text, min_text_length=None, max_text_length=
         auto_dismiss=False,
         pos_hint={'y': .15},
     )
+
+    def on_open(*args, **kwargs):
+        content.ids.number_input.focus = True
+
     popup.update_width = lambda *args: None
+    popup.bind(on_open=on_open)
     popup.open()
     return popup
 

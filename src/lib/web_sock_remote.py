@@ -56,7 +56,6 @@ _WebSocketClosed = True
 _WebSocketStarted = False
 _WebSocketConnecting = False
 _WebSocketConnectingAttempts = 0
-_WebSocketConnectingMaxAttempts = 0
 _WebSocketAuthToken = None
 _WebSocketSessionKey = None
 _LastCallID = 0
@@ -270,9 +269,9 @@ def on_message(ws_inst, message):
     global _WebSocketAuthToken
     global _WebSocketSessionKey
     json_data = jsn.loads(message)
-    if _Debug:
-        print('web_sock_remote.on_message %d bytes' % len(message))
     cmd = json_data.get('cmd')
+    if _Debug:
+        print('web_sock_remote.on_message [%s] with %d bytes' % ((str(cmd)[:20]), len(message)))
     if cmd == 'server-public-key':
         # SECURITY
         # TODO: think about verifying if that is a malicious request that is intended to interrupt already connected "good guy"
@@ -352,7 +351,7 @@ def on_message(ws_inst, message):
             print('web_sock_remote.on_message AUTHORIZED', ws_inst)
         on_connect(ws_inst)        
         return True
-    if cmd in ['response', 'push']:
+    if cmd in ['response', 'push', 'publish-routers']:
         if 'iv' not in json_data or 'ct' not in json_data:
             if _Debug:
                 print('web_sock_remote.on_message received not encrypted web socket message: %r' % json_data)
@@ -364,11 +363,11 @@ def on_message(ws_inst, message):
             if _Debug:
                 print('web_sock_remote.on_message failed receiving incoming message payload: %r' % exc)
             return False
-        if 'payload' not in decrypted_json_payload:
-            if _Debug:
-                print('web_sock_remote.on_message no payload found in the response: %r' % decrypted_json_payload)
-            return False
         if cmd == 'response':
+            if 'payload' not in decrypted_json_payload:
+                if _Debug:
+                    print('web_sock_remote.on_message no payload found in the response: %r' % decrypted_json_payload)
+                return False
             if 'call_id' not in json_data:
                 if _Debug:
                     print('        call_id not found in the response')
@@ -386,6 +385,10 @@ def on_message(ws_inst, message):
                 result_callback(decrypted_json_payload)
             return True
         if cmd == 'push':
+            if 'payload' not in decrypted_json_payload:
+                if _Debug:
+                    print('web_sock_remote.on_message no payload found in the response: %r' % decrypted_json_payload)
+                return False
             payload_type = decrypted_json_payload.get('type')
             if payload_type == 'event':
                 return on_event(decrypted_json_payload)
@@ -393,6 +396,23 @@ def on_message(ws_inst, message):
                 return on_stream_message(decrypted_json_payload)
             if payload_type == 'model':
                 return on_model_update(decrypted_json_payload)
+        if cmd == 'publish-routers':
+            if 'routers' not in decrypted_json_payload:
+                if _Debug:
+                    print('        routers list was not found in the response')
+                return False
+            try:
+                client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
+                client_info['routers'] = decrypted_json_payload['routers']
+                client_info['authorized_routers'] = decrypted_json_payload.get('authorized_routers') or {}
+                system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
+            except Exception as e:
+                if _Debug:
+                    print('web_sock_remote.on_message failed writing updated routers list', e)
+                return False
+            if _Debug:
+                print('        routers list was updated: %r' % client_info['routers'])
+            return True
     if cmd == 'server-disconnected':
         if _Debug:
             print('    routed web socket connection was DISCONNECTED from server side')
@@ -468,7 +488,7 @@ def continue_handshake(server_code):
     hashed_server_code = hashes.sha1(strng.to_bin(salted_server_code))
     client_key_object = rsa_key.RSAKey()
     client_key_object.fromDict(client_info['key'])
-    client_info['client_code'] = cipher.generate_digits(6, as_text=True)
+    client_info['client_code'] = cipher.generate_digits(4, as_text=True)
     system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
     # here must be shown the client_code digits in the BitDust Node UI
     # user will have to enter the displayed client code on the server manually if BitDust runs in headless mode
@@ -535,24 +555,28 @@ def websocket_thread():
     global _WebSocketApp
     global _WebSocketClosed
     global _WebSocketConnectingAttempts
-    global _WebSocketConnectingMaxAttempts
     web_socket.enableTrace(False)
     if _Debug:
-        print('web_sock_remote.websocket_thread beginning _ClientInfoFilePath=%r' % _ClientInfoFilePath)
+        print('web_sock_remote.websocket_thread beginning _ClientInfoFilePath=%r attempts=%r' % (_ClientInfoFilePath, _WebSocketConnectingAttempts))
     client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
     routers = client_info['routers']
-    _WebSocketConnectingMaxAttempts = len(routers)
-    _WebSocketConnectingAttempts = 1
+    max_attempts = len(routers)
+    if _WebSocketConnectingAttempts > max_attempts:
+        _WebSocketConnectingAttempts = 0
     while is_started():
         if _Debug:
-            print('web_sock_remote.websocket_thread calling run_forever(ping_interval=10) %r' % time.asctime())
+            print('web_sock_remote.websocket_thread making %d attempt, calling run_forever() %r' % (_WebSocketConnectingAttempts, time.asctime()))
         _WebSocketClosed = False
-        if _WebSocketConnectingAttempts > _WebSocketConnectingMaxAttempts:
+        client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
+        routers = client_info['routers']
+        max_attempts = len(routers)
+        if _WebSocketConnectingAttempts > max_attempts:
             on_error(None, Exception('connection attempts exceeded, failed connecting to web socket routers'))
             break
         url = routers[_WebSocketConnectingAttempts - 1]
+        _WebSocketConnectingAttempts += 1
         if _Debug:
-            print('web_sock_remote.websocket_thread is going to connect to %r, attempts=%r, max_attempts=%r' % (url, _WebSocketConnectingAttempts, _WebSocketConnectingMaxAttempts))
+            print('web_sock_remote.websocket_thread is going to connect to %r, attempts=%r, max_attempts=%r' % (url, _WebSocketConnectingAttempts, max_attempts))
         _WebSocketApp = web_socket.WebSocketApp(
             url=url,
             on_message=on_message,
@@ -561,7 +585,7 @@ def websocket_thread():
             on_open=on_open,
         )
         try:
-            ret = ws().run_forever(ping_interval=60, ping_timeout=15)
+            ret = ws().run_forever(ping_interval=5*60, ping_timeout=15)
         except Exception as exc:
             ret = None
             _WebSocketApp = None
@@ -576,7 +600,6 @@ def websocket_thread():
         if not is_started():
             break
         time.sleep(5)
-        _WebSocketConnectingAttempts += 1
     _WebSocketApp = None
     if _Debug:
         print('web_sock_remote.websocket_thread finished')
