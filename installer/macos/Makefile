@@ -57,6 +57,9 @@ build: .spec
 	@mkdir -p ./workspace/data && cp -v ./background.png ./workspace/data
 	@cd ./workspace && sh -x create-osx-dmg.sh BitDust-p2p.app BitDust-p2p && mv BitDust-p2p.dmg BitDust-p2p-app.dmg
 	@mv -v ./workspace/BitDust-p2p-app.dmg ./bin
+	@echo "Now go to https://github.com/bitdust-io/p2p-app/releases/tag/alpha page and click [Edit] icon button in the top right corner."
+	@echo "First remove the BitDust-p2p-app.dmg file from the attached binaries."
+	@echo "Then upload bin/BitDust-p2p-app.dmg file and click [Update release] button."
 
 clean:
 	@(cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v osx clean) || echo "done"
