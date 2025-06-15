@@ -86,7 +86,6 @@ class QRCodeWidget(FloatLayout):
             return
         QRCode = qrcode.QRCode
         addr = self.addr
-        print('update_qr', self, addr)
         try:
             self.qr = qr = QRCode(
                 version=None,
@@ -103,7 +102,6 @@ class QRCodeWidget(FloatLayout):
 
     def setMinimumSize(self, size):
         # currently unused, do we need this?
-        print('setMinimumSize', size)
         self._texture_size = size
 
     def _create_texture(self, k, dt):

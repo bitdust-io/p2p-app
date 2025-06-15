@@ -39,6 +39,9 @@ build: .prepare .venv
 	@cp -v ./src/bitdust-p2p-app-info.plist ./workspace/bitdust-p2p-app-ios/
 	@cd ./workspace/ && ./venv/bin/toolchain update bitdust-p2p-app-ios/bitdust-p2p-app.xcodeproj
 	@echo "" && echo 'now run "make open_project" and click "build" in the Xcode dashboard'
+	@echo 'next you need to update release version: open "Info" tab in .xcodeproj file properties, change "Bundle version" and "Bundle version string" values'
+	@echo 'then click in the top menu [Product]->[Archive]->[Distribute app] to upload built package via AppConnect'
+	@echo 'go to https://developer.apple.com/account -> Apps -> BitDust, create new version, fill in the form details and send fore app review'
 
 clean:
 	@rm -rf ./workspace

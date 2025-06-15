@@ -56,7 +56,7 @@ REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.tx
 .spec: .prepare .venv .install_buildozer
 	@cd ./workspace/ && P_requirements="$(REQUIREMENTS_ANDROID)" ./venv/bin/python3 -c "tpl=open('buildozer.spec.template').read();import os,sys;sys.stdout.write(tpl.format(requirements=os.environ['P_requirements']));" > buildozer.spec
 
-build: .spec
+build: .spec apk
 	@rm -rfv ./workspace/bin/*.aab
 	@rm -rfv ./workspace/bin/*.apk
 	@# cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
@@ -68,8 +68,13 @@ build: .spec
 	@rm -rfv ./workspace/bin/bitdust1-*-release.aab
 	@mv -v ./workspace/bin/*.aab ./bin/
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
+	@echo "Now go to Goggle Dev Console at https://play.google.com/apps/publish/""
+	@echo "Go to Releases -> Production page and click [Create new release] button"
+	@echo "Upload bin/BitDustAndroid.aab file and copy release notes from the previos releases, then click [send release for review] button"
+	@echo 'Upload bin/*.apk files to the GitHub: https://github.com/bitdust-io/p2p-app/releases/tag/alpha'
 
-# apk: build_arm64_v8a build_armeabi_v7a build_x86_64
+apk: build_arm64_v8a build_armeabi_v7a build_x86_64
+
 # 	@rm -rfv ./workspace/bin/*.apk
 # 	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 # 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release 1>buildozer.log 2>buildozer.err

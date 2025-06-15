@@ -55,7 +55,7 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase):
             print('TabRemoteDevice.on_url_enter_button_clicked', args)
         self.url_input_dialog = dialogs.open_text_input_dialog(
             title='Connection info',
-            text='Enter device connection info generated on the remote BitDust node:',
+            text='Enter device connection URL generated on the remote BitDust node:',
             button_confirm='Continue',
             button_cancel='Back',
             cb=self.on_url_entered,
