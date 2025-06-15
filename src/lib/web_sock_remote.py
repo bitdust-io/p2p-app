@@ -78,7 +78,7 @@ def start(callbacks={}, client_info_filepath=None):
         raise Exception('already started')
     if _Debug:
         print('web_sock_remote.start client_info_filepath=%r' % client_info_filepath)
-    _ClientInfoFilePath = client_info_filepath
+    _ClientInfoFilePath = client_info_filepath or 'client.json'
     _RegisteredCallbacks = callbacks or {}
     _WebSocketConnecting = True
     _WebSocketStarted = True
@@ -312,7 +312,7 @@ def on_message(ws_inst, message):
             orig_encrypted_payload = base64.b64decode(strng.to_bin(encrypted_payload))
             client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
             client_code = client_info['client_code']
-            linked_routers = client_info['routers']
+            linked_routers = client_info.get('routers') or []
             client_key_object = rsa_key.RSAKey()
             client_key_object.fromDict(client_info['key'])
             server_key_object = rsa_key.RSAKey()
@@ -344,6 +344,7 @@ def on_message(ws_inst, message):
         client_info['auth_token'] = auth_token
         client_info['session_key'] = session_key_text
         client_info['routers'] = linked_routers
+        client_info['state'] = 'authorized'
         system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
         _WebSocketAuthToken = auth_token
         _WebSocketSessionKey = base64.b64decode(strng.to_bin(session_key_text))
@@ -459,16 +460,51 @@ def on_model_update(json_data):
 
 #------------------------------------------------------------------------------
 
-def restart_handshake():
+def generate_client_private_key():
     global _ClientInfoFilePath
     client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
     if _Debug:
-        print('web_sock_remote.restart_handshake about to generate new RSA key')
+        print('web_sock_remote.generate_client_private_key about to generate new RSA key for remote web socket connection')
     key_object = rsa_key.RSAKey()
     key_object.generate(2048)
     client_info['key'] = key_object.toDict(include_private=True)
     client_info['state'] = 'init'
     system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
+
+
+def load_server_auth_info(encrypted_auth_info, signature, server_public_key_text):
+    global _ClientInfoFilePath
+    client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
+    client_code = client_info.get('client_code') or None
+    client_key_object = rsa_key.RSAKey()
+    client_key_object.fromDict(client_info['key'])
+    orig_encrypted_payload = base64.b64decode(strng.to_bin(encrypted_auth_info))
+    server_key_object = rsa_key.RSAKey()
+    server_key_object.fromString(server_public_key_text)
+    received_salted_payload = strng.to_text(client_key_object.decrypt(orig_encrypted_payload))
+    hashed_payload = hashes.sha1(strng.to_bin(received_salted_payload))
+    if not server_key_object.verify(strng.to_bin(signature), hashed_payload):
+        if _Debug:
+            print('web_sock_remote.load_server_auth_info authorization info signature verification failed')
+        raise Exception('signature verification failed')
+    received_client_code, auth_token, session_key_text, _ = received_salted_payload.split('#')
+    if client_code and received_client_code != client_code:
+        if _Debug:
+            print('web_sock_remote.load_server_auth_info client code is not matching')
+        raise Exception('client code is not matching')
+    client_info['auth_token'] = auth_token
+    client_info['session_key'] = session_key_text
+    client_info['server_public_key'] = server_public_key_text
+    client_info['state'] = 'authorized'
+    system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
+
+
+def restart_handshake():
+    global _ClientInfoFilePath
+    generate_client_private_key()
+    client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
+    key_object = rsa_key.RSAKey()
+    key_object.fromDict(client_info['key'])
     json_data = {
         'cmd': 'client-public-key',
         'client_public_key': key_object.toPublicString(),

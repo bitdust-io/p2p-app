@@ -34,13 +34,21 @@ def clean_remote_path(file_path):
 
 
 def pack_device_url(url):
-    _u = url.replace('ws://', '')
-    _head, _, _tail = _u.rpartition('/?r=')
-    return _head + ':' + _tail
+    _u = url
+    if _u.startswith('ws://'):
+        _u = _u.replace('ws://', '')
+    if _u.count('/?r='):
+        _head, _, _tail = _u.rpartition('/?r=')
+        return _head + ':' + _tail
+    return _u
 
 
 def unpack_device_url(inp):
-    _head, _, _tail = inp.rpartition(':')
-    if not _head.startswith('ws://'):
-        _head = 'ws://' + _head
-    return _head + '/?r=' + _tail
+    if inp.startswith('ws://'):
+        return inp
+    if not inp.count('/?r=') and inp.count(':') == 2:
+        _head, _, _tail = inp.rpartition(':')
+        if not _head.startswith('ws://'):
+            _head = 'ws://' + _head
+        return _head + '/?r=' + _tail
+    return 'ws://' + inp

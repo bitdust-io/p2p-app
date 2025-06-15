@@ -164,7 +164,7 @@ class Controller(object):
             api_client.set_web_sock_type('local')
         else:
             if not self.mw().state_device_authorized:
-                raise Exception('device was not authorized')
+                raise Exception('this device was not authorized yet')
             api_client.set_web_sock_type('remote')
         self.enabled = True
         if self.mw().state_node_local:

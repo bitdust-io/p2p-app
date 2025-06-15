@@ -20,11 +20,11 @@ device_info_temlate_text = """
 
 [color=#909090]authorized:[/color] {authorized}
 
-[color=#909090]connection info:[/color] [size={large_text_size}][font=RobotoMono-Regular]{url}[/font][/size]   [u][color=#0000ff][ref=copy_url][copy to clipboard][/ref][/color][/u]
+[color=#909090]connection URL:[/color] [size={large_text_size}][font=RobotoMono-Regular]{url}[/font][/size]   [u][color=#0000ff][ref=copy_url][copy to clipboard][/ref][/color][/u]
 
-Scan the QR code above using the BitDust p2p-app on your mobile device and be ready to enter the 4 digits verification code to authorize your mobile device.
+Scan the QR code above using the BitDust p2p-app on your mobile device and be ready to enter the 4 digits authorization code to pair your mobile device.
 
-You can also manually enter the connection info specified above on your remote device.[/size]
+You can also manually enter the connection URL specified above on your mobile device.[/size]
 """
 
 
@@ -98,8 +98,11 @@ class DeviceInfoScreen(screen.AppScreen):
             snackbar.error(text=api_client.response_err(resp))
             return
         result = api_client.result(resp)
-        connected_routers = (result.get('instance', {}) or {}).get('connected_routers', []) or []
-        self.url = connected_routers[0] if connected_routers else ''
+        if (result.get('meta') or {}).get('routed'):
+            connected_routers = (result.get('instance', {}) or {}).get('connected_routers', []) or []
+            self.url = connected_routers[0] if connected_routers else ''
+        else:
+            self.url = result.get('url')
         result.update(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
             small_text_size='{}sp'.format(self.app().font_size_small_absolute),
