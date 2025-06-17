@@ -54,10 +54,10 @@ from lib import pkcs1_v2
 
 class RSAKey(object):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.keyObject = None
         self.privateKeyObject = None
-        self.label = ''
+        self.label = kwargs.pop('label', '')
         self.bits = None
         self.signed = None
         self.active = True

@@ -56,24 +56,26 @@ REQUIREMENTS_ANDROID:=$(shell python3 -c "import sys;l=open('src/requirements.tx
 .spec: .prepare .venv .install_buildozer
 	@cd ./workspace/ && P_requirements="$(REQUIREMENTS_ANDROID)" ./venv/bin/python3 -c "tpl=open('buildozer.spec.template').read();import os,sys;sys.stdout.write(tpl.format(requirements=os.environ['P_requirements']));" > buildozer.spec
 
-build: .spec apk
+build: .spec apk aab
+
+apk: build_arm64_v8a build_armeabi_v7a build_x86_64
+
+aab:
+	~/.gradle/wrapper/dists/gradle-8.0.2-all/14bt34ptcsg1ikmfn78tdh1keu/gradle-8.0.2/bin/gradle --stop || echo "gradle daemon was not stopped"
 	@rm -rfv ./workspace/bin/*.aab
-	@rm -rfv ./workspace/bin/*.apk
 	@# cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v android release 1>buildozer.log 2>buildozer.err
 	@cp -f -T -v ./workspace/bin/bitdust*arm64-v8a_armeabi-v7a_x86_64-release.aab ./workspace/bin/BitDustAndroid_unsigned.aab
-	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.aab ./bin/BitDustAndroid.aab
-	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true --min-sdk-version 21 bin/BitDustAndroid.aab
+	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.aab ./bin/BitDustAndroid.aab 1>zipalign.log 2>zipalign.err
+	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true --min-sdk-version 21 bin/BitDustAndroid.aab 1>apksigner.log 2>apksigner.err
 	@rm -rfv ./workspace/bin/BitDustAndroid_unsigned.aab
 	@rm -rfv ./workspace/bin/bitdust1-*-release.aab
 	@mv -v ./workspace/bin/*.aab ./bin/
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
-	@echo "Now go to Goggle Dev Console at https://play.google.com/apps/publish/""
+	@echo "Now go to Goggle Dev Console at https://play.google.com/apps/publish/"
 	@echo "Go to Releases -> Production page and click [Create new release] button"
 	@echo "Upload bin/BitDustAndroid.aab file and copy release notes from the previos releases, then click [send release for review] button"
-	@echo 'Upload bin/*.apk files to the GitHub: https://github.com/bitdust-io/p2p-app/releases/tag/alpha'
-
-apk: build_arm64_v8a build_armeabi_v7a build_x86_64
+	@echo "Upload bin/*.apk files to the GitHub: https://github.com/bitdust-io/p2p-app/releases/tag/alpha"
 
 # 	@rm -rfv ./workspace/bin/*.apk
 # 	@cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
@@ -115,11 +117,11 @@ build_arm64_v8a:
 	@# cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile arm64_v8a android release 1>buildozer.arm64_v8a.log 2>buildozer.arm64_v8a.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
-	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
-	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true ./bin/BitDustAndroid.apk
+	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk 1>zipalign.arm64_v8a.log 2>zipalign.arm64_v8a.err
+	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true ./bin/BitDustAndroid.apk 1>apksigner.arm64_v8a.log 2>apksigner.arm64_v8a.err
 	@mv -v ./workspace/bin/BitDustAndroid.apk ./workspace/bin/BitDustAndroid_arm64_v8a.apk
 	@cp -v ./workspace/bin/BitDustAndroid_arm64_v8a.apk ./bin/
-	@apktool d -o ./workspace/bin/apk/ -f ./workspace/bin/BitDustAndroid_arm64_v8a.apk
+	@apktool d -o ./workspace/bin/apk/ -f ./workspace/bin/BitDustAndroid_arm64_v8a.apk 1>workspace/apktool.arm64_v8a.log 2>workspace/apktool.arm64_v8a.err
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
 
 build_armeabi_v7a:
@@ -127,11 +129,11 @@ build_armeabi_v7a:
 	@# cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile armeabi_v7a android release 1>buildozer.armeabi_v7a.log 2>buildozer.armeabi_v7a.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
-	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
-	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true ./bin/BitDustAndroid.apk
+	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk 1>zipalign.armeabi_v7a.log 2>zipalign.armeabi_v7a.err
+	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true ./bin/BitDustAndroid.apk 1>apksigner.armeabi_v7a.log 2>apksigner.armeabi_v7a.err
 	@mv -v ./workspace/bin/BitDustAndroid.apk ./workspace/bin/BitDustAndroid_armeabi_v7a.apk
 	@cp -v ./workspace/bin/BitDustAndroid_armeabi_v7a.apk ./bin/
-	@apktool d -o ./workspace/bin/apk/ -f ./workspace/bin/BitDustAndroid_armeabi_v7a.apk
+	@apktool d -o ./workspace/bin/apk/ -f ./workspace/bin/BitDustAndroid_armeabi_v7a.apk 1>workspace/apktool.armeabi_v7a.log 2>workspace/apktool.armeabi_v7a.err
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
 
 build_x86_64:
@@ -139,11 +141,11 @@ build_x86_64:
 	@# cd ./workspace/app/bitdust/ && find . -type f -name "*.py" -exec sed -i -e 's/_Debug = True/_Debug = False/g' {} +
 	cd ./workspace/ && PYTHONIOENCODING=utf-8 VIRTUAL_ENV=1 ./venv/bin/buildozer -v --profile x86_64 android release 1>buildozer.x86_64.log 2>buildozer.x86_64.err
 	@cp -v -T -f ./workspace/bin/bitdust*.apk ./workspace/bin/BitDustAndroid_unsigned.apk
-	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk
-	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true ./bin/BitDustAndroid.apk
+	@cd ./workspace/ && zipalign -v 4 ./bin/BitDustAndroid_unsigned.apk  ./bin/BitDustAndroid.apk 1>zipalign.x86_64.log 2>zipalign.x86_64.err
+	@cd ./workspace/ && apksigner sign --ks ~/keystores/bitdust.keystore --ks-pass file:../.keystore_password --v1-signing-enabled true --v2-signing-enabled true ./bin/BitDustAndroid.apk 1>apksigner.x86_64.log 2>apksigner.x86_64.err
 	@mv -v ./workspace/bin/BitDustAndroid.apk ./workspace/bin/BitDustAndroid_x86_64.apk
 	@cp -v ./workspace/bin/BitDustAndroid_x86_64.apk ./bin/
-	@apktool d -o ./workspace/bin/apk/ -f ./workspace/bin/BitDustAndroid_x86_64.apk
+	@apktool d -o ./workspace/bin/apk/ -f ./workspace/bin/BitDustAndroid_x86_64.apk 1>workspace/apktool.x86_64.log 2>workspace/apktool.x86_64.err
 	@cp -v ./workspace/version ./src/version && cat ./src/version && echo "" && echo "DONE"
 
 clean:
