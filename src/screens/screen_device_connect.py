@@ -140,7 +140,7 @@ class WebSocketConnectorController(object):
             self.spinner_dialog = None
         self.server_code_input_dialog = dialogs.open_number_input_dialog(
             title='Device authorization code',
-            text='Please enter the 4 digits authorization code generated in BitDust node running on your desktop/server computer:',
+            text='Please enter the 4-digits authorization code generated in BitDust node running on your desktop/server computer:',
             min_text_length=4,
             max_text_length=4,
             button_confirm='Continue',
@@ -328,7 +328,6 @@ class TabDemoDevice(MDFloatLayout, MDTabsBase):
     def on_access_key_enter_button_clicked(self, *args):
         if _Debug:
             print('TabDemoDevice.on_access_key_enter_button_clicked', args)
-        # open dialog to paste generated on the server client device info
         self.access_key_input_dialog = dialogs.open_text_input_dialog(
             title='Access key',
             text='Paste access key text content:',
@@ -420,7 +419,7 @@ class DeviceConnectScreen(screen.AppScreen):
                 self.ids.selection_tabs.add_widget(TabRemoteDevice(title='Remote desktop'))
             self.ids.selection_tabs.add_widget(TabServerDevice(title='Remote server'))
             # self.ids.selection_tabs.add_widget(TabWebdockIODevice(title='Webdock.io'))
-            # self.ids.selection_tabs.add_widget(TabDemoDevice(title='Demo'))
+            self.ids.selection_tabs.add_widget(TabDemoDevice(title='Demo'))
 
     def on_leave(self, *args):
         if _Debug:

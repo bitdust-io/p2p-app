@@ -274,7 +274,7 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         device_name = event_data['device_name']
         self.device_client_code_input_dialog = dialogs.open_number_input_dialog(
             title='Device confirmation code',
-            text='Please enter the 4 digits confirmation code displayed in BitDust p2p-app running on your remote device:',
+            text='Please enter the 4-digits confirmation code displayed in BitDust p2p-app running on your remote device:',
             min_text_length=4,
             max_text_length=4,
             button_confirm='Confirm',

@@ -607,7 +607,7 @@ def websocket_thread():
         routers = client_info['routers']
         max_attempts = len(routers)
         if _WebSocketConnectingAttempts > max_attempts:
-            on_error(None, Exception('connection attempts exceeded, failed connecting to web socket routers'))
+            on_error(None, Exception('connection attempts exceeded, failed connecting to web socket'))
             break
         url = routers[_WebSocketConnectingAttempts - 1]
         _WebSocketConnectingAttempts += 1
