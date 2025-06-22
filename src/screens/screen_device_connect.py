@@ -1,3 +1,7 @@
+import base64
+
+#------------------------------------------------------------------------------
+
 from kivy.clock import Clock
 
 from kivymd.uix.tab import MDTabsBase
@@ -6,8 +10,24 @@ from kivymd.uix.floatlayout import MDFloatLayout
 #------------------------------------------------------------------------------
 
 from lib import system
+
+_USE_PYCRYPTODOME = True
+
+if system.is_ios():
+    _USE_PYCRYPTODOME = False
+
+from lib import strng
 from lib import util
 from lib import web_sock_remote
+
+if _USE_PYCRYPTODOME:
+    from lib import rsa_key
+    from lib import cipher
+    from lib import hashes
+else:
+    from lib import rsa_key_slow as rsa_key
+    from lib import cipher_slow as cipher
+    from lib import hashes_slow as hashes
 
 from components import screen
 from components import dialogs
@@ -43,7 +63,54 @@ class WebSocketConnectorController(object):
     callback_on_success = None
     callback_on_fail = None
 
-    def start_connecting(self, router_url, on_success=None, on_fail=None): 
+    def load_client_info_from_access_code(self, inp):
+        try:
+            url, encrypted_payload, client_code, client_key_body, client_key_label, client_key_size, server_public_key, signature = inp.split('&')
+        except:
+            raise Exception('invalid access key format')
+        if not client_key_body.startswith('-----BEGIN RSA PRIVATE KEY-----'):
+            client_key_body = '-----BEGIN RSA PRIVATE KEY-----\\n' + client_key_body
+        if not client_key_body.endswith('-----END RSA PRIVATE KEY-----'):
+            client_key_body = client_key_body + '\\n-----END RSA PRIVATE KEY-----'
+        try:
+            client_key_body = client_key_body.replace('\\n', '\n')            
+            client_key_object = rsa_key.RSAKey()
+            client_key_object.fromDict({
+                'body': client_key_body,
+                'label': client_key_label,
+            })
+        except:
+            raise Exception('invalid client key')
+        if str(client_key_object.size()) != str(client_key_size):
+            raise Exception('invalid client key size')
+        if not server_public_key.startswith('ssh-rsa '):
+            server_public_key = 'ssh-rsa ' + server_public_key
+        try:
+            server_key_object = rsa_key.RSAKey()
+            server_key_object.fromString(server_public_key)
+        except:
+            raise Exception('invalid server key')
+        try:
+            orig_encrypted_payload = base64.b64decode(strng.to_bin(encrypted_payload))
+            received_salted_payload = strng.to_text(client_key_object.decrypt(orig_encrypted_payload))
+            hashed_payload = hashes.sha1(strng.to_bin(received_salted_payload))
+            received_client_code, auth_token, session_key_text, _ = received_salted_payload.split('#')
+        except:
+            raise Exception('access key verification failed')
+        if received_client_code != client_code:
+            raise Exception('client code is not matching')
+        if not server_key_object.verify(strng.to_bin(signature), hashed_payload):
+            raise Exception('signature verification failed')
+        screen.main_window().state_node_local = False
+        screen.my_app().client_info['local'] = screen.main_window().state_node_local
+        screen.my_app().client_info['auth_token'] = auth_token
+        screen.my_app().client_info['session_key'] = session_key_text
+        screen.my_app().client_info['routers'] = [url, ]
+        screen.my_app().client_info['state'] = 'authorized'
+        screen.my_app().save_client_info()
+        return url
+
+    def start_connecting(self, router_url, reset_auth=True, on_success=None, on_fail=None): 
         if not router_url:
             if on_fail:
                 on_fail(None)
@@ -59,10 +126,11 @@ class WebSocketConnectorController(object):
         screen.main_window().state_node_local = False
         screen.my_app().client_info['local'] = screen.main_window().state_node_local
         screen.my_app().client_info['routers'] = [router_url, ]
-        screen.my_app().client_info.pop('key', None)
-        screen.my_app().client_info.pop('server_public_key', None)
-        screen.my_app().client_info.pop('auth_token', None)
-        screen.my_app().client_info.pop('session_key', None)
+        if reset_auth:
+            screen.my_app().client_info.pop('key', None)
+            screen.my_app().client_info.pop('server_public_key', None)
+            screen.my_app().client_info.pop('auth_token', None)
+            screen.my_app().client_info.pop('session_key', None)
         screen.my_app().save_client_info()
         self.spinner_dialog = dialogs.open_spinner_dialog(
             title='',
@@ -80,7 +148,7 @@ class WebSocketConnectorController(object):
 
     def on_websocket_connect(self, ws_inst):
         if _Debug:
-            print('WebSocketConnectorController.on_websocket_connect', ws_inst)
+            print('WebSocketConnectorController.on_websocket_connect', ws_inst, self.callback_on_success)
         if self.spinner_dialog:
             self.spinner_dialog.dismiss()
             self.spinner_dialog = None
@@ -88,7 +156,6 @@ class WebSocketConnectorController(object):
             web_sock_remote.stop()
         screen.my_app().load_client_info()
         success = bool(screen.my_app().client_info.get('auth_token'))
-        # self.ids.qr_scan_open_button.disabled = not system.is_mobile()
         if self.confirmation_code_dialog:
             self.confirmation_code_dialog.dismiss()
             self.confirmation_code_dialog = None
@@ -98,7 +165,7 @@ class WebSocketConnectorController(object):
             snackbar.error(text='device was not authorized')
         if success:
             if self.callback_on_success:
-                self.callback_on_success(ws_inst)
+                self.callback_on_success(True)
                 self.callback_on_success = None
         else:
             if self.callback_on_fail:
@@ -234,13 +301,13 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
             return
         self.start_connecting(
             router_url=router_url,
-            on_success=self.on_connection_success,
-            on_fail=self.on_connection_failed,
+            on_success=self.on_remote_device_connection_success,
+            on_fail=self.on_remote_device_connection_failed,
         )
 
-    def on_connection_success(self, err, args):
+    def on_remote_device_connection_success(self, args):
         if _Debug:
-            print('TabRemoteDevice.on_connection_success', err, args)
+            print('TabRemoteDevice.on_remote_device_connection_success', args)
         screen.my_app().load_client_info()
         screen.my_app().client_info['local'] = False
         screen.my_app().client_info.pop('client_code', None)
@@ -251,11 +318,10 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
         screen.stack_append('welcome_screen')
         screen.my_app().do_start_controller()
 
-    def on_connection_failed(self, err, args):
+    def on_remote_device_connection_failed(self, err, args):
         if _Debug:
-            print('TabRemoteDevice.on_connection_failed', err, args)
+            print('TabRemoteDevice.on_remote_device_connection_failed', err, args)
         snackbar.error(text=str(err))
-        # self.ids.qr_scan_open_button.disabled = not system.is_mobile()
 
 #------------------------------------------------------------------------------
 
@@ -285,21 +351,20 @@ class TabServerDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
     def on_url_entered(self, inp):
         if _Debug:
             print('TabServerDevice.on_url_entered', inp)
-        self.url_input_dialog = None
+        if self.url_input_dialog:
+            self.url_input_dialog.dismiss()
+            self.url_input_dialog = None
         if not inp:
             return
         self.start_connecting(
             router_url=inp,
-            on_success=self.on_connection_success,
-            on_fail=self.on_connection_failed,
+            on_success=self.on_server_device_connection_success,
+            on_fail=self.on_server_device_connection_failed,
         )
 
-    def on_connection_success(self, err, args):
+    def on_server_device_connection_success(self, args):
         if _Debug:
-            print('TabServerDevice.on_connection_success', err, args)
-        if self.url_input_dialog:
-            self.url_input_dialog.dismiss()
-            self.url_input_dialog = None
+            print('TabServerDevice.on_server_device_connection_success', args)
         screen.my_app().load_client_info()
         screen.my_app().client_info['local'] = False
         screen.my_app().client_info.pop('client_code', None)
@@ -310,20 +375,24 @@ class TabServerDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
         screen.stack_append('welcome_screen')
         screen.my_app().do_start_controller()
 
-    def on_connection_failed(self, err, args):
+    def on_server_device_connection_failed(self, err, args):
         if _Debug:
-            print('TabServerDevice.on_connection_failed', err, args)
-        if self.url_input_dialog:
-            self.url_input_dialog.dismiss()
-            self.url_input_dialog = None
+            print('TabServerDevice.on_server_device_connection_failed', err, args)
         snackbar.error(text=str(err))
-        # self.ids.qr_scan_open_button.disabled = not system.is_mobile()
 
 #------------------------------------------------------------------------------
 
-class TabDemoDevice(MDFloatLayout, MDTabsBase):
+class TabDemoDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
 
     access_key_input_dialog = None
+
+    def on_demo_text_ref_pressed(self, *args):
+        if _Debug:
+            print('TabDemoDevice.on_demo_text_ref_pressed', args)
+        if args[1] == 'bitdust_email_link':
+            system.open_url('mailto:bitdust.io@gmail.com')
+        elif args[1] == 'bitdust_telegram_link':
+            system.open_url('https://t.me/bitdust')
 
     def on_access_key_enter_button_clicked(self, *args):
         if _Debug:
@@ -340,21 +409,26 @@ class TabDemoDevice(MDFloatLayout, MDTabsBase):
     def on_access_key_entered(self, inp):
         if _Debug:
             print('TabDemoDevice.on_access_key_entered', inp)
-        self.access_key_input_dialog = None
-        if not inp:
-            return
-        self.start_connecting(
-            router_url=inp,
-            on_success=self.on_connection_success,
-            on_fail=self.on_connection_failed,
-        )
-
-    def on_connection_success(self, err, args):
-        if _Debug:
-            print('TabDemoDevice.on_connection_success', err, args)
         if self.access_key_input_dialog:
             self.access_key_input_dialog.dismiss()
             self.access_key_input_dialog = None
+        if not inp:
+            return
+        try:
+            router_url = self.load_client_info_from_access_code(inp)
+        except Exception as err:
+            snackbar.error(text=str(err))
+            return
+        self.start_connecting(
+            router_url=router_url,
+            reset_auth=False,
+            on_success=self.on_demo_device_connection_success,
+            on_fail=self.on_demo_device_connection_failed,
+        )
+
+    def on_demo_device_connection_success(self, args):
+        if _Debug:
+            print('TabDemoDevice.on_demo_device_connection_success', args)
         screen.my_app().load_client_info()
         screen.my_app().client_info['local'] = False
         screen.my_app().client_info.pop('client_code', None)
@@ -365,22 +439,10 @@ class TabDemoDevice(MDFloatLayout, MDTabsBase):
         screen.stack_append('welcome_screen')
         screen.my_app().do_start_controller()
 
-    def on_connection_failed(self, err, args):
+    def on_demo_device_connection_failed(self, err, args):
         if _Debug:
-            print('TabDemoDevice.on_connection_failed', err, args)
-        if self.access_key_input_dialog:
-            self.access_key_input_dialog.dismiss()
-            self.access_key_input_dialog = None
+            print('TabDemoDevice.on_demo_device_connection_failed', err, args)
         snackbar.error(text=str(err))
-        # self.ids.qr_scan_open_button.disabled = not system.is_mobile()
-
-    def on_demo_text_ref_pressed(self, *args):
-        if _Debug:
-            print('TabDemoDevice.on_demo_text_ref_pressed', args)
-        if args[1] == 'bitdust_email_link':
-            system.open_url('mailto:bitdust.io@gmail.com')
-        elif args[1] == 'bitdust_telegram_link':
-            system.open_url('https://t.me/bitdust')
 
 #------------------------------------------------------------------------------
 

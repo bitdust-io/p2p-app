@@ -16,21 +16,15 @@ from kivy.clock import mainthread
 
 from lib import system
 
-#------------------------------------------------------------------------------
-
 _USE_PYCRYPTODOME = True
 
 if system.is_ios():
     _USE_PYCRYPTODOME = False
 
-#------------------------------------------------------------------------------
-
 from lib import strng
 from lib import jsn
 from lib import serialization
 from lib import web_socket
-
-#------------------------------------------------------------------------------
 
 if _USE_PYCRYPTODOME:
     from lib import rsa_key
