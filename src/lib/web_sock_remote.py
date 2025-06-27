@@ -16,21 +16,15 @@ from kivy.clock import mainthread
 
 from lib import system
 
-#------------------------------------------------------------------------------
-
 _USE_PYCRYPTODOME = True
 
 if system.is_ios():
     _USE_PYCRYPTODOME = False
 
-#------------------------------------------------------------------------------
-
 from lib import strng
 from lib import jsn
 from lib import serialization
 from lib import web_socket
-
-#------------------------------------------------------------------------------
 
 if _USE_PYCRYPTODOME:
     from lib import rsa_key
@@ -312,7 +306,7 @@ def on_message(ws_inst, message):
             orig_encrypted_payload = base64.b64decode(strng.to_bin(encrypted_payload))
             client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
             client_code = client_info['client_code']
-            linked_routers = client_info.get('routers') or []
+            listeners = client_info.get('listeners') or client_info.get('routers') or []
             client_key_object = rsa_key.RSAKey()
             client_key_object.fromDict(client_info['key'])
             server_key_object = rsa_key.RSAKey()
@@ -343,7 +337,7 @@ def on_message(ws_inst, message):
             return False
         client_info['auth_token'] = auth_token
         client_info['session_key'] = session_key_text
-        client_info['routers'] = linked_routers
+        client_info['listeners'] = listeners
         client_info['state'] = 'authorized'
         system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
         _WebSocketAuthToken = auth_token
@@ -404,7 +398,7 @@ def on_message(ws_inst, message):
                 return False
             try:
                 client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
-                client_info['routers'] = decrypted_json_payload['routers']
+                client_info['listeners'] = decrypted_json_payload.get('routers') or decrypted_json_payload.get('listeners') or []
                 client_info['authorized_routers'] = decrypted_json_payload.get('authorized_routers') or {}
                 system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
             except Exception as e:
@@ -595,8 +589,8 @@ def websocket_thread():
     if _Debug:
         print('web_sock_remote.websocket_thread beginning _ClientInfoFilePath=%r attempts=%r' % (_ClientInfoFilePath, _WebSocketConnectingAttempts))
     client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
-    routers = client_info['routers']
-    max_attempts = len(routers)
+    listeners = client_info['listeners']
+    max_attempts = len(listeners)
     if _WebSocketConnectingAttempts > max_attempts:
         _WebSocketConnectingAttempts = 0
     while is_started():
@@ -604,12 +598,12 @@ def websocket_thread():
             print('web_sock_remote.websocket_thread making %d attempt, calling run_forever() %r' % (_WebSocketConnectingAttempts, time.asctime()))
         _WebSocketClosed = False
         client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
-        routers = client_info['routers']
-        max_attempts = len(routers)
+        listeners = client_info['listeners']
+        max_attempts = len(listeners)
         if _WebSocketConnectingAttempts > max_attempts:
-            on_error(None, Exception('connection attempts exceeded, failed connecting to web socket routers'))
+            on_error(None, Exception('connection attempts exceeded, failed connecting to web socket'))
             break
-        url = routers[_WebSocketConnectingAttempts - 1]
+        url = listeners[_WebSocketConnectingAttempts - 1]
         _WebSocketConnectingAttempts += 1
         if _Debug:
             print('web_sock_remote.websocket_thread is going to connect to %r, attempts=%r, max_attempts=%r' % (url, _WebSocketConnectingAttempts, max_attempts))

@@ -38,6 +38,28 @@
         mode: "rectangle"
 
 
+<InputTextMultilineContent>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "240dp"
+
+    MDLabel:
+        text: root.text_content
+
+    TextInput:
+        id: text_input
+        multiline: True
+        text: ''
+        halign: 'left'
+        text_size: self.size
+        width: dp(310)
+        height: dp(200)
+        size_hint: None, None
+	    font_name: 'RobotoMono-Regular'
+	    font_size: '8sp'
+
+
 <InputNumberContent>:
     orientation: "vertical"
     spacing: "12dp"

@@ -52,3 +52,17 @@ def unpack_device_url(inp):
             _head = 'ws://' + _head
         return _head + '/?r=' + _tail
     return 'ws://' + inp
+
+
+def shorten_device_url(url):
+    _u = url
+    if _u.startswith('ws://'):
+        _u = _u.replace('ws://', '')
+    if _u.count(':'):
+        _head, _, _ = _u.rpartition(':')
+        _u = _head
+    if _u.count('/?r='):
+        _head, _, _ = _u.rpartition('/?r=')
+        _u = _head
+    _u = _u.strip('/').strip('?').strip('&').strip('=').strip(':').replace(':', '_').replace('.', '_').replace('-', '_')
+    return _u

@@ -80,6 +80,8 @@ class MyIDScreen(screen.AppScreen):
 
     def on_leave(self, *args):
         self.ids.state_panel.release()
+        self.ids.my_id_details.text = ''
+        self.my_identity_name = ''
 
     def on_identity_get_result(self, resp):
         if not api_client.is_ok(resp):

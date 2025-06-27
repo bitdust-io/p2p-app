@@ -54,10 +54,10 @@ from lib import pkcs1_v2
 
 class RSAKey(object):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.keyObject = None
         self.privateKeyObject = None
-        self.label = ''
+        self.label = kwargs.pop('label', '')
         self.bits = None
         self.signed = None
         self.active = True
@@ -117,7 +117,7 @@ class RSAKey(object):
         if result:
             self.label = key_dict.get('label', '')
             self.active = key_dict.get('active', True)
-            self.meta = key_dict.get('meta', {})
+            self.meta = dict(key_dict.get('meta', {}))
             if 'signature' in key_dict and 'signature_pubkey' in key_dict:
                 self.signed = (
                     key_dict['signature'],
@@ -235,7 +235,7 @@ class RSAKey(object):
                 'signature_pubkey': self.signed[1],
             })
         if self.meta:
-            key_dict['meta'] = self.meta
+            key_dict['meta'] = self.meta.copy()
         return key_dict
 
     def sign(self, message, as_digits=True):

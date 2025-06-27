@@ -22,7 +22,7 @@ class DeviceDisconnectedScreen(screen.AppScreen):
         return 'connecting to BitDust node'
 
     def on_enter(self, *args):
-        if screen.main_window().state_node_local:
+        if screen.main_window().state_node_local == 1:
             self.do_start_controller()
             return
         if not screen.main_window().state_device_authorized:

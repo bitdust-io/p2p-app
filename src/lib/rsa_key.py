@@ -56,9 +56,9 @@ from lib import number
 
 class RSAKey(object):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.keyObject = None
-        self.label = ''
+        self.label = kwargs.pop('label', '')
         self.signed = None
         self.active = True
         self.meta = {}
@@ -114,7 +114,7 @@ class RSAKey(object):
         if result:
             self.label = key_dict.get('label', '')
             self.active = key_dict.get('active', True)
-            self.meta = key_dict.get('meta', {})
+            self.meta = dict(key_dict.get('meta', {}))
             if 'signature' in key_dict and 'signature_pubkey' in key_dict:
                 self.signed = (
                     key_dict['signature'],
@@ -185,7 +185,7 @@ class RSAKey(object):
                 'signature_pubkey': self.signed[1],
             })
         if self.meta:
-            key_dict['meta'] = self.meta
+            key_dict['meta'] = self.meta.copy()
         return key_dict
 
     def sign(self, message, as_digits=True):
@@ -228,11 +228,11 @@ class RSAKey(object):
             result = True
         except (
             ValueError,
-            TypeError,
+            TypeError
         ) as exc:
             # do not raise any exception... just return False
             if _Debug:
-                print(exc, 'signature=%r message=%r' % (signature, message))
+                print(exc, 'signature=%r message=%r signed=%r label=%r meta=%r' % (signature, message, self.isSigned(), self.label, self.meta))
         if _Debug:
             if _CryptoLog:
                 print('verify', result, signature)

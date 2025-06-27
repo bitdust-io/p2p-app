@@ -22,7 +22,7 @@ device_info_temlate_text = """
 
 [color=#909090]connection URL:[/color] [size={large_text_size}][font=RobotoMono-Regular]{url}[/font][/size]   [u][color=#0000ff][ref=copy_url][copy to clipboard][/ref][/color][/u]
 
-Scan the QR code above using the BitDust p2p-app on your mobile device and be ready to enter the 4 digits authorization code to pair your mobile device.
+Scan the QR code above using the BitDust p2p-app on your mobile device and be ready to enter the 4-digits authorization code to pair your mobile device.
 
 You can also manually enter the connection URL specified above on your mobile device.[/size]
 """

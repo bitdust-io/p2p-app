@@ -99,9 +99,13 @@ class SearchPeopleScreen(screen.AppScreen):
         if not result:
             self.ids.search_results.add_widget(NoUsersFound(text='no users found'))
             return
+        user_id_set = set()
         for r in result:
             if isinstance(r, str):
                 user_id = util.IDUrlToGlobalID(r)
             else:
                 user_id = str(r['global_id'])
+            if user_id in user_id_set:
+                continue
+            user_id_set.add(user_id)
             self.ids.search_results.add_widget(SearchPeopleResult(label_text=user_id))

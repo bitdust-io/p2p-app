@@ -17,14 +17,14 @@
 	            text:
 	            	"""
 	            	[size=20sp][b]Local BitDust Node[/b][/size]\n
-		            BitDust node will be running in background on this machine.\n
-		            This type of connection is only available for Laptops and Desktops.\n"""
+		            BitDust Node will be automatically installed and running in background on this computer - the BitDust p2p-app will be connected directly to your local host when opened.\n
+		            This is a standard way of running BitDust for Desktop computers.\n"""
 
 			VFixedEmptySpace:
 
             FillRoundFlatButton:
                 id: local_device_button
-                text: "[size=18sp]{}[/size]  [size=16sp][b]confirm & start[/b][/size]  ".format(md_icon("check-bold"))
+                text: "[size=18sp]{}[/size]  [size=16sp][b]install & start[/b][/size]  ".format(md_icon("play-circle"))
                 md_bg_color: app.theme_cls.accent_color
                 theme_text_color: "Custom"
                 text_color: app.color_white99
@@ -48,20 +48,18 @@
 	            text_size: self.width, None
 	            height: self.texture_size[1]
 	            color: app.color_black
+	            on_ref_press: root.on_remote_device_text_ref_pressed(*args)
 	            text:
 	            	f"""
 	            	[size=20sp][b]Remotely running BitDust Node[/b][/size]\n
-                    The BitDust app on that device will be connected remotely via secure web socket connection to another computer device of yours which also runs BitDust and stay connected to the Internet.\n
+                    The BitDust p2p-app on that device will be connected remotely via secure web socket to another computer which already running BitDust Node and stay connected to the Internet.\n
                     This can be your:
                     {md_icon("circle-medium")} home laptop
-                    {md_icon("circle-medium")} desktop computer
-                    {md_icon("circle-medium")} VPS in the cloud
-                    {md_icon("circle-medium")} Dedicated cloud server
-                    {md_icon("circle-medium")} Docker image
-                    {md_icon("circle-medium")} Raspberry Pi
-                    {md_icon("circle-medium")} other device able to run Python\n
-                    First, make sure you have BitDust node installed on your remote computer, go to www.bitdust.io and download BitDust Desktop app for your OS.\n
-                    When BitDust Desktop window appears, click left top screen corner [size=20sp][b]{md_icon("menu")}[/b][/size] {md_icon("arrow-right")} settings {md_icon("arrow-right")} devices and create a new device configuration. There you will see a QR code on your screen.\n"""
+                    {md_icon("circle-medium")} desktop PC
+                    {md_icon("circle-medium")} raspberry Pi\n
+                    First, make sure you have BitDust Node installed on your remote computer, go to [u][color=#0000ff][ref=web_site_link]www.bitdust.io[/ref][/color][/u], download BitDust Desktop app for your OS and install it.\n
+                    When BitDust Desktop window appears, click left top screen corner [size=20sp][b]{md_icon("menu")}[/b][/size] {md_icon("arrow-right")} settings {md_icon("arrow-right")} devices and create a new device configuration.
+                    There you will see a QR code on your screen that you can scan here to establish connection between the p2p-app and your BitDust Node.\n"""
 
 			VFixedEmptySpace:
 
@@ -84,9 +82,39 @@
 	            color: app.color_black
 	            text:
                     """
-                    If you are running BitDust node on a headless server with no user interface, type in the command line:\n
-                    [font=RobotoMono-Regular]    bitdust device add[/font]\n\n
-                    You can also manually enter connection details here, you will find "connection info" string bellow the QR code.\n"""
+                    Be ready to enter 4-digits security codes on both devices. Web socket connection will be established automatically.\n
+                    Make sure your BitDust Node is running at all times and your computer is connected to the Internet."""
+
+
+<TabServerDevice>:
+
+    VerticalScrollView:
+        id: tab_server_view
+
+        PageContainerWithLeftPaddingLayout:
+            size_hint: None, None
+            width: root.width - app.scroll_bar_width
+            height: self.minimum_height
+
+	        MarkupLabel:
+	            pos_hint: {'top': 1}
+	            size_hint_y: None
+	            text_size: self.width, None
+	            height: self.texture_size[1]
+	            color: app.color_black
+	            on_ref_press: root.on_server_text_ref_pressed(*args)
+	            text:
+	            	f"""
+	            	[size=20sp][b]BitDust Node is running on a server[/b][/size]\n
+                    The BitDust p2p-app on that device will be connected remotely via secure web socket to a server machine where BitDust Node is already running.\n
+                    This could be a:
+                    {md_icon("circle-medium")} VPS in the cloud
+                    {md_icon("circle-medium")} dedicated cloud server
+                    {md_icon("circle-medium")} docker container
+                    {md_icon("circle-medium")} your home or office PC
+                    {md_icon("circle-medium")} other device able to run Python\n"""
+
+			VFixedEmptySpace:
 
             FillRoundFlatButton:
                 id: url_enter_button
@@ -105,10 +133,88 @@
 	            text_size: self.width, None
 	            height: self.texture_size[1]
 	            color: app.color_black
+	            on_ref_press: root.on_server_text_ref_pressed(*args)
 	            text:
                     """
-                    Be ready to enter 4-digits security code on both devices. Web socket connection will be established automatically.\n
-                    Make sure your remote BitDust node is running regularly and stay connected to the Internet."""
+                    First, make sure you have BitDust Node installed on your server, read [u][color=#0000ff][ref=wiki_install_page_link]server install[/ref][/color][/u] wiki page to learn more about installation process.\n
+                    When BitDust Node is installed, you can create a new device configuration via command line, read more about that on [u][color=#0000ff][ref=wiki_device_config_page_link]remote device config[/ref][/color][/u] wiki page.\n
+                    When completed, you will find the server connection URL in the command line output - enter that URL here and connection will be established automatically.\n"""
+
+
+
+<TabWebdockIODevice>:
+
+    VerticalScrollView:
+        id: tab_webdock_io_view
+
+        PageContainerWithLeftPaddingLayout:
+            size_hint: None, None
+            width: root.width - app.scroll_bar_width
+            height: self.minimum_height
+
+	        MarkupLabel:
+	            pos_hint: {'top': 1}
+	            size_hint_y: None
+	            text_size: self.width, None
+	            height: self.texture_size[1]
+	            color: app.color_black
+	            on_ref_press: root.on_webdock_io_text_ref_pressed(*args)
+	            text:
+	            	f"""
+	            	[size=20sp][b]BitDust Node is deployed in Webdock.io[/b][/size]\n
+                    The BitDust p2p-app on that device will be connected remotely via secure web socket to a VPS rented from [u][color=#0000ff][ref=webdock_io_link]Webdock.io[/ref][/color][/u] where BitDust Node is already running.\n
+                    A fresh VPS will be automatically provisioned for you and BitDust Node will be installed and configured there.\n
+                    You have to have an own account at Webdock.io and fill in your billing details there in order to be able to rent a VPS.\n
+                    Finally go to your Webdock.io [u][color=#0000ff][ref=webdock_io_profile_page_link]profile page[/ref][/color][/u] and under "API & Integrations" section create a new API token - enter that API token bellow to start the provisioning.\n"""
+
+            FillRoundFlatButton:
+                id: webdock_io_api_token_enter_button
+                text: "[size=18sp]{}[/size]  [size=16sp][b]enter API token[/b][/size]".format(md_icon("key-variant"))
+                md_bg_color: app.theme_cls.accent_color
+                theme_text_color: "Custom"
+                text_color: app.color_white99
+                pos_hint: {'left': 0}
+                on_release: root.on_webdock_io_api_token_enter_button_clicked()
+
+
+
+<TabDemoDevice>:
+
+    VerticalScrollView:
+        id: tab_demo_device_view
+
+        PageContainerWithLeftPaddingLayout:
+            size_hint: None, None
+            width: root.width - app.scroll_bar_width
+            height: self.minimum_height
+
+	        MarkupLabel:
+	            pos_hint: {'top': 1}
+	            size_hint_y: None
+	            text_size: self.width, None
+	            height: self.texture_size[1]
+	            color: app.color_black
+	            on_ref_press: root.on_demo_text_ref_pressed(*args)
+	            text:
+	            	f"""
+	            	[size=20sp][b]Demo[/b][/size]\n
+	            	You will get access to one of our testing nodes and will be able to try out the app yourself.\n
+					We periodically restart those nodes, all your data will be deleted automatically one day.\n
+					To get access please contact us and we will send you the Demo Access Key:
+                    {md_icon("circle-medium")} send a email to [u][color=#0000ff][ref=bitdust_email_link]bitdust.io@gmail.com[/ref][/color][/u]
+                    {md_icon("circle-medium")} join us via [u][color=#0000ff][ref=bitdust_telegram_link]Telegram[/ref][/color][/u]\n""" 
+
+			VFixedEmptySpace:
+
+            FillRoundFlatButton:
+                id: url_enter_button
+                text: "[size=18sp]{}[/size]  [size=16sp][b]enter demo access key[/b][/size]".format(md_icon("video-vintage"))
+                md_bg_color: app.theme_cls.accent_color
+                theme_text_color: "Custom"
+                text_color: app.color_white99
+                pos_hint: {'left': 0}
+                on_release: root.on_access_key_enter_button_clicked()
+
 
 
 <DeviceConnectScreen>:
@@ -126,11 +232,5 @@
 				text_color_normal: (0, 0, 0, .5)
 				text_color_active: self.theme_cls.primary_color
         		on_tab_switch: root.on_tab_switched(*args)
-
-				TabLocalDevice:
-					title: "Local"
-
-				TabRemoteDevice:
-					title: "Remote"
 
         BottomEmptyScreenSpace:

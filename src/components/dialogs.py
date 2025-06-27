@@ -60,9 +60,16 @@ class InputTextContent(BoxLayout):
     text_content = StringProperty()
 
 
-def open_text_input_dialog(title, text, button_confirm='Confirm', button_cancel='Cancel', cb=None):
+class InputTextMultilineContent(BoxLayout):
+    text_content = StringProperty()
+
+
+def open_text_input_dialog(title, text, multiline=False, button_confirm='Confirm', button_cancel='Cancel', cb=None):
     popup = None
-    content = InputTextContent(text_content=text)
+    if multiline:
+        content = InputTextMultilineContent(text_content=text)
+    else:
+        content = InputTextContent(text_content=text)
 
     def on_confirm(*args, **kwargs):
         inp = content.ids.text_input.text

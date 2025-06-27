@@ -1,5 +1,5 @@
 """
-All of the available BitDust engine API methods can be found here:
+All of the available BitDust node API methods can be found here:
 https://github.com/bitdust-io/public/blob/master/bitdust/interface/api.py
 
 """
