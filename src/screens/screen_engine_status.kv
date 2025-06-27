@@ -20,8 +20,18 @@
                         size_hint: 1, None
                         height: self.texture_size[1]
                         text:
-                        	"""BitDust engine is a peer-to-peer application that powers independent online storage, secure private messaging and other p2p services available to everyone.
+                        	"""BitDust node is a peer-to-peer application that powers independent online storage, secure private messaging and other p2p services available to everyone.
                         	The process will run in the background and maintain peer-to-peer connections to other devices on the network."""
+
+                HorizontalMinimumHeightLayout:
+
+                    MarkupLabel:
+                        id: device_configurations_content_label
+                        size_hint: 1, None
+                        height: self.texture_size[1]
+                        halign: 'left'
+                        on_ref_press: root.on_device_configurations_content_label_pressed(*args)
+                        text: ''
 
                 HorizontalLayout:
                     size_hint: 1, None
@@ -29,7 +39,7 @@
 
                     HFlexMarkupLabel:
                         label_height: dp(48)
-                        text: 'BitDust engine is ON:  '
+                        text: 'BitDust node is ON:  '
 
                     MDSwitch:
                         id: button_engine_on
@@ -41,7 +51,7 @@
                     HFlexMarkupLabel:
                         halign: 'left'
                         text: 'Network connection [u][color=#0000ff][ref=link]status[/ref][/color][/u]:'
-                        on_ref_press: root.on_network_connection_status_pressed()
+                        on_ref_press: root.on_network_connection_status_pressed(*args)
 
                 HorizontalMinimumHeightLayout:
 

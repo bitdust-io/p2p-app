@@ -1,4 +1,10 @@
+import os
+
+#------------------------------------------------------------------------------
+
 from lib import api_client
+from lib import system
+from lib import jsn
 
 from components import screen
 from components import styles
@@ -33,11 +39,48 @@ class EngineStatusScreen(screen.AppScreen):
     def populate(self):
         if _Debug:
             print('EngineStatusScreen.populate state_panel_attached=%r' % self.state_panel_attached)
-        if screen.main_window().state_node_local:
+        if screen.main_window().state_node_local == 1:
             self.ids.button_engine_on.disabled = False
             self.on_service(None)
         else:
             self.ids.button_engine_on.disabled = True
+        _t = ''
+        for client_info_name in self.app().list_client_info_records():
+            if self.main_win().state_node_local == 1 or self.main_win().state_device_authorized:
+                if client_info_name == self.app().selected_client:
+                    continue
+            _t += f'  [u][color=#0000ff][ref={client_info_name}_link]{self.shorten_client_info_name(client_info_name)}[/ref][/color][/u]'
+            if client_info_name == 'local':
+                _t += '\n'
+            else:
+                _t += f'  [u][color=#ff0000][ref={client_info_name}_delete][delete][/ref][/color][/u]\n'
+        if self.main_win().state_node_local == 1:
+            if _t:
+                _t = f'\nBitDust node is currently configured to run on this device. You can add [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] or select one of the known configurations:\n' + _t
+            else:
+                _t = '\nBitDust node is currently configured to run on this device, but you can add [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] to run it remotely.\n'
+        else:
+            if self.main_win().state_device_authorized:
+                if _t:
+                    _t = f'\nBitDust node is currently configured to run on a remote device [b]{self.shorten_client_info_name(self.app().selected_client)}[/b]. You can add [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] or select one of the known configurations:\n' + _t
+                else:
+                    _t = f'\nBitDust node is currently configured to run on a remote device [b]{self.shorten_client_info_name(self.app().selected_client)}[/b]. Also a [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] can be added.\n'
+            else:
+                _t = '\nBitDust node is not configured yet, click [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] to start.\n'
+        self.ids.device_configurations_content_label.text = _t
+
+    def set_nw_progress(self, v):
+        self.ids.connection_progress.value = v
+        if v == 100:
+            self.ids.connection_progress.color = styles.app.color_success_green
+        else:
+            self.ids.connection_progress.color = self.theme_cls.primary_color
+
+    def shorten_client_info_name(self, inp):
+        if '_' not in inp:
+            return inp
+        h, _, _ = inp.rpartition('_')
+        return h
 
     def on_enter(self, *args):
         if _Debug:
@@ -105,9 +148,38 @@ class EngineStatusScreen(screen.AppScreen):
         else:
             self.set_nw_progress(0)
 
-    def set_nw_progress(self, v):
-        self.ids.connection_progress.value = v
-        if v == 100:
-            self.ids.connection_progress.color = styles.app.color_success_green
-        else:
-            self.ids.connection_progress.color = self.theme_cls.primary_color
+    def on_device_configurations_content_label_pressed(self, *args):
+        if _Debug:
+            print('EngineStatusScreen.on_device_configurations_content_label_pressed', args)
+        if args[1] == 'add_new_configuration_link':
+            self.app().selected_client = None
+            self.main_win().state_node_local = -1
+            self.main_win().state_device_authorized = False
+            self.main_win().select_screen('device_connect_screen')
+            return
+        if args[1].endswith('_delete'):
+            _n = args[1].replace('_delete', '')
+            _fn = os.path.join(system.get_app_data_path(), _n + '.client_info')
+            if os.path.exists(_fn):
+                try:
+                    os.remove(_fn)
+                except Exception as exc:
+                    if _Debug:
+                        print(exc)
+            self.populate()
+            return
+        if args[1].endswith('_link'):
+            _n = args[1].replace('_link', '')
+            _fn = os.path.join(system.get_app_data_path(), _n + '.client_info')
+            _info = jsn.loads(system.ReadTextFile(_fn) or '{}')
+            if not _info:
+                return
+            if not _info.get('local') and not _info.get('auth_token'):
+                return
+            self.control().stop()
+            screen.my_app().set_client_info(_info)
+            self.main_win().state_node_local = 1 if _info.get('local') else 0
+            self.main_win().state_device_authorized = True
+            screen.stack_clear()
+            screen.stack_append('welcome_screen')
+            self.control().start()

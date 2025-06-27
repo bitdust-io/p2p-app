@@ -148,6 +148,9 @@ class BitDustApp(styles.AppStyle, MDApp):
     control = None
     main_window = None
     finishing = threading.Event()
+    selected_client = None
+    client_info = {}
+    client_info_file_path = None
 
     def __init__(self, **kwargs):
         global ROOT_PATH
@@ -156,33 +159,56 @@ class BitDustApp(styles.AppStyle, MDApp):
             print('BitDustApp.__init__ ROOT_PATH=%r app_data_path=%r' % (self.ROOT_PATH, system.get_app_data_path(), ))
         if not os.path.exists(system.get_app_data_path()):
             os.makedirs(system.get_app_data_path())
-        self.client_info = {}
-        self.client_info_file_path = os.path.join(system.get_app_data_path(), 'client_info')
         super().__init__(**kwargs)
 
     def load_client_info(self):
+        if not self.selected_client:
+            self.selected_client = system.ReadTextFile(os.path.join(system.get_app_data_path(), 'current_client')).strip()
+        if not self.selected_client:
+            return None
+        client_info_file_path = os.path.join(system.get_app_data_path(), self.selected_client+'.client_info')
         try:
-            _client_info = jsn.loads(system.ReadTextFile(self.client_info_file_path) or '{}')
+            selected_device_info = jsn.loads(system.ReadTextFile(client_info_file_path) or '{}')
         except:
             if _Debug:
                 traceback.print_exc()
-            _client_info = {}
-        if not _client_info:
+            selected_device_info = {}
+        if not selected_device_info:
             return None
-        self.client_info = _client_info
-        if 'local' not in self.client_info:
+        if 'local' not in selected_device_info:
             return None
+        self.client_info = selected_device_info
+        self.client_info_file_path = client_info_file_path
         if _Debug:
-            print('BitDustApp.load_client_info:', self.client_info_file_path, self.client_info)
-        self.main_window.state_node_local = self.client_info.get('local', True)
-        self.main_window.state_device_authorized = bool(self.client_info.get('auth_token', None))
+            print('BitDustApp.load_client_info:', self.client_info_file_path, selected_device_info)
+        self.main_window.state_node_local = 1 if selected_device_info.get('local', True) else 0
+        self.main_window.state_device_authorized = bool(selected_device_info.get('auth_token', None))
         return self.client_info
+
+    def set_client_info(self, client_info):
+        if _Debug:
+            print('BitDustApp.set_client_info: %r' % client_info)
+        _selected_client = client_info['name']
+        _client_info_file_path = os.path.join(system.get_app_data_path(), _selected_client+'.client_info')
+        system.WriteTextFile(_client_info_file_path, jsn.dumps(client_info, indent=2))
+        system.WriteTextFile(os.path.join(system.get_app_data_path(), 'current_client'), _selected_client)
+        self.selected_client = _selected_client
+        self.client_info_file_path = _client_info_file_path
+        self.client_info = client_info
 
     def save_client_info(self):
         if _Debug:
             print('BitDustApp.save_client_info:', self.client_info_file_path, self.client_info)
         system.WriteTextFile(self.client_info_file_path, jsn.dumps(self.client_info, indent=2))
         return True
+
+    def list_client_info_records(self):
+        res = []
+        for filename in os.listdir(system.get_app_data_path()):
+            if not filename.endswith('.client_info'):
+                continue
+            res.append(filename.replace('.client_info', ''))
+        return res
 
     def apply_styles(self):
         from kivy.app import App
@@ -277,23 +303,23 @@ class BitDustApp(styles.AppStyle, MDApp):
     @mainthread
     def do_start_controller(self):
         if _Debug:
-            print('BitDustApp.do_start_controller')
+            print('BitDustApp.do_start_controller granted=%r' % self.granted)
         self.dont_gc = None
-        if not system.is_android():
-            self.control.start()
-            self.start_engine()
+        if system.is_android():
+            if not self.granted:
+                mActivity.finishAndRemoveTask()
+                return False
+            try:
+                self.control.start()
+                self.start_engine()
+            except:
+                if _Debug:
+                    traceback.print_exc()
+                mActivity.finishAndRemoveTask()
+                return False
             return True
-        if not self.granted:
-            mActivity.finishAndRemoveTask()
-            return False
-        try:
-            self.control.start()
-            self.start_engine()
-        except:
-            if _Debug:
-                traceback.print_exc()
-            mActivity.finishAndRemoveTask()
-            return False
+        self.control.start()
+        self.start_engine()
         return True
 
     def get_service_name(self):
@@ -336,7 +362,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     #     svc.start(mActivity, 'bitdust.png', 'BitDust Service', 'Started', '')
 
     def start_engine(self, after_restart=False):
-        if not self.main_window.state_node_local:
+        if self.main_window.state_node_local != 1:
             return True
         if self.main_window.engine_is_on:
             if _Debug:
@@ -351,7 +377,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         return True
 
     def restart_engine(self):
-        if not self.main_window.state_node_local:
+        if self.main_window.state_node_local != 1:
             return
         if not self.main_window.engine_is_on:
             if _Debug:
@@ -364,7 +390,7 @@ class BitDustApp(styles.AppStyle, MDApp):
             self.check_restart_bitdust_process(params=['restart', ])
 
     def redeploy_engine(self):
-        if not self.main_window.state_node_local:
+        if self.main_window.state_node_local != 1:
             return
         if system.is_mobile():
             if _Debug:
@@ -376,7 +402,7 @@ class BitDustApp(styles.AppStyle, MDApp):
         self.check_restart_bitdust_process(params=['redeploy', ])
 
     def stop_engine(self):
-        if not self.main_window.state_node_local:
+        if self.main_window.state_node_local != 1:
             return
         if not self.main_window.engine_is_on:
             if _Debug:
@@ -423,7 +449,7 @@ class BitDustApp(styles.AppStyle, MDApp):
     #     return True
 
     def check_restart_bitdust_process(self, params=[]):
-        if not self.main_window.state_node_local:
+        if self.main_window.state_node_local != 1:
             return None
         if not system.is_linux() and not system.is_osx() and not system.is_windows():
             if _Debug:

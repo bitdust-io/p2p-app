@@ -1,4 +1,6 @@
+import os
 import base64
+import time
 
 #------------------------------------------------------------------------------
 
@@ -17,6 +19,7 @@ if system.is_ios():
     _USE_PYCRYPTODOME = False
 
 from lib import strng
+from lib import jsn
 from lib import util
 from lib import web_sock_remote
 
@@ -39,20 +42,6 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-class TabLocalDevice(MDFloatLayout, MDTabsBase):
-
-    def on_local_device_button_clicked(self, *args):
-        if _Debug:
-            print('TabLocalDevice.on_local_device_button_clicked', args)
-        screen.main_window().state_node_local = True
-        screen.my_app().client_info['local'] = screen.main_window().state_node_local
-        screen.my_app().save_client_info()
-        screen.stack_clear()
-        screen.stack_append('welcome_screen')
-        screen.my_app().do_start_controller()
-
-#------------------------------------------------------------------------------
-
 class WebSocketConnectorController(object):
 
     server_code_input_dialog = None
@@ -62,6 +51,7 @@ class WebSocketConnectorController(object):
     busy = False
     callback_on_success = None
     callback_on_fail = None
+    connecting_client_info_file_path = None
 
     def load_client_info_from_access_code(self, inp):
         try:
@@ -101,16 +91,14 @@ class WebSocketConnectorController(object):
             raise Exception('client code is not matching')
         if not server_key_object.verify(strng.to_bin(signature), hashed_payload):
             raise Exception('signature verification failed')
-        screen.main_window().state_node_local = False
-        screen.my_app().client_info['local'] = screen.main_window().state_node_local
-        screen.my_app().client_info['auth_token'] = auth_token
-        screen.my_app().client_info['session_key'] = session_key_text
-        screen.my_app().client_info['routers'] = [url, ]
-        screen.my_app().client_info['state'] = 'authorized'
-        screen.my_app().save_client_info()
-        return url
+        auth_info = {
+            'state': 'authorized',
+            'auth_token': auth_token,
+            'session_key': session_key_text,
+        }
+        return url, auth_info
 
-    def start_connecting(self, router_url, reset_auth=True, on_success=None, on_fail=None): 
+    def start_connecting(self, router_url, auth_info, on_success=None, on_fail=None): 
         if not router_url:
             if on_fail:
                 on_fail(None)
@@ -123,15 +111,13 @@ class WebSocketConnectorController(object):
         self.callback_on_success = on_success
         self.callback_on_fail = on_fail
         router_url = util.unpack_device_url(router_url.strip())
-        screen.main_window().state_node_local = False
-        screen.my_app().client_info['local'] = screen.main_window().state_node_local
-        screen.my_app().client_info['routers'] = [router_url, ]
-        if reset_auth:
-            screen.my_app().client_info.pop('key', None)
-            screen.my_app().client_info.pop('server_public_key', None)
-            screen.my_app().client_info.pop('auth_token', None)
-            screen.my_app().client_info.pop('session_key', None)
-        screen.my_app().save_client_info()
+        _client_info = {}
+        _client_info.update(auth_info)
+        _client_info['local'] = False
+        _client_info['name'] = util.shorten_device_url(router_url.strip()) + '_' + time.strftime('%Y%m%d%I%M%S', time.localtime())
+        _client_info['listeners'] = [router_url, ]
+        self.connecting_client_info_file_path = os.path.join(system.get_app_data_path(), 'connecting_info')
+        system.WriteTextFile(self.connecting_client_info_file_path, jsn.dumps(_client_info, indent=2))
         self.spinner_dialog = dialogs.open_spinner_dialog(
             title='',
             label='connecting',
@@ -154,8 +140,13 @@ class WebSocketConnectorController(object):
             self.spinner_dialog = None
         if web_sock_remote.is_started():
             web_sock_remote.stop()
-        screen.my_app().load_client_info()
-        success = bool(screen.my_app().client_info.get('auth_token'))
+        connecting_info = jsn.loads(system.ReadTextFile(self.connecting_client_info_file_path) or '{}')
+        if not connecting_info:
+            if self.callback_on_fail:
+                self.callback_on_fail(Exception('device connection info loading failed'), (ws_inst, ))
+                self.callback_on_fail = None
+            return
+        success = bool(connecting_info.get('auth_token'))
         if self.confirmation_code_dialog:
             self.confirmation_code_dialog.dismiss()
             self.confirmation_code_dialog = None
@@ -233,7 +224,6 @@ class WebSocketConnectorController(object):
         self.server_code_input_dialog = None
         if not inp:
             self.busy = False
-            # self.ids.qr_scan_open_button.disabled = not system.is_mobile()
             if web_sock_remote.is_started():
                 web_sock_remote.stop()
             return
@@ -248,11 +238,9 @@ class WebSocketConnectorController(object):
     def on_confirmation_code_dialog_closed(self, *args, **kwargs):
         self.confirmation_code_dialog = None
         self.busy = False
-        # self.ids.qr_scan_open_button.disabled = not system.is_mobile()
 
     def on_cancel_spinner_dialog(self):
         self.busy = False
-        # self.ids.qr_scan_open_button.disabled = not system.is_mobile()
         self.spinner_dialog = None
         if web_sock_remote.is_started():
             web_sock_remote.stop()
@@ -269,8 +257,24 @@ class WebSocketConnectorController(object):
                 'on_handshake_started': self.on_websocket_handshake_started,
                 'on_server_disconnected': self.on_websocket_server_disconnected,
             },
-            client_info_filepath=screen.my_app().client_info_file_path,
+            client_info_filepath=self.connecting_client_info_file_path,
         )
+
+#------------------------------------------------------------------------------
+
+class TabLocalDevice(MDFloatLayout, MDTabsBase):
+
+    def on_local_device_button_clicked(self, *args):
+        if _Debug:
+            print('TabLocalDevice.on_local_device_button_clicked', args)
+        screen.my_app().set_client_info({
+            'local': True,
+            'name': 'local',
+        })
+        screen.main_window().state_node_local = 1
+        screen.stack_clear()
+        screen.stack_append('welcome_screen')
+        screen.my_app().do_start_controller()
 
 #------------------------------------------------------------------------------
 
@@ -301,6 +305,7 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
             return
         self.start_connecting(
             router_url=router_url,
+            auth_info={},
             on_success=self.on_remote_device_connection_success,
             on_fail=self.on_remote_device_connection_failed,
         )
@@ -308,20 +313,33 @@ class TabRemoteDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
     def on_remote_device_connection_success(self, args):
         if _Debug:
             print('TabRemoteDevice.on_remote_device_connection_success', args)
-        screen.my_app().load_client_info()
-        screen.my_app().client_info['local'] = False
-        screen.my_app().client_info.pop('client_code', None)
-        screen.my_app().save_client_info()
-        screen.main_window().state_node_local = False
+        connecting_info = jsn.loads(system.ReadTextFile(self.connecting_client_info_file_path) or '{}')
+        if not connecting_info:
+            snackbar.error(text='client info update failed')
+            return
+        screen.my_app().set_client_info(connecting_info)
+        screen.main_window().state_node_local = 0
         screen.main_window().state_device_authorized = True
         screen.stack_clear()
         screen.stack_append('welcome_screen')
         screen.my_app().do_start_controller()
+        try:
+            os.remove(self.connecting_client_info_file_path)
+            self.connecting_client_info_file_path = None
+        except Exception as exc:
+            if _Debug:
+                print('TabRemoteDevice.on_remote_device_connection_success failed: %r' % exc)
 
     def on_remote_device_connection_failed(self, err, args):
         if _Debug:
             print('TabRemoteDevice.on_remote_device_connection_failed', err, args)
         snackbar.error(text=str(err))
+        try:
+            os.remove(self.connecting_client_info_file_path)
+            self.connecting_client_info_file_path = None
+        except Exception as exc:
+            if _Debug:
+                print('TabRemoteDevice.on_remote_device_connection_failed: %r' % exc)
 
 #------------------------------------------------------------------------------
 
@@ -358,6 +376,7 @@ class TabServerDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
             return
         self.start_connecting(
             router_url=inp,
+            auth_info={},
             on_success=self.on_server_device_connection_success,
             on_fail=self.on_server_device_connection_failed,
         )
@@ -365,20 +384,33 @@ class TabServerDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
     def on_server_device_connection_success(self, args):
         if _Debug:
             print('TabServerDevice.on_server_device_connection_success', args)
-        screen.my_app().load_client_info()
-        screen.my_app().client_info['local'] = False
-        screen.my_app().client_info.pop('client_code', None)
-        screen.my_app().save_client_info()
-        screen.main_window().state_node_local = False
+        connecting_info = jsn.loads(system.ReadTextFile(self.connecting_client_info_file_path) or '{}')
+        if not connecting_info:
+            snackbar.error(text='client info update failed')
+            return
+        screen.my_app().set_client_info(connecting_info)
+        screen.main_window().state_node_local = 0
         screen.main_window().state_device_authorized = True
         screen.stack_clear()
         screen.stack_append('welcome_screen')
         screen.my_app().do_start_controller()
+        try:
+            os.remove(self.connecting_client_info_file_path)
+            self.connecting_client_info_file_path = None
+        except Exception as exc:
+            if _Debug:
+                print('TabRemoteDevice.on_server_device_connection_success failed: %r' % exc)
 
     def on_server_device_connection_failed(self, err, args):
         if _Debug:
             print('TabServerDevice.on_server_device_connection_failed', err, args)
         snackbar.error(text=str(err))
+        try:
+            os.remove(self.connecting_client_info_file_path)
+            self.connecting_client_info_file_path = None
+        except Exception as exc:
+            if _Debug:
+                print('TabRemoteDevice.on_server_device_connection_failed: %r' % exc)
 
 #------------------------------------------------------------------------------
 
@@ -415,13 +447,13 @@ class TabDemoDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
         if not inp:
             return
         try:
-            router_url = self.load_client_info_from_access_code(inp)
+            router_url, auth_info = self.load_client_info_from_access_code(inp)
         except Exception as err:
             snackbar.error(text=str(err))
             return
         self.start_connecting(
             router_url=router_url,
-            reset_auth=False,
+            auth_info=auth_info,
             on_success=self.on_demo_device_connection_success,
             on_fail=self.on_demo_device_connection_failed,
         )
@@ -429,20 +461,33 @@ class TabDemoDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
     def on_demo_device_connection_success(self, args):
         if _Debug:
             print('TabDemoDevice.on_demo_device_connection_success', args)
-        screen.my_app().load_client_info()
-        screen.my_app().client_info['local'] = False
-        screen.my_app().client_info.pop('client_code', None)
-        screen.my_app().save_client_info()
-        screen.main_window().state_node_local = False
+        connecting_info = jsn.loads(system.ReadTextFile(self.connecting_client_info_file_path) or '{}')
+        if not connecting_info:
+            snackbar.error(text='client info update failed')
+            return
+        screen.my_app().set_client_info(connecting_info)
+        screen.main_window().state_node_local = 0
         screen.main_window().state_device_authorized = True
         screen.stack_clear()
         screen.stack_append('welcome_screen')
         screen.my_app().do_start_controller()
+        try:
+            os.remove(self.connecting_client_info_file_path)
+            self.connecting_client_info_file_path = None
+        except Exception as exc:
+            if _Debug:
+                print('TabDemoDevice.on_demo_device_connection_success failed: %r' % exc)
 
     def on_demo_device_connection_failed(self, err, args):
         if _Debug:
             print('TabDemoDevice.on_demo_device_connection_failed', err, args)
         snackbar.error(text=str(err))
+        try:
+            os.remove(self.connecting_client_info_file_path)
+            self.connecting_client_info_file_path = None
+        except Exception as exc:
+            if _Debug:
+                print('TabDemoDevice.on_demo_device_connection_failed: %r' % exc)
 
 #------------------------------------------------------------------------------
 

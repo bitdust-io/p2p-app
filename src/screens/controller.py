@@ -141,33 +141,20 @@ class Controller(object):
         self.my_idurl = None
         self.is_local = None
 
-    def verify_device_ready(self):
-        if _Debug:
-            print('Controller.verify_device_ready', self.mw().state_node_local, self.mw().state_device_authorized)
-        if self.mw().state_node_local is None:
-            self.mw().select_screen('device_connect_screen')
-            return False
-        if self.mw().state_node_local is True:
-            return True
-        if self.mw().state_device_authorized:
-            return True
-        self.mw().select_screen('device_connect_screen')
-        return False
-
     def mw(self):
         return self.app.main_window
 
     def start(self):
         if _Debug:
             print('Controller.start')
-        if self.mw().state_node_local:
+        if self.mw().state_node_local == 1:
             api_client.set_web_sock_type('local')
         else:
             if not self.mw().state_device_authorized:
                 raise Exception('this device was not authorized yet')
             api_client.set_web_sock_type('remote')
         self.enabled = True
-        if self.mw().state_node_local:
+        if self.mw().state_node_local == 1:
             self.is_local = True
             web_sock.start(
                 callbacks={
@@ -248,6 +235,19 @@ class Controller(object):
         return True
 
     #------------------------------------------------------------------------------
+
+    def verify_device_ready(self):
+        if _Debug:
+            print('Controller.verify_device_ready', self.mw().state_node_local, self.mw().state_device_authorized)
+        if self.mw().state_node_local == -1:
+            self.mw().select_screen('device_connect_screen')
+            return False
+        if self.mw().state_node_local == 1:
+            return True
+        if self.mw().state_device_authorized:
+            return True
+        self.mw().select_screen('device_connect_screen')
+        return False
 
     def verify_process_health(self, *args, **kwargs):
         if _Debug:
@@ -631,6 +631,8 @@ class Controller(object):
             self.mw().state_message_history = -1
             self.mw().update_menu_items()
             self.model_data.clear()
+            if self.mw().state_node_local == -1:
+                raise Exception('device configuration was not done yet')
             if self.mw().state_node_local:
                 if self.mw().selected_screen not in process_dead_screens_list():
                     self.mw().select_screen('welcome_screen')

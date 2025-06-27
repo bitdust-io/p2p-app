@@ -116,6 +116,8 @@ class PrivateDistributedFileSystem(DistributedFileSystem):
             if details:
                 if _Debug:
                     print('PrivateDistributedFileSystem.getsize found indexed', fn, details['size'])
+                if str(details.get('size')) == '-1B':
+                    return 0
                 return details['size']
         if _Debug:
             print('PrivateDistributedFileSystem.getsize', fn, 'model data was not found')
@@ -202,6 +204,8 @@ class SharedDistributedFileSystem(DistributedFileSystem):
             if details:
                 if _Debug:
                     print('SharedDistributedFileSystem.getsize found indexed', self.key_id, remote_path, details['size'])
+                if str(details.get('size')) == '-1B':
+                    return 0
                 return details['size']
         if _Debug:
             print('SharedDistributedFileSystem.getsize', remote_path, 'model data was not found')
@@ -428,6 +432,8 @@ class DistributedFileChooserListView(FileChooserController):
         except OSError:
             return '--'
         if not size:
+            return ''
+        if int(size) < 0:
             return ''
         for unit in self.filesize_units:
             if size < 1024.0:
