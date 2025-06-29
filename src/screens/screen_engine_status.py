@@ -45,12 +45,13 @@ class EngineStatusScreen(screen.AppScreen):
         else:
             self.ids.button_engine_on.disabled = True
         _t = ''
+        _s = self.app().selected_client
         for client_info_name in self.app().list_client_info_records():
             if self.main_win().state_node_local == 1 or self.main_win().state_device_authorized:
-                if client_info_name == self.app().selected_client:
+                if client_info_name == _s:
                     continue
             _t += f'  [u][color=#0000ff][ref={client_info_name}_link]{self.shorten_client_info_name(client_info_name)}[/ref][/color][/u]'
-            if client_info_name == 'local':
+            if client_info_name == 'local' or client_info_name == _s:
                 _t += '\n'
             else:
                 _t += f'  [u][color=#ff0000][ref={client_info_name}_delete][delete][/ref][/color][/u]\n'
@@ -62,9 +63,9 @@ class EngineStatusScreen(screen.AppScreen):
         else:
             if self.main_win().state_device_authorized:
                 if _t:
-                    _t = f'\nBitDust node is currently configured to run on a remote device [b]{self.shorten_client_info_name(self.app().selected_client)}[/b]. You can add [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] or select one of the known configurations:\n' + _t
+                    _t = f'\nBitDust node is currently configured to run on a remote device [b]{self.shorten_client_info_name(_s)}[/b]. You can add [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] or select one of the known configurations:\n' + _t
                 else:
-                    _t = f'\nBitDust node is currently configured to run on a remote device [b]{self.shorten_client_info_name(self.app().selected_client)}[/b]. Also a [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] can be added.\n'
+                    _t = f'\nBitDust node is currently configured to run on a remote device [b]{self.shorten_client_info_name(_s)}[/b]. Also a [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] can be added.\n'
             else:
                 _t = '\nBitDust node is not configured yet, click [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] to start.\n'
         self.ids.device_configurations_content_label.text = _t
@@ -153,7 +154,8 @@ class EngineStatusScreen(screen.AppScreen):
             print('EngineStatusScreen.on_device_configurations_content_link_pressed', args)
         if args[1] == 'add_new_configuration_link':
             self.app().selected_client = None
-            self.control().stop()
+            if self.control().enabled:
+                self.control().stop()
             self.main_win().state_node_local = -1
             self.main_win().state_device_authorized = False
             self.main_win().state_process_health = -1
@@ -187,7 +189,8 @@ class EngineStatusScreen(screen.AppScreen):
                 return
             if not _info.get('local') and not _info.get('auth_token'):
                 return
-            self.control().stop()
+            if self.control().enabled:
+                self.control().stop()
             screen.my_app().set_client_info(_info)
             self.main_win().state_node_local = 1 if _info.get('local') else 0
             self.main_win().state_device_authorized = True

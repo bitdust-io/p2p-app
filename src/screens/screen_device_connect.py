@@ -15,7 +15,7 @@ from lib import system
 
 _USE_PYCRYPTODOME = True
 
-if system.is_ios():
+if system.is_ios() or system.is_android():
     _USE_PYCRYPTODOME = False
 
 from lib import strng

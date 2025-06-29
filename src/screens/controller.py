@@ -20,7 +20,7 @@ from lib import web_sock_remote
 #------------------------------------------------------------------------------
 
 _Debug = False
-_DebugModelUpdates = True
+_DebugModelUpdates = False
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -632,7 +632,9 @@ class Controller(object):
             self.mw().update_menu_items()
             self.model_data.clear()
             if self.mw().state_node_local == -1:
-                raise Exception('device configuration was not done yet')
+                if _Debug:
+                    print('device configuration was not done yet')
+                return
             if self.mw().state_node_local:
                 if self.mw().selected_screen not in process_dead_screens_list():
                     self.mw().select_screen('welcome_screen')
