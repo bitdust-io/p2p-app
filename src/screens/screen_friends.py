@@ -65,8 +65,8 @@ class FriendItem(TwoLineIconListItem):
 
 class FriendsScreen(screen.AppScreen):
 
-    def get_title(self):
-        return 'contacts'
+    # def get_title(self):
+    #     return 'contacts'
 
     # def get_icon(self):
     #     return 'account-box-multiple'

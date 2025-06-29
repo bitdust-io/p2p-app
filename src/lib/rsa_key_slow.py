@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# rsa_key.py
+# rsa_key_slow.py
 #
 # Copyright (C) 2008 Veselin Penev, https://bitdust.io
 #
-# This file (rsa_key.py) is part of BitDust Software.
+# This file (rsa_key_slow.py) is part of BitDust Software.
 #
 # BitDust is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@
 #
 #
 """
-.. module:: rsa_key.
+.. module:: rsa_key_slow.
 
 
 """
@@ -64,7 +64,7 @@ class RSAKey(object):
         self.meta = {}
 
     def __str__(self) -> str:
-        return 'RSAKey(%s|%s)' % (self.label, 'active' if self.active else 'inactive')
+        return 'RSAKeySlow(%s|%s)' % (self.label, 'active' if self.active else 'inactive')
 
     def isReady(self):
         return self.keyObject is not None
@@ -157,6 +157,13 @@ class RSAKey(object):
             if _Debug:
                 print(exc, 'key_src=%r' % key_src)
             raise ValueError('failed to read key body')
+        _bits = rsa.common.bit_size(self.keyObject.e * self.keyObject.n)
+        if _bits > 4000:
+            self.bits = 4096
+        elif _bits > 2000:
+            self.bits = 2048
+        elif _bits > 1000:
+            self.bits = 1024
         del key_src
         # gc.collect()
         return True
@@ -187,6 +194,13 @@ class RSAKey(object):
             else:
                 self.privateKeyObject = rsa.PrivateKey.load_pkcs1(key_src)
                 self.keyObject = rsa.PublicKey(self.privateKeyObject.n, self.privateKeyObject.e)
+            _bits = rsa.common.bit_size(self.keyObject.e * self.keyObject.n)
+            if _bits > 4000:
+                self.bits = 4096
+            elif _bits > 2000:
+                self.bits = 2048
+            elif _bits > 1000:
+                self.bits = 1024
         except Exception as exc:
             if _Debug:
                 print(exc, 'key_src=%r' % key_src)

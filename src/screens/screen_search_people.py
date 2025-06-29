@@ -40,8 +40,8 @@ class SearchPeopleScreen(screen.AppScreen):
         self.return_screen_id = kw.pop('return_screen_id', 'friends_screen')
         return kw
 
-    def get_title(self):
-        return "search people"
+    # def get_title(self):
+    #     return "search people"
 
     def clean_view(self, clear_input_field=False):
         if clear_input_field:

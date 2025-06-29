@@ -18,3 +18,5 @@ pyzbar
 pillow
 libzbar
 platformdirs
+rsa==4.9
+pyasn1

@@ -68,8 +68,8 @@ class SharesScreen(screen.AppScreen):
 
     new_share_item_button = None
 
-    def get_title(self):
-        return 'shared locations'
+    # def get_title(self):
+    #     return 'shared locations'
 
     # def get_icon(self):
     #     return 'account-box-multiple'

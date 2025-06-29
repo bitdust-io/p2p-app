@@ -58,8 +58,8 @@ class MyIDScreen(screen.AppScreen):
 
     my_identity_name = None
 
-    def get_title(self):
-        return 'my identity'
+    # def get_title(self):
+    #     return 'my identity'
 
     def get_statuses(self):
         return {

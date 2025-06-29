@@ -14,8 +14,8 @@ _Debug = False
 
 class NewIdentityScreen(screen.AppScreen):
 
-    def get_title(self):
-        return 'create new identity'
+    # def get_title(self):
+    #     return 'create new identity'
 
     def get_statuses(self):
         return {

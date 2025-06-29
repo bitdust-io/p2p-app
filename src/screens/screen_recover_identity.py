@@ -17,8 +17,8 @@ _Debug = False
 
 class RecoverIdentityScreen(screen.AppScreen):
 
-    def get_title(self):
-        return 'recover identity'
+    # def get_title(self):
+    #     return 'recover identity'
 
     def get_statuses(self):
         return {

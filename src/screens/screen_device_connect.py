@@ -15,7 +15,7 @@ from lib import system
 
 _USE_PYCRYPTODOME = True
 
-if system.is_ios():
+if system.is_ios() or system.is_android():
     _USE_PYCRYPTODOME = False
 
 from lib import strng
@@ -509,8 +509,8 @@ class TabWebdockIODevice(MDFloatLayout, MDTabsBase):
 
 class DeviceConnectScreen(screen.AppScreen):
 
-    def get_title(self):
-        return 'node configuration'
+    # def get_title(self):
+    #     return 'node configuration'
 
     def on_tab_switched(self, *args):
         if _Debug:

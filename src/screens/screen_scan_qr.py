@@ -49,8 +49,8 @@ class ScanQRScreen(screen.AppScreen):
         self.scan_qr_callback = kw.pop('scan_qr_callback', None)
         return kw
 
-    def get_title(self):
-        return 'scan QR code'
+    # def get_title(self):
+    #     return 'scan QR code'
 
     def on_enter(self):
         self.camera = CameraContainer()

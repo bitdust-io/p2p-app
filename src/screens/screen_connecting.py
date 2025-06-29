@@ -46,8 +46,8 @@ class ConnectingScreen(screen.AppScreen):
     known_services = {}
     state_panel_attached = False
 
-    def get_title(self):
-        return 'network services'
+    # def get_title(self):
+    #     return 'network services'
 
     def get_statuses(self):
         return {

@@ -12,7 +12,7 @@
                 statuses: root.get_statuses()
 
             VEmptySpace:
-                size_hint_y: 0.5
+                size_hint_y: 0.3
 
             HLayout:
 
@@ -27,32 +27,28 @@
 	                MarkupLabel:
 	                    text_size: self.size
 	                    valign: "top"
-	                    halign: "left"
+	                    halign: "center"
 	                    size_hint: None, None
 	                    text_size: self.width, None
 	                    height: self.texture_size[1]
 	                    pos_hint: {'center_x': .5}
-	                    width: dp(260)
+	                    width: dp(320)
 	                    color: app.color_gray
 	                    multiline: True
-	                    text:
-	                    	"""* lowercase letters: [b]a-z[/b]
-	                    	* digits: [b]0-9[/b]
-	                    	* minus sign: [b]-[/b]
-	                    	* underscore character: [b]_[/b]
-	                    	* minimum length is: [b]3[/b] characters
-	                    	* maximum length is: [b]20[/b] characters"""
+	                    text: "[size=20sp]Create a username to get started[/size]\n\n[size=12sp]Use only lowercase, digits, dash and underscore.\nUsername must begin with a letter, minimum 3 and maximum 20 characters long.[/size]"
 
 					VFixedEmptySpace:
 
 	                CustomTextField:
 	                    id: username_input
 	                    hint_text: 'Enter your username'
+	                    icon_left: 'card-account-details'
+	                    max_text_length: 20
 	                    text: ''
 	                    multiline: False
 	                    pos_hint: {'center_x': .5}
 	                    size_hint_x: None
-	                    width: dp(220)
+	                    width: dp(230)
 	                    on_key_enter_pressed: root.on_username_input_key_enter_pressed()
 
 					VFixedEmptySpace:
@@ -66,10 +62,13 @@
 	                    pos_hint: {'center_x': .5}
 	                    on_release: root.on_create_identity_button_clicked()
 
+					VFixedEmptySpace:
+
 	                StatusLabel:
 	                    id: create_identity_result_message
-	                    valign: 'bottom'
-	                    halign: 'right'
+	                    valign: 'top'
+	                    halign: 'center'
+	                    width: dp(300)
 	                    height: dp(20)
 	                    size_hint: None, None
 	                    pos_hint: {'center_x': .5}
@@ -79,6 +78,6 @@
                     size_hint_x: 0.5
 
             VEmptySpace:
-                size_hint_y: 0.5
+                size_hint_y: 0.7
 
         BottomEmptyScreenSpace:

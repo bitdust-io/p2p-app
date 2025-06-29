@@ -26,8 +26,8 @@ Also you can give us your feedback about the BitDust p2p-app or report a bug dir
 
 class AboutScreen(screen.AppScreen):
 
-    def get_title(self):
-        return 'about BitDust p2p-app'
+    # def get_title(self):
+    #     return 'about BitDust p2p-app'
 
     def on_enter(self, *args):
         self.ids.about_text.text = about_temlate_text.format()

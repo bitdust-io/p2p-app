@@ -55,8 +55,8 @@ class SinglePrivateFileScreen(screen.AppScreen):
         self.downloaded_path = os.path.join(system.get_downloads_dir(), self.file_name)
         return kw
 
-    def get_title(self):
-        return 'private file'
+    # def get_title(self):
+    #     return 'private file'
 
     def get_statuses(self):
         return {

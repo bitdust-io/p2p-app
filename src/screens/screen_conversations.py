@@ -82,8 +82,8 @@ class NewGroupChat(OneLineIconListItem):
 
 class ConversationsScreen(screen.AppScreen):
 
-    def get_title(self):
-        return 'conversations'
+    # def get_title(self):
+    #     return 'conversations'
 
     def get_statuses(self):
         return {

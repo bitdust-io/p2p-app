@@ -37,8 +37,8 @@ class PrivateChatScreen(screen.AppScreen):
     # def get_icon(self):
     #     return ''
 
-    def get_title(self):
-        return self.username
+    # def get_title(self):
+    #     return self.username
 
     def get_hot_button(self):
         return {'icon': 'send', 'color': 'green', }

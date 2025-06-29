@@ -291,8 +291,8 @@ class SettingsScreen(screen.AppScreen):
     # def get_icon(self):
     #     return 'cogs'
 
-    def get_title(self):
-        return "settings"
+    # def get_title(self):
+    #     return "settings"
 
     def populate(self):
         api_client.services_list(cb=self.on_services_list_result)

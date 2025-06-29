@@ -19,8 +19,8 @@ _Debug = False
 
 class BackupIdentityScreen(screen.AppScreen):
 
-    def get_title(self):
-        return 'backup secret key'
+    # def get_title(self):
+    #     return 'backup secret key'
 
     def get_statuses(self):
         return {

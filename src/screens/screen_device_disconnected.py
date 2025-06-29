@@ -18,8 +18,8 @@ class DeviceDisconnectedScreen(screen.AppScreen):
     device_check_task = None
     device_process_health_task = None
 
-    def get_title(self):
-        return 'connecting to BitDust node'
+    # def get_title(self):
+    #     return 'connecting to BitDust node'
 
     def on_enter(self, *args):
         if screen.main_window().state_node_local == 1:

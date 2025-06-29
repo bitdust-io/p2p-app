@@ -55,8 +55,8 @@ my_local_storage_details_temlate_text = """
 
 class MyStorageInfoScreen(screen.AppScreen):
 
-    def get_title(self):
-        return 'storage info'
+    # def get_title(self):
+    #     return 'storage info'
 
     def get_statuses(self):
         return {
