@@ -20,7 +20,7 @@ from lib import web_sock_remote
 #------------------------------------------------------------------------------
 
 _Debug = False
-_DebugModelUpdates = False
+_DebugModelUpdates = True
 
 #------------------------------------------------------------------------------
 # create new screen step-by-step:
@@ -575,7 +575,7 @@ class Controller(object):
             if model_name == 'service':
                 def _st(d):
                     return 1 if d['state'] == 'ON' else (
-                        -1 if d['state'] in ['OFF', 'NOT_INSTALLED', 'CLOSED', ] else 0)
+                        -1 if d['state'] in ['OFF', 'NOT_INSTALLED', 'CLOSED', 'DEPENDS_OFF', ] else 0)
                 if snap_id == 'service_my_data':
                     self.mw().state_my_data = _st(d)
                 elif snap_id == 'service_message_history':

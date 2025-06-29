@@ -5,7 +5,7 @@ from components import screen
 class StartUpScreen(screen.AppScreen):
 
     def get_title(self):
-        return 'initializing ...'
+        return 'starting'
 
     def get_statuses(self):
         return {

@@ -12,7 +12,7 @@
                 statuses: root.get_statuses()
 
             VEmptySpace:
-                size_hint_y: 0.5
+                size_hint_y: 0.3
 
 	        HLayout:
 
@@ -23,30 +23,24 @@
 	                size_hint: 1, 1
 
 	                MarkupLabel:
+	                    valign: "top"
+	                    halign: "center"
 	                    size_hint_y: None
 	                    text_size: self.width, None
 	                    height: self.texture_size[1]
 	                    color: app.color_gray
-	                    text: "To recover your BitDust identity, you will need a backup copy of your private key and one of your IDURL addresses."
-
-					VFixedEmptySpace:
-
-	                MarkupLabel:
-	                    size_hint_y: None
-	                    text_size: self.width, None
-	                    height: self.texture_size[1]
-	                    color: app.color_gray
-	                    text: "Paste the IDURL address and the private key below or load a backup copy from a text file."
+	                    text: "[size=20sp]Restore existing identity[/size]\n\n[size=12sp]To recover your BitDust identity, you will need a backup copy of your master key and one of your IDURL addresses. Copy & paste the [b]IDURL address[/b] and the [b]Private key[/b] below in the text input field or load a backup copy of your BitDust master key from a text file.[/size]"
 
 					VFixedEmptySpace:
 
                     HFlexMarkupLabel:
 	                    pos_hint: {'center_x': 0.5}
-                        text: '[u][color=#0000ff][ref=link]load private key[/ref][/color][/u]'
+                        text: '[u][color=#0000ff][ref=link]load from text file[/ref][/color][/u]'
                         on_ref_press: root.on_load_private_key_pressed()
 
                     TextInput:
                         id: private_key_input
+                        hint_text: 'http://example-identity-server.com/alice.xml\n-----BEGIN RSA PRIVATE KEY-----\n...'
                         multiline: True
                         text: ''
                         halign: 'left'
@@ -55,7 +49,7 @@
                         height: dp(160)
                         size_hint: 1, None
 					    font_name: 'RobotoMono-Regular'
-					    font_size: '12sp'
+					    font_size: '10sp'
 
 					VFixedEmptySpace:
 
@@ -84,7 +78,7 @@
                     size_hint_x: 0.1
 
             VEmptySpace:
-                size_hint_y: 0.5
+                size_hint_y: 0.3
 
         BottomEmptyScreenSpace:
 

@@ -34,8 +34,8 @@ class GroupChatScreen(screen.AppScreen):
     # def get_icon(self):
     #     return 'account-group'
 
-    def get_title(self):
-        return self.label
+    # def get_title(self):
+    #     return self.label
 
     def get_hot_button(self):
         return {'icon': 'send', 'color': 'green', }

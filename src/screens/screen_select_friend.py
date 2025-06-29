@@ -40,8 +40,8 @@ class SelectFriendScreen(screen.AppScreen):
         self.screen_header = kw.pop('screen_header', '')
         return kw
 
-    def get_title(self):
-        return 'select contact'
+    # def get_title(self):
+    #     return 'select contact'
 
     # def get_icon(self):
     #     return 'target-account'

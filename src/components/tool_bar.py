@@ -556,6 +556,8 @@ class CustomBottomToolbar(CustomNotchedBox, styles.AppStyle):
 
     def update_bottom_action_bar_item(self, icon_name, state):
         itm = self.get_action_bar_item(icon_name)
+        if _Debug:
+            print('CustomBottomToolbar.update_bottom_action_bar_item %r state=%r' % (icon_name, state))
         if itm:
             if state == 0:
                 itm.start_blinking()
@@ -564,7 +566,7 @@ class CustomBottomToolbar(CustomNotchedBox, styles.AppStyle):
                 itm.text_color = self.state2color(state)
         else:
             if _Debug:
-                print('CustomBottomToolbar.update_action_bar_item item was not found for name %r' % icon_name)
+                print('CustomBottomToolbar.update_bottom_action_bar_item item was not found for name %r' % icon_name)
 
     def update_md_bg_color(self, *args):
         self.md_bg_color = self.theme_cls._get_primary_color()

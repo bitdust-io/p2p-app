@@ -211,8 +211,8 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
             return
         title = screen_inst.get_title()
         if title and system.is_mobile():
-            if len(title) > 20:
-                title = title[:20] + '...'
+            if len(title) > 15:
+                title = title[:15] + '...'
         icn = screen_inst.get_icon()
         if icn:
             icn_pack = screen_inst.get_icon_pack()
@@ -248,6 +248,8 @@ class MainWin(Screen, ThemableBehavior, styles.AppStyle):
         )
 
     def populate_bottom_toolbar_icon(self, icon_name, state):
+        if _Debug:
+            print('MainWin.populate_bottom_toolbar_icon', icon_name, state)
         Clock.schedule_once(lambda *a: self.footer_bar().update_bottom_action_bar_item(icon_name, state))
 
     def populate_device_server_code_display_dialog(self, event_data):

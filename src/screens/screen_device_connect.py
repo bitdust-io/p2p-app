@@ -509,8 +509,8 @@ class TabWebdockIODevice(MDFloatLayout, MDTabsBase):
 
 class DeviceConnectScreen(screen.AppScreen):
 
-    def get_title(self):
-        return 'node configuration'
+    # def get_title(self):
+    #     return 'node configuration'
 
     def on_tab_switched(self, *args):
         if _Debug:

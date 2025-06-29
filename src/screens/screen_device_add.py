@@ -17,8 +17,8 @@ class DeviceAddScreen(screen.AppScreen):
 
     spinner_dialog = None
 
-    def get_title(self):
-        return 'add new device'
+    # def get_title(self):
+    #     return 'add new device'
 
     def clean_view(self, clear_input_field=False):
         if clear_input_field:

@@ -14,8 +14,8 @@ class CreateShareScreen(screen.AppScreen):
     # def get_icon(self):
     #     return 'chat-plus'
 
-    def get_title(self):
-        return 'create shared location'
+    # def get_title(self):
+    #     return 'create shared location'
 
     def clean_view(self, clear_input_field=False):
         if clear_input_field:

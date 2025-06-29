@@ -69,8 +69,8 @@ class SharedLocationScreen(screen.AppScreen):
             self.automat_id = kw.pop('automat_id', None)
         return kw
 
-    def get_title(self):
-        return self.label
+    # def get_title(self):
+    #     return self.label
 
     # def get_icon(self):
     #     return 'file-lock'

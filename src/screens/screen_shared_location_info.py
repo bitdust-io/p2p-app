@@ -51,11 +51,11 @@ class SharedLocationInfoScreen(screen.AppScreen):
     # def get_icon(self):
     #     return 'account-group'
 
-    def get_title(self):
-        l = self.label
-        if len(l) > 20:
-            l = l[:20] + '...'
-        return l
+    # def get_title(self):
+    #     l = self.label
+    #     if len(l) > 20:
+    #         l = l[:20] + '...'
+    #     return l
 
     def get_statuses(self):
         return {

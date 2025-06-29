@@ -29,8 +29,8 @@ class UploadPrivateFile(OneLineIconListItem):
 
 class PrivateFilesScreen(screen.AppScreen):
 
-    def get_title(self):
-        return 'private files'
+    # def get_title(self):
+    #     return 'private files'
 
     # def get_icon(self):
     #     return 'file-lock'
