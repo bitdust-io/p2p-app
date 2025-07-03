@@ -446,6 +446,7 @@ class TabDemoDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
             self.access_key_input_dialog = None
         if not inp:
             return
+        inp = inp.replace('-----BEGIN DEVICE ACCESS KEY-----', '').replace('-----END DEVICE ACCESS KEY-----', '').strip()
         try:
             router_url, auth_info = self.load_client_info_from_access_code(inp)
         except Exception as err:
@@ -493,9 +494,7 @@ class TabDemoDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
 
 class TabWebdockIODevice(MDFloatLayout, MDTabsBase):
 
-    def on_webdock_io_api_token_enter_button_clicked(self, *args):
-        if _Debug:
-            print('TabWebdockIODevice.on_webdock_io_api_token_enter_button_clicked', args)
+    api_token_input_dialog = None
 
     def on_webdock_io_text_ref_pressed(self, *args):
         if _Debug:
@@ -504,6 +503,66 @@ class TabWebdockIODevice(MDFloatLayout, MDTabsBase):
             system.open_url('https://webdock.io')
         elif args[1] == 'webdock_io_profile_page_link':
             system.open_url('https://webdock.io/en/dash/profile')
+
+    def on_webdock_io_api_token_enter_button_clicked(self, inp):
+        if _Debug:
+            print('TabWebdockIODevice.on_webdock_io_api_token_enter_button_clicked', inp)
+        self.api_token_input_dialog = dialogs.open_text_input_dialog(
+            title='Connection info',
+            text='Enter device connection URL generated on the remote BitDust node:',
+            button_confirm='Continue',
+            button_cancel='Back',
+            cb=self.on_url_entered,
+        )
+
+    def on_webdock_io_api_token_entered(self, inp):
+        if _Debug:
+            print('TabWebdockIODevice.on_webdock_io_api_token_entered', inp)
+        if self.api_token_input_dialog:
+            self.api_token_input_dialog.dismiss()
+            self.api_token_input_dialog = None
+        t = inp.strip()
+        if not t:
+            return
+
+    def _do_connect(self, inp):        
+        self.start_connecting(
+            router_url=inp,
+            auth_info={},
+            on_success=self.on_server_device_connection_success,
+            on_fail=self.on_server_device_connection_failed,
+        )
+
+    def on_server_device_connection_success(self, args):
+        if _Debug:
+            print('TabWebdockIODevice.on_server_device_connection_success', args)
+        connecting_info = jsn.loads(system.ReadTextFile(self.connecting_client_info_file_path) or '{}')
+        if not connecting_info:
+            snackbar.error(text='client info update failed')
+            return
+        screen.my_app().set_client_info(connecting_info)
+        screen.main_window().state_node_local = 0
+        screen.main_window().state_device_authorized = True
+        screen.stack_clear()
+        screen.stack_append('welcome_screen')
+        screen.my_app().do_start_controller()
+        try:
+            os.remove(self.connecting_client_info_file_path)
+            self.connecting_client_info_file_path = None
+        except Exception as exc:
+            if _Debug:
+                print('TabRemoteDevice.on_server_device_connection_success failed: %r' % exc)
+
+    def on_server_device_connection_failed(self, err, args):
+        if _Debug:
+            print('TabWebdockIODevice.on_server_device_connection_failed', err, args)
+        snackbar.error(text=str(err))
+        try:
+            os.remove(self.connecting_client_info_file_path)
+            self.connecting_client_info_file_path = None
+        except Exception as exc:
+            if _Debug:
+                print('TabRemoteDevice.on_server_device_connection_failed: %r' % exc)
 
 #------------------------------------------------------------------------------
 
@@ -525,7 +584,7 @@ class DeviceConnectScreen(screen.AppScreen):
             if system.is_mobile():
                 self.ids.selection_tabs.add_widget(TabRemoteDevice(title='Remote desktop'))
             self.ids.selection_tabs.add_widget(TabServerDevice(title='Remote server'))
-            # self.ids.selection_tabs.add_widget(TabWebdockIODevice(title='Webdock.io'))
+            self.ids.selection_tabs.add_widget(TabWebdockIODevice(title='Webdock.io'))
             self.ids.selection_tabs.add_widget(TabDemoDevice(title='Demo'))
 
     def on_leave(self, *args):
