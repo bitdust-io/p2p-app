@@ -11,23 +11,21 @@
                 size_hint_x: 1
                 statuses: root.get_statuses()
 
-            VEmptySpace:
-                size_hint_y: 0.5
+            VerticalScrollView:
 
-	        HLayout:
-
-                HEmptySpace:
-                    size_hint_x: 0.1
-
-                VLayout:
-	                size_hint: 1, 1
+	            VerticalWithPaddingLayout:
+	                size_hint: None, None
+	                pos_hint: {"top": 1}
+	                height: self.minimum_height
+	                width: root.width - app.scroll_bar_width
+	                padding: (dp(40), dp(40))
 
 	                MarkupLabel:
 	                    size_hint_y: None
 	                    text_size: self.width, None
 	                    height: self.texture_size[1]
 	                    color: app.color_gray
-	                    text: "It is [b][color=#ff0000]highly recommended[/color][/b] to make two or three copies of your private key on reliable and compact media just after the program set up and hide them in a secure place."
+	                    text: "It is [b][color=#ff0000]highly recommended[/color][/b] to make two or three copies of your private key on reliable and compact media and hide them in a safe place."
 
 					VFixedEmptySpace:
 
@@ -54,7 +52,7 @@
 	                    text_size: self.width, None
 	                    height: self.texture_size[1]
 	                    color: app.color_gray
-	                    text: "The reliability of your personal information security is completely dependent on the safety of your private key and [b][color=#ff0000]physical control[/color][/b] of this device."
+	                    text: "The reliability of your personal information security is completely dependent on the safety of your private key and [b][color=#ff0000]physical control[/color][/b] of this device.\n"
 
 					VFixedEmptySpace:
 
@@ -87,12 +85,6 @@
 	                    pos_hint: {'center_x': .5}
 	                    disabled: True
 	                    on_release: root.on_continue_pressed()
-
-                HEmptySpace:
-                    size_hint_x: 0.1
-
-            VEmptySpace:
-                size_hint_y: 0.5
 
         BottomEmptyScreenSpace:
 

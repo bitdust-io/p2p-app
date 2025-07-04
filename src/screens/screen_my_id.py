@@ -118,16 +118,7 @@ class MyIDScreen(screen.AppScreen):
         if _Debug:
             print('MyIDScreen.on_drop_down_menu_item_clicked', btn.icon)
         if btn.icon == 'shield-key':
-            filename = 'BitDust_master_key_{}.txt'.format(self.my_identity_name) if self.my_identity_name else 'BitDust_key.txt'
-            if system.is_android():
-                from android.storage import app_storage_path  # @UnresolvedImport
-                destination_filepath = os.path.join(app_storage_path(), filename)
-            else:
-                destination_filepath = os.path.join(os.path.expanduser('~'), filename)
-            api_client.identity_backup(
-                destination_filepath=destination_filepath,
-                cb=lambda resp: self.on_identity_backup_result(resp, destination_filepath),
-            )
+            screen.select_screen('backup_identity_screen')
         elif btn.icon == 'cellphone-remove':
             dialogs.open_yes_no_dialog(
                 title='Erase my identity and the private key',

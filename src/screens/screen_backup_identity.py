@@ -1,5 +1,4 @@
 import os
-import time
 
 from kivy.clock import mainthread
 
@@ -7,6 +6,7 @@ from kivy.clock import mainthread
 
 from lib import system
 from lib import api_client
+from lib import api_file_transfer
 
 from components import screen
 from components import snackbar
@@ -37,6 +37,7 @@ class BackupIdentityScreen(screen.AppScreen):
         }
 
     def on_enter(self, *args):
+        self.ids.continue_button.disabled = True
         self.ids.state_panel.attach(automat_id='initializer')
 
     def on_leave(self, *args):
@@ -52,39 +53,66 @@ class BackupIdentityScreen(screen.AppScreen):
         if _Debug:
             print('BackupIdentityScreen.on_identity_get_result', resp)
         if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
+            self.ids.continue_button.disabled = False
             return
         result = api_client.response_result(resp)
         if not result:
+            self.ids.continue_button.disabled = False
             return
         self.my_identity_name = result.get('name', '')
-        filename = 'BitDust_master_key_{}.txt'.format(self.my_identity_name) if self.my_identity_name else 'BitDust_key.txt'
-        if system.is_android():
-            from android.storage import app_storage_path  # @UnresolvedImport
-            destination_filepath = os.path.join(app_storage_path(), filename)
+        self.filename = f'BitDust_{self.my_identity_name}_master_key.txt' if self.my_identity_name else 'BitDust_master_key.txt'
+        if screen.control().is_local:
+            destination_filepath = os.path.join(system.get_documents_dir(), self.filename)
         else:
-            destination_filepath = os.path.join(os.path.expanduser('~'), filename)
+            destination_filepath = ''
         api_client.identity_backup(
             destination_filepath=destination_filepath,
-            cb=lambda resp: self.on_identity_backup_result(resp, destination_filepath),
+            cb=self.on_identity_backup_result,
         )
 
-    def on_identity_backup_result(self, resp, destination_filepath):
+    def on_identity_backup_result(self, resp):
         if _Debug:
-            print('BackupIdentityScreen.on_identity_backup_result', destination_filepath, resp)
+            print('BackupIdentityScreen.on_identity_backup_result', resp)
+        if not api_client.is_ok(resp):
+            snackbar.error(text=api_client.response_err(resp))
+            self.ids.continue_button.disabled = False
+            return
+        result = api_client.response_result(resp)
+        if not result:
+            self.ids.continue_button.disabled = False
+            return
+        downloaded_path = result.get('local_path')
+        if screen.control().is_local:
+            if downloaded_path and os.path.exists(downloaded_path):
+                system.open_path_in_os(downloaded_path)
+            self.ids.continue_button.disabled = False
+            return
+        destination_path = os.path.join(system.get_downloads_dir(), self.filename)
+        api_file_transfer.file_download(
+            source_path=downloaded_path,
+            destination_path=destination_path,
+            result_callback=self.on_file_transfer_result,
+        )
+
+    def on_file_transfer_result(self, result):
+        if _Debug:
+            print('BackupIdentityScreen.on_file_transfer_result', result)
+        screen.main_window().state_file_transfering = False
+        if isinstance(result, Exception):
+            snackbar.error(text=str(result))
+            self.ids.continue_button.disabled = False
+            return
+        snackbar.success(text='downloading is complete')
+        self.ids.continue_button.disabled = False
+        destination_path = os.path.join(system.get_downloads_dir(), self.filename)
         if system.is_android():
             from androidstorage4kivy import SharedStorage  # @UnresolvedImport
-            shared_path = SharedStorage().copy_to_shared(destination_filepath)
-            try:
-                os.remove(destination_filepath)
-            except Exception as e:
-                if _Debug:
-                    print(e)
-            destination_filepath = shared_path
-        if not api_client.is_ok(resp):
-            snackbar.error(text='identity backup failed: %s' % api_client.response_err(resp))
+            local_uri = SharedStorage().copy_to_shared(private_file=destination_path)
+            if local_uri:
+                system.open_path_in_os(local_uri)
         else:
-            system.open_path_in_os(destination_filepath)
-        self.ids.continue_button.disabled = False
+            system.open_path_in_os(destination_path)
 
     def on_continue_pressed(self, *args):
         screen.select_screen('welcome_screen')
