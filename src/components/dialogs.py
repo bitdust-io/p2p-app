@@ -4,7 +4,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
 
-from kivymd.uix.button import MDFillRoundFlatButton, MDFlatButton
+from kivymd.uix.button import MDFillRoundFlatButton
 from kivymd.uix.dialog import MDDialog
 
 #------------------------------------------------------------------------------
@@ -236,10 +236,11 @@ def open_spinner_dialog(title, label='', button_cancel=None, cb_cancel=None):
         type='custom',
         content_cls=spin,
         buttons=[
-            MDFlatButton(
+            MDFillRoundFlatButton(
                 font_size=sp(14),
                 text=button_cancel,
                 on_release=on_cancel,
+                text_color=(1,1,1,1),
             ),
         ] if button_cancel else [],
         size_hint_x=None,
@@ -280,10 +281,11 @@ def open_log_progress_dialog(title, button_cancel=None, cb_open=None, cb_cancel=
         type='custom',
         content_cls=content,
         buttons=[
-            MDFlatButton(
+            MDFillRoundFlatButton(
                 font_size=sp(14),
                 text=button_cancel,
                 on_release=on_cancel,
+                text_color=(1,1,1,1),
             ),
         ] if button_cancel else [],
         size_hint_x=None,

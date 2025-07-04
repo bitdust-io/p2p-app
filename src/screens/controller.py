@@ -187,12 +187,10 @@ class Controller(object):
         if _Debug:
             print('Controller.stop')
         self.enabled = False
-        if self.is_local:
-            if web_sock.is_started():
-                web_sock.stop()
-        else:
-            if web_sock_remote.is_started():
-                web_sock_remote.stop()
+        if web_sock.is_started():
+            web_sock.stop()
+        if web_sock_remote.is_started():
+            web_sock_remote.stop()
 
     def send_process_stop(self, callback=None):
         self.mw().state_process_health = 0
