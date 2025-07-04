@@ -77,3 +77,27 @@
         input_filter: 'int'
         required: True
         mode: "rectangle"
+
+
+<LogProgressContainerContent>:
+    orientation: "vertical"
+    spacing: "0dp"
+    size_hint_y: None
+    height: "180dp"
+    pos_hint: {"top": 1}
+
+    VerticalScrollView:
+
+        VerticalWithPaddingLayout:
+            size_hint: None, None
+            pos_hint: {"top": 1}
+            height: self.minimum_height
+            width: root.width
+
+		    MDLabel:
+		        id: log_content
+                size_hint_y: None
+                text_size: self.width, None
+                height: self.texture_size[1]
+		        valign: 'top'
+		        text: ''

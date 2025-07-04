@@ -101,6 +101,18 @@ def get_downloads_dir():
         return os.path.join(os.path.expanduser('~'), 'Documents')
     return platformdirs.user_downloads_dir()
 
+
+def get_documents_dir():
+    if is_android():
+        from android.storage import app_storage_path  # @UnresolvedImport
+        documents_dir = os.path.join(app_storage_path(), 'documents')
+        if not os.path.exists(documents_dir):
+            os.makedirs(documents_dir)
+        return documents_dir
+    if is_ios():
+        return os.path.join(os.path.expanduser('~'), 'Documents')
+    return platformdirs.user_documents_dir()
+
 #------------------------------------------------------------------------------
 
 def android_sdk_version():

@@ -57,9 +57,9 @@ class EngineStatusScreen(screen.AppScreen):
                 _t += f'  [u][color=#ff0000][ref={client_info_name}_delete][delete][/ref][/color][/u]\n'
         if self.main_win().state_node_local == 1:
             if _t:
-                _t = f'\nBitDust node is currently configured to run on this device. You can add [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] or select one of the known configurations:\n' + _t
+                _t = f'\nBitDust node is currently configured to run [b]on this device[/b]. You can add [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] or select one of the known configurations:\n' + _t
             else:
-                _t = '\nBitDust node is currently configured to run on this device, but you can add [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] to run it remotely.\n'
+                _t = '\nBitDust node is currently configured to run [b]on this device[/b], but you can add [u][color=#0000ff][ref=add_new_configuration_link]new configuration[/ref][/color][/u] to run it remotely.\n'
         else:
             if self.main_win().state_device_authorized:
                 if _t:

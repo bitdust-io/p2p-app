@@ -103,7 +103,7 @@ def open_text_input_dialog(title, text, multiline=False, button_confirm='Confirm
         size_hint_x=None,
         width=dp(360),
         auto_dismiss=False,
-        pos_hint={'y': .15},
+        pos_hint={'y': .2},
     )
 
     def on_open(*args, **kwargs):
@@ -249,5 +249,51 @@ def open_spinner_dialog(title, label='', button_cancel=None, cb_cancel=None):
         pos_hint={'y': .15},
     )
     popup.update_width = lambda *args: None
+    popup.open()
+    return popup
+
+
+#------------------------------------------------------------------------------
+
+class LogProgressContainerContent(BoxLayout):
+    pass
+
+
+def open_log_progress_dialog(title, button_cancel=None, cb_open=None, cb_cancel=None):
+    popup = None
+    content = LogProgressContainerContent()
+
+    def on_cancel(*args, **kwargs):
+        popup.dismiss()
+        if cb_cancel:
+            cb_cancel()
+
+    def on_dismiss(*args, **kwargs):
+        pass
+
+    def on_open(*args, **kwargs):
+        if cb_open:
+            cb_open(content)
+
+    popup = MDDialog(
+        title=title,
+        type='custom',
+        content_cls=content,
+        buttons=[
+            MDFlatButton(
+                font_size=sp(14),
+                text=button_cancel,
+                on_release=on_cancel,
+            ),
+        ] if button_cancel else [],
+        size_hint_x=None,
+        width=dp(360),
+        auto_dismiss=False,
+        on_dismiss=on_dismiss,
+        pos_hint={'y': .15},
+    )
+
+    popup.update_width = lambda *args: None
+    popup.bind(on_open=on_open)
     popup.open()
     return popup
