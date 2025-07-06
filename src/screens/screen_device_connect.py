@@ -127,7 +127,7 @@ class WebSocketConnectorController(object):
         self.spinner_dialog = dialogs.open_spinner_dialog(
             title='',
             label='connecting',
-            button_cancel='[u][color=#0000dd]Cancel[/color][/u]',
+            button_cancel='Cancel',
             cb_cancel=self.on_cancel_spinner_dialog,
         )
         if web_sock_remote.is_started():
@@ -531,13 +531,15 @@ class TabWebdockIODevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController
             system.open_url('https://webdock.io')
         elif args[1] == 'webdock_io_profile_page_link':
             system.open_url('https://webdock.io/en/dash/profile')
+        elif args[1] == 'webdock_io_signup_link':
+            system.open_url('https://webdock.io/en/signup')
 
     def on_webdock_io_api_token_enter_button_clicked(self):
         if _Debug:
             print('TabWebdockIODevice.on_webdock_io_api_token_enter_button_clicked')
         self.api_token_input_dialog = dialogs.open_text_input_dialog(
-            title='Connection info',
-            text='Enter device connection URL generated on the remote BitDust node:',
+            title='Webdock.io API token',
+            text='Copy & paste here API token from Webdock.io > Account > API & Integrations section:',
             button_confirm='Continue',
             button_cancel='Back',
             cb=self.on_webdock_io_api_token_entered,
@@ -556,13 +558,12 @@ class TabWebdockIODevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController
             return
         self.api_token = t
         self.thread_cancelled = False
-        self.access_code = None
         if self.log_progress_dialog:
             self.log_progress_dialog.dismiss()
             self.log_progress_dialog = None
         self.log_progress_dialog = dialogs.open_log_progress_dialog(
             title='Webdock.io server configuration',
-            button_cancel='[u][color=#0000dd]Cancel[/color][/u]',
+            button_cancel='Cancel',
             cb_open=self.on_log_progress_dialog_opened,
             cb_cancel=self.on_cancel_webdock_io_log_progress_dialog,
         )
@@ -592,35 +593,35 @@ class TabWebdockIODevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController
     @mainthread
     def on_cancel_webdock_io_log_progress_dialog(self):
         if _Debug:
-            print('TabWebdockIODevice.on_cancel_webdock_io_log_progress_dialog', bool(self.access_code))
+            print('TabWebdockIODevice.on_cancel_webdock_io_log_progress_dialog')
         self.thread_cancelled = True
         self.log_progress_dialog = None
         self.log_progress_dialog_content = None
-        if self.access_code:
-            try:
-                router_url, auth_info = self.load_client_info_from_access_code(self.access_code)
-            except Exception as err:
-                snackbar.error(text=str(err))
-                return
-            self.start_connecting(
-                router_url=router_url,
-                auth_info=auth_info,
-                on_success=self.on_webdock_io_device_connection_success,
-                on_fail=self.on_webdock_io_device_connection_failed,
-            )
 
     @mainthread
     def on_webdock_io_thread_result(self, result):
         access_code_lookup = re.search('-----BEGIN DEVICE ACCESS KEY-----(.+?)-----END DEVICE ACCESS KEY-----', str(result), flags=(re.MULTILINE | re.DOTALL))
         if _Debug:
             print('TabWebdockIODevice.on_webdock_io_thread_result with %d bytes: %r' % (len(str(result)), access_code_lookup))
-        if access_code_lookup:
-            self.access_code = access_code_lookup.group(1).strip()
+        if not access_code_lookup:
             if self.log_progress_dialog:
-                self.log_progress_dialog.ids.button_box.children[0].text = '[u][color=#0000dd]Continue[/color][/u]'
-        else:
-            if self.log_progress_dialog:
-                self.log_progress_dialog.ids.button_box.children[0].text = '[u][color=#0000dd]Close[/color][/u]'
+                self.log_progress_dialog.ids.button_box.children[0].text = 'Close'
+            return
+        access_code = access_code_lookup.group(1).strip()
+        if self.log_progress_dialog:
+            self.log_progress_dialog.dismiss()
+            self.log_progress_dialog = None
+        try:
+            router_url, auth_info = self.load_client_info_from_access_code(access_code)
+        except Exception as err:
+            snackbar.error(text=str(err))
+            return
+        self.start_connecting(
+            router_url=router_url,
+            auth_info=auth_info,
+            on_success=self.on_webdock_io_device_connection_success,
+            on_fail=self.on_webdock_io_device_connection_failed,
+        )
 
     def on_webdock_io_device_connection_success(self, args):
         if _Debug:
