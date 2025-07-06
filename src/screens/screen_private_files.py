@@ -2,8 +2,6 @@ import os
 
 from kivy.clock import mainthread
 
-from kivymd.uix.list import OneLineIconListItem
-
 from lib import api_client
 from lib import api_file_transfer
 from lib import system
@@ -19,13 +17,6 @@ from components import webfont
 _Debug = False
 
 #------------------------------------------------------------------------------
-
-class UploadPrivateFile(OneLineIconListItem):
-
-    def on_pressed(self):
-        if _Debug:
-            print('UploadPrivateFile.on_pressed', self)
-
 
 class PrivateFilesScreen(screen.AppScreen):
 
@@ -170,19 +161,29 @@ class PrivateFilesScreen(screen.AppScreen):
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
             return
+        target_remote_path = api_client.result(resp).get('remote_path')
         screen.main_window().state_file_transfering = True
         if screen.control().is_local:
             api_client.file_upload_start(
                 local_path=file_path,
-                remote_path=remote_path,
+                remote_path=target_remote_path,
                 wait_result=True,
                 cb=self.on_upload_file_started,
             )
         else:
             api_file_transfer.file_upload(
                 source_path=file_path,
-                result_callback=lambda result: self.on_file_transfer_result(result, remote_path),
+                chunk_size=256*1024,
+                result_callback=lambda result: self.on_file_transfer_result(result, target_remote_path),
+                progress_callback=lambda *a, **kw: self.on_file_transfer_progress(target_remote_path, *a, **kw),
             )
+
+    @mainthread
+    def on_file_transfer_progress(self, remote_path, source_path, destination_path, bytes_sent):
+        if _Debug:
+            print('PrivateFilesScreen.on_file_transfer_progress', remote_path, bytes_sent)
+        if remote_path in self.ids.files_list_view.index_by_remote_path:
+            self.ids.files_list_view.index_by_remote_path[remote_path].ids.file_condition.text = '[size=10sp][color=bbbf]%s uploaded[/color][/size]' % system.make_nice_size(bytes_sent)
 
     def on_file_transfer_result(self, result, remote_path):
         if _Debug:

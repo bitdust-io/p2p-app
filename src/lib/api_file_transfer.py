@@ -11,7 +11,7 @@ _Debug = False
 
 #------------------------------------------------------------------------------
 
-def file_download(source_path, destination_path, chunk_size=64*1024, result_callback=None):
+def file_download(source_path, destination_path, chunk_size=64*1024, result_callback=None, progress_callback=None):
     if _Debug:
         print('api_file_transfer.file_download', source_path, destination_path)
     try:
@@ -68,13 +68,17 @@ def file_download(source_path, destination_path, chunk_size=64*1024, result_call
     def do_chunk_request(offset):
         if _Debug:
             print('api_file_transfer.file_download.do_chunk_request', source_path, destination_path, offset)
+        if offset:
+            if progress_callback:
+                progress_callback(source_path, destination_path, offset)
+            
         api_client.chunk_read(path=source_path, offset=offset, max_size=chunk_size, cb=lambda resp: on_chunk_received(resp, offset))
 
     do_chunk_request(0)
 
 #------------------------------------------------------------------------------
 
-def file_upload(source_path, chunk_size=64*1024, result_callback=None):
+def file_upload(source_path, chunk_size=64*1024, result_callback=None, progress_callback=None):
     if _Debug:
         print('api_file_transfer.file_upload', source_path)
     try:
@@ -85,9 +89,9 @@ def file_upload(source_path, chunk_size=64*1024, result_callback=None):
         return
 
     @mainthread
-    def on_chunk_result(resp, destination_path):
+    def on_chunk_result(resp, destination_path, bytes_sent):
         if _Debug:
-            print('api_file_transfer.file_upload.on_chunk_result', destination_path, resp)
+            print('api_file_transfer.file_upload.on_chunk_result', destination_path, bytes_sent, resp)
         if not api_client.is_ok(resp):
             try:
                 file_src.close()
@@ -109,12 +113,15 @@ def file_upload(source_path, chunk_size=64*1024, result_callback=None):
                 if result_callback:
                     result_callback(Exception('file transfer was not completed successfully'))
                 return
-        do_chunk_send(destination_path)
+        do_chunk_send(destination_path, bytes_sent)
 
     @mainthread
-    def do_chunk_send(destination_path):
+    def do_chunk_send(destination_path, bytes_sent):
         if _Debug:
-            print('api_file_transfer.file_upload.do_chunk_send', destination_path)
+            print('api_file_transfer.file_upload.do_chunk_send', destination_path, bytes_sent)
+        if destination_path:
+            if progress_callback:
+                progress_callback(source_path, destination_path, bytes_sent)
         try:
             bin_chunk = file_src.read(chunk_size)
         except Exception as exc:
@@ -136,6 +143,6 @@ def file_upload(source_path, chunk_size=64*1024, result_callback=None):
                 result_callback(destination_path)
             return
         text_chunk = strng.to_text(bin_chunk, encoding='latin1')
-        api_client.chunk_write(data=text_chunk, path=destination_path, cb=lambda resp: on_chunk_result(resp, destination_path))
+        api_client.chunk_write(data=text_chunk, path=destination_path, cb=lambda resp: on_chunk_result(resp, destination_path, bytes_sent + len(bin_chunk)))
 
-    do_chunk_send(None)
+    do_chunk_send(None, 0)
