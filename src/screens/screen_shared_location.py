@@ -62,7 +62,10 @@ class SharedLocationScreen(screen.AppScreen):
     def populate(self, *args, **kwargs):
         if _Debug:
             print('SharedLocationScreen.populate', screen.main_window().state_file_transfering)
-        self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
+        if screen.main_window().state_my_data != 1:
+            self.ids.upload_file_button.disabled = True
+        else:
+            self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
         if system.is_ios() and self.upload_multimedia_button:
             self.upload_multimedia_button.disabled = screen.main_window().state_file_transfering
 
@@ -110,11 +113,17 @@ class SharedLocationScreen(screen.AppScreen):
         if api_client.is_ok(resp):
             if api_client.result(resp)['active']:
                 self.ids.files_list_view.open()
-                self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
+                if screen.main_window().state_my_data != 1:
+                    self.ids.upload_file_button.disabled = True
+                else:
+                    self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
                 # self.ids.upload_file_button.md_bg_color = self.app().theme_cls.accent_color
                 return
         self.ids.files_list_view.close()
-        self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
+        if screen.main_window().state_my_data != 1:
+            self.ids.upload_file_button.disabled = True
+        else:
+            self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
 
     def on_state_panel_release(self, resp):
         pass
@@ -344,7 +353,10 @@ class SharedLocationScreen(screen.AppScreen):
             print('SharedLocationScreen.on_share_close_result', resp)
         if api_client.is_ok(resp):
             self.ids.files_list_view.close()
-            self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
+            if screen.main_window().state_my_data != 1:
+                self.ids.upload_file_button.disabled = True
+            else:
+                self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering or not self.ids.files_list_view.opened
             snackbar.success(text='shared location closed')
         else:
             snackbar.error(text=api_client.response_err(resp))

@@ -40,7 +40,10 @@ class PrivateFilesScreen(screen.AppScreen):
         }
 
     def populate(self, *args, **kwargs):
-        self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering
+        if screen.main_window().state_my_data != 1:
+            self.ids.upload_file_button.disabled = True
+        else:
+            self.ids.upload_file_button.disabled = screen.main_window().state_file_transfering
         if system.is_ios() and self.upload_multimedia_button:
             self.upload_multimedia_button.disabled = screen.main_window().state_file_transfering
 

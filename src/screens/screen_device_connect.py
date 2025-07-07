@@ -116,6 +116,7 @@ class WebSocketConnectorController(object):
         self.busy = True
         self.callback_on_success = on_success
         self.callback_on_fail = on_fail
+        self.connect_attempts = 0
         router_url = util.unpack_device_url(router_url.strip())
         _client_info = {}
         _client_info.update(auth_info)
@@ -254,6 +255,16 @@ class WebSocketConnectorController(object):
     def _do_connect(self, interval=None):
         if _Debug:
             print('WebSocketConnectorController._do_connect')
+        if web_sock_remote.is_started():
+            if self.connect_attempts > 3:
+                return
+            web_sock_remote.stop()
+            if self.device_check_task:
+                self.device_check_task.cancel()
+                self.device_check_task = None
+            self.device_check_task = Clock.schedule_once(self._do_connect, 2)
+            return
+        self.connect_attempts += 1
         web_sock_remote.start(
             callbacks={
                 'on_open': self.on_websocket_open,
@@ -453,6 +464,7 @@ class TabDemoDevice(MDFloatLayout, MDTabsBase, WebSocketConnectorController):
         if not inp:
             return
         inp = inp.replace('-----BEGIN DEVICE ACCESS KEY-----', '').replace('-----END DEVICE ACCESS KEY-----', '').strip()
+        inp = inp.replace('\n', '').replace('\r', '')
         try:
             router_url, auth_info = self.load_client_info_from_access_code(inp)
         except Exception as err:
