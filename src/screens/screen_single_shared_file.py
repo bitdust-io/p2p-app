@@ -184,6 +184,7 @@ class SingleSharedFileScreen(screen.AppScreen):
         api_file_transfer.file_download(
             source_path=local_path,
             destination_path=destination_path,
+            chunk_size=256*1024,
             result_callback=self.on_file_transfer_result,
         )
 
