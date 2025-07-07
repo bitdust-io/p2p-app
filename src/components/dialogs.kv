@@ -31,7 +31,7 @@
         text: root.text_content
 
     MDTextField:
-    	id: text_input
+        id: text_input
         size_hint_x: None
         width: dp(310)
         required: True
@@ -56,8 +56,8 @@
         width: dp(310)
         height: dp(200)
         size_hint: None, None
-	    font_name: 'RobotoMono-Regular'
-	    font_size: '8sp'
+        font_name: 'RobotoMono-Regular'
+        font_size: '8sp'
 
 
 <InputNumberContent>:
@@ -70,7 +70,7 @@
         text: root.text_content
 
     MDTextField:
-    	id: number_input
+        id: number_input
         size_hint_x: None
         width: dp(100)
         max_text_length: root.max_text_length
@@ -94,10 +94,10 @@
             height: self.minimum_height
             width: root.width
 
-		    MDLabel:
-		        id: log_content
+            MDLabel:
+                id: log_content
                 size_hint_y: None
                 text_size: self.width, None
                 height: self.texture_size[1]
-		        valign: 'top'
-		        text: ''
+                valign: 'top'
+                text: ''

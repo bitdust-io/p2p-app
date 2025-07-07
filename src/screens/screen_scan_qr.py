@@ -3,7 +3,6 @@ from PIL import Image, ImageOps
 
 #------------------------------------------------------------------------------
 
-from kivy.properties import ListProperty  # @UnresolvedImport
 from kivy.uix.anchorlayout import AnchorLayout
 
 #------------------------------------------------------------------------------
@@ -32,15 +31,10 @@ class CameraContainer(AnchorLayout):
 
 class ScanQRScreen(screen.AppScreen):
 
-    symbols = ListProperty([])
-
     def __init__(self, **kw):
         self.scan_qr_callback = None
         self.is_android = system.is_android()
         self.is_ios = system.is_ios()
-        if not self.is_ios:
-            from pyzbar import pyzbar
-            self.code_types = ListProperty(set(pyzbar.ZBarSymbol))
         super(ScanQRScreen, self).__init__(**kw)
 
     def init_kwargs(self, **kw):
@@ -108,14 +102,14 @@ class ScanQRScreen(screen.AppScreen):
             size = camera.texture.size
             pil_image = Image.frombytes(mode='RGBA', size=size, data=image_data)
             pil_image = self.fix_android_image(pil_image)
-            self.symbols = []
-            codes = pyzbar.decode(pil_image, symbols=self.code_types)
+            result_symbols = []
+            codes = pyzbar.decode(pil_image, symbols=set(pyzbar.ZBarSymbol))
             for code in codes:
                 symbol = BarSymbol(type=code.type, data=code.data)
-                self.symbols.append(symbol)
-            if not self.symbols:
+                result_symbols.append(symbol)
+            if not result_symbols:
                 return
-            result_text = ', '.join([symbol.data.decode('utf-8') for symbol in self.symbols])
+            result_text = ', '.join([symbol.data.decode('utf-8') for symbol in result_symbols])
         except Exception as exc:
             if _Debug:
                 print('ScanQRScreen.on_tex', exc)
