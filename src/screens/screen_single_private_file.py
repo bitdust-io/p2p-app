@@ -183,12 +183,12 @@ class SinglePrivateFileScreen(screen.AppScreen):
                 self.populate()
             return
         screen.main_window().state_file_transfering = True
-        api_file_transfer.file_download(
+        api_file_transfer.FileDownloader(
             source_path=local_path,
             destination_path=destination_path,
-            chunk_size=256*1024,
+            chunk_size=128*1024,
             result_callback=self.on_file_transfer_result,
-        )
+        ).start()
 
     def on_file_transfer_result(self, result):
         if _Debug:
