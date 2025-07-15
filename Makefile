@@ -35,7 +35,7 @@ PYTHON_VERSION=python3
 
 .system_dependencies:
 ifeq ($(OS), Ubuntu)
-	@sudo apt-get update && sudo apt-get install --yes --no-install-recommends cmake build-essential libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip python3-setuptools python3-pygame python3-opengl python3-enchant python3-dev python3-pip python3-virtualenv
+	@sudo apt-get update && sudo apt-get install --yes --no-install-recommends cmake build-essential libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev xclip python3-setuptools python3-pygame python3-opengl python3-enchant python3-dev python3-pip python3-venv
 endif
 
 install: .system_dependencies clean venv

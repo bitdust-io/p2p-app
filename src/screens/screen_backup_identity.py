@@ -6,7 +6,6 @@ from kivy.clock import mainthread
 
 from lib import system
 from lib import api_client
-from lib import api_file_transfer
 
 from components import screen
 from components import snackbar
@@ -43,7 +42,6 @@ class BackupIdentityScreen(screen.AppScreen):
     def on_leave(self, *args):
         self.ids.state_panel.release()
 
-    @mainthread
     def on_save_private_key_pressed(self, *args):
         if _Debug:
             print('BackupIdentityScreen.on_save_private_key_pressed', args)
@@ -76,11 +74,10 @@ class BackupIdentityScreen(screen.AppScreen):
             print('BackupIdentityScreen.on_identity_backup_result', resp)
         if not api_client.is_ok(resp):
             snackbar.error(text=api_client.response_err(resp))
-            self.ids.continue_button.disabled = False
             return
         result = api_client.response_result(resp)
         if not result:
-            self.ids.continue_button.disabled = False
+            snackbar.error(text='was not able to read master key')
             return
         downloaded_path = result.get('local_path')
         if screen.control().is_local:
@@ -88,31 +85,21 @@ class BackupIdentityScreen(screen.AppScreen):
                 system.open_path_in_os(downloaded_path)
             self.ids.continue_button.disabled = False
             return
-        destination_path = os.path.join(system.get_downloads_dir(), self.filename)
-        api_file_transfer.file_download(
-            source_path=downloaded_path,
-            destination_path=destination_path,
-            result_callback=self.on_file_transfer_result,
-        )
-
-    def on_file_transfer_result(self, result):
-        if _Debug:
-            print('BackupIdentityScreen.on_file_transfer_result', result)
-        screen.main_window().state_file_transfering = False
-        if isinstance(result, Exception):
-            snackbar.error(text=str(result))
-            self.ids.continue_button.disabled = False
+        if not result.get('result'):
+            snackbar.error(text='was not able to read master key')
             return
-        snackbar.success(text='downloading is complete')
-        self.ids.continue_button.disabled = False
         destination_path = os.path.join(system.get_downloads_dir(), self.filename)
-        if system.is_android():
-            from androidstorage4kivy import SharedStorage  # @UnresolvedImport
-            local_uri = SharedStorage().copy_to_shared(private_file=destination_path)
-            if local_uri:
-                system.open_path_in_os(local_uri)
-        else:
-            system.open_path_in_os(destination_path)
+        system.WriteTextFile(destination_path, result['result'])
+        if destination_path and os.path.exists(destination_path):
+            snackbar.success(text='master key backup successfully created')
+            if system.is_android():
+                from androidstorage4kivy import SharedStorage  # @UnresolvedImport
+                local_uri = SharedStorage().copy_to_shared(private_file=destination_path)
+                if local_uri:
+                    system.open_path_in_os(local_uri)
+            else:
+                system.open_path_in_os(destination_path)
+        self.ids.continue_button.disabled = False
 
     def on_continue_pressed(self, *args):
         screen.select_screen('welcome_screen')

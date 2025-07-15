@@ -174,12 +174,12 @@ class PrivateFilesScreen(screen.AppScreen):
                 cb=self.on_upload_file_started,
             )
         else:
-            api_file_transfer.file_upload(
+            api_file_transfer.FileUploader(
                 source_path=file_path,
-                chunk_size=256*1024,
+                chunk_size=128*1024,
                 result_callback=lambda result: self.on_file_transfer_result(result, target_remote_path),
                 progress_callback=lambda *a, **kw: self.on_file_transfer_progress(target_remote_path, *a, **kw),
-            )
+            ).start()
 
     @mainthread
     def on_file_transfer_progress(self, remote_path, source_path, destination_path, bytes_sent):

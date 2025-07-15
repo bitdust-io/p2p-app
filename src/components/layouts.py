@@ -150,4 +150,4 @@ class DelayedResizeLayout(AnchorLayout):
 #------------------------------------------------------------------------------
 
 class WrapperLayout(AnchorLayout):
-    background_color = ColorProperty([1, 0, 0, 1, ])
+    background_color = ColorProperty([1, 1, 1, 1, ])

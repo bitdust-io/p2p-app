@@ -271,7 +271,8 @@ class BitDustApp(styles.AppStyle, MDApp):
         from components import layouts
         from kivy.metrics import dp
         self.wrapper = layouts.WrapperLayout()
-        self.wrapper.background_color = self.theme_cls.primary_color
+        if not system.is_android():
+            self.wrapper.background_color = self.theme_cls.primary_color
         if system.is_ios():
             self.wrapper.padding = [0, 0, 0, dp(17), ]
         else:
