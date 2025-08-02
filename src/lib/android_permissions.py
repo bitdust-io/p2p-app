@@ -26,25 +26,28 @@ class AndroidPermissions:
 
     def permission_status(self, permissions, grants):
         if _Debug:
-            print('AndroidPermissions.permission_status', permissions, grants, self.permissions)
+            print('AndroidPermissions.permission_status', self.permission_dialog_count, permissions, grants, self.permissions)
         granted = True
         for p in self.permissions:
             one_perm = check_permission(p)
             if _Debug:
-                print('AndroidPermissions.permission_status check_permission returned', p, one_perm)
+                print('AndroidPermissions.permission_status : ', p, one_perm)
             granted = granted and one_perm
         if granted:
             if self.callback:
                 if _Debug:
                     print('AndroidPermissions.permission_status SUCCESS', self.callback)
-                self.callback(granted)
+                # self.callback(granted)
+                Clock.schedule_once(lambda dt: self.callback(granted))
+            return
         elif self.permission_dialog_count < 2:
             Clock.schedule_once(self.permission_dialog)  
         else:
             if self.callback:
                 if _Debug:
                     print('AndroidPermissions.permission_status NOT GRANTED', self.callback)
-                self.callback(granted)
+                # self.callback(granted)
+                Clock.schedule_once(lambda dt: self.callback(granted))
         
     def permission_dialog(self, dt):
         if _Debug:

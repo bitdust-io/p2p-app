@@ -5,6 +5,8 @@ from PIL import Image, ImageOps
 
 from kivy.uix.anchorlayout import AnchorLayout
 
+from kivy.clock import Clock
+
 #------------------------------------------------------------------------------
 
 from components import screen
@@ -91,7 +93,8 @@ class ScanQRScreen(screen.AppScreen):
         if args and self.scan_qr_callback:
             _cb = self.scan_qr_callback
             self.scan_qr_callback = None
-            _cb(strng.to_text(args[1]))
+            # _cb(strng.to_text(args[1]))
+            Clock.schedule_once(lambda dt: _cb(strng.to_text(args[1])))
 
     def on_tex(self, camera):
         if _Debug:
@@ -119,4 +122,5 @@ class ScanQRScreen(screen.AppScreen):
         if self.scan_qr_callback:
             _cb = self.scan_qr_callback
             self.scan_qr_callback = None
-            _cb(result_text)
+            # _cb(result_text)
+            Clock.schedule_once(lambda dt: _cb(result_text))

@@ -98,22 +98,19 @@ android.presplash_lottie = loading_animation.json
 android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_MEDIA_IMAGES,READ_MEDIA_VIDEO,READ_MEDIA_AUDIO,DOWNLOAD_WITHOUT_NOTIFICATION,POST_NOTIFICATIONS,CAMERA
 
 # (int) Target Android API, should be as high as possible.
-android.api = 34
+android.api = 36
 
 # (int) Minimum API your APK will support.
-# android.minapi = 21
+android.minapi = 21
 
 # (int) Android SDK version to use
 # android.sdk = 22
 
 # (str) Android NDK version to use
-# android.ndk = 17c
-# android.ndk = 17b
-# android.ndk = 19c
 # android.ndk = 25b
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
-# android.ndk_api = 21
+# android.ndk_api = 24
 
 # (bool) Use --private data storage (True) or --dir public storage (False)
 # android.private_storage = True

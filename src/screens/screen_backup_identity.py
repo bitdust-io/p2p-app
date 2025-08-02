@@ -1,7 +1,5 @@
 import os
 
-from kivy.clock import mainthread
-
 #------------------------------------------------------------------------------
 
 from lib import system

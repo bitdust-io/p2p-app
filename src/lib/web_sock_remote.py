@@ -343,7 +343,7 @@ def on_message(ws_inst, message):
         _WebSocketAuthToken = auth_token
         _WebSocketSessionKey = base64.b64decode(strng.to_bin(session_key_text))
         if _Debug:
-            print('web_sock_remote.on_message AUTHORIZED', ws_inst)
+            print('web_sock_remote.on_message AUTHORIZED %r with the routers: %r' % (ws_inst, listeners))
         on_connect(ws_inst)        
         return True
     if cmd in ['response', 'push', 'publish-routers']:
@@ -392,13 +392,13 @@ def on_message(ws_inst, message):
             if payload_type == 'model':
                 return on_model_update(decrypted_json_payload)
         if cmd == 'publish-routers':
-            if 'routers' not in decrypted_json_payload:
+            if 'routers' not in decrypted_json_payload and 'listeners' not in decrypted_json_payload:
                 if _Debug:
                     print('        routers list was not found in the response')
                 return False
             try:
                 client_info = jsn.loads(system.ReadTextFile(_ClientInfoFilePath) or '{}')
-                client_info['listeners'] = decrypted_json_payload.get('routers') or decrypted_json_payload.get('listeners') or []
+                client_info['listeners'] = decrypted_json_payload.get('listeners') or decrypted_json_payload.get('routers') or []
                 client_info['authorized_routers'] = decrypted_json_payload.get('authorized_routers') or {}
                 system.WriteTextFile(_ClientInfoFilePath, jsn.dumps(client_info, indent=2))
             except Exception as e:
@@ -406,7 +406,7 @@ def on_message(ws_inst, message):
                     print('web_sock_remote.on_message failed writing updated routers list', e)
                 return False
             if _Debug:
-                print('        routers list was updated: %r' % client_info['routers'])
+                print('        routers list was updated: %r' % client_info['listeners'])
             return True
     if cmd == 'server-disconnected':
         if _Debug:
