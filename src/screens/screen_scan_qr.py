@@ -28,6 +28,7 @@ class CameraContainer(AnchorLayout):
 
     def __init__(self, **kwargs):
         self.is_android = system.is_android()
+        self.is_ios = system.is_android()
         super(AnchorLayout, self).__init__(**kwargs)
 
 
