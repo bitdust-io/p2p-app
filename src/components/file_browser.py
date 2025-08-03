@@ -10,6 +10,7 @@ from components import screen
 
 from lib import system
 from lib import api_client
+from lib import api_file_transfer
 
 #------------------------------------------------------------------------------
 
@@ -269,6 +270,8 @@ class DistributedFileChooserListView(FileChooserController):
             api_client.add_model_listener('private_file', listener_cb=self.on_private_file)
         elif self.file_system_type == 'shared':
             api_client.add_model_listener('shared_file', listener_cb=self.on_shared_file)
+        api_client.add_model_listener('chunk_read', listener_cb=self.on_chunk_read)
+        api_client.add_model_listener('chunk_write', listener_cb=self.on_chunk_write)
 
     def shutdown(self):
         if _Debug:
@@ -278,6 +281,8 @@ class DistributedFileChooserListView(FileChooserController):
             api_client.remove_model_listener('private_file', listener_cb=self.on_private_file)
         elif self.file_system_type == 'shared':
             api_client.remove_model_listener('shared_file', listener_cb=self.on_shared_file)
+        api_client.remove_model_listener('chunk_read', listener_cb=self.on_chunk_read)
+        api_client.remove_model_listener('chunk_write', listener_cb=self.on_chunk_write)
         self.file_clicked_callback = None
         self.close()
 
@@ -347,6 +352,32 @@ class DistributedFileChooserListView(FileChooserController):
                 if _Debug:
                     print('        updating files')
                 self._update_files()
+
+    def on_chunk_read(self, payload):
+        if not self.opened:
+            if _Debug:
+                print('DistributedFileChooserListView.on_chunk_read SKIP', payload)
+            return
+        progress_bytes = payload['data']['bytes']
+        destination_path = payload['data']['path']
+        remote_path = api_file_transfer.get_downloading_remote_path(destination_path)
+        if _Debug:
+            print('DistributedFileChooserListView.on_chunk_read', progress_bytes, destination_path, remote_path)
+        if remote_path in self.index_by_remote_path:
+            self.index_by_remote_path[remote_path].ids.file_condition.text = '[size=10sp][color=bbbf]%s downloaded[/color][/size]' % system.get_nice_size(progress_bytes)
+
+    def on_chunk_write(self, payload):
+        if not self.opened:
+            if _Debug:
+                print('DistributedFileChooserListView.on_chunk_write SKIP', payload)
+            return
+        progress_bytes = payload['data']['bytes']
+        destination_path = payload['data']['path']
+        remote_path = api_file_transfer.get_uploading_remote_path(destination_path)
+        if _Debug:
+            print('DistributedFileChooserListView.on_chunk_write', progress_bytes, destination_path, remote_path)
+        if remote_path in self.index_by_remote_path:
+            self.index_by_remote_path[remote_path].ids.file_condition.text = '[size=10sp][color=bbbf]%s uploaded[/color][/size]' % system.get_nice_size(progress_bytes)
 
     def on_remote_version(self, payload):
         if not self.opened:

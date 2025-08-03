@@ -14,6 +14,7 @@ from kivy.clock import Clock
 
 from lib import system
 from lib import api_client
+from lib import api_file_transfer
 from lib import web_sock
 from lib import web_sock_remote
 
@@ -137,6 +138,8 @@ class Controller(object):
         self.shared_files_index = {}
         self.remote_versions_index = {}
         self.remote_files_details = {}
+        self.remote_files_downloading_progress = {}
+        self.remote_files_uploading_progress = {}
         self.my_global_id = None
         self.my_idurl = None
         self.is_local = None
@@ -179,6 +182,8 @@ class Controller(object):
                 },
                 client_info_filepath=self.app.client_info_file_path,
             )
+        api_file_transfer.set_downloading_progress_tracking_callback(self.on_downloading_progress)
+        api_file_transfer.set_uploading_progress_tracking_callback(self.on_uploading_progress)
         self.mw().update_menu_items()
         self.mw().select_screen('welcome_screen')
         self.run()
@@ -187,6 +192,8 @@ class Controller(object):
         if _Debug:
             print('Controller.stop')
         self.enabled = False
+        api_file_transfer.set_downloading_progress_tracking_callback(None)
+        api_file_transfer.set_uploading_progress_tracking_callback(None)
         if web_sock.is_started():
             web_sock.stop()
         if web_sock_remote.is_started():
@@ -407,6 +414,8 @@ class Controller(object):
         api_client.start_model_streaming('shared_file', request_all=True)
         api_client.start_model_streaming('remote_version', request_all=True)
         api_client.start_model_streaming('service', request_all=True)
+        api_client.start_model_streaming('chunk_read')
+        api_client.start_model_streaming('chunk_write')
 
     def on_websocket_error(self, websocket_instance, error):
         if _Debug:
@@ -745,3 +754,25 @@ class Controller(object):
             print('Controller.on_routed_web_socket_node_disconnected', ws_inst)
         self.stop()
         self.mw().state_process_health = -1
+
+    def on_downloading_progress(self, bytes_received, source_path, destination_path, remote_path, thread_id):
+        if _Debug:
+            print('Controller.on_downloading_progress', thread_id, bytes_received, remote_path)
+        if bytes_received is None:
+            self.remote_files_downloading_progress.pop(remote_path, None)
+        else:
+            self.remote_files_downloading_progress[remote_path] = bytes_received
+        cb_list = self.callbacks.get('on_downloading_progress', [])
+        for cb, _ in cb_list:
+            cb(bytes_received, source_path, destination_path, remote_path, thread_id)
+
+    def on_uploading_progress(self, bytes_sent, source_path, destination_path, remote_path, thread_id):
+        if _Debug:
+            print('Controller.on_uploading_progress', thread_id, bytes_sent, remote_path)
+        if bytes_sent is None:
+            self.remote_files_uploading_progress.pop(remote_path, None)
+        else:
+            self.remote_files_uploading_progress[remote_path] = bytes_sent
+        cb_list = self.callbacks.get('on_uploading_progress', [])
+        for cb, _ in cb_list:
+            cb(bytes_sent, source_path, destination_path, remote_path, thread_id)

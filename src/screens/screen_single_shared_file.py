@@ -21,7 +21,8 @@ shared_file_info_text = """
 [color=#909090]remote path:[/color] {remote_path}
 [color=#909090]global ID:[/color] {global_id}
 [color=#909090]size:[/color] {size_text}
-[color=#909090]downloaded to:[/color] {download_path}
+[color=#909090]local path:[/color] {download_path}
+[color=#909090]status:[/color] {status}
 {versions_text}
 [/size]
 """
@@ -74,10 +75,13 @@ class SingleSharedFileScreen(screen.AppScreen):
     def populate(self, **kwargs):
         if _Debug:
             print('SingleSharedFileScreen.populate', self.details)
+        bytes_sent = kwargs.pop('bytes_sent', None)
+        bytes_received = kwargs.pop('bytes_received', None)
         if system.is_android():
             download_path = self.downloaded_path or ''
         else:
             download_path = (self.downloaded_path if (self.downloaded_path and os.path.exists(self.downloaded_path)) else '') or ''
+        download_state = self.downloaded_path and os.path.exists(self.downloaded_path)
         ctx = self.details.copy()
         ctx.update(
             text_size='{}sp'.format(self.app().font_size_normal_absolute),
@@ -86,7 +90,12 @@ class SingleSharedFileScreen(screen.AppScreen):
             download_path=download_path,
             global_id=self.global_id,
             size_text=system.get_nice_size(self.details.get('size', 0)),
+            status='available' if download_state else 'distributed',
         )
+        if bytes_sent:
+            ctx['status'] = '%s uploaded' % system.get_nice_size(bytes_sent)
+        if bytes_received:
+            ctx['status'] = '%s downloaded' % system.get_nice_size(bytes_received)
         versions_text = ''
         for v in ctx['versions']:
             v['header_text_size'] = '{}sp'.format(self.app().font_size_medium_absolute)
@@ -95,20 +104,36 @@ class SingleSharedFileScreen(screen.AppScreen):
         ctx['versions_text'] = versions_text
         self.ids.shared_file_details.text = shared_file_info_text.format(**ctx)
         if screen.control().is_local:
-            self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
+            self.ids.open_file_button.disabled = not download_state
         else:
-            self.ids.open_file_button.disabled = not self.downloaded_path or not os.path.exists(self.downloaded_path)
+            self.ids.open_file_button.disabled = not download_state
         self.ids.download_file_button.disabled = screen.main_window().state_file_transfering
 
     def on_created(self):
         screen.main_window().bind(state_file_transfering=self.ids.download_file_button.setter("disabled"))
 
     def on_enter(self, *args):
+        screen.control().add_callback('on_downloading_progress', self.on_downloading_progress)
+        screen.control().add_callback('on_uploading_progress', self.on_uploading_progress)
         self.ids.state_panel.attach(automat_id='service_my_data')
+        api_client.add_model_listener('remote_version', listener_cb=self.on_remote_version)
         self.populate()
 
     def on_leave(self, *args):
+        screen.control().remove_callback('on_downloading_progress', self.on_downloading_progress)
+        screen.control().remove_callback('on_uploading_progress', self.on_uploading_progress)
+        api_client.remove_model_listener('remote_version', listener_cb=self.on_remote_version)
         self.ids.state_panel.release()
+
+    def on_downloading_progress(self, bytes_received, source_path, destination_path, remote_path, thread_id):
+        if _Debug:
+            print('SingleSharedFileScreen.on_downloading_progress', bytes_received, source_path, destination_path, remote_path, thread_id)
+        self.populate(bytes_received=bytes_received)
+
+    def on_uploading_progress(self, bytes_sent, source_path, destination_path, remote_path, thread_id):
+        if _Debug:
+            print('SingleSharedFileScreen.on_uploading_progress', bytes_sent, source_path, destination_path, remote_path, thread_id)
+        self.populate(bytes_sent=bytes_sent)
 
     def on_download_file_button_clicked(self):
         if _Debug:
@@ -181,12 +206,12 @@ class SingleSharedFileScreen(screen.AppScreen):
                 self.populate()
             return
         screen.main_window().state_file_transfering = True
-        api_file_transfer.FileDownloader(
+        api_file_transfer.start_downloader(
             source_path=local_path,
             destination_path=destination_path,
-            chunk_size=128*1024,
+            remote_path=self.remote_path,
             result_callback=self.on_file_transfer_result,
-        ).start()
+        )
 
     def on_file_transfer_result(self, result):
         if _Debug:
