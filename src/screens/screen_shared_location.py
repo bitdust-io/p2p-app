@@ -1,10 +1,6 @@
 import os
 
 from kivy.clock import mainthread
-from kivy.properties import StringProperty, NumericProperty  # @UnresolvedImport
-
-from kivymd.uix.list import OneLineIconListItem
-from kivymd.uix.list import TwoLineIconListItem
 
 from lib import system
 from lib import util
@@ -217,19 +213,11 @@ class SharedLocationScreen(screen.AppScreen):
                 cb=self.on_upload_file_started,
             )
         else:
-            api_file_transfer.FileUploader(
+            api_file_transfer.start_uploader(
+                remote_path=target_remote_path,
                 source_path=file_path,
-                chunk_size=128*1024,
                 result_callback=lambda result: self.on_file_transfer_result(result, target_remote_path),
-                progress_callback=lambda *a, **kw: self.on_file_transfer_progress(target_remote_path, *a, **kw),
-            ).start()
-
-    @mainthread
-    def on_file_transfer_progress(self, remote_path, source_path, destination_path, bytes_sent):
-        if _Debug:
-            print('SharedLocationScreen.on_file_transfer_progress', remote_path, bytes_sent)
-        if remote_path in self.ids.files_list_view.index_by_remote_path:
-            self.ids.files_list_view.index_by_remote_path[remote_path].ids.file_condition.text = '[size=10sp][color=bbbf]%s uploaded[/color][/size]' % system.make_nice_size(bytes_sent)
+            )
 
     def on_file_transfer_result(self, result, remote_path):
         if _Debug:

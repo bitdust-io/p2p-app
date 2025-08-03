@@ -458,17 +458,6 @@ class BackgroundProcess(object):
 
 #------------------------------------------------------------------------------
 
-def get_nice_size(size_bytes):
-    if strng.is_text(size_bytes):
-        return size_bytes
-    sz = float(size_bytes)
-    for unit in ('B', 'KB', 'MB', 'GB', 'TB'):
-        if sz < 1024.0:
-            return '%1.0f %s' % (sz, unit)
-        sz /= 1024.0
-    return '%1.0f %s' % (sz, 'TB')
-
-
 def float2str(float_value, mask='%6.8f', no_trailing_zeros=True):
     """
     Some smart method to do simple operation - convert float value into string.
@@ -492,11 +481,19 @@ def percent2string(percent, precis=3):
     return s + '%'
 
 
-def make_nice_size(sz):
-    for unit in ('B', 'KB', 'MB', 'GB', 'TB', ):
+def get_nice_size(size_bytes):
+    if strng.is_text(size_bytes):
+        return size_bytes
+    sz = float(size_bytes)
+    for unit in ('B', 'KB', 'MB', 'GB', 'TB'):
         if sz < 1024.0:
+            if sz < 100.0:
+                return '%1.1f %s' % (sz, unit)
             return '%1.0f %s' % (sz, unit)
         sz /= 1024.0
+    if sz < 100.0:
+        return '%1.1f %s' % (sz, 'TB')
+    return '%1.0f %s' % (sz, 'TB')
 
 
 def make_nice_file_condition(file_info):
