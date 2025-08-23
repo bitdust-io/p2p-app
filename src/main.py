@@ -220,7 +220,6 @@ class BitDustApp(styles.AppStyle, MDApp):
 
         self.theme_cls.theme_style = 'Light'
         self.theme_cls.primary_palette = 'Blue'
-        self.theme_cls.primary_hue = "400"
         self.theme_cls.accent_palette = 'Green'
 
         fonts_path = os.path.join(self.ROOT_PATH, 'fonts')
